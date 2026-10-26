@@ -433,10 +433,20 @@
       .map((q) => (q.done ? (q.gaveUp ? "✕" : String(q.guesses.length)) : "·"))
       .join(" ");
     const head = `Cricketle ${state.day} · ${isHard() ? "Hard" : "Easy"} · Puzzle ${m.current + 1}/${PUZZLES_PER_DAY}`;
-    const text = pz.gaveUp
+    const text = (pz.gaveUp
       ? `${head}\nGave up after ${n} guesses.\nToday: ${summary}`
-      : `${head}\nGot it in ${n} guess${n === 1 ? "" : "es"}!\nToday: ${summary}`;
+      : `${head}\nGot it in ${n} guess${n === 1 ? "" : "es"}!\nToday: ${summary}`)
+      + `\nhttps://mr-zero0.github.io/Cricketle/`;
     const btn = $("share-btn");
+
+    if (navigator.share) {
+      navigator.share({ title: "Cricketle", text }).catch(() => copyToClipboard(text, btn));
+    } else {
+      copyToClipboard(text, btn);
+    }
+  }
+
+  function copyToClipboard(text, btn) {
     navigator.clipboard?.writeText(text).then(
       () => {
         btn.innerHTML = `<svg aria-hidden="true"><use href="#i-check"/></svg> Copied`;
