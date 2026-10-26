@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Cricketle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <svg hidden aria-hidden="true">
+    <defs>
+      <symbol id="i-ball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 5.5c3 3 3 10 0 13M17 5.5c-3 3-3 10 0 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.6 8l1.6.6M8.6 11l1.6.6M8.6 14l1.6.6M15.4 8l-1.6.6M15.4 11l-1.6.6M15.4 14l-1.6.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+      <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></symbol>
+      <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-4.2-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-stumps" viewBox="0 0 24 24"><path d="M7 21V7M12 21V7M17 21V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 6h5M13 6h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    </defs>
+  </svg>
+
+  <main class="app">
+    <div class="col-main">
+      <header class="top">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"><svg><use href="#i-ball"/></svg></span>
+          <div>
+            <h1>Cricketle</h1>
+            <p class="tagline">Find the secret cricketer. Every guess tells you how close you are.</p>
+          </div>
+        </div>
+        <button id="help-btn" class="icon-btn" type="button" aria-label="How to play">
+          <svg aria-hidden="true"><use href="#i-help"/></svg>
+        </button>
+      </header>
+
+      <div class="segmented" role="group" aria-label="Difficulty">
+        <span class="seg-thumb" aria-hidden="true"></span>
+        <button id="mode-easy" class="seg active" type="button" aria-pressed="true">Easy</button>
+        <button id="mode-hard" class="seg" type="button" aria-pressed="false">Hard</button>
+      </div>
+
+      <section class="tracker" aria-label="Today's puzzles">
+        <div class="tracker-row">
+          <span class="tracker-label" id="tracker-label">Puzzle 1 of 5</span>
+          <span class="reset" id="reset" aria-live="off">Resets in --:--:--</span>
+        </div>
+        <div class="dots" id="dots"></div>
+      </section>
+
+      <section class="stats" aria-label="Progress">
+        <div class="stat"><span class="stat-label">Guesses</span><span class="stat-value" id="guess-count">0</span></div>
+        <div class="stat"><span class="stat-label">Closest</span><span class="stat-value" id="closest">–</span></div>
+        <button id="give-up" class="text-btn" type="button">
+          <svg aria-hidden="true"><use href="#i-flag"/></svg> Give up
+        </button>
+      </section>
+
+      <section class="guess-box">
+        <div class="input-wrap">
+          <svg class="input-icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <label for="guess-input" class="sr-only">Guess a cricketer</label>
+          <input id="guess-input" type="text" autocomplete="off" autocapitalize="words" spellcheck="false"
+                 placeholder="Type a cricketer's name"
+                 role="combobox" aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list" />
+          <ul id="suggestions" class="suggestions" role="listbox" aria-label="Matching players" hidden></ul>
+        </div>
+        <p id="message" class="message" aria-live="polite"></p>
+      </section>
+
+      <section id="win" class="win" hidden></section>
+
+      <section id="empty" class="empty">
+        <svg class="empty-icon" aria-hidden="true"><use href="#i-stumps"/></svg>
+        <p>No guesses yet. Start with someone famous and follow the heat.</p>
+        <div class="starters" id="starters"></div>
+      </section>
+    </div>
+
+    <div class="col-side">
+      <section class="last-guess" id="last-guess" hidden></section>
+      <section class="history">
+        <ol id="guess-list" class="guess-list" aria-label="All guesses, closest first"></ol>
+      </section>
+    </div>
+
+    <footer class="credit">Made by Aman</footer>
+
+    <dialog id="help" aria-labelledby="help-title">
+      <h2 id="help-title">How to play</h2>
+      <p>A secret cricketer is picked each day. Guess any cricketer and you get a <strong>rank</strong>: <strong>1</strong> is the answer, and the lower the number, the closer you are.</p>
+      <p>The colour of each guess follows its rank:</p>
+      <ul class="legend">
+        <li><span class="swatch hot"></span><span id="legend-hot"></span></li>
+        <li><span class="swatch warm"></span><span id="legend-warm"></span></li>
+        <li><span class="swatch cool"></span><span id="legend-cool"></span></li>
+        <li><span class="swatch cold"></span><span id="legend-cold"></span></li>
+      </ul>
+      <p>The pool has <strong id="pool-size"></strong> players, every one of whom has played at least one Test, one ODI and one T20I.</p>
+      <p>Closeness comes from nation, role, batting hand, bowling style, era, IPL teams, ICC titles and career numbers.</p>
+      <p><strong>Easy</strong> shows the rank, the colour and tags for what the guess shares with the answer. <strong>Hard</strong> shows only the rank and the colour.</p>
+      <p><strong>Five puzzles a day in each mode</strong>, ten different players in all. They unlock one at a time, are the same for everyone, and reset at midnight IST. A finished puzzle can be reviewed but not replayed.</p>
+      <form method="dialog"><button type="submit" class="btn primary">Got it</button></form>
+    </dialog>
+  </main>
+
+  <script src="players.js"></script>
+  <script src="bg.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
