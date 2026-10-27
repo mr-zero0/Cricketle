@@ -3,9 +3,18 @@
 A Wordle-inspired daily cricket guessing game. Test your cricket knowledge by guessing the secret cricketer! Every guess provides contextual clues and indicators to help you narrow down the player.
 
 ![Cricketle](https://img.shields.io/badge/Cricketle-Daily%20Cricket%20Game-green?style=for-the-badge)
+[![Play Live](https://img.shields.io/badge/▶_Play_Now-mr--zero0.github.io%2FCricketle-2ea44f?style=for-the-badge&logo=googlechrome&logoColor=white)](https://mr-zero0.github.io/Cricketle/)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+---
+
+## 🌐 Play Online
+
+Jump straight into today's puzzles (no download or login needed):
+
+👉 **[https://mr-zero0.github.io/Cricketle/](https://mr-zero0.github.io/Cricketle/)**
 
 ---
 
