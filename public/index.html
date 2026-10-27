@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="Cricketle: guess the secret cricketer. Three puzzles a day in Easy and Hard, hints, a live timer and leaderboards." />
+  <title>Cricketle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to the game</a>
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <svg hidden aria-hidden="true">
+    <defs>
+      <symbol id="i-ball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 5.5c3 3 3 10 0 13M17 5.5c-3 3-3 10 0 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.6 8l1.6.6M8.6 11l1.6.6M8.6 14l1.6.6M15.4 8l-1.6.6M15.4 11l-1.6.6M15.4 14l-1.6.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+      <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></symbol>
+      <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-4.2-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-stumps" viewBox="0 0 24 24"><path d="M7 21V7M12 21V7M17 21V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 6h5M13 6h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0V4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4m-4 3h8m-6 0v-3h4v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 20a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5-10-6.5Z" fill="currentColor"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor"/></symbol>
+      <symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M15 8l4 4-4 4M19 12H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.3-5.2M19 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6L13 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"><svg><use href="#i-ball"/></svg></span>
+      <div class="brand-text">
+        <h1>Cricketle</h1>
+        <p class="tagline">Find the secret cricketer. Every guess tells you how close you are.</p>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      <a href="#play" class="nav-link" data-view="play" aria-current="page"><svg aria-hidden="true"><use href="#i-ball"/></svg><span>Play</span></a>
+      <a href="#leaderboard" class="nav-link" data-view="leaderboard"><svg aria-hidden="true"><use href="#i-trophy"/></svg><span>Leaderboard</span></a>
+      <a href="#profile" class="nav-link" data-view="profile" id="nav-profile"><svg aria-hidden="true"><use href="#i-user"/></svg><span id="nav-profile-label">Sign in</span></a>
+    </nav>
+    <button id="help-btn" class="icon-btn" type="button" aria-label="How to play">
+      <svg aria-hidden="true"><use href="#i-help"/></svg>
+    </button>
+  </header>
+
+  <main id="main" class="app" tabindex="-1">
+
+    <!-- ============ PLAY ============ -->
+    <section id="view-play" class="view view-play" aria-labelledby="play-title">
+      <h2 id="play-title" class="sr-only">Play</h2>
+
+      <div class="col-main">
+        <div id="guest-banner" class="banner" hidden>
+          <svg aria-hidden="true"><use href="#i-trophy"/></svg>
+          <p><strong>Playing as a guest.</strong> Progress is saved on this device only. Sign in to keep your streak and join the leaderboard.</p>
+          <a href="#profile" class="btn small">Sign in</a>
+        </div>
+
+        <div class="segmented" role="group" aria-label="Difficulty">
+          <span class="seg-thumb" aria-hidden="true"></span>
+          <button id="mode-easy" class="seg active" type="button" aria-pressed="true">Easy</button>
+          <button id="mode-hard" class="seg" type="button" aria-pressed="false">Hard</button>
+        </div>
+
+        <section class="tracker card" aria-label="Today's puzzles">
+          <div class="tracker-row">
+            <span class="tracker-label" id="tracker-label">Easy · Puzzle 1 of 3</span>
+            <span class="reset" id="reset">Resets in --:--:--</span>
+          </div>
+          <div class="dots" id="dots"></div>
+          <div class="tracker-foot">
+            <span id="today-points" class="today-points">Today: 0 pts</span>
+            <span id="today-rank" class="today-rank"></span>
+          </div>
+        </section>
+
+        <section class="stats card" aria-label="Current puzzle">
+          <div class="stat stat-timer">
+            <span class="stat-label"><svg aria-hidden="true"><use href="#i-clock"/></svg> Time</span>
+            <span class="stat-value" id="timer">00:00</span>
+          </div>
+          <div class="stat"><span class="stat-label">Guesses</span><span class="stat-value" id="guess-count">0</span></div>
+          <div class="stat"><span class="stat-label">Closest</span><span class="stat-value" id="closest">–</span></div>
+          <div class="stat"><span class="stat-label">Worth</span><span class="stat-value" id="worth">100</span></div>
+          <button id="give-up" class="text-btn" type="button" hidden>
+            <svg aria-hidden="true"><use href="#i-flag"/></svg> Give up
+          </button>
+        </section>
+
+        <section id="start-panel" class="start card" hidden>
+          <p class="eyebrow" id="start-eyebrow">Puzzle 1 of 3 · Easy</p>
+          <h3 id="start-title">Ready when you are</h3>
+          <p id="start-copy" class="muted">The clock starts the moment you press Start. Fewer guesses, fewer hints and a faster time all earn more points.</p>
+          <button id="start-btn" class="btn primary big" type="button"><svg aria-hidden="true"><use href="#i-play"/></svg> Start puzzle</button>
+        </section>
+
+        <section id="guess-box" class="guess-box" hidden>
+          <div class="input-wrap">
+            <svg class="input-icon" aria-hidden="true"><use href="#i-search"/></svg>
+            <label for="guess-input" class="sr-only">Guess a cricketer</label>
+            <input id="guess-input" type="text" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="go"
+                   placeholder="Type a cricketer's name"
+                   role="combobox" aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list" />
+            <ul id="suggestions" class="suggestions" role="listbox" aria-label="Matching players" hidden></ul>
+          </div>
+          <p id="message" class="message" aria-live="polite"></p>
+
+          <section class="hints card" aria-labelledby="hints-title">
+            <div class="hints-head">
+              <h3 id="hints-title"><svg aria-hidden="true"><use href="#i-bulb"/></svg> Hints</h3>
+              <span class="muted small-text" id="hints-cost">−10 pts each</span>
+            </div>
+            <ol id="hint-list" class="hint-list"></ol>
+          </section>
+        </section>
+
+        <section id="win" class="win card" hidden></section>
+
+        <section id="empty" class="empty" hidden>
+          <svg class="empty-icon" aria-hidden="true"><use href="#i-stumps"/></svg>
+          <p>No guesses yet. Start with someone famous and follow the heat.</p>
+          <div class="starters" id="starters"></div>
+        </section>
+      </div>
+
+      <div class="col-side">
+        <section class="last-guess" id="last-guess" hidden></section>
+        <section class="history">
+          <ol id="guess-list" class="guess-list" aria-label="All guesses, closest first"></ol>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============ LEADERBOARD ============ -->
+    <section id="view-leaderboard" class="view view-board" aria-labelledby="board-title" hidden>
+      <div class="view-head">
+        <div>
+          <p class="eyebrow">Ranks</p>
+          <h2 id="board-title">Leaderboard</h2>
+        </div>
+        <button id="board-refresh" class="icon-btn" type="button" aria-label="Refresh leaderboard"><svg aria-hidden="true"><use href="#i-refresh"/></svg></button>
+      </div>
+      <div class="segmented tabs" role="tablist" aria-label="Leaderboard period">
+        <span class="seg-thumb" aria-hidden="true"></span>
+        <button id="tab-today" class="seg active" type="button" role="tab" aria-selected="true" aria-controls="board-panel">Today</button>
+        <button id="tab-alltime" class="seg" type="button" role="tab" aria-selected="false" aria-controls="board-panel">All-time</button>
+      </div>
+      <div id="board-me" class="me-card card" hidden></div>
+      <div id="board-panel" class="board card" role="tabpanel">
+        <ol id="board-list" class="board-list" aria-label="Rankings"></ol>
+        <p id="board-empty" class="board-empty" hidden></p>
+      </div>
+      <p id="board-updated" class="muted small-text center"></p>
+    </section>
+
+    <!-- ============ PROFILE ============ -->
+    <section id="view-profile" class="view view-profile" aria-labelledby="profile-title" hidden>
+      <div class="view-head">
+        <div>
+          <p class="eyebrow">Account</p>
+          <h2 id="profile-title">Profile</h2>
+        </div>
+      </div>
+
+      <div id="auth-card" class="card auth" hidden>
+        <div class="segmented tabs" role="tablist" aria-label="Sign in or create an account">
+          <span class="seg-thumb" aria-hidden="true"></span>
+          <button id="tab-signin" class="seg active" type="button" role="tab" aria-selected="true" aria-controls="auth-form">Sign in</button>
+          <button id="tab-signup" class="seg" type="button" role="tab" aria-selected="false" aria-controls="auth-form">Create account</button>
+        </div>
+        <form id="auth-form" novalidate>
+          <div id="auth-summary" class="error-summary" role="alert" tabindex="-1" hidden></div>
+          <div class="field">
+            <label for="auth-username">Username</label>
+            <input id="auth-username" name="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" aria-describedby="auth-username-help auth-username-error" />
+            <p id="auth-username-help" class="help-text">3–20 letters, numbers or underscores.</p>
+            <p id="auth-username-error" class="field-error" aria-live="polite"></p>
+          </div>
+          <div class="field">
+            <label for="auth-password">Password</label>
+            <input id="auth-password" name="password" type="password" autocomplete="current-password" required minlength="6" aria-describedby="auth-password-help auth-password-error" />
+            <p id="auth-password-help" class="help-text">At least 6 characters.</p>
+            <p id="auth-password-error" class="field-error" aria-live="polite"></p>
+          </div>
+          <div class="field" id="confirm-field" hidden>
+            <label for="auth-confirm">Confirm password</label>
+            <input id="auth-confirm" name="confirm" type="password" autocomplete="new-password" aria-describedby="auth-confirm-error" />
+            <p id="auth-confirm-error" class="field-error" aria-live="polite"></p>
+          </div>
+          <button id="auth-submit" class="btn primary big" type="submit">Sign in</button>
+          <p class="muted small-text">No email needed. Your account only stores your username, a hashed password and your results.</p>
+        </form>
+      </div>
+
+      <div id="profile-card" class="profile" hidden></div>
+
+      <div id="offline-card" class="card center" hidden>
+        <p><strong>Accounts and leaderboards need the Cricketle server.</strong></p>
+        <p class="muted">You are playing the offline version, so progress is saved on this device only. Run <code>npm start</code> and open the server address to sign in.</p>
+      </div>
+    </section>
+
+    <footer class="credit">Made by Aman</footer>
+  </main>
+
+  <nav class="tabbar" aria-label="Primary">
+    <a href="#play" class="tab" data-view="play" aria-current="page"><svg aria-hidden="true"><use href="#i-ball"/></svg><span>Play</span></a>
+    <a href="#leaderboard" class="tab" data-view="leaderboard"><svg aria-hidden="true"><use href="#i-trophy"/></svg><span>Ranks</span></a>
+    <a href="#profile" class="tab" data-view="profile"><svg aria-hidden="true"><use href="#i-user"/></svg><span id="tab-profile-label">Sign in</span></a>
+  </nav>
+
+  <div id="toasts" class="toasts" aria-live="polite" aria-atomic="false"></div>
+
+  <dialog id="help" aria-labelledby="help-title">
+    <button class="dialog-close icon-btn" type="button" data-close aria-label="Close"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+    <h2 id="help-title">How to play</h2>
+    <p>A secret cricketer is picked for each puzzle. Guess any cricketer and you get a <strong>rank</strong>: <strong>1</strong> is the answer, and the lower the number, the closer you are.</p>
+    <ul class="legend">
+      <li><span class="swatch hot"></span><span id="legend-hot"></span></li>
+      <li><span class="swatch warm"></span><span id="legend-warm"></span></li>
+      <li><span class="swatch cool"></span><span id="legend-cool"></span></li>
+      <li><span class="swatch cold"></span><span id="legend-cold"></span></li>
+    </ul>
+    <p>Closeness comes from nation, role, batting hand, bowling style, era, IPL teams, ICC titles and career numbers.</p>
+    <h3>Modes</h3>
+    <p><strong>Easy</strong> picks from <strong id="pool-easy"></strong> well-known players and shows tags for what each guess shares with the answer. <strong>Hard</strong> uses all <strong id="pool-hard"></strong> players and shows only the rank.</p>
+    <h3>Three puzzles a day</h3>
+    <p>Each mode has <strong>three puzzles a day</strong>. They unlock one at a time, are the same for everyone who is signed in, and reset at midnight IST. A finished puzzle can be reviewed but not replayed.</p>
+    <h3>Hints and points</h3>
+    <p>Every puzzle has <strong>three hints</strong>: nation, then role, then era. Each costs 10 points.</p>
+    <p>A solve is worth <strong>100 points</strong>, minus 3 per guess after the first, 10 per hint and 1 per 20 seconds. Hard mode counts <strong>1.5×</strong>. Giving up scores 0.</p>
+    <h3>Leaderboards and ranks</h3>
+    <p>Sign in to appear on <strong>today's</strong> and the <strong>all-time</strong> leaderboard. All-time points also earn you a title: <span id="ladder"></span>.</p>
+    <form method="dialog"><button type="submit" class="btn primary">Got it</button></form>
+  </dialog>
+
+  <dialog id="confirm" aria-labelledby="confirm-title">
+    <h2 id="confirm-title">Give up on this puzzle?</h2>
+    <p>The answer will be revealed and the puzzle scores 0. You cannot replay it today.</p>
+    <form method="dialog" class="confirm-actions">
+      <button type="submit" value="cancel" class="btn">Keep playing</button>
+      <button type="submit" value="ok" class="btn danger">Give up</button>
+    </form>
+  </dialog>
+
+  <script src="players.js"></script>
+  <script src="game-core.js"></script>
+  <script src="bg.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

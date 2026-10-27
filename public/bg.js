@@ -31,10 +31,13 @@
 
   // ---------- Setup ----------
 
+  // Phones get a lighter scene: lower pixel ratio, fewer particles, no bats.
+  const small = () => w < 700 || matchMedia("(pointer: coarse)").matches;
+
   function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
     w = window.innerWidth;
     h = window.innerHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, small() ? 1.5 : 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
     canvas.style.width = w + "px";
@@ -45,7 +48,7 @@
   }
 
   function initParticles() {
-    const n = Math.round(Math.min(80, (w * h) / 18000));
+    const n = Math.round(Math.min(small() ? 36 : 80, (w * h) / (small() ? 30000 : 18000)));
     particles = Array.from({ length: n }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
@@ -494,7 +497,7 @@
     drawParticles(dt, now);
 
     // Far layer: bats drift behind the stumps and the ball.
-    if (elapsed >= nextBatAt && bats.length < 2) {
+    if (!small() && elapsed >= nextBatAt && bats.length < 2) {
       spawnBat();
       nextBatAt = elapsed + 12000 + Math.random() * 10000;
     }

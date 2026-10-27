@@ -484,3 +484,8 @@ const PLAYERS = [
   p("Stuart Thompson", "IRE", "All-rounder", "L", "RM", 2013, false, 60, 600, 40, 0, []),
   p("Peter Chase", "IRE", "Bowler", "R", "RFM", 2015, false, 40, 50, 50, 0, []),
 ];
+
+// Node (server + tests) loads this file with require(); browsers read the globals above.
+if (typeof module === "object" && module.exports) {
+  module.exports = { PLAYERS, COUNTRIES, IPL_TEAMS, BOWL_STYLES, PACE, SPIN };
+}
