@@ -84,6 +84,7 @@ const { Db } = require("./lib/db.js");
 const { SupabaseDb } = require("./lib/supabase-db.js");
 const auth = require("./lib/auth.js");
 const { GameService } = require("./lib/game.js");
+const { createLogger } = require("./lib/logger.js");
 
 const COOKIE = "cricketle_sid";
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
@@ -127,7 +128,19 @@ class HttpError extends Error {
 
 function createApp(opts = {}) {
   const now = opts.now || Date.now;
-  const log = opts.log === false ? () => {} : (...a) => console.log(...a);
+  const logger = opts.logger || createLogger({
+    enabled: opts.log !== false,
+    level: opts.logLevel || process.env.LOG_LEVEL || "info",
+    format: opts.logFormat || process.env.LOG_FORMAT || "text",
+    color: opts.color,
+  });
+
+  // Backward-compatible log dispatcher routing through structured logger
+  const log = opts.log === false ? () => {} : (tag, ...args) => {
+    const cleanTag = String(tag || "SYSTEM").toUpperCase();
+    const msg = args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ");
+    logger.info(cleanTag, msg);
+  };
 
   const supabaseUrl = opts.supabaseUrl || process.env.SUPABASE_URL;
   const supabaseKey = opts.supabaseKey || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
@@ -136,13 +149,13 @@ function createApp(opts = {}) {
     db = opts.db;
   } else if (opts.dbPath === ":memory:" || (!supabaseUrl && !opts.supabaseUrl)) {
     const dbPath = opts.dbPath || process.env.CRICKETLE_DB || path.join(__dirname, "data", "cricketle.db");
-    db = new Db(dbPath);
+    db = new Db(dbPath, logger);
   } else if (supabaseUrl && supabaseKey) {
-    db = new SupabaseDb(supabaseUrl, supabaseKey);
-    log("database", "Connected to Supabase PostgreSQL at " + supabaseUrl);
+    db = new SupabaseDb(supabaseUrl, supabaseKey, logger);
+    logger.db("supabase_connected", "Connected to Supabase PostgreSQL at " + supabaseUrl, { endpoint: supabaseUrl });
   } else {
     const dbPath = opts.dbPath || process.env.CRICKETLE_DB || path.join(__dirname, "data", "cricketle.db");
-    db = new Db(dbPath);
+    db = new Db(dbPath, logger);
   }
 
   // CRICKETLE_SECRET=public uses the public seed (same answers as guests); only for local testing.
@@ -219,6 +232,7 @@ function createApp(opts = {}) {
   }
 
   function fail(res, status, code, message) {
+    res._failError = { status, code, message: message || MESSAGES[code] || code };
     send(res, status, { error: code, message: message || MESSAGES[code] || code });
   }
 
@@ -245,15 +259,20 @@ function createApp(opts = {}) {
     const token = cookies(req)[COOKIE];
     if (!token) {
       if (isAdmin(null, req)) {
-        return { id: 0, username: "admin", display_name: "Administrator", isAdmin: true, is_admin: 1 };
+        const adminUser = { id: 0, username: "admin", display_name: "Administrator", isAdmin: true, is_admin: 1 };
+        req._user = adminUser;
+        return adminUser;
       }
       return null;
     }
     const user = await db.sessionUser(auth.hashToken(token), now());
     if (user) {
       user.isAdmin = isAdmin(user, req);
+      req._user = user;
     } else if (isAdmin(null, req)) {
-      return { id: 0, username: "admin", display_name: "Administrator", isAdmin: true, is_admin: 1 };
+      const adminUser = { id: 0, username: "admin", display_name: "Administrator", isAdmin: true, is_admin: 1 };
+      req._user = adminUser;
+      return adminUser;
     }
     return user;
   }
@@ -298,10 +317,18 @@ function createApp(opts = {}) {
   // Sliding-window limiter per IP and bucket.
   function rateLimit(req, bucket, max, windowMs) {
     if (!limiter) return;
-    const key = bucket + "|" + (req.socket.remoteAddress || "?");
+    const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "?").split(",")[0].trim();
+    const key = bucket + "|" + ip;
     const t = now();
     const hits = (limiter.get(key) || []).filter((x) => t - x < windowMs);
-    if (hits.length >= max) throw new HttpError(429, "rate_limited", "Too many requests. Try again in a few minutes.");
+    if (hits.length >= max) {
+      logger.warn("SECURITY", `Rate limit exceeded for bucket "${bucket}" by IP ${ip} (${hits.length}/${max} in ${windowMs / 1000}s)`, {
+        bucket,
+        ip,
+        limit: max,
+      });
+      throw new HttpError(429, "rate_limited", "Too many requests. Try again in a few minutes.");
+    }
     hits.push(t);
     limiter.set(key, hits);
     if (limiter.size > 5000) limiter.clear();
@@ -341,12 +368,15 @@ function createApp(opts = {}) {
       try {
         user = await db.createUser(username, auth.hashPassword(body.password), now(), { displayName, avatar });
       } catch (err) {
-        if (err.code === "username_taken") return fail(res, 409, "username_taken", "That username is taken.");
+        if (err.code === "username_taken") {
+          logger.authWarn("register_conflict", `Registration rejected: username "${username}" is taken`, { username });
+          return fail(res, 409, "username_taken", "That username is taken.");
+        }
         throw err;
       }
       const token = auth.newToken();
       await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      log("register", user.username);
+      logger.auth("register_success", `New user registered @${user.username}`, { username: user.username, id: user.id });
       return send(res, 201, {
         user: {
           id: user.id,
@@ -368,6 +398,7 @@ function createApp(opts = {}) {
       const identifier = typeof body.username === "string" ? body.username.trim() : (typeof body.identifier === "string" ? body.identifier.trim() : "");
       const pin = String(body.pin !== undefined ? body.pin : (body.password !== undefined ? body.password : "")).trim();
       if (!identifier || !pin) {
+        logger.authWarn("login_bad_input", "Sign in rejected: missing username or PIN");
         return fail(res, 400, "missing_fields", "Please enter both username and PIN.");
       }
       let row = await db.userByName(identifier);
@@ -376,10 +407,12 @@ function createApp(opts = {}) {
         if (norm) row = await db.userByPhone(norm);
       }
       if (!row || !row.pass_hash || !auth.verifyPassword(pin, row.pass_hash)) {
+        logger.authWarn("login_failed", `Incorrect username or PIN attempt for "${identifier}"`, { identifier });
         return fail(res, 401, "bad_credentials", "Incorrect username or PIN.");
       }
       const token = auth.newToken();
       await db.createSession(auth.hashToken(token), row.id, now(), SESSION_TTL_MS);
+      logger.auth("login_success", `Player @${row.username} signed in successfully`, { username: row.username, id: row.id });
       return send(res, 200, {
         ok: true,
         user: {
@@ -463,7 +496,7 @@ function createApp(opts = {}) {
 
       const token = auth.newToken();
       await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      log("google_login", user.username);
+      logger.auth("google_signin_success", `Google sign-in for @${user.username}`, { user: user.username, email });
       return send(
         res,
         200,
@@ -514,6 +547,7 @@ function createApp(opts = {}) {
         return fail(res, 400, "invalid_pin", "PIN must be 4 to 8 numbers.");
       }
       if (await db.userByPhone(phone)) {
+        logger.authWarn("phone_register_conflict", `Registration rejected: mobile number already registered`, { phone });
         return fail(res, 409, "phone_exists", "This mobile number is already registered. Please sign in or reset your PIN.");
       }
 
@@ -524,6 +558,7 @@ function createApp(opts = {}) {
           return fail(res, 400, "invalid_username", "Username must be 3-20 letters, numbers, or underscores.");
         }
         if (await db.userByName(candidate)) {
+          logger.authWarn("phone_register_conflict", `Registration rejected: username "${candidate}" already taken`, { username: candidate, phone });
           return fail(res, 409, "username_taken", "That username is already taken. Please choose another.");
         }
         username = candidate;
@@ -552,9 +587,11 @@ function createApp(opts = {}) {
         });
       } catch (err) {
         if (err.code === "phone_taken") {
+          logger.authWarn("phone_register_conflict", `Registration conflict on DB insert: phone registered`, { phone });
           return fail(res, 409, "phone_exists", "This mobile number is already registered. Please sign in or reset your PIN.");
         }
         if (err.code === "username_taken") {
+          logger.authWarn("phone_register_conflict", `Registration conflict on DB insert: username "${username}" taken`, { username, phone });
           return fail(res, 409, "username_taken", "That username is already taken. Please choose another.");
         }
         throw err;
@@ -562,7 +599,7 @@ function createApp(opts = {}) {
 
       const token = auth.newToken();
       await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      log("phone_register", user.username, phone);
+      logger.auth("phone_register_success", `New player registered via phone @${user.username}`, { user: user.username, phone, id: user.id });
       return send(res, 201, {
         ok: true,
         user: {
@@ -591,12 +628,13 @@ function createApp(opts = {}) {
       const pin = String(body.pin || "").trim();
       const user = await db.userByPhone(phone);
       if (!user || !user.pass_hash || !auth.verifyPassword(pin, user.pass_hash)) {
+        logger.authWarn("phone_login_failed", `Incorrect PIN attempt for mobile`, { phone });
         return fail(res, 401, "bad_pin", "Incorrect PIN for this mobile number. Try again or reset your PIN.");
       }
 
       const token = auth.newToken();
       await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      log("phone_login", user.username, phone);
+      logger.auth("phone_login_success", `Player @${user.username} signed in via phone`, { user: user.username, phone, id: user.id });
       return send(res, 200, {
         ok: true,
         user: {
@@ -629,13 +667,14 @@ function createApp(opts = {}) {
       }
       const user = await db.userByPhone(phone);
       if (!user) {
+        logger.authWarn("phone_reset_failed", `PIN reset requested for non-existent phone`, { phone });
         return fail(res, 404, "not_found", "No account found with this phone number.");
       }
 
       await db.updatePassword(user.id, auth.hashPassword(newPin));
       const token = auth.newToken();
       await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      log("phone_pin_reset", user.username, phone);
+      logger.auth("phone_pin_reset", `Secret PIN reset for user @${user.username}`, { user: user.username, phone, id: user.id });
       return send(res, 200, {
         ok: true,
         user: {
@@ -967,6 +1006,11 @@ function createApp(opts = {}) {
       const user = await requireUser(req);
       rateLimit(req, "play", 600, 10 * 60 * 1000);
       const { mode, idx } = puzzleArgs(await readJson(req));
+      logger.game("puzzle_start", `Player @${user.username} started ${mode} puzzle #${idx + 1}`, {
+        user: user.username,
+        mode,
+        idx: idx + 1,
+      });
       return engineResult(res, req, await game.start(user.id, mode, idx));
     }
 
@@ -977,10 +1021,37 @@ function createApp(opts = {}) {
       const { mode, idx } = puzzleArgs(body);
       if (typeof body.name !== "string") return fail(res, 400, "unknown_player");
       const r = await game.guess(user.id, mode, idx, body.name);
-      if (!r.ok) return fail(res, 400, r.error);
+      if (!r.ok) {
+        logger.game("guess_rejected", `Guess rejected for @${user.username} on ${mode} #${idx + 1}: ${r.error}`, {
+          user: user.username,
+          mode,
+          idx: idx + 1,
+          guess: body.name,
+          error: r.error,
+        });
+        return fail(res, 400, r.error);
+      }
       const p = r.state.modes[mode].puzzles[idx];
       const extra = { rank: r.rank, solved: r.solved, guess: p.guesses[p.guesses.length - 1] };
-      if (r.solved) extra.answer = game.answerOf(r.state, mode, idx);
+      if (r.solved) {
+        extra.answer = game.answerOf(r.state, mode, idx);
+        logger.game("puzzle_solved", `🏆 Player @${user.username} SOLVED ${mode} puzzle #${idx + 1} (${body.name}) in ${p.guesses.length} guesses! Score: ${p.score} pts`, {
+          user: user.username,
+          mode,
+          idx: idx + 1,
+          player: body.name,
+          guesses: p.guesses.length,
+          score: p.score,
+        });
+      } else {
+        logger.game("guess_made", `@${user.username} guessed "${body.name}" on ${mode} #${idx + 1} -> Rank ${r.rank} (${p.guesses.length}/10 guesses)`, {
+          user: user.username,
+          mode,
+          idx: idx + 1,
+          guess: body.name,
+          rank: r.rank,
+        });
+      }
       return engineResult(res, req, r, extra);
     }
 
@@ -989,6 +1060,14 @@ function createApp(opts = {}) {
       rateLimit(req, "play", 600, 10 * 60 * 1000);
       const { mode, idx } = puzzleArgs(await readJson(req));
       const r = await game.hint(user.id, mode, idx);
+      if (r.ok) {
+        logger.game("hint_unlocked", `💡 @${user.username} unlocked hint #${r.hint} on ${mode} #${idx + 1}`, {
+          user: user.username,
+          mode,
+          idx: idx + 1,
+          hint: r.hint,
+        });
+      }
       return engineResult(res, req, r, r.ok ? { hint: r.hint } : null);
     }
 
@@ -997,7 +1076,17 @@ function createApp(opts = {}) {
       rateLimit(req, "play", 600, 10 * 60 * 1000);
       const { mode, idx } = puzzleArgs(await readJson(req));
       const r = await game.giveUp(user.id, mode, idx);
-      return engineResult(res, req, r, r.ok ? { answer: game.answerOf(r.state, mode, idx) } : null);
+      if (r.ok) {
+        const answer = game.answerOf(r.state, mode, idx);
+        logger.game("puzzle_giveup", `🏳️ @${user.username} gave up on ${mode} #${idx + 1}. Answer was: ${answer ? answer.name : "unknown"}`, {
+          user: user.username,
+          mode,
+          idx: idx + 1,
+          answer: answer ? answer.name : undefined,
+        });
+        return engineResult(res, req, r, { answer });
+      }
+      return engineResult(res, req, r, null);
     }
 
     if (key === "GET /api/leaderboard/today") {
@@ -1153,14 +1242,39 @@ function createApp(opts = {}) {
   // ---------- dispatch ----------
 
   const server = http.createServer((req, res) => {
+    const startTime = Date.now();
     const url = new URL(req.url, "http://" + (req.headers.host || "localhost"));
     const pathname = url.pathname;
+    const clientIp = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "127.0.0.1").split(",")[0].trim();
+
+    res.on("finish", () => {
+      const latencyMs = Date.now() - startTime;
+      const meta = { ip: clientIp };
+      if (req._user && req._user.username) meta.user = `@${req._user.username}`;
+      if (res._failError) meta.error = res._failError.code;
+
+      if (!pathname.startsWith("/api/")) {
+        if (res.statusCode >= 400) {
+          logger.http(req.method, pathname, res.statusCode, latencyMs, meta);
+        } else {
+          logger.debug("STATIC", `${req.method} ${pathname} -> ${res.statusCode} (${latencyMs}ms)`);
+        }
+      } else {
+        logger.http(req.method, pathname, res.statusCode, latencyMs, meta);
+      }
+    });
+
     const done = (p) => p.catch((err) => {
-      if (err instanceof HttpError) return fail(res, err.status, err.code, err.message);
-      log("error", err);
+      if (err instanceof HttpError) {
+        res._failError = { status: err.status, code: err.code, message: err.message };
+        return fail(res, err.status, err.code, err.message);
+      }
+      logger.error("SYSTEM", `Unhandled error on ${req.method} ${pathname}: ${err.message}`, err);
+      res._failError = { status: 500, code: "server_error", message: err.message };
       if (!res.headersSent) fail(res, 500, "server_error", "Something went wrong.");
       else res.end();
     });
+
     if (pathname.startsWith("/api/")) done(api(req, res, pathname, url.searchParams));
     else if (pathname === "/admin" || pathname === "/admin/") serveStatic(req, res, "/admin.html");
     else serveStatic(req, res, pathname);
@@ -1170,6 +1284,7 @@ function createApp(opts = {}) {
     server,
     db,
     game,
+    logger,
     close(cb) {
       server.close(() => {
         try { db.close(); } catch (_) { /* already closed */ }
@@ -1183,9 +1298,24 @@ if (require.main === module) {
   const port = Number(process.env.PORT) || 3000;
   const app = createApp();
   app.server.listen(port, () => {
-    console.log("Cricketle running at http://localhost:" + port + "  (IST day " + core.todayKey() + ")");
+    const isSupabase = Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY));
+    const dbType = isSupabase ? "Supabase PostgreSQL" : "Local SQLite";
+    const banner = [
+      "===========================================================",
+      "🏏 CRICKETLE V2.0 · DAILY CRICKET CHALLENGE",
+      "===========================================================",
+      `[SYSTEM] Server listening on http://localhost:${port}`,
+      `[SYSTEM] Active IST Calendar Day: ${core.todayKey()}`,
+      `[SYSTEM] Database Engine: ${dbType}`,
+      `[SYSTEM] Structured Logger: active (Level: ${process.env.LOG_LEVEL || "info"})`,
+      "===========================================================",
+    ].join("\n");
+    console.log(banner);
   });
-  const stop = () => app.close(() => process.exit(0));
+  const stop = () => app.close(() => {
+    console.log("[SYSTEM] Cricketle server shut down cleanly.");
+    process.exit(0);
+  });
   process.on("SIGINT", stop);
   process.on("SIGTERM", stop);
 }

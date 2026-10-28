@@ -27,6 +27,39 @@
   const GUEST_KEY = "cricketle:v2:guest";
   const MODE_KEY = "cricketle:v2:mode";
 
+  // ---------- Client Structured Logger ----------
+
+  const CricketleLog = {
+    _badge(tag, color) {
+      return [
+        `%cCricketle%c %c${tag}%c`,
+        "background:#059669;color:#fff;font-weight:bold;padding:1px 5px;border-radius:3px 0 0 3px;",
+        "",
+        `background:${color};color:#fff;font-weight:bold;padding:1px 5px;border-radius:0 3px 3px 0;`,
+        "",
+      ];
+    },
+    info(tag, msg, ...args) {
+      console.log(...this._badge(tag, "#0284c7"), msg, ...args);
+    },
+    success(tag, msg, ...args) {
+      console.log(...this._badge(tag, "#16a34a"), msg, ...args);
+    },
+    warn(tag, msg, ...args) {
+      console.warn(...this._badge(tag, "#eab308"), msg, ...args);
+    },
+    error(tag, msg, ...args) {
+      console.error(...this._badge(tag, "#ef4444"), msg, ...args);
+    },
+    auth(action, msg, ...args) {
+      console.log(...this._badge("AUTH", "#06b6d4"), `${action}: ${msg}`, ...args);
+    },
+    game(action, msg, ...args) {
+      console.log(...this._badge("GAME", "#8b5cf6"), `${action}: ${msg}`, ...args);
+    },
+  };
+  window.CricketleLog = CricketleLog;
+
   // ---------- Errors + API ----------
 
   class ApiError extends Error {
@@ -38,6 +71,7 @@
   }
 
   async function api(method, path, body) {
+    const t0 = performance.now();
     let res;
     try {
       res = await fetch(path, {
@@ -46,13 +80,20 @@
         body: body === undefined ? undefined : JSON.stringify(body),
         credentials: "same-origin",
       });
-    } catch (_) {
+    } catch (err) {
+      CricketleLog.error("API", `${method} ${path} -> Network error`, err);
       throw new ApiError("network", MESSAGES.network, 0);
     }
+    const ms = Math.round(performance.now() - t0);
     const text = await res.text();
     let json = null;
     try { json = text ? JSON.parse(text) : null; } catch (_) { json = null; }
-    if (!res.ok) throw new ApiError((json && json.error) || "http_" + res.status, json && json.message, res.status);
+    if (!res.ok) {
+      const errCode = (json && json.error) || "http_" + res.status;
+      CricketleLog.warn("API", `${method} ${path} -> ${res.status} (${ms}ms) [${errCode}]`, json && json.message ? json.message : "");
+      throw new ApiError(errCode, json && json.message, res.status);
+    }
+    CricketleLog.info("API", `${method} ${path} -> ${res.status} (${ms}ms)`);
     return json;
   }
 
@@ -1918,6 +1959,7 @@
     app.user = user;
     app.store = new RemoteStore();
     app.board.data = {};
+    CricketleLog.auth("SIGN_IN", `Authenticated as @${user.username} (${user.displayName || user.username})`);
     await refreshStats();
     await reload();
     renderNav();
@@ -1928,6 +1970,7 @@
     app.user = null;
     app.stats = null;
     app.store = new LocalStore();
+    CricketleLog.auth("GUEST", "Session cleared · Operating in guest mode");
     if (app.store && app.store.saveProfile) {
       const p = app.store.getProfile();
       if (p.phone) {
@@ -2084,6 +2127,7 @@
       if (app.store.kind === "remote") { app.offline = false; await becomeGuest(); } else throw err;
     }
     showView();
+    CricketleLog.info("READY", `Cricketle ready · Day: ${core.todayKey()} · Mode: ${app.mode} · Storage: ${app.store.kind}`);
     tick();
     setInterval(tick, 250);
   }
