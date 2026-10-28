@@ -1615,7 +1615,7 @@
 
   const SUPABASE_CONFIG = {
     url: (window.CRICKETLE_SUPABASE_URL || "https://shzfexckrhcykiuddhwa.supabase.co").trim(),
-    key: (window.CRICKETLE_SUPABASE_KEY || (typeof atob === "function" ? atob("c2Jfc2VjcmV0XzdJT0xnY0dKOVJYU0FDdnVxRTN0emdfT1NuejMwR3c=") : "")).trim(),
+    key: (window.CRICKETLE_SUPABASE_ANON_KEY || localStorage.getItem("cricketle:supabase_anon_key") || window.CRICKETLE_SUPABASE_KEY || (typeof atob === "function" ? atob("c2Jfc2VjcmV0XzdJT0xnY0dKOVJYU0FDdnVxRTN0emdfT1NuejMwR3c=") : "")).trim(),
     adminPhone: "+918755428254",
   };
 
@@ -1637,7 +1637,11 @@
       let json = null;
       try { json = text ? JSON.parse(text) : null; } catch (_) {}
       if (!res.ok) {
-        const err = new Error((json && (json.message || json.error)) || `Supabase HTTP ${res.status}`);
+        let msg = (json && (json.message || json.error)) || `Supabase HTTP ${res.status}`;
+        if (msg.includes("Forbidden use of secret API key in browser")) {
+          msg = "Supabase requires the public 'anon' key (starts with eyJ...) in browsers. Please provide your Supabase anon key to enable live browser auth, or play at http://localhost:3000.";
+        }
+        const err = new Error(msg);
         err.status = res.status;
         err.json = json;
         throw err;
