@@ -20,8 +20,11 @@ CREATE TABLE IF NOT EXISTS users (
   bio TEXT DEFAULT '',
   fav_team TEXT DEFAULT '',
   fav_player TEXT DEFAULT '',
+  is_admin BOOLEAN DEFAULT false,
   created_at BIGINT NOT NULL
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT false;
 
 CREATE INDEX IF NOT EXISTS idx_users_username ON users (LOWER(username));
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone ON users (phone) WHERE phone IS NOT NULL;
