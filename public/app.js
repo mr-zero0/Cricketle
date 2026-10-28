@@ -1626,30 +1626,45 @@
   let recaptchaVerifier = null;
   let recaptchaWidgetId = null;
 
-  async function initFirebasePhone() {
-    try {
-      if (typeof window === "undefined" || !window.firebase || !window.firebase.auth) return;
-      let config = window.FIREBASE_CONFIG || null;
-      if (!config) {
-        try {
-          const res = await api("GET", "/api/config/firebase");
-          if (res && res.enabled && res.config) config = res.config;
-        } catch (_) {}
-      }
-      if (config && config.apiKey && config.projectId) {
-        if (!firebase.apps.length) {
+  async function ensureFirebase() {
+    if (firebaseEnabled && recaptchaVerifier) return true;
+    if (typeof window === "undefined") return false;
+
+    for (let i = 0; i < 30; i++) {
+      if (window.firebase && window.firebase.auth) break;
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    if (!window.firebase || !window.firebase.auth) return false;
+
+    let config = window.FIREBASE_CONFIG || null;
+    if (!config) {
+      try {
+        const res = await api("GET", "/api/config/firebase");
+        if (res && res.enabled && res.config) config = res.config;
+      } catch (_) {}
+    }
+
+    if (config && config.apiKey && config.projectId) {
+      try {
+        if (!firebase.apps || !firebase.apps.length) {
           firebase.initializeApp(config);
         }
         firebaseEnabled = true;
         setupRecaptchaVerifier();
+        return true;
+      } catch (err) {
+        console.error("Firebase init failed:", err);
       }
-    } catch (_) {
-      firebaseEnabled = false;
     }
+    return false;
+  }
+
+  async function initFirebasePhone() {
+    await ensureFirebase();
   }
 
   function setupRecaptchaVerifier() {
-    if (!firebaseEnabled || !window.firebase || !window.firebase.auth) return null;
+    if (!window.firebase || !window.firebase.auth) return null;
     const container = $("recaptcha-container");
     if (!container) return null;
     if (!recaptchaVerifier) {
@@ -1739,63 +1754,47 @@
         sendBtn.disabled = true;
 
         try {
-          let res;
-          if (firebaseEnabled && window.firebase && window.firebase.auth) {
-            setupRecaptchaVerifier();
-            if (!recaptchaVerifier) throw new Error("Verification widget unavailable.");
-            try {
-              firebaseConfirmationResult = await firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier);
-              res = {
-                ok: true,
-                phone: fullPhone,
-                realSms: true,
-                provider: "firebase",
-                expiresAt: Date.now() + 5 * 60 * 1000,
-              };
-            } catch (fbErr) {
-              if (recaptchaWidgetId !== null && window.grecaptcha) {
-                try { grecaptcha.reset(recaptchaWidgetId); } catch (_) {}
-              }
-              const msg = fbErr.code === "auth/invalid-phone-number"
-                ? "Invalid phone number format."
-                : fbErr.code === "auth/quota-exceeded"
-                ? "Daily SMS quota exceeded. Please try later."
-                : (fbErr.message || "Failed to send SMS via Firebase.");
-              throw new Error(msg);
-            }
-          } else if (app.offline) {
-            const devCode = String(Math.floor(100000 + Math.random() * 900000));
-            if (app.store && app.store.setOtp) app.store.setOtp(fullPhone, devCode);
-            res = { ok: true, phone: fullPhone, devOtp: devCode, expiresAt: Date.now() + 5 * 60 * 1000 };
-          } else {
-            res = await api("POST", "/api/auth/otp/send", { phone: fullPhone });
+          const ready = await ensureFirebase();
+          if (!ready) {
+            throw new Error("Connecting to Google Firebase Phone service... please refresh the page and try again.");
           }
 
-          app.otpPhone = res.phone;
-          app.latestDevOtp = res.devOtp;
+          setupRecaptchaVerifier();
+          if (!recaptchaVerifier) throw new Error("Verification widget unavailable. Please refresh the page.");
+
+          try {
+            firebaseConfirmationResult = await firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier);
+          } catch (fbErr) {
+            if (recaptchaWidgetId !== null && window.grecaptcha) {
+              try { grecaptcha.reset(recaptchaWidgetId); } catch (_) {}
+            }
+            const msg = fbErr.code === "auth/invalid-phone-number"
+              ? "Invalid mobile number format. Please check your country code and digits."
+              : fbErr.code === "auth/quota-exceeded"
+              ? "Daily SMS quota exceeded."
+              : fbErr.code === "auth/too-many-requests"
+              ? "Too many attempts. Please wait a moment and try again."
+              : (fbErr.message || "Failed to send SMS via Firebase.");
+            throw new Error(msg);
+          }
+
+          app.otpPhone = fullPhone;
 
           const bannerIcon = $("otp-banner-icon");
           const bannerTitle = $("otp-banner-title");
           const bannerText = $("otp-banner-text");
           const autofillBtn = $("otp-autofill-btn");
 
-          if (res.realSms) {
-            if (bannerIcon) bannerIcon.textContent = "📱";
-            if (bannerTitle) bannerTitle.textContent = res.provider === "firebase" ? "Real SMS Sent (Google Firebase)" : "Real SMS Sent (OTP.dev)";
-            if (bannerText) bannerText.innerHTML = `We sent a 6-digit code via SMS to <strong>${escapeHtml(res.phone)}</strong>. Check your phone's SMS inbox!`;
-            if (autofillBtn) autofillBtn.hidden = true;
-            toast(`Real SMS sent to ${res.phone}! Check your phone.`, "success");
-          } else {
-            if (bannerIcon) bannerIcon.textContent = "⚡";
-            if (bannerTitle) bannerTitle.textContent = "Free OTP Sandbox";
-            if (bannerText) bannerText.innerHTML = `Your code is: <strong id="otp-delivered-code" class="otp-code-highlight">${res.devOtp || "------"}</strong>`;
-            if (autofillBtn) autofillBtn.hidden = !res.devOtp;
-            toast(res.devOtp ? "Test OTP code ready! Tap auto-fill to verify." : "OTP code sent!", "info");
-          }
+          if (bannerIcon) bannerIcon.textContent = "📱";
+          if (bannerTitle) bannerTitle.textContent = "Real SMS Sent (Google Firebase)";
+          if (bannerText) bannerText.innerHTML = `We sent a 6-digit verification code to <strong>${escapeHtml(fullPhone)}</strong> via SMS. Check your phone's SMS inbox!`;
+          if (autofillBtn) autofillBtn.hidden = true;
+
+          toast(`Real SMS sent to ${fullPhone}! Check your phone's SMS inbox.`, "success");
 
           $("otp-step-phone").hidden = true;
           $("otp-step-verify").hidden = false;
-          startOtpTimer(res.expiresAt || (Date.now() + 5 * 60 * 1000));
+          startOtpTimer(Date.now() + 5 * 60 * 1000);
           if ($("otp-code")) {
             $("otp-code").value = "";
             $("otp-code").focus();
