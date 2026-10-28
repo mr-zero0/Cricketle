@@ -462,3 +462,16 @@ test("streakDetails calculates current streak, best streak, and week calendar", 
   assert.equal(res.week[3].active, false); // 2026-10-25 was skipped
 });
 
+test("totalElapsedMs sums elapsed time across all 3 puzzles in a mode", () => {
+  let s = fresh();
+  s = core.startPuzzle(s, "easy", 0, NOW).state;
+  // Puzzle 0 finishes in 30s
+  s = core.giveUp(s, "easy", 0, NOW + 30000).state;
+  // Puzzle 1 starts at NOW + 30000 and is active for 20s
+  s = core.startPuzzle(s, "easy", 1, NOW + 30000).state;
+
+  const total = core.totalElapsedMs(s, "easy", NOW + 50000);
+  assert.equal(total, 50000);
+  assert.equal(core.formatTime(total), "00:50");
+});
+

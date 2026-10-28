@@ -438,7 +438,11 @@
     trackerLabel.textContent = `${modeLabel(app.mode)} · Puzzle ${idx() + 1} of ${core.PUZZLES_PER_DAY}`;
 
     const pts = core.dayPoints(app.state);
-    $("today-points").innerHTML = `Today: <strong>${pts.total} pts</strong> <span class="muted">(${modeLabel(app.mode)} ${pts[app.mode]})</span>`;
+    const allDone = core.modeDone(app.state, app.mode);
+    const waTracker = allDone
+      ? ` <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(buildShareText())}" target="_blank" rel="noopener noreferrer" class="tracker-wa-btn" title="Share total score & time to WhatsApp"><svg class="whatsapp-icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Share</a>`
+      : "";
+    $("today-points").innerHTML = `Today: <strong>${pts.total} pts</strong> <span class="muted">(${modeLabel(app.mode)} ${pts[app.mode]})</span>${waTracker}`;
     const rankEl = $("today-rank");
     if (app.user && app.stats) {
       rankEl.innerHTML = app.stats.todayRank
@@ -494,15 +498,27 @@
     const lost = p.status === "gaveUp";
     win.hidden = false;
     win.classList.toggle("lost", lost);
-    const time = core.formatTime(core.elapsedMs(p, app.store.now()));
+    const now = app.store.now();
+    const ps = puzzles();
+    const totalMs = ps.reduce((s, q) => s + core.elapsedMs(q, now), 0);
+    const totalTime = core.formatTime(totalMs);
+    const puzzleMs = core.elapsedMs(p, now);
+    const puzzleTime = core.formatTime(puzzleMs);
     const title = a ? a.name : "Unknown";
     const sub = a ? `${a.countryName} · ${a.role} · debut ${a.debut}` : "";
-    const nextReady = puzzles()[idx() + 1] && puzzles()[idx() + 1].status === "ready";
+    const nextReady = ps[idx() + 1] && ps[idx() + 1].status === "ready";
     const allDone = core.modeDone(app.state, app.mode);
     const otherMode = isHard() ? "easy" : "hard";
     const otherDone = core.modeDone(app.state, otherMode);
 
-    let actions = `<button id="share-btn" class="btn" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg> Copy result</button>`;
+    const shareText = buildShareText();
+    const whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(shareText);
+
+    let actions = `
+      <a id="whatsapp-share-btn" class="btn whatsapp-btn" target="_blank" rel="noopener noreferrer" href="${whatsappUrl}">
+        <svg class="whatsapp-icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Share on WhatsApp
+      </a>
+      <button id="share-btn" class="btn" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg> Copy result</button>`;
     let note = "";
     if (nextReady) {
       actions += `<button id="next-btn" class="btn primary" type="button">Next puzzle <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>`;
@@ -521,13 +537,19 @@
       <p>${escapeHtml(sub)}</p>
       <div class="win-stats" role="list">
         <div class="win-stat" role="listitem"><span class="v">${n}</span><span class="k">guess${n === 1 ? "" : "es"}</span></div>
-        <div class="win-stat" role="listitem"><span class="v">${time}</span><span class="k">time</span></div>
+        <div class="win-stat" role="listitem" title="Puzzle: ${puzzleTime} · Total across 3: ${totalTime}"><span class="v">${totalTime}</span><span class="k">total time</span></div>
         <div class="win-stat" role="listitem"><span class="v">${p.hints}</span><span class="k">hint${p.hints === 1 ? "" : "s"}</span></div>
         <div class="win-stat points" role="listitem"><span class="v">${lost ? 0 : "+" + p.points}</span><span class="k">points</span></div>
       </div>
       ${note}
       <div class="actions">${actions}</div>`;
     $("share-btn").addEventListener("click", share);
+    const wa = $("whatsapp-share-btn");
+    if (wa) {
+      wa.addEventListener("click", () => {
+        wa.href = "https://api.whatsapp.com/send?text=" + encodeURIComponent(buildShareText());
+      });
+    }
     const next = $("next-btn");
     if (next) next.addEventListener("click", () => { app.current[app.mode] = idx() + 1; render(); $("start-btn").focus(); });
     const other = $("other-mode-btn");
@@ -590,14 +612,17 @@
   function updateTimer(force) {
     if (!app.state) return;
     const p = puzzle();
+    const ps = puzzles();
     const wrap = timerEl.parentElement;
-    const text = core.formatTime(core.elapsedMs(p, app.store.now()));
+    const now = app.store.now();
+    const totalMs = ps.reduce((s, q) => s + core.elapsedMs(q, now), 0);
+    const text = core.formatTime(totalMs);
     if (force || text !== lastTimerText) { timerEl.textContent = text; lastTimerText = text; }
     wrap.classList.toggle("running", p.status === "active");
     wrap.classList.toggle("done", core.isFinished(p));
     let w;
     if (p.status === "active") {
-      w = core.scorePuzzle({ mode: app.mode, guesses: p.guesses.length + 1, hints: p.hints, seconds: core.elapsedMs(p, app.store.now()) / 1000, solved: true });
+      w = core.scorePuzzle({ mode: app.mode, guesses: p.guesses.length + 1, hints: p.hints, seconds: core.elapsedMs(p, now) / 1000, solved: true });
     } else if (core.isFinished(p)) {
       w = p.points;
     } else {
@@ -733,21 +758,49 @@
     render();
   }
 
-  function share() {
-    const p = puzzle();
+  function buildShareText() {
     const ps = puzzles();
-    const n = p.guesses.length;
-    const time = core.formatTime(core.elapsedMs(p, app.store.now()));
-    const summary = ps.map((q) => (core.isFinished(q) ? (q.status === "gaveUp" ? "✕" : String(q.points)) : "·")).join(" · ");
-    const head = `Cricketle ${app.day} · ${modeLabel(app.mode)} ${idx() + 1}/${core.PUZZLES_PER_DAY}`;
-    const line = p.status === "gaveUp"
-      ? `🏳️ Gave up after ${n} guess${n === 1 ? "" : "es"} · ${time}`
-      : `✅ ${n} guess${n === 1 ? "" : "es"} · ${time} · ${p.hints} hint${p.hints === 1 ? "" : "s"} · ${p.points} pts`;
-    const text = `${head}\n${line}\nToday: ${summary}`;
+    const now = app.store.now();
+    const totalMs = ps.reduce((s, q) => s + core.elapsedMs(q, now), 0);
+    const totalTime = core.formatTime(totalMs);
+    const mode = modeLabel(app.mode);
+    const allDone = core.modeDone(app.state, app.mode);
+    const totalPts = ps.reduce((s, q) => s + (q.points || 0), 0);
+    const solvedCount = ps.filter((q) => q.status === "solved").length;
+
+    const icons = ["1️⃣", "2️⃣", "3️⃣"];
+    const puzzleLines = ps.map((q, i) => {
+      if (!core.isFinished(q)) return `${icons[i]} ⏳ In progress / Not started`;
+      if (q.status === "gaveUp") return `${icons[i]} ❌ Gave up (${q.guesses.length} guesses)`;
+      return `${icons[i]} ✅ ${q.points} pts (${q.guesses.length} guess${q.guesses.length === 1 ? "" : "es"}, ${q.hints || 0} hints)`;
+    });
+
+    const streak = (app.stats && app.stats.currentStreak) ? ` · 🔥 ${app.stats.currentStreak}-day streak` : "";
+    const siteUrl = (typeof window !== "undefined" && window.location.origin && window.location.origin !== "null" && !window.location.origin.startsWith("file"))
+      ? window.location.origin
+      : "https://mr-zero0.github.io/Cricketle";
+
+    const lines = [
+      `🏏 Cricketle · ${app.day}`,
+      `${mode} Mode · ${allDone ? `Finished (${solvedCount}/${core.PUZZLES_PER_DAY} Solved)` : `Puzzle ${idx() + 1} of 3`}`,
+      `⏱️ Total Time (3 puzzles): ${totalTime}`,
+      `🏆 Points: ${totalPts} pts${streak}`,
+      ``,
+      ...puzzleLines,
+      ``,
+      `Play now: ${siteUrl}`
+    ];
+    return lines.join("\n");
+  }
+
+  function share() {
+    const text = buildShareText();
     const btn = $("share-btn");
     const ok = () => {
-      btn.innerHTML = `<svg aria-hidden="true"><use href="#i-check"/></svg> Copied`;
-      setTimeout(() => { btn.innerHTML = `<svg aria-hidden="true"><use href="#i-copy"/></svg> Copy result`; }, 1600);
+      if (btn) {
+        btn.innerHTML = `<svg aria-hidden="true"><use href="#i-check"/></svg> Copied`;
+        setTimeout(() => { btn.innerHTML = `<svg aria-hidden="true"><use href="#i-copy"/></svg> Copy result`; }, 1600);
+      }
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(ok, () => toast("Could not copy. " + text.replace(/\n/g, " "), "error"));

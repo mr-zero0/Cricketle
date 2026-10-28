@@ -1145,3 +1145,63 @@ dialog form { margin-top: var(--space-4); text-align: right; }
 .guest-callout-text h4 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--primary-soft); }
 .guest-callout-text p { margin: 2px 0 0; font-size: 0.85rem; color: var(--fg); }
 
+/* ---------- WhatsApp Share Button ---------- */
+.btn.whatsapp-btn {
+  background: #25d366;
+  color: #ffffff !important;
+  border-color: #25d366;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.28);
+  transition: background var(--dur-fast), transform var(--dur-fast), box-shadow var(--dur-fast);
+}
+.btn.whatsapp-btn:hover {
+  background: #20bd5a;
+  border-color: #20bd5a;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.4);
+}
+.btn.whatsapp-btn:active {
+  transform: translateY(0);
+}
+.btn.whatsapp-btn svg,
+.btn.whatsapp-btn .whatsapp-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.tracker-wa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #25d366;
+  color: #ffffff !important;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 8px;
+  vertical-align: middle;
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.25);
+  transition: all var(--dur-fast);
+}
+.tracker-wa-btn:hover {
+  background: #20bd5a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
+}
+.tracker-wa-btn .whatsapp-icon {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+}
+
+

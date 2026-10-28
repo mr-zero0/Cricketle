@@ -483,6 +483,12 @@
     return Math.max(0, end - p.startedAt);
   }
 
+  function totalElapsedMs(state, mode, now) {
+    if (!state || !state.modes || !state.modes[mode]) return 0;
+    const ps = state.modes[mode].puzzles || [];
+    return ps.reduce((s, p) => s + elapsedMs(p, now), 0);
+  }
+
   function formatTime(ms) {
     const s = Math.max(0, Math.floor(ms / 1000));
     const h = Math.floor(s / 3600);
@@ -785,7 +791,7 @@
     dailyAnswers, answerFor, ranksFor,
     hintFor, scorePuzzle, rankTitle,
     newDayState, startPuzzle, applyGuess, useHint, giveUp, revealedHints,
-    modeDone, dayPoints, elapsedMs, formatTime, isFinished,
+    modeDone, dayPoints, elapsedMs, totalElapsedMs, formatTime, isFinished,
     evaluateAchievements, streakDetails,
   };
 });
