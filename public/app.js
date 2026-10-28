@@ -1027,6 +1027,10 @@
     const label = app.user ? app.user.username : "Sign in";
     $("nav-profile-label").textContent = label;
     $("tab-profile-label").textContent = app.user ? "Profile" : "Sign in";
+    const navAdmin = $("nav-admin");
+    if (navAdmin) {
+      navAdmin.style.display = (app.user && app.user.isAdmin) ? "inline-flex" : "none";
+    }
     document.querySelectorAll("[data-view]").forEach((el) => {
       if (el.dataset.view === app.view) el.setAttribute("aria-current", "page");
       else el.removeAttribute("aria-current");
@@ -1594,8 +1598,25 @@
     const summary = $("auth-summary") || $("otp-summary");
     if (summary) {
       summary.hidden = false;
-      summary.innerHTML = `<h3>${escapeHtml(msg)}</h3>`;
+      summary.style.display = "block";
+      summary.innerHTML = `
+        <div class="auth-error-wrap">
+          <svg class="auth-error-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span class="auth-error-text">${escapeHtml(msg)}</span>
+        </div>`;
+      summary.scrollIntoView({ behavior: "smooth", block: "nearest" });
       summary.focus();
+    }
+  }
+
+  function clearPhoneAuthErrors() {
+    const summary = $("auth-summary") || $("otp-summary");
+    if (summary) {
+      summary.hidden = true;
+      summary.style.display = "none";
+      summary.innerHTML = "";
     }
   }
 
@@ -1676,40 +1697,30 @@
       }
 
       try {
-        let user;
-        if (app.offline) {
-          const p = app.store.getProfile();
-          const match = p && ((p.username && p.username.toLowerCase() === identifier.toLowerCase()) || p.phone === identifier);
-          if (!match || (p.pin && p.pin !== pin)) {
-            throw new Error("Incorrect username or PIN.");
-          }
-          p.loginTime = Date.now();
-          app.store.saveProfile(p);
-          user = {
-            username: p.username || identifier,
-            displayName: p.displayName || p.username || identifier,
-            phone: p.phone || null,
-            avatar: p.avatar || "allrounder",
-            bio: p.bio || "",
-            favTeam: p.favTeam || "",
-            favPlayer: p.favPlayer || "",
-            phoneConnected: Boolean(p.phone),
-            isOffline: true,
-          };
-          app.user = user;
-          renderNav();
-          renderProfile();
-        } else {
-          const res = await api("POST", "/api/auth/login", { username: identifier, pin });
-          user = res.user;
-          await becomeUser(user);
+        const res = await api("POST", "/api/auth/login", { username: identifier, pin });
+        if (!res || !res.ok || !res.user) {
+          throw new Error("Incorrect username or PIN. Please verify and try again.");
         }
-
-        toast(`Welcome back, @${user.username}!`, "success");
+        await becomeUser(res.user);
+        toast(`Welcome back, @${res.user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
-        showPhoneAuthError(err.message || "Incorrect username or PIN. Please try again.");
+        let msg = "Incorrect username or PIN. Please verify and try again.";
+        if (err.code === "bad_credentials") {
+          msg = "Incorrect username or PIN. This combination does not match any registered account.";
+        } else if (err.code === "missing_fields") {
+          msg = "Please enter both username and PIN.";
+        } else if (err.code === "network") {
+          msg = "Cannot reach authentication server. Please ensure the Cricketle server is running.";
+        } else if (err.message) {
+          msg = err.message;
+        }
+        showPhoneAuthError(msg);
+        if (signinPin) {
+          signinPin.value = "";
+          signinPin.focus();
+        }
       } finally {
         if (signinBtn) {
           signinBtn.classList.remove("loading");
@@ -1790,47 +1801,34 @@
       }
 
       try {
-        let user;
-        if (app.offline) {
-          const p = app.store.getProfile();
-          p.phone = fullPhone;
-          p.pin = pin;
-          p.username = username;
-          p.displayName = username;
-          p.loginTime = Date.now();
-          app.store.saveProfile(p);
-          user = {
-            username: p.username,
-            displayName: p.displayName,
-            phone: fullPhone,
-            avatar: p.avatar || "allrounder",
-            bio: p.bio || "",
-            favTeam: p.favTeam || "",
-            favPlayer: p.favPlayer || "",
-            phoneConnected: true,
-            isOffline: true,
-          };
-          app.user = user;
-          renderNav();
-          renderProfile();
-        } else {
-          const res = await api("POST", "/api/auth/phone/register", {
-            phone: fullPhone,
-            username,
-            pin,
-          });
-          user = res.user;
-          await becomeUser(user);
+        const res = await api("POST", "/api/auth/phone/register", {
+          phone: fullPhone,
+          username,
+          pin,
+        });
+        if (!res || !res.ok || !res.user) {
+          throw new Error("Failed to create account. Please try again.");
         }
-
-        toast(`Welcome to Cricketle, @${user.username}!`, "success");
+        await becomeUser(res.user);
+        toast(`Welcome to Cricketle, @${res.user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
-        showPhoneAuthError(err.message || "Failed to create account. Try again.");
-        if (err.code === "username_taken" && regUsername) {
-          regUsername.focus();
+        let msg = "Failed to create account. Try again.";
+        if (err.code === "username_taken") {
+          msg = `Username "@${username}" is already taken! Please choose another unique username.`;
+          if (regUsername) {
+            regUsername.focus();
+            regUsername.select();
+          }
+        } else if (err.code === "phone_exists") {
+          msg = `Mobile number ${fullPhone} is already registered! Please switch to Sign In or reset your PIN.`;
+        } else if (err.code === "network") {
+          msg = "Cannot reach authentication server. Please ensure the Cricketle server is running.";
+        } else if (err.message) {
+          msg = err.message;
         }
+        showPhoneAuthError(msg);
       } finally {
         if (registerBtn) {
           registerBtn.classList.remove("loading");
@@ -1891,38 +1889,25 @@
       }
 
       try {
-        let user;
-        if (app.offline) {
-          const p = app.store.getProfile();
-          if (p.phone !== fullPhone) throw new Error("No account found with this phone number.");
-          p.pin = newPin;
-          p.loginTime = Date.now();
-          app.store.saveProfile(p);
-          user = {
-            username: p.username || ("player_" + fullPhone.slice(-4)),
-            displayName: p.displayName || ("Cricketer " + fullPhone.slice(-4)),
-            phone: fullPhone,
-            avatar: p.avatar || "allrounder",
-            bio: p.bio || "",
-            favTeam: p.favTeam || "",
-            favPlayer: p.favPlayer || "",
-            phoneConnected: true,
-            isOffline: true,
-          };
-          app.user = user;
-          renderNav();
-          renderProfile();
-        } else {
-          const res = await api("POST", "/api/auth/phone/reset", { phone: fullPhone, newPin });
-          user = res.user;
-          await becomeUser(user);
+        const res = await api("POST", "/api/auth/phone/reset", { phone: fullPhone, newPin });
+        if (!res || !res.ok || !res.user) {
+          throw new Error("Failed to reset PIN. Please try again.");
         }
-
-        toast(`Secret PIN updated! Welcome, @${user.username}!`, "success");
+        await becomeUser(res.user);
+        toast(`Secret PIN updated! Welcome back, @${res.user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
-        showPhoneAuthError(err.message || "Failed to reset PIN. Try again.");
+        let msg = "Failed to reset PIN. Try again.";
+        if (err.code === "not_found") {
+          msg = "No account found with this registered mobile number.";
+          if (resetPhone) resetPhone.focus();
+        } else if (err.code === "network") {
+          msg = "Cannot reach authentication server. Please ensure the Cricketle server is running.";
+        } else if (err.message) {
+          msg = err.message;
+        }
+        showPhoneAuthError(msg);
       } finally {
         if (resetBtn) {
           resetBtn.classList.remove("loading");
