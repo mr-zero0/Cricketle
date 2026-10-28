@@ -194,3 +194,29 @@ CREATE TABLE IF NOT EXISTS otp_codes (
   created_at BIGINT NOT NULL
 );
 
+-- 7. Row Level Security (RLS) Configuration
+-- Enables RLS while permitting full backend operation (via service_role or anon key):
+ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE puzzles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE otp_codes ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'settings' AND policyname = 'Allow backend access') THEN
+    CREATE POLICY "Allow backend access" ON settings FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'users' AND policyname = 'Allow backend access') THEN
+    CREATE POLICY "Allow backend access" ON users FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'sessions' AND policyname = 'Allow backend access') THEN
+    CREATE POLICY "Allow backend access" ON sessions FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'puzzles' AND policyname = 'Allow backend access') THEN
+    CREATE POLICY "Allow backend access" ON puzzles FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'otp_codes' AND policyname = 'Allow backend access') THEN
+    CREATE POLICY "Allow backend access" ON otp_codes FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
