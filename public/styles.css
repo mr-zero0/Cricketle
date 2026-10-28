@@ -1185,6 +1185,9 @@ dialog form { margin-top: var(--space-4); text-align: right; }
   color: #ffffff !important;
   padding: 3px 10px;
   border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
   font-size: 0.74rem;
   font-weight: 700;
   text-decoration: none;

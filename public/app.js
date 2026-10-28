@@ -440,9 +440,13 @@
     const pts = core.dayPoints(app.state);
     const allDone = core.modeDone(app.state, app.mode);
     const waTracker = allDone
-      ? ` <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(buildShareText())}" target="_blank" rel="noopener noreferrer" class="tracker-wa-btn" title="Share total score & time to WhatsApp"><svg class="whatsapp-icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Share</a>`
+      ? ` <button type="button" class="tracker-wa-btn" id="tracker-wa-btn" title="Share total score & time to WhatsApp"><svg class="whatsapp-icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Share</button>`
       : "";
     $("today-points").innerHTML = `Today: <strong>${pts.total} pts</strong> <span class="muted">(${modeLabel(app.mode)} ${pts[app.mode]})</span>${waTracker}`;
+    const twa = $("tracker-wa-btn");
+    if (twa) {
+      twa.addEventListener("click", () => openWhatsApp(buildShareText()));
+    }
     const rankEl = $("today-rank");
     if (app.user && app.stats) {
       rankEl.innerHTML = app.stats.todayRank
@@ -511,13 +515,10 @@
     const otherMode = isHard() ? "easy" : "hard";
     const otherDone = core.modeDone(app.state, otherMode);
 
-    const shareText = buildShareText();
-    const whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(shareText);
-
     let actions = `
-      <a id="whatsapp-share-btn" class="btn whatsapp-btn" target="_blank" rel="noopener noreferrer" href="${whatsappUrl}">
+      <button id="whatsapp-share-btn" class="btn whatsapp-btn" type="button">
         <svg class="whatsapp-icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Share on WhatsApp
-      </a>
+      </button>
       <button id="share-btn" class="btn" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg> Copy result</button>`;
     let note = "";
     if (nextReady) {
@@ -547,7 +548,7 @@
     const wa = $("whatsapp-share-btn");
     if (wa) {
       wa.addEventListener("click", () => {
-        wa.href = "https://api.whatsapp.com/send?text=" + encodeURIComponent(buildShareText());
+        openWhatsApp(buildShareText());
       });
     }
     const next = $("next-btn");
@@ -758,6 +759,18 @@
     render();
   }
 
+  function formatDayDDMMMYY(dayStr) {
+    if (!dayStr) return "";
+    const parts = String(dayStr).split("-").map(Number);
+    if (parts.length !== 3) return dayStr;
+    const [y, m, d] = parts;
+    const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const dd = String(d).padStart(2, "0");
+    const mmm = MONTHS[m - 1] || "";
+    const yy = String(y).slice(-2);
+    return `${dd}-${mmm}-${yy}`;
+  }
+
   function buildShareText() {
     const ps = puzzles();
     const now = app.store.now();
@@ -768,6 +781,13 @@
     const totalPts = ps.reduce((s, q) => s + (q.points || 0), 0);
     const solvedCount = ps.filter((q) => q.status === "solved").length;
 
+    // Dot-separated guess sequence: e.g. (# 1.2.3) or (# 1.2.4)
+    const guessSeq = ps.map((q) => {
+      if (!core.isFinished(q)) return "·";
+      if (q.status === "gaveUp") return "X";
+      return String(q.guesses.length);
+    }).join(".");
+
     const icons = ["1️⃣", "2️⃣", "3️⃣"];
     const puzzleLines = ps.map((q, i) => {
       if (!core.isFinished(q)) return `${icons[i]} ⏳ In progress / Not started`;
@@ -776,12 +796,11 @@
     });
 
     const streak = (app.stats && app.stats.currentStreak) ? ` · 🔥 ${app.stats.currentStreak}-day streak` : "";
-    const siteUrl = (typeof window !== "undefined" && window.location.origin && window.location.origin !== "null" && !window.location.origin.startsWith("file"))
-      ? window.location.origin
-      : "https://mr-zero0.github.io/Cricketle";
+    const siteUrl = "https://mr-zero0.github.io/Cricketle";
+    const dateFormatted = formatDayDDMMMYY(app.day);
 
     const lines = [
-      `🏏 Cricketle · ${app.day}`,
+      `🏏 Cricketle · ${dateFormatted} (# ${guessSeq})`,
       `${mode} Mode · ${allDone ? `Finished (${solvedCount}/${core.PUZZLES_PER_DAY} Solved)` : `Puzzle ${idx() + 1} of 3`}`,
       `⏱️ Total Time (3 puzzles): ${totalTime}`,
       `🏆 Points: ${totalPts} pts${streak}`,
@@ -793,20 +812,53 @@
     return lines.join("\n");
   }
 
-  function share() {
-    const text = buildShareText();
-    const btn = $("share-btn");
+  function openWhatsApp(text) {
+    const encoded = encodeURIComponent(text);
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      // Use direct whatsapp:// scheme on mobile to pass the entire message into chat compose
+      window.location.href = `whatsapp://send?text=${encoded}`;
+      setTimeout(() => {
+        window.open(`https://wa.me/?text=${encoded}`, "_blank");
+      }, 700);
+    } else {
+      // Use wa.me on desktop to open WhatsApp Web/Desktop with entire message intact
+      window.open(`https://wa.me/?text=${encoded}`, "_blank");
+    }
+  }
+
+  function copyToClipboard(text, btn) {
     const ok = () => {
       if (btn) {
+        const orig = btn.innerHTML;
         btn.innerHTML = `<svg aria-hidden="true"><use href="#i-check"/></svg> Copied`;
-        setTimeout(() => { btn.innerHTML = `<svg aria-hidden="true"><use href="#i-copy"/></svg> Copy result`; }, 1600);
+        setTimeout(() => { btn.innerHTML = orig; }, 1600);
       }
+      toast("Result copied to clipboard!", "success");
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(ok, () => toast("Could not copy. " + text.replace(/\n/g, " "), "error"));
+      navigator.clipboard.writeText(text).then(ok, () => toast("Could not copy automatically."));
     } else {
-      toast(text.replace(/\n/g, " "));
+      toast("Could not access clipboard.");
     }
+  }
+
+  async function share() {
+    const text = buildShareText();
+    const btn = $("share-btn");
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (navigator.share && isMobile) {
+      try {
+        // Crucial: Only pass 'text' without 'url' property, so WhatsApp does not drop the message
+        await navigator.share({ text });
+        return;
+      } catch (err) {
+        if (err.name === "AbortError") return;
+      }
+    }
+
+    copyToClipboard(text, btn);
   }
 
   // ---------- Autocomplete ----------
