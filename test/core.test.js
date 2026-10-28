@@ -412,3 +412,53 @@ test("ranksFor memoises the rank table per day, mode and index", () => {
   assert.equal(a.get(core.answerFor(DAY, "easy", 0).name), 1);
   assert.equal(a.size, core.poolFor("easy").length);
 });
+
+test("AVATARS list provides distinct presets with roles and icons", () => {
+  assert.ok(Array.isArray(core.AVATARS) && core.AVATARS.length >= 8);
+  const ids = new Set();
+  for (const a of core.AVATARS) {
+    assert.ok(a.id && a.name && a.icon && a.color && a.role);
+    assert.ok(!ids.has(a.id), "Duplicate avatar ID: " + a.id);
+    ids.add(a.id);
+  }
+});
+
+test("ACHIEVEMENTS list covers tiers and progress evaluation", () => {
+  assert.ok(Array.isArray(core.ACHIEVEMENTS) && core.ACHIEVEMENTS.length >= 10);
+  const tiers = new Set(core.ACHIEVEMENTS.map((a) => a.tier));
+  assert.ok(tiers.has("bronze"));
+  assert.ok(tiers.has("silver"));
+  assert.ok(tiers.has("gold"));
+  assert.ok(tiers.has("diamond"));
+
+  // Empty stats -> first ball locked
+  const empty = core.evaluateAchievements({}, []);
+  const firstBall = empty.find((a) => a.id === "first_ball");
+  assert.ok(firstBall && !firstBall.unlocked);
+
+  // Solve 1 puzzle -> first ball unlocked
+  const solvedOne = core.evaluateAchievements({ solvedPuzzles: 1, totalPoints: 100 }, [
+    { status: "solved", guesses: ["Virat Kohli"], started_at: 1000, finished_at: 15000, hints: 0 }
+  ]);
+  const solvedBall = solvedOne.find((a) => a.id === "first_ball");
+  assert.ok(solvedBall && solvedBall.unlocked);
+
+  // Golden arm: solved with 1 guess
+  const goldenArm = solvedOne.find((a) => a.id === "golden_arm");
+  assert.ok(goldenArm && goldenArm.unlocked);
+});
+
+test("streakDetails calculates current streak, best streak, and week calendar", () => {
+  const today = "2026-10-28";
+  const daysDesc = ["2026-10-28", "2026-10-27", "2026-10-26", "2026-10-24", "2026-10-23"];
+  const res = core.streakDetails(daysDesc, today);
+  assert.equal(res.current, 3);
+  assert.equal(res.best, 3);
+  assert.equal(res.week.length, 7);
+  assert.equal(res.week[6].day, today);
+  assert.equal(res.week[6].active, true);
+  assert.equal(res.week[5].active, true);
+  assert.equal(res.week[4].active, true);
+  assert.equal(res.week[3].active, false); // 2026-10-25 was skipped
+});
+

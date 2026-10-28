@@ -491,9 +491,293 @@
     return h ? h + ":" + pad(m) + ":" + pad(sec) : pad(m) + ":" + pad(sec);
   }
 
+  // ---------- Avatars & Achievements ----------
+
+  const AVATARS = [
+    { id: "batter", name: "Master Blaster", role: "Batter", icon: "🏏", bg: "linear-gradient(135deg, #15803d, #22c55e)", color: "#22c55e" },
+    { id: "bowler", name: "Speed Merchant", role: "Pacer", icon: "🎯", bg: "linear-gradient(135deg, #b91c1c, #ef4444)", color: "#ef4444" },
+    { id: "spinner", name: "Spin Wizard", role: "Spinner", icon: "🌀", bg: "linear-gradient(135deg, #0369a1, #38bdf8)", color: "#38bdf8" },
+    { id: "keeper", name: "The Wall", role: "Wicketkeeper", icon: "🧤", bg: "linear-gradient(135deg, #b45309, #f59e0b)", color: "#f59e0b" },
+    { id: "captain", name: "The Skipper", role: "Captain", icon: "👑", bg: "linear-gradient(135deg, #7e22ce, #a855f7)", color: "#a855f7" },
+    { id: "allrounder", name: "Powerhouse", role: "All-Rounder", icon: "⚡", bg: "linear-gradient(135deg, #0f766e, #14b8a6)", color: "#14b8a6" },
+    { id: "legend", name: "Hall of Fame", role: "Legend", icon: "🏆", bg: "linear-gradient(135deg, #ca8a04, #facc15)", color: "#facc15" },
+    { id: "lion", name: "Roaring Lion", role: "Mascot", icon: "🦁", bg: "linear-gradient(135deg, #ea580c, #fb923c)", color: "#fb923c" },
+    { id: "eagle", name: "Soaring Eagle", role: "Mascot", icon: "🦅", bg: "linear-gradient(135deg, #475569, #94a3b8)", color: "#94a3b8" },
+  ];
+
+  const ACHIEVEMENTS = [
+    {
+      id: "first_ball",
+      title: "First Ball",
+      desc: "Solve your very first Cricketle puzzle.",
+      tier: "bronze",
+      icon: "ball",
+      check: function (s) {
+        const c = s.solved != null ? s.solved : (s.solvedPuzzles || 0);
+        return { unlocked: c >= 1, progress: { current: Math.min(1, c), max: 1, pct: c >= 1 ? 100 : 0 } };
+      },
+    },
+    {
+      id: "quick_single",
+      title: "Quick Single",
+      desc: "Solve a puzzle in under 45 seconds.",
+      tier: "silver",
+      icon: "bolt",
+      check: function (s, h) {
+        const hit = h.some(function (p) {
+          return p.status === "solved" && p.started_at && p.finished_at && (p.finished_at - p.started_at) <= 45000;
+        });
+        return { unlocked: hit, progress: { current: hit ? 1 : 0, max: 1, pct: hit ? 100 : 0 } };
+      },
+    },
+    {
+      id: "lightning_strike",
+      title: "Lightning Strike",
+      desc: "Solve a puzzle in under 20 seconds.",
+      tier: "gold",
+      icon: "bolt",
+      check: function (s, h) {
+        const hit = h.some(function (p) {
+          return p.status === "solved" && p.started_at && p.finished_at && (p.finished_at - p.started_at) <= 20000;
+        });
+        return { unlocked: hit, progress: { current: hit ? 1 : 0, max: 1, pct: hit ? 100 : 0 } };
+      },
+    },
+    {
+      id: "clean_sheet",
+      title: "Clean Sheet",
+      desc: "Solve a puzzle without using any hints.",
+      tier: "silver",
+      icon: "shield",
+      check: function (s, h) {
+        const hit = h.some(function (p) {
+          return p.status === "solved" && (p.hints === 0 || p.hints == null);
+        });
+        return { unlocked: hit, progress: { current: hit ? 1 : 0, max: 1, pct: hit ? 100 : 0 } };
+      },
+    },
+    {
+      id: "sharp_shooter",
+      title: "Sharp Shooter",
+      desc: "Solve a puzzle with 3 or fewer guesses.",
+      tier: "silver",
+      icon: "stumps",
+      check: function (s, h) {
+        const hit = h.some(function (p) {
+          if (p.status !== "solved") return false;
+          let count = 0;
+          if (Array.isArray(p.guesses)) count = p.guesses.length;
+          else if (typeof p.guesses === "string") {
+            try { count = JSON.parse(p.guesses).length; } catch (_) { count = 0; }
+          }
+          return count > 0 && count <= 3;
+        });
+        return { unlocked: hit, progress: { current: hit ? 1 : 0, max: 1, pct: hit ? 100 : 0 } };
+      },
+    },
+    {
+      id: "golden_arm",
+      title: "Golden Arm",
+      desc: "Solve a puzzle on your very first guess!",
+      tier: "gold",
+      icon: "crown",
+      check: function (s, h) {
+        const hit = h.some(function (p) {
+          if (p.status !== "solved") return false;
+          let count = 0;
+          if (Array.isArray(p.guesses)) count = p.guesses.length;
+          else if (typeof p.guesses === "string") {
+            try { count = JSON.parse(p.guesses).length; } catch (_) { count = 0; }
+          }
+          return count === 1;
+        });
+        return { unlocked: hit, progress: { current: hit ? 1 : 0, max: 1, pct: hit ? 100 : 0 } };
+      },
+    },
+    {
+      id: "century",
+      title: "Century",
+      desc: "Score 100 or more points on a single puzzle.",
+      tier: "gold",
+      icon: "trophy",
+      check: function (s, h) {
+        const hit = h.some(function (p) {
+          return p.status === "solved" && (p.points || 0) >= 100;
+        });
+        return { unlocked: hit, progress: { current: hit ? 1 : 0, max: 1, pct: hit ? 100 : 0 } };
+      },
+    },
+    {
+      id: "hat_trick",
+      title: "Hat-Trick",
+      desc: "Solve all 3 puzzles of a mode in a single day.",
+      tier: "silver",
+      icon: "stumps",
+      check: function (s, h) {
+        const byDay = {};
+        for (let i = 0; i < h.length; i++) {
+          const p = h[i];
+          if (p.status === "solved") {
+            const k = (p.day || "") + ":" + (p.mode || "");
+            byDay[k] = (byDay[k] || 0) + 1;
+          }
+        }
+        let hit = false;
+        for (const k in byDay) {
+          if (byDay[k] >= 3) { hit = true; break; }
+        }
+        return { unlocked: hit, progress: { current: hit ? 1 : 0, max: 1, pct: hit ? 100 : 0 } };
+      },
+    },
+    {
+      id: "on_strike",
+      title: "On Strike",
+      desc: "Achieve a 3-day playing streak.",
+      tier: "bronze",
+      icon: "flame",
+      check: function (s) {
+        const best = Math.max(s.currentStreak || 0, s.bestStreak || 0);
+        return { unlocked: best >= 3, progress: { current: Math.min(3, best), max: 3, pct: Math.min(100, Math.round((best / 3) * 100)) } };
+      },
+    },
+    {
+      id: "weekly_maestro",
+      title: "Weekly Maestro",
+      desc: "Maintain a 7-day playing streak.",
+      tier: "silver",
+      icon: "flame",
+      check: function (s) {
+        const best = Math.max(s.currentStreak || 0, s.bestStreak || 0);
+        return { unlocked: best >= 7, progress: { current: Math.min(7, best), max: 7, pct: Math.min(100, Math.round((best / 7) * 100)) } };
+      },
+    },
+    {
+      id: "fortnight_hero",
+      title: "Fortnight Hero",
+      desc: "Maintain a 14-day playing streak.",
+      tier: "gold",
+      icon: "flame",
+      check: function (s) {
+        const best = Math.max(s.currentStreak || 0, s.bestStreak || 0);
+        return { unlocked: best >= 14, progress: { current: Math.min(14, best), max: 14, pct: Math.min(100, Math.round((best / 14) * 100)) } };
+      },
+    },
+    {
+      id: "ten_solves",
+      title: "10 Not Out",
+      desc: "Solve 10 total Cricketle puzzles.",
+      tier: "bronze",
+      icon: "bat",
+      check: function (s) {
+        const c = s.solved != null ? s.solved : (s.solvedPuzzles || 0);
+        return { unlocked: c >= 10, progress: { current: Math.min(10, c), max: 10, pct: Math.min(100, Math.round((c / 10) * 100)) } };
+      },
+    },
+    {
+      id: "fifty_solves",
+      title: "Half-Century Club",
+      desc: "Solve 50 total Cricketle puzzles.",
+      tier: "silver",
+      icon: "trophy",
+      check: function (s) {
+        const c = s.solved != null ? s.solved : (s.solvedPuzzles || 0);
+        return { unlocked: c >= 50, progress: { current: Math.min(50, c), max: 50, pct: Math.min(100, Math.round((c / 50) * 100)) } };
+      },
+    },
+    {
+      id: "domestic_star",
+      title: "Domestic Star",
+      desc: "Accumulate 1,000 career points.",
+      tier: "silver",
+      icon: "star",
+      check: function (s) {
+        const pts = s.allTimePoints || 0;
+        return { unlocked: pts >= 1000, progress: { current: Math.min(1000, pts), max: 1000, pct: Math.min(100, Math.round((pts / 1000) * 100)) } };
+      },
+    },
+    {
+      id: "international_cap",
+      title: "International Cap",
+      desc: "Accumulate 2,500 career points.",
+      tier: "gold",
+      icon: "star",
+      check: function (s) {
+        const pts = s.allTimePoints || 0;
+        return { unlocked: pts >= 2500, progress: { current: Math.min(2500, pts), max: 2500, pct: Math.min(100, Math.round((pts / 2500) * 100)) } };
+      },
+    },
+    {
+      id: "world_class",
+      title: "World Class Legend",
+      desc: "Accumulate 6,000 career points.",
+      tier: "diamond",
+      icon: "crown",
+      check: function (s) {
+        const pts = s.allTimePoints || 0;
+        return { unlocked: pts >= 6000, progress: { current: Math.min(6000, pts), max: 6000, pct: Math.min(100, Math.round((pts / 6000) * 100)) } };
+      },
+    },
+  ];
+
+  function evaluateAchievements(stats, history) {
+    const s = stats || {};
+    const h = Array.isArray(history) ? history : [];
+    return ACHIEVEMENTS.map(function (a) {
+      const res = a.check(s, h);
+      return {
+        id: a.id,
+        title: a.title,
+        desc: a.desc,
+        tier: a.tier,
+        icon: a.icon,
+        unlocked: res.unlocked,
+        progress: res.progress,
+      };
+    });
+  }
+
+  function streakDetails(daysDesc, todayKey) {
+    const set = new Set(daysDesc || []);
+    let current = 0;
+    let d = set.has(todayKey) ? todayKey : shiftDay(todayKey, -1);
+    while (set.has(d)) {
+      current++;
+      d = shiftDay(d, -1);
+    }
+    const asc = [...set].sort();
+    let best = 0;
+    let run = 0;
+    let prev = null;
+    for (let i = 0; i < asc.length; i++) {
+      const day = asc[i];
+      run = prev && shiftDay(prev, 1) === day ? run + 1 : 1;
+      if (run > best) best = run;
+      prev = day;
+    }
+    const week = [];
+    const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    for (let i = 6; i >= 0; i--) {
+      const dayStr = shiftDay(todayKey, -i);
+      const parts = dayStr.split("-").map(Number);
+      const dt = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+      week.push({
+        day: dayStr,
+        label: DAY_LABELS[dt.getUTCDay()],
+        active: set.has(dayStr),
+        isToday: dayStr === todayKey,
+      });
+    }
+    return {
+      current: current,
+      best: best,
+      activeToday: set.has(todayKey),
+      week: week,
+    };
+  }
+
   return {
     PUZZLES_PER_DAY, HINTS_PER_PUZZLE, HINT_COST, MODES, IST_OFFSET_MS, DAY_MS,
-    EASY_NAMES, RANK_LADDER, HINT_LABELS,
+    EASY_NAMES, RANK_LADDER, HINT_LABELS, AVATARS, ACHIEVEMENTS,
     data: { COUNTRIES: data.COUNTRIES, IPL_TEAMS: data.IPL_TEAMS, BOWL_STYLES: data.BOWL_STYLES },
     poolFor, inPool, byName, describe,
     similarity, reasons, buildRanks, tiers, tier,
@@ -502,5 +786,6 @@
     hintFor, scorePuzzle, rankTitle,
     newDayState, startPuzzle, applyGuess, useHint, giveUp, revealedHints,
     modeDone, dayPoints, elapsedMs, formatTime, isFinished,
+    evaluateAchievements, streakDetails,
   };
 });

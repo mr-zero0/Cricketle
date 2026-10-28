@@ -184,9 +184,12 @@ function createApp(opts = {}) {
       const username = typeof body.username === "string" ? body.username.trim() : "";
       if (!auth.validUsername(username)) return fail(res, 400, "invalid_username", "Usernames are 3-20 letters, numbers or underscores.");
       if (!auth.validPassword(body.password)) return fail(res, 400, "invalid_password", "Passwords need at least 6 characters.");
+      const displayName = typeof body.displayName === "string" && body.displayName.trim() ? body.displayName.trim().slice(0, 30) : username;
+      const avatar = typeof body.avatar === "string" ? body.avatar.trim().slice(0, 50) : "batter";
+
       let user;
       try {
-        user = db.createUser(username, auth.hashPassword(body.password), now());
+        user = db.createUser(username, auth.hashPassword(body.password), now(), { displayName, avatar });
       } catch (err) {
         if (err.code === "username_taken") return fail(res, 409, "username_taken", "That username is taken.");
         throw err;
@@ -194,7 +197,19 @@ function createApp(opts = {}) {
       const token = auth.newToken();
       db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
       log("register", user.username);
-      return send(res, 201, { user: { id: user.id, username: user.username, createdAt: user.createdAt } }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
+      return send(res, 201, {
+        user: {
+          id: user.id,
+          username: user.username,
+          displayName: user.displayName || user.username,
+          avatar: user.avatar || "batter",
+          bio: user.bio || "",
+          favTeam: user.favTeam || "",
+          favPlayer: user.favPlayer || "",
+          googleConnected: false,
+          createdAt: user.createdAt,
+        },
+      }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
     }
 
     if (key === "POST /api/auth/login") {
@@ -202,12 +217,142 @@ function createApp(opts = {}) {
       const body = await readJson(req);
       const username = typeof body.username === "string" ? body.username.trim() : "";
       const row = username ? db.userByName(username) : null;
-      if (!row || !auth.verifyPassword(String(body.password || ""), row.pass_hash)) {
+      if (!row || !row.pass_hash || !auth.verifyPassword(String(body.password || ""), row.pass_hash)) {
         return fail(res, 401, "bad_credentials", "Wrong username or password.");
       }
       const token = auth.newToken();
       db.createSession(auth.hashToken(token), row.id, now(), SESSION_TTL_MS);
-      return send(res, 200, { user: { id: row.id, username: row.username, createdAt: row.created_at } }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
+      return send(res, 200, {
+        user: {
+          id: row.id,
+          username: row.username,
+          displayName: row.display_name || row.username,
+          avatar: row.avatar || "batter",
+          bio: row.bio || "",
+          favTeam: row.fav_team || "",
+          favPlayer: row.fav_player || "",
+          googleConnected: Boolean(row.google_id),
+          createdAt: row.created_at,
+        },
+      }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
+    }
+
+    if (key === "POST /api/auth/google") {
+      rateLimit(req, "auth", 30, 15 * 60 * 1000);
+      const body = await readJson(req);
+      let googleId = "";
+      let email = "";
+      let name = "";
+      let picture = "";
+
+      if (body.credential && typeof body.credential === "string") {
+        try {
+          const parts = body.credential.split(".");
+          if (parts.length === 3) {
+            const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
+            googleId = payload.sub || "";
+            email = payload.email || "";
+            name = payload.name || payload.given_name || "";
+            picture = payload.picture || "";
+          }
+        } catch (_) {
+          return fail(res, 400, "invalid_google_token", "Invalid Google credentials.");
+        }
+      } else if (body.sub && typeof body.sub === "string") {
+        googleId = body.sub;
+        email = body.email || "";
+        name = body.name || "";
+        picture = body.picture || "";
+      }
+
+      if (!googleId) {
+        return fail(res, 400, "missing_google_id", "Google account information was not received.");
+      }
+
+      let user = db.userByGoogleId(googleId);
+      if (!user && email) {
+        user = db.userByEmail(email);
+        if (user) {
+          user = db.linkGoogle(user.id, googleId, email, picture);
+        }
+      }
+
+      if (!user) {
+        let baseUsername = (name || email.split("@")[0] || "Cricketer")
+          .replace(/[^A-Za-z0-9_]/g, "_")
+          .slice(0, 15);
+        if (baseUsername.length < 3) baseUsername = "Player_" + baseUsername;
+
+        let username = baseUsername;
+        let suffix = 1;
+        while (db.userByName(username) && suffix < 1000) {
+          username = (baseUsername.slice(0, 14) + "_" + suffix).slice(0, 20);
+          suffix++;
+        }
+
+        user = db.createUser(username, null, now(), {
+          displayName: name || username,
+          email,
+          googleId,
+          avatar: "captain",
+          bio: "Cricket enthusiast · Signed in with Google",
+        });
+      }
+
+      const token = auth.newToken();
+      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      log("google_login", user.username);
+      return send(
+        res,
+        200,
+        {
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.display_name || user.displayName || user.username,
+            email: user.email,
+            avatar: user.avatar || "captain",
+            bio: user.bio || "",
+            favTeam: user.fav_team || user.favTeam || "",
+            favPlayer: user.fav_player || user.favPlayer || "",
+            googleConnected: true,
+            createdAt: user.created_at || user.createdAt,
+          },
+        },
+        { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) }
+      );
+    }
+
+    if (key === "POST /api/profile/update") {
+      const user = requireUser(req);
+      rateLimit(req, "profile", 40, 5 * 60 * 1000);
+      const body = await readJson(req);
+
+      const displayName = typeof body.displayName === "string" ? body.displayName.trim().slice(0, 30) : undefined;
+      const bio = typeof body.bio === "string" ? body.bio.trim().slice(0, 160) : undefined;
+      const avatar = typeof body.avatar === "string" ? body.avatar.trim().slice(0, 100) : undefined;
+      const favTeam = typeof body.favTeam === "string" ? body.favTeam.trim().slice(0, 50) : undefined;
+      const favPlayer = typeof body.favPlayer === "string" ? body.favPlayer.trim().slice(0, 50) : undefined;
+
+      const updated = db.updateProfile(user.id, { displayName, bio, avatar, favTeam, favPlayer });
+      const stats = game.stats(user.id);
+
+      return send(res, 200, {
+        ok: true,
+        user: {
+          id: updated.id,
+          username: updated.username,
+          displayName: updated.display_name || updated.username,
+          email: updated.email,
+          avatar: updated.avatar || "batter",
+          bio: updated.bio || "",
+          favTeam: updated.fav_team || "",
+          favPlayer: updated.fav_player || "",
+          googleConnected: Boolean(updated.google_id),
+          createdAt: updated.created_at,
+        },
+        stats,
+      });
     }
 
     if (key === "POST /api/auth/logout") {
@@ -221,7 +366,18 @@ function createApp(opts = {}) {
       const user = currentUser(req);
       if (!user) return send(res, 200, { user: null, day: core.todayKey(now()), now: now() });
       return send(res, 200, {
-        user: { id: user.id, username: user.username, createdAt: user.created_at },
+        user: {
+          id: user.id,
+          username: user.username,
+          displayName: user.display_name || user.username,
+          email: user.email || null,
+          avatar: user.avatar || "batter",
+          bio: user.bio || "",
+          favTeam: user.fav_team || "",
+          favPlayer: user.fav_player || "",
+          googleConnected: Boolean(user.google_id),
+          createdAt: user.created_at,
+        },
         stats: game.stats(user.id),
         day: core.todayKey(now()),
         now: now(),
@@ -317,11 +473,12 @@ function createApp(opts = {}) {
     if (ext === ".html") {
       headers["content-security-policy"] = [
         "default-src 'self'",
-        "script-src 'self'",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style",
         "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data:",
-        "connect-src 'self'",
+        "img-src 'self' data: https://lh3.googleusercontent.com https://*.googleusercontent.com",
+        "connect-src 'self' https://accounts.google.com/gsi/",
+        "frame-src https://accounts.google.com/gsi/",
         "frame-ancestors 'none'",
         "base-uri 'self'",
       ].join("; ");

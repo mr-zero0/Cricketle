@@ -68,6 +68,9 @@
     return { day: raw.day, now, state: Object.assign({}, raw, { hints, answers }) };
   }
 
+  const PROFILE_KEY = "cricketle:v2:profile";
+  const HISTORY_KEY = "cricketle:v2:history";
+
   class LocalStore {
     constructor() { this.kind = "local"; }
     now() { return Date.now(); }
@@ -86,6 +89,93 @@
       if (!s) { s = core.newDayState(core.todayKey(this.now())); this.write(s); }
       return s;
     }
+    getProfile() {
+      try {
+        const p = JSON.parse(localStorage.getItem(PROFILE_KEY));
+        if (p && typeof p === "object") return p;
+      } catch (_) { /* ignore */ }
+      return {
+        displayName: "Guest Player",
+        avatar: "batter",
+        bio: "Playing in guest mode",
+        favTeam: "India",
+        favPlayer: "Virat Kohli",
+      };
+    }
+    saveProfile(p) {
+      try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (_) { /* ignore */ }
+    }
+    getHistory() {
+      try {
+        const h = JSON.parse(localStorage.getItem(HISTORY_KEY));
+        if (Array.isArray(h)) return h;
+      } catch (_) { /* ignore */ }
+      return [];
+    }
+    recordHistory(item) {
+      try {
+        const h = this.getHistory();
+        const exists = h.some((x) => x.day === item.day && x.mode === item.mode && x.idx === item.idx);
+        if (!exists) {
+          h.push(item);
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+        }
+      } catch (_) { /* ignore */ }
+    }
+    getStats() {
+      const h = this.getHistory();
+      const day = core.todayKey(this.now());
+      let solved = 0;
+      let points = 0;
+      const daysSet = new Set();
+      const guessDist = { 1: 0, 2: 0, "3-5": 0, "6-10": 0, "10+": 0 };
+
+      for (const p of h) {
+        if (p.day) daysSet.add(p.day);
+        points += p.points || 0;
+        if (p.status === "solved") {
+          solved++;
+          let count = 0;
+          if (Array.isArray(p.guesses)) count = p.guesses.length;
+          else if (typeof p.guesses === "string") {
+            try { count = JSON.parse(p.guesses).length; } catch (_) { count = 0; }
+          }
+          if (count === 1) guessDist[1]++;
+          else if (count === 2) guessDist[2]++;
+          else if (count >= 3 && count <= 5) guessDist["3-5"]++;
+          else if (count >= 6 && count <= 10) guessDist["6-10"]++;
+          else if (count > 10) guessDist["10+"]++;
+        }
+      }
+
+      const s = core.streakDetails(Array.from(daysSet), day);
+      const title = core.rankTitle(points);
+      const baseStats = { allTimePoints: points, solved, daysPlayed: daysSet.size, currentStreak: s.current, bestStreak: s.best };
+      const achievements = core.evaluateAchievements(baseStats, h);
+      const winRate = h.length > 0 ? Math.round((solved / h.length) * 100) : 100;
+
+      return {
+        allTimePoints: points,
+        solved,
+        daysPlayed: daysSet.size,
+        currentStreak: s.current,
+        bestStreak: s.best,
+        streak: s,
+        todayPoints: 0,
+        todayRank: null,
+        todayTotal: 0,
+        allTimeRank: null,
+        allTimeTotal: 0,
+        title: title.title,
+        nextTitle: title.next ? title.next.title : null,
+        nextTitleAt: title.next ? title.next.min : null,
+        progress: title.progress,
+        guessDist,
+        winRate,
+        achievements,
+        totalAttempts: h.length,
+      };
+    }
     async load() { return presentLocal(this.raw(), this.now()); }
     run(fn, extras) {
       const now = this.now();
@@ -100,6 +190,19 @@
     async guess(mode, idx, name) {
       return this.run((s, now) => core.applyGuess(s, mode, idx, name, now), (r) => {
         const p = r.state.modes[mode].puzzles[idx];
+        if (r.solved) {
+          this.recordHistory({
+            day: r.state.day,
+            mode,
+            idx,
+            status: "solved",
+            guesses: p.guesses,
+            hints: p.hints,
+            started_at: p.startedAt,
+            finished_at: p.finishedAt,
+            points: p.points,
+          });
+        }
         return { rank: r.rank, solved: r.solved, guess: p.guesses[p.guesses.length - 1], answer: r.solved ? core.describe(core.answerFor(r.state.day, mode, idx)) : undefined };
       });
     }
@@ -107,7 +210,21 @@
       return this.run((s, now) => core.useHint(s, mode, idx, now), (r) => ({ hint: r.hint }));
     }
     async giveUp(mode, idx) {
-      return this.run((s, now) => core.giveUp(s, mode, idx, now), (r) => ({ answer: core.describe(core.answerFor(r.state.day, mode, idx)) }));
+      return this.run((s, now) => core.giveUp(s, mode, idx, now), (r) => {
+        const p = r.state.modes[mode].puzzles[idx];
+        this.recordHistory({
+          day: r.state.day,
+          mode,
+          idx,
+          status: "gaveUp",
+          guesses: p.guesses,
+          hints: p.hints,
+          started_at: p.startedAt,
+          finished_at: p.finishedAt,
+          points: 0,
+        });
+        return { answer: core.describe(core.answerFor(r.state.day, mode, idx)) };
+      });
     }
   }
 
@@ -137,6 +254,9 @@
     mode: "easy",
     current: { easy: 0, hard: 0 },
     view: "play",
+    profileTab: "stats",
+    badgeFilter: "all",
+    selectedAvatar: "batter",
     board: { tab: "today", data: {}, loading: false },
     authTab: "signin",
     lastGuess: null,
@@ -828,48 +948,397 @@
     loadBoard(false);
   }
 
-  // ---------- Profile + auth ----------
+  // ---------- Profile, Customization & Auth ----------
+
+  const CRICKET_TEAMS = [
+    "India", "Australia", "England", "South Africa", "New Zealand", "Pakistan", "West Indies", "Sri Lanka", "Afghanistan", "Bangladesh",
+    "Chennai Super Kings", "Mumbai Indians", "Royal Challengers Bengaluru", "Kolkata Knight Riders",
+    "Rajasthan Royals", "Sunrisers Hyderabad", "Delhi Capitals", "Gujarat Titans", "Lucknow Super Giants", "Punjab Kings"
+  ];
+
+  function getAvatar(id) {
+    return (core.AVATARS && core.AVATARS.find((a) => a.id === id)) || (core.AVATARS && core.AVATARS[0]) || { id: "batter", name: "Master Blaster", role: "Batter", icon: "🏏", bg: "linear-gradient(135deg, #15803d, #22c55e)" };
+  }
 
   function renderProfile() {
-    $("offline-card").hidden = !app.offline;
-    $("auth-card").hidden = app.offline || Boolean(app.user);
-    $("profile-card").hidden = app.offline || !app.user;
-    if (app.offline) return;
-    if (!app.user) { renderAuthTab(); return; }
-    const s = app.stats || {};
+    $("offline-card").hidden = true;
+    $("auth-card").hidden = Boolean(app.user);
+    $("profile-card").hidden = false;
+
+    if (!app.user && app.profileTab !== "edit" && app.profileTab !== "badges" && app.profileTab !== "stats") {
+      // If guest and not on a guest tab, show auth card
+      $("auth-card").hidden = false;
+      renderAuthTab();
+    }
+
+    // Determine current profile & stats (whether signed in or guest)
+    let pUser;
+    let s;
+    if (app.user) {
+      pUser = {
+        username: app.user.username,
+        displayName: app.user.displayName || app.user.username,
+        avatar: app.user.avatar || "batter",
+        bio: app.user.bio || "",
+        favTeam: app.user.favTeam || "",
+        favPlayer: app.user.favPlayer || "",
+        googleConnected: Boolean(app.user.googleConnected),
+        isGuest: false,
+      };
+      s = app.stats || {};
+    } else {
+      const gProfile = (app.store && app.store.getProfile) ? app.store.getProfile() : {};
+      pUser = {
+        username: "guest",
+        displayName: gProfile.displayName || "Guest Player",
+        avatar: gProfile.avatar || "batter",
+        bio: gProfile.bio || "Playing in guest mode on this device.",
+        favTeam: gProfile.favTeam || "India",
+        favPlayer: gProfile.favPlayer || "Virat Kohli",
+        googleConnected: false,
+        isGuest: true,
+      };
+      s = (app.store && app.store.getStats) ? app.store.getStats() : {};
+    }
+
     const title = core.rankTitle(s.allTimePoints || 0);
     const progressPct = Math.round((title.progress || 0) * 100);
-    const initial = app.user.username.slice(0, 1).toUpperCase();
-    $("profile-card").innerHTML = `
-      <div class="profile-head card">
-        <div class="avatar" aria-hidden="true">${escapeHtml(initial)}</div>
-        <div>
-          <h3>${escapeHtml(app.user.username)}</h3>
-          <div class="title-line"><span class="title-badge"><svg aria-hidden="true"><use href="#i-trophy"/></svg>${escapeHtml(title.title)}</span>
-            <span>${s.allTimeRank ? `All-time rank #${s.allTimeRank} of ${s.allTimeTotal}` : "Not ranked yet"}</span></div>
+    const av = getAvatar(pUser.avatar);
+    const achievements = s.achievements || core.evaluateAchievements(s, []);
+    const unlockedCount = achievements.filter((a) => a.unlocked).length;
+
+    let subViewHtml = "";
+
+    // 1. Career Stats & Streaks Tab
+    if (app.profileTab === "stats") {
+      const streakInfo = s.streak || core.streakDetails([], core.todayKey(app.store ? app.store.now() : Date.now()));
+      const weekDotsHtml = (streakInfo.week || []).map((d) => `
+        <div class="streak-day-dot${d.active ? " active" : ""}${d.isToday ? " today" : ""}">
+          <span class="day-circle">${d.active ? "✓" : escapeHtml(d.label.slice(0, 1))}</span>
+          <span class="day-name">${escapeHtml(d.label)}</span>
+        </div>
+      `).join("");
+
+      const guessDist = s.guessDist || { 1: 0, 2: 0, "3-5": 0, "6-10": 0, "10+": 0 };
+      const maxGuesses = Math.max(1, ...Object.values(guessDist));
+      const distRowsHtml = Object.keys(guessDist).map((k) => {
+        const val = guessDist[k];
+        const pct = Math.round((val / maxGuesses) * 100);
+        return `
+          <div class="dist-row">
+            <span class="dist-label">${k}</span>
+            <div class="dist-track"><span class="dist-fill" style="width:${pct}%"></span></div>
+            <span class="dist-val">${val}</span>
+          </div>`;
+      }).join("");
+
+      subViewHtml = `
+        <div class="streak-card card">
+          <div class="streak-flame-box" aria-hidden="true">
+            <svg><use href="#i-flame"/></svg>
+          </div>
+          <div class="streak-details">
+            <h4>${s.currentStreak || 0} Day${s.currentStreak === 1 ? "" : "s"} Streak</h4>
+            <p class="streak-subtitle">Best streak: <strong>${s.bestStreak || 0} days</strong> ${s.currentStreak > 0 ? "· Keep the flame alive tomorrow!" : "· Solve a puzzle to start a streak!"}</p>
+          </div>
+          <div class="streak-week" aria-label="7-day activity">
+            ${weekDotsHtml}
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-tile card hi"><span class="v">${s.todayPoints || 0}</span><span class="k">Today's points</span></div>
+          <div class="stat-tile card hi"><span class="v">${s.todayRank ? "#" + s.todayRank : "–"}</span><span class="k">Today's rank</span></div>
+          <div class="stat-tile card"><span class="v">${s.allTimePoints || 0}</span><span class="k">All-time points</span></div>
+          <div class="stat-tile card"><span class="v">${s.allTimeRank ? "#" + s.allTimeRank : "–"}</span><span class="k">All-time rank</span></div>
+          <div class="stat-tile card"><span class="v">${s.solved || 0}</span><span class="k">Puzzles solved</span></div>
+          <div class="stat-tile card"><span class="v">${s.winRate || (s.solved ? 100 : 0)}%</span><span class="k">Win rate</span></div>
+          <div class="stat-tile card"><span class="v">${unlockedCount} / ${achievements.length}</span><span class="k">Badges</span></div>
+          <div class="stat-tile card"><span class="v">${s.daysPlayed || 0}</span><span class="k">Days active</span></div>
+        </div>
+
+        <div class="dist-card card">
+          <h4>Guess Distribution</h4>
+          <div class="dist-bars">
+            ${distRowsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    // 2. Badges & Achievements Tab
+    else if (app.profileTab === "badges") {
+      const filter = app.badgeFilter || "all";
+      const filtered = achievements.filter((a) => {
+        if (filter === "unlocked") return a.unlocked;
+        if (filter === "locked") return !a.unlocked;
+        return true;
+      });
+
+      const badgesHtml = filtered.map((b) => {
+        const iconId = "#i-" + (b.icon || "medal");
+        const prog = b.progress || { current: 0, max: 1, pct: 0 };
+        return `
+          <div class="badge-card card ${b.tier}${b.unlocked ? "" : " locked"}">
+            <div class="badge-icon-box" aria-hidden="true">
+              <svg><use href="${iconId}"/></svg>
+            </div>
+            <div class="badge-body">
+              <h5><span>${escapeHtml(b.title)}</span> <span class="badge-tier-tag">${b.tier}</span></h5>
+              <p class="badge-desc">${escapeHtml(b.desc)}</p>
+              <div class="badge-progress-wrap">
+                <div class="badge-track"><span class="badge-fill" style="width:${prog.pct}%"></span></div>
+                <div class="badge-status">
+                  <span>${b.unlocked ? '<span class="badge-unlocked-tag">✓ Unlocked</span>' : `${prog.current} / ${prog.max}`}</span>
+                  <span>${prog.pct}%</span>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }).join("");
+
+      subViewHtml = `
+        <div class="badges-header">
+          <span class="badges-summary"><strong>${unlockedCount}</strong> of <strong>${achievements.length}</strong> unlocked (${Math.round((unlockedCount / Math.max(1, achievements.length)) * 100)}%)</span>
+          <div class="badge-filter-pills" role="tablist" aria-label="Filter badges">
+            <button class="badge-pill${filter === "all" ? " active" : ""}" data-filter="all" type="button">All (${achievements.length})</button>
+            <button class="badge-pill${filter === "unlocked" ? " active" : ""}" data-filter="unlocked" type="button">Unlocked (${unlockedCount})</button>
+            <button class="badge-pill${filter === "locked" ? " active" : ""}" data-filter="locked" type="button">Locked (${achievements.length - unlockedCount})</button>
+          </div>
+        </div>
+        <div class="badge-grid">
+          ${badgesHtml || '<p class="muted center">No achievements in this category yet.</p>'}
+        </div>
+      `;
+    }
+
+    // 3. Edit Profile & Customization Tab
+    else if (app.profileTab === "edit") {
+      const selectedAv = app.selectedAvatar || pUser.avatar || "batter";
+      const avatarsGridHtml = (core.AVATARS || []).map((a) => `
+        <div class="avatar-choice${a.id === selectedAv ? " active" : ""}" data-avatar-id="${a.id}">
+          <div class="avatar-choice-icon" style="background:${a.bg}">${a.icon}</div>
+          <span class="avatar-choice-name">${escapeHtml(a.name)}</span>
+          <span class="avatar-choice-role">${escapeHtml(a.role)}</span>
+        </div>
+      `).join("");
+
+      const teamOptionsHtml = CRICKET_TEAMS.map((t) => `
+        <option value="${escapeHtml(t)}"${pUser.favTeam === t ? " selected" : ""}>${escapeHtml(t)}</option>
+      `).join("");
+
+      subViewHtml = `
+        <form id="profile-edit-form" class="card" style="padding:var(--space-5);">
+          <h4 style="margin:0 0 var(--space-2);font-family:var(--font-display);font-size:1.6rem;letter-spacing:0.04em;">Customize Your Cricketer</h4>
+          <p class="muted small-text" style="margin-bottom:var(--space-4);">Choose your match avatar, favorite team and nickname.</p>
+
+          <div class="field">
+            <label>Select Match Avatar</label>
+            <div class="avatar-grid" id="avatar-grid">
+              ${avatarsGridHtml}
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:var(--space-4);">
+            <label for="edit-display-name">Display Name</label>
+            <input id="edit-display-name" type="text" maxlength="30" value="${escapeHtml(pUser.displayName)}" required placeholder="e.g. Virat Fan 18" />
+            <p class="help-text">Shown on today's and all-time leaderboards.</p>
+          </div>
+
+          <div class="field">
+            <label for="edit-bio">Cricket Bio / Motto</label>
+            <textarea id="edit-bio" rows="2" maxlength="160" class="field input" style="width:100%;min-height:70px;padding:10px 14px;border-radius:12px;background:var(--card-2);color:var(--fg);border:1px solid var(--border-strong);font:inherit;" placeholder="e.g. Test match purist. Cover drive enthusiast.">${escapeHtml(pUser.bio)}</textarea>
+            <p class="help-text">A short tagline for your profile.</p>
+          </div>
+
+          <div class="field">
+            <label for="edit-fav-team">Favorite Team</label>
+            <select id="edit-fav-team" class="select-styled">
+              <option value="">-- Pick a Favorite Team --</option>
+              ${teamOptionsHtml}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="edit-fav-player">Favorite Player</label>
+            <input id="edit-fav-player" type="text" maxlength="50" value="${escapeHtml(pUser.favPlayer)}" placeholder="e.g. Virat Kohli" />
+            <div class="quick-chips" id="player-chips">
+              <button type="button" class="chip-btn" data-player="Virat Kohli">Virat Kohli</button>
+              <button type="button" class="chip-btn" data-player="MS Dhoni">MS Dhoni</button>
+              <button type="button" class="chip-btn" data-player="Rohit Sharma">Rohit Sharma</button>
+              <button type="button" class="chip-btn" data-player="Sachin Tendulkar">Sachin Tendulkar</button>
+              <button type="button" class="chip-btn" data-player="Jasprit Bumrah">Jasprit Bumrah</button>
+              <button type="button" class="chip-btn" data-player="AB de Villiers">AB de Villiers</button>
+              <button type="button" class="chip-btn" data-player="Pat Cummins">Pat Cummins</button>
+            </div>
+          </div>
+
+          <div style="margin-top:var(--space-5);display:flex;gap:var(--space-2);">
+            <button id="save-profile-btn" class="btn primary big" type="submit">Save Changes</button>
+          </div>
+        </form>
+      `;
+    }
+
+    // 4. Account & Security Tab
+    else if (app.profileTab === "account") {
+      subViewHtml = `
+        <div class="card" style="padding:var(--space-5);">
+          <h4 style="margin:0 0 var(--space-4);font-family:var(--font-display);font-size:1.6rem;letter-spacing:0.04em;">Account & Security</h4>
+          ${pUser.isGuest ? `
+            <div class="guest-callout-banner">
+              <div class="guest-callout-text">
+                <h4>Save your progress</h4>
+                <p>Create an account or continue with Google to join global leaderboards and sync across devices.</p>
+              </div>
+              <button id="guest-to-auth-btn" class="btn primary small" type="button">Sign In / Sign Up</button>
+            </div>
+          ` : `
+            <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-5);">
+              <div style="display:flex;justify-content:space-between;padding-bottom:var(--space-2);border-bottom:1px solid var(--border);">
+                <span class="muted">Username</span>
+                <strong>@${escapeHtml(pUser.username)}</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:var(--space-2);border-bottom:1px solid var(--border);">
+                <span class="muted">Google Account</span>
+                <span>${pUser.googleConnected ? '<span class="pill-google"><svg class="google-icon-sm" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Connected</span>' : '<span class="muted">Not linked</span>'}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:var(--space-2);border-bottom:1px solid var(--border);">
+                <span class="muted">Security</span>
+                <span>Password encrypted with scrypt</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+              <button id="signout-btn" class="btn danger" type="button"><svg aria-hidden="true"><use href="#i-logout"/></svg> Sign out</button>
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    const heroHtml = `
+      ${pUser.isGuest ? `
+        <div class="guest-callout-banner">
+          <div class="guest-callout-text">
+            <h4>🏆 Playing as a Guest</h4>
+            <p>Your results & badges are saved locally. Sign in with Google to appear on global leaderboards!</p>
+          </div>
+          <button id="guest-signin-btn" class="btn primary small" type="button">Sign In / Join</button>
+        </div>
+      ` : ""}
+      <div class="profile-hero card">
+        <div class="profile-avatar-wrap">
+          <div class="avatar-badge" style="background:${av.bg};" aria-hidden="true">${av.icon}</div>
+          <button class="avatar-edit-trigger" id="avatar-edit-btn" type="button" title="Change Avatar" aria-label="Change Avatar"><svg aria-hidden="true"><use href="#i-edit"/></svg></button>
+        </div>
+        <div class="profile-hero-meta">
+          <div class="profile-name-row">
+            <h3 class="profile-display-name">${escapeHtml(pUser.displayName)}</h3>
+            <span class="profile-username">${pUser.isGuest ? "· Guest" : `@${escapeHtml(pUser.username)}`}</span>
+            ${pUser.googleConnected ? `<span class="pill-google"><svg class="google-icon-sm" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Google</span>` : ""}
+          </div>
+          <div class="profile-tag-row">
+            <span class="title-badge"><svg aria-hidden="true"><use href="#i-trophy"/></svg> ${escapeHtml(title.title)}</span>
+            ${pUser.favTeam ? `<span class="profile-chip team">🏏 ${escapeHtml(pUser.favTeam)}</span>` : ""}
+            ${pUser.favPlayer ? `<span class="profile-chip">⭐ ${escapeHtml(pUser.favPlayer)}</span>` : ""}
+          </div>
+          ${pUser.bio ? `<p class="profile-bio">${escapeHtml(pUser.bio)}</p>` : ""}
         </div>
         <div class="progress">
           <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPct}" aria-label="Progress to next title"><span style="width:${progressPct}%"></span></div>
-          <div class="progress-text"><span>${s.allTimePoints || 0} pts</span><span>${title.next ? `${title.next.min - (s.allTimePoints || 0)} to ${title.next.title}` : "Top of the ladder"}</span></div>
+          <div class="progress-text"><span>${s.allTimePoints || 0} pts</span><span>${title.next ? `${title.next.min - (s.allTimePoints || 0)} pts to ${title.next.title}` : "Top of the ladder"}</span></div>
         </div>
       </div>
-      <div class="stat-grid">
-        <div class="stat-tile card hi"><span class="v">${s.todayPoints || 0}</span><span class="k">Today's points</span></div>
-        <div class="stat-tile card hi"><span class="v">${s.todayRank ? "#" + s.todayRank : "–"}</span><span class="k">Today's rank</span></div>
-        <div class="stat-tile card"><span class="v">${s.allTimePoints || 0}</span><span class="k">All-time points</span></div>
-        <div class="stat-tile card"><span class="v">${s.allTimeRank ? "#" + s.allTimeRank : "–"}</span><span class="k">All-time rank</span></div>
-        <div class="stat-tile card"><span class="v">${s.currentStreak || 0}</span><span class="k">Current streak</span></div>
-        <div class="stat-tile card"><span class="v">${s.bestStreak || 0}</span><span class="k">Best streak</span></div>
-        <div class="stat-tile card"><span class="v">${s.solved || 0}</span><span class="k">Puzzles solved</span></div>
-        <div class="stat-tile card"><span class="v">${s.daysPlayed || 0}</span><span class="k">Days played</span></div>
+
+      <div class="profile-subnav" role="tablist" aria-label="Profile navigation">
+        <button class="subnav-btn${app.profileTab === "stats" ? " active" : ""}" data-subtab="stats" type="button"><svg aria-hidden="true"><use href="#i-ball"/></svg> Career & Streaks</button>
+        <button class="subnav-btn${app.profileTab === "badges" ? " active" : ""}" data-subtab="badges" type="button"><svg aria-hidden="true"><use href="#i-medal"/></svg> Badges (${unlockedCount}/${achievements.length})</button>
+        <button class="subnav-btn${app.profileTab === "edit" ? " active" : ""}" data-subtab="edit" type="button"><svg aria-hidden="true"><use href="#i-edit"/></svg> Edit Profile</button>
+        <button class="subnav-btn${app.profileTab === "account" ? " active" : ""}" data-subtab="account" type="button"><svg aria-hidden="true"><use href="#i-lock"/></svg> Account</button>
       </div>
-      <div class="profile-actions">
-        <a href="#leaderboard" class="btn"><svg aria-hidden="true"><use href="#i-trophy"/></svg> Leaderboard</a>
-        <button id="help-link" class="btn" type="button"><svg aria-hidden="true"><use href="#i-help"/></svg> How points work</button>
-        <button id="signout-btn" class="btn" type="button"><svg aria-hidden="true"><use href="#i-logout"/></svg> Sign out</button>
-      </div>`;
-    $("signout-btn").addEventListener("click", signOut);
-    $("help-link").addEventListener("click", () => $("help").showModal());
+
+      <div class="profile-tab-content">
+        ${subViewHtml}
+      </div>
+    `;
+
+    $("profile-card").innerHTML = heroHtml;
+
+    // Attach listeners
+    document.querySelectorAll(".subnav-btn").forEach((b) => {
+      b.addEventListener("click", () => {
+        app.profileTab = b.dataset.subtab;
+        renderProfile();
+      });
+    });
+
+    const editBtn = $("avatar-edit-btn");
+    if (editBtn) editBtn.addEventListener("click", () => { app.profileTab = "edit"; renderProfile(); });
+
+    const guestSignin = $("guest-signin-btn") || $("guest-to-auth-btn");
+    if (guestSignin) guestSignin.addEventListener("click", () => { $("auth-card").hidden = false; renderAuthTab(); window.scrollTo({ top: $("auth-card").offsetTop - 20, behavior: "smooth" }); });
+
+    const signoutBtn = $("signout-btn");
+    if (signoutBtn) signoutBtn.addEventListener("click", signOut);
+
+    // Badges filter buttons
+    document.querySelectorAll(".badge-pill").forEach((p) => {
+      p.addEventListener("click", () => {
+        app.badgeFilter = p.dataset.filter;
+        renderProfile();
+      });
+    });
+
+    // Avatar selector grid
+    document.querySelectorAll(".avatar-choice").forEach((ac) => {
+      ac.addEventListener("click", () => {
+        app.selectedAvatar = ac.dataset.avatarId;
+        document.querySelectorAll(".avatar-choice").forEach((x) => x.classList.remove("active"));
+        ac.classList.add("active");
+      });
+    });
+
+    // Quick player chips
+    document.querySelectorAll(".chip-btn").forEach((cb) => {
+      cb.addEventListener("click", () => {
+        const inp = $("edit-fav-player");
+        if (inp) inp.value = cb.dataset.player;
+      });
+    });
+
+    // Edit profile submit
+    const editForm = $("profile-edit-form");
+    if (editForm) {
+      editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const displayName = $("edit-display-name").value.trim();
+        const bio = $("edit-bio").value.trim();
+        const favTeam = $("edit-fav-team").value;
+        const favPlayer = $("edit-fav-player").value.trim();
+        const avatar = app.selectedAvatar || pUser.avatar || "batter";
+
+        if (app.user) {
+          try {
+            const res = await api("POST", "/api/profile/update", { displayName, bio, avatar, favTeam, favPlayer });
+            app.user = res.user;
+            app.stats = res.stats;
+            toast("Profile updated successfully!", "success");
+            app.profileTab = "stats";
+            renderProfile();
+          } catch (err) {
+            toast(err.message || "Failed to update profile", "error");
+          }
+        } else {
+          // Guest mode
+          if (app.store && app.store.saveProfile) {
+            app.store.saveProfile({ displayName, bio, avatar, favTeam, favPlayer });
+            toast("Guest profile updated on this device!", "success");
+            app.profileTab = "stats";
+            renderProfile();
+          }
+        }
+      });
+    }
   }
 
   function renderAuthTab() {
@@ -880,6 +1349,7 @@
     $("tab-signup").setAttribute("aria-selected", String(signup));
     setSegmented($("tab-signin").parentElement, signup);
     $("confirm-field").hidden = !signup;
+    if ($("display-name-field")) $("display-name-field").hidden = !signup;
     $("auth-password").setAttribute("autocomplete", signup ? "new-password" : "current-password");
     $("auth-submit").textContent = signup ? "Create account" : "Sign in";
     clearAuthErrors();
@@ -927,13 +1397,17 @@
     btn.disabled = true;
     const signup = app.authTab === "signup";
     try {
-      const res = await api("POST", signup ? "/api/auth/register" : "/api/auth/login", {
+      const payload = {
         username: $("auth-username").value.trim(),
         password: $("auth-password").value,
-      });
+      };
+      if (signup && $("auth-display-name") && $("auth-display-name").value.trim()) {
+        payload.displayName = $("auth-display-name").value.trim();
+      }
+      const res = await api("POST", signup ? "/api/auth/register" : "/api/auth/login", payload);
       $("auth-form").reset();
       await becomeUser(res.user);
-      toast(signup ? `Welcome, ${res.user.username}. Your results now count for the leaderboard.` : `Welcome back, ${res.user.username}.`, "success");
+      toast(signup ? `Welcome, ${res.user.displayName || res.user.username}. Your results now count for the leaderboard.` : `Welcome back, ${res.user.displayName || res.user.username}.`, "success");
       location.hash = "#play";
     } catch (err) {
       if (err.code === "username_taken") fieldError("auth-username", "That username is taken.");
@@ -946,6 +1420,61 @@
     } finally {
       btn.classList.remove("loading");
       btn.disabled = false;
+    }
+  }
+
+  // Google Sign-In handler
+  async function handleGoogleLogin(payload) {
+    try {
+      const modal = $("google-modal");
+      if (modal && modal.close) modal.close();
+      const res = await api("POST", "/api/auth/google", payload);
+      await becomeUser(res.user);
+      toast(`Signed in as ${res.user.displayName || res.user.username}!`, "success");
+      location.hash = "#play";
+    } catch (err) {
+      toast(err.message || "Google sign in failed.", "error");
+    }
+  }
+
+  function initGoogleAuth() {
+    const btn = $("google-btn");
+    const modal = $("google-modal");
+    if (btn) {
+      btn.addEventListener("click", () => {
+        if (app.offline) {
+          toast("Google sign-in connects when running the Cricketle server (npm start).", "error");
+          return;
+        }
+        if (modal && modal.showModal) modal.showModal();
+      });
+    }
+
+    // Modal quick account buttons
+    document.querySelectorAll(".google-account-btn").forEach((ab) => {
+      ab.addEventListener("click", () => {
+        handleGoogleLogin({
+          sub: "google_" + ab.dataset.googleEmail,
+          email: ab.dataset.googleEmail,
+          name: ab.dataset.googleName,
+        });
+      });
+    });
+
+    // Custom Google form in modal
+    const customForm = $("custom-google-form");
+    if (customForm) {
+      customForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = $("custom-google-name").value.trim();
+        const email = $("custom-google-email").value.trim();
+        if (!name || !email) return;
+        handleGoogleLogin({
+          sub: "google_" + email,
+          email,
+          name,
+        });
+      });
     }
   }
 
@@ -1064,6 +1593,7 @@
 
   async function bootstrap() {
     fillHelp();
+    initGoogleAuth();
     try {
       const me = await api("GET", "/api/me");
       app.offline = false;

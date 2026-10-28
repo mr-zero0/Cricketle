@@ -365,3 +365,74 @@ test("POST requests must be JSON from the same origin", async () => {
     assert.equal((await c.get("/api/nothing")).status, 404);
   } finally { await app.close(); }
 });
+
+test("google sign-in creates an account and sets up profile", async () => {
+  const app = await boot();
+  try {
+    const c = client(app.base);
+    // Sign in with Google payload
+    const r1 = await c.post("/api/auth/google", {
+      sub: "google-123456",
+      email: "aman@example.com",
+      name: "Mohd Aman",
+      picture: "https://lh3.googleusercontent.com/a/photo.jpg",
+    });
+    assert.equal(r1.status, 200, r1.text);
+    assert.equal(r1.json.user.displayName, "Mohd Aman");
+    assert.equal(r1.json.user.email, "aman@example.com");
+    assert.equal(r1.json.user.googleConnected, true);
+
+    // Verify /api/me returns user details
+    const me = await c.get("/api/me");
+    assert.equal(me.status, 200);
+    assert.equal(me.json.user.displayName, "Mohd Aman");
+    assert.equal(me.json.user.googleConnected, true);
+    assert(Array.isArray(me.json.stats.achievements));
+
+    // Logging in again with same Google sub returns the same user
+    const c2 = client(app.base);
+    const r2 = await c2.post("/api/auth/google", {
+      sub: "google-123456",
+      email: "aman@example.com",
+      name: "Mohd Aman",
+    });
+    assert.equal(r2.status, 200);
+    assert.equal(r2.json.user.id, r1.json.user.id);
+  } finally { await app.close(); }
+});
+
+test("profile updates change display name, avatar, bio and favorite team", async () => {
+  const app = await boot();
+  try {
+    const c = await signUp(app.base, "cricketer_pro");
+    const updateRes = await c.post("/api/profile/update", {
+      displayName: "Virat Fan 18",
+      bio: "Chase master devotee. Cover drive enthusiast.",
+      avatar: "captain",
+      favTeam: "Royal Challengers Bengaluru",
+      favPlayer: "Virat Kohli",
+    });
+    assert.equal(updateRes.status, 200, updateRes.text);
+    assert.equal(updateRes.json.user.displayName, "Virat Fan 18");
+    assert.equal(updateRes.json.user.avatar, "captain");
+    assert.equal(updateRes.json.user.favTeam, "Royal Challengers Bengaluru");
+    assert.equal(updateRes.json.user.favPlayer, "Virat Kohli");
+
+    const me = await c.get("/api/me");
+    assert.equal(me.json.user.displayName, "Virat Fan 18");
+    assert.equal(me.json.user.bio, "Chase master devotee. Cover drive enthusiast.");
+
+    // Verify streak and achievements in stats
+    assert(me.json.stats.streak.week.length === 7);
+    const firstBall = me.json.stats.achievements.find((a) => a.id === "first_ball");
+    assert(firstBall);
+    assert.equal(firstBall.unlocked, false);
+
+    // Solve a puzzle and verify First Ball achievement unlocks!
+    await solve(c, "easy", 0, "2026-10-27");
+    const meAfter = await c.get("/api/me");
+    const firstBallAfter = meAfter.json.stats.achievements.find((a) => a.id === "first_ball");
+    assert.equal(firstBallAfter.unlocked, true);
+  } finally { await app.close(); }
+});
+
