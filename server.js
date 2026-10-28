@@ -81,6 +81,7 @@ async function verifyOtpDev({ key, phone, code }) {
 
 const core = require("./public/game-core.js");
 const { Db } = require("./lib/db.js");
+const { SupabaseDb } = require("./lib/supabase-db.js");
 const auth = require("./lib/auth.js");
 const { GameService } = require("./lib/game.js");
 
@@ -127,11 +128,42 @@ class HttpError extends Error {
 function createApp(opts = {}) {
   const now = opts.now || Date.now;
   const log = opts.log === false ? () => {} : (...a) => console.log(...a);
-  const dbPath = opts.dbPath || process.env.CRICKETLE_DB || path.join(__dirname, "data", "cricketle.db");
-  const db = new Db(dbPath);
+
+  const supabaseUrl = opts.supabaseUrl || process.env.SUPABASE_URL;
+  const supabaseKey = opts.supabaseKey || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+  let db;
+  if (opts.db) {
+    db = opts.db;
+  } else if (opts.dbPath === ":memory:" || (!supabaseUrl && !opts.supabaseUrl)) {
+    const dbPath = opts.dbPath || process.env.CRICKETLE_DB || path.join(__dirname, "data", "cricketle.db");
+    db = new Db(dbPath);
+  } else if (supabaseUrl && supabaseKey) {
+    db = new SupabaseDb(supabaseUrl, supabaseKey);
+    log("database", "Connected to Supabase PostgreSQL at " + supabaseUrl);
+  } else {
+    const dbPath = opts.dbPath || process.env.CRICKETLE_DB || path.join(__dirname, "data", "cricketle.db");
+    db = new Db(dbPath);
+  }
+
   // CRICKETLE_SECRET=public uses the public seed (same answers as guests); only for local testing.
   const envSecret = process.env.CRICKETLE_SECRET;
-  const secret = opts.secret !== undefined ? opts.secret : envSecret === "public" ? "" : (envSecret || db.getOrCreateSecret());
+  let secret = "";
+  if (opts.secret !== undefined) {
+    secret = opts.secret;
+  } else if (envSecret === "public") {
+    secret = "";
+  } else if (envSecret) {
+    secret = envSecret;
+  } else if (typeof db.getOrCreateSecret === "function") {
+    try {
+      const res = db.getOrCreateSecret();
+      if (typeof res === "string") secret = res;
+      else if (res && typeof res.then === "function") {
+        res.then((s) => { if (s && game) game.secret = s; }).catch(() => {});
+      }
+    } catch (_) {}
+  }
+
   const game = new GameService(db, { now, secret });
   const publicDir = opts.publicDir || PUBLIC_DIR;
   const limiter = opts.rateLimit === false ? null : new Map();
@@ -189,14 +221,14 @@ function createApp(opts = {}) {
     return parts.join("; ");
   }
 
-  function currentUser(req) {
+  async function currentUser(req) {
     const token = cookies(req)[COOKIE];
     if (!token) return null;
-    return db.sessionUser(auth.hashToken(token), now());
+    return await db.sessionUser(auth.hashToken(token), now());
   }
 
-  function requireUser(req) {
-    const user = currentUser(req);
+  async function requireUser(req) {
+    const user = await currentUser(req);
     if (!user) throw new HttpError(401, "unauthorized", "Sign in to play for the leaderboard.");
     return user;
   }
@@ -276,13 +308,13 @@ function createApp(opts = {}) {
 
       let user;
       try {
-        user = db.createUser(username, auth.hashPassword(body.password), now(), { displayName, avatar });
+        user = await db.createUser(username, auth.hashPassword(body.password), now(), { displayName, avatar });
       } catch (err) {
         if (err.code === "username_taken") return fail(res, 409, "username_taken", "That username is taken.");
         throw err;
       }
       const token = auth.newToken();
-      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
       log("register", user.username);
       return send(res, 201, {
         user: {
@@ -303,12 +335,12 @@ function createApp(opts = {}) {
       rateLimit(req, "auth", 20, 15 * 60 * 1000);
       const body = await readJson(req);
       const username = typeof body.username === "string" ? body.username.trim() : "";
-      const row = username ? db.userByName(username) : null;
+      const row = username ? await db.userByName(username) : null;
       if (!row || !row.pass_hash || !auth.verifyPassword(String(body.password || ""), row.pass_hash)) {
         return fail(res, 401, "bad_credentials", "Wrong username or password.");
       }
       const token = auth.newToken();
-      db.createSession(auth.hashToken(token), row.id, now(), SESSION_TTL_MS);
+      await db.createSession(auth.hashToken(token), row.id, now(), SESSION_TTL_MS);
       return send(res, 200, {
         user: {
           id: row.id,
@@ -356,11 +388,11 @@ function createApp(opts = {}) {
         return fail(res, 400, "missing_google_id", "Google account information was not received.");
       }
 
-      let user = db.userByGoogleId(googleId);
+      let user = await db.userByGoogleId(googleId);
       if (!user && email) {
-        user = db.userByEmail(email);
+        user = await db.userByEmail(email);
         if (user) {
-          user = db.linkGoogle(user.id, googleId, email, picture);
+          user = await db.linkGoogle(user.id, googleId, email, picture);
         }
       }
 
@@ -372,12 +404,12 @@ function createApp(opts = {}) {
 
         let username = baseUsername;
         let suffix = 1;
-        while (db.userByName(username) && suffix < 1000) {
+        while ((await db.userByName(username)) && suffix < 1000) {
           username = (baseUsername.slice(0, 14) + "_" + suffix).slice(0, 20);
           suffix++;
         }
 
-        user = db.createUser(username, null, now(), {
+        user = await db.createUser(username, null, now(), {
           displayName: name || username,
           email,
           googleId,
@@ -387,7 +419,7 @@ function createApp(opts = {}) {
       }
 
       const token = auth.newToken();
-      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
       log("google_login", user.username);
       return send(
         res,
@@ -417,7 +449,7 @@ function createApp(opts = {}) {
       if (!phone || !/^\+[1-9]\d{9,14}$/.test(phone)) {
         return fail(res, 400, "invalid_phone", "Please enter a valid mobile number with country code (e.g. +91 98765 43210).");
       }
-      const user = db.userByPhone(phone);
+      const user = await db.userByPhone(phone);
       return send(res, 200, {
         ok: true,
         phone,
@@ -438,7 +470,7 @@ function createApp(opts = {}) {
       if (!/^\d{4,8}$/.test(pin)) {
         return fail(res, 400, "invalid_pin", "PIN must be 4 to 8 numbers.");
       }
-      if (db.userByPhone(phone)) {
+      if (await db.userByPhone(phone)) {
         return fail(res, 409, "phone_exists", "This mobile number is already registered. Please sign in or reset your PIN.");
       }
 
@@ -448,7 +480,7 @@ function createApp(opts = {}) {
         if (!auth.validUsername(candidate)) {
           return fail(res, 400, "invalid_username", "Username must be 3-20 letters, numbers, or underscores.");
         }
-        if (db.userByName(candidate)) {
+        if (await db.userByName(candidate)) {
           return fail(res, 409, "username_taken", "That username is already taken. Please choose another.");
         }
         username = candidate;
@@ -457,7 +489,7 @@ function createApp(opts = {}) {
         const baseUsername = "Player_" + lastDigits;
         username = baseUsername;
         let suffix = 1;
-        while (db.userByName(username) && suffix < 1000) {
+        while ((await db.userByName(username)) && suffix < 1000) {
           username = "Player_" + lastDigits + "_" + suffix;
           suffix++;
         }
@@ -469,7 +501,7 @@ function createApp(opts = {}) {
 
       let user;
       try {
-        user = db.createUser(username, auth.hashPassword(pin), now(), {
+        user = await db.createUser(username, auth.hashPassword(pin), now(), {
           displayName,
           phone,
           avatar: "allrounder",
@@ -486,7 +518,7 @@ function createApp(opts = {}) {
       }
 
       const token = auth.newToken();
-      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
       log("phone_register", user.username, phone);
       return send(res, 201, {
         ok: true,
@@ -514,13 +546,13 @@ function createApp(opts = {}) {
         return fail(res, 400, "invalid_phone", "Please enter a valid mobile number.");
       }
       const pin = String(body.pin || "").trim();
-      const user = db.userByPhone(phone);
+      const user = await db.userByPhone(phone);
       if (!user || !user.pass_hash || !auth.verifyPassword(pin, user.pass_hash)) {
         return fail(res, 401, "bad_pin", "Incorrect PIN for this mobile number. Try again or reset your PIN.");
       }
 
       const token = auth.newToken();
-      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
       log("phone_login", user.username, phone);
       return send(res, 200, {
         ok: true,
@@ -552,14 +584,14 @@ function createApp(opts = {}) {
       if (!/^\d{4,8}$/.test(newPin)) {
         return fail(res, 400, "invalid_pin", "New PIN must be 4 to 8 numbers.");
       }
-      const user = db.userByPhone(phone);
+      const user = await db.userByPhone(phone);
       if (!user) {
         return fail(res, 404, "not_found", "No account found with this phone number.");
       }
 
-      db.updatePassword(user.id, auth.hashPassword(newPin));
+      await db.updatePassword(user.id, auth.hashPassword(newPin));
       const token = auth.newToken();
-      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
       log("phone_pin_reset", user.username, phone);
       return send(res, 200, {
         ok: true,
@@ -602,7 +634,7 @@ function createApp(opts = {}) {
       const codeHash = crypto.createHash("sha256").update(phone + ":" + code).digest("hex");
       const expiresAt = now() + 5 * 60 * 1000; // 5 minutes
 
-      db.setOtp(phone, codeHash, expiresAt, now());
+      await db.setOtp(phone, codeHash, expiresAt, now());
       log("otp_sent", phone);
 
       let realSms = false;
@@ -657,14 +689,14 @@ function createApp(opts = {}) {
         return fail(res, 400, "missing_fields", "Mobile number and 6-digit OTP code are required.");
       }
 
-      const otpRecord = db.getOtp(phone);
+      const otpRecord = await db.getOtp(phone);
       if (!otpRecord || otpRecord.expires_at < now()) {
-        if (otpRecord) db.deleteOtp(phone);
+        if (otpRecord) await db.deleteOtp(phone);
         return fail(res, 400, "otp_expired", "OTP has expired or was not requested. Please request a new OTP.");
       }
 
       if (otpRecord.attempts >= 5) {
-        db.deleteOtp(phone);
+        await db.deleteOtp(phone);
         return fail(res, 400, "otp_locked", "Too many incorrect attempts. Please request a fresh OTP.");
       }
 
@@ -683,25 +715,25 @@ function createApp(opts = {}) {
       }
 
       if (!isValid) {
-        db.incrementOtpAttempts(phone);
+        await db.incrementOtpAttempts(phone);
         const remaining = 5 - (otpRecord.attempts + 1);
         if (remaining <= 0) {
-          db.deleteOtp(phone);
+          await db.deleteOtp(phone);
           return fail(res, 400, "otp_locked", "Too many incorrect attempts. Please request a fresh OTP.");
         }
         return fail(res, 400, "invalid_otp", `Incorrect OTP code. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`);
       }
 
       // Valid OTP: delete it immediately so it cannot be reused
-      db.deleteOtp(phone);
+      await db.deleteOtp(phone);
 
-      let user = db.userByPhone(phone);
+      let user = await db.userByPhone(phone);
       if (!user) {
         const lastDigits = phone.slice(-4);
         const baseUsername = "Player_" + lastDigits;
         let username = baseUsername;
         let suffix = 1;
-        while (db.userByName(username) && suffix < 1000) {
+        while ((await db.userByName(username)) && suffix < 1000) {
           username = "Player_" + lastDigits + "_" + suffix;
           suffix++;
         }
@@ -710,7 +742,7 @@ function createApp(opts = {}) {
           ? body.displayName.trim().slice(0, 30)
           : "Cricketer " + lastDigits;
 
-        user = db.createUser(username, null, now(), {
+        user = await db.createUser(username, null, now(), {
           displayName,
           phone,
           avatar: "allrounder",
@@ -719,7 +751,7 @@ function createApp(opts = {}) {
       }
 
       const token = auth.newToken();
-      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
       log("otp_login", user.username);
       return send(
         res,
@@ -769,13 +801,13 @@ function createApp(opts = {}) {
         return fail(res, 400, "invalid_phone", "Valid phone number required.");
       }
 
-      let user = db.userByPhone(phone);
+      let user = await db.userByPhone(phone);
       if (!user) {
         const lastDigits = phone.slice(-4);
         const baseUsername = "Player_" + lastDigits;
         let username = baseUsername;
         let suffix = 1;
-        while (db.userByName(username) && suffix < 1000) {
+        while ((await db.userByName(username)) && suffix < 1000) {
           username = "Player_" + lastDigits + "_" + suffix;
           suffix++;
         }
@@ -784,7 +816,7 @@ function createApp(opts = {}) {
           ? body.displayName.trim().slice(0, 30)
           : "Cricketer " + lastDigits;
 
-        user = db.createUser(username, null, now(), {
+        user = await db.createUser(username, null, now(), {
           displayName,
           phone,
           avatar: "allrounder",
@@ -793,7 +825,7 @@ function createApp(opts = {}) {
       }
 
       const token = auth.newToken();
-      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
       log("firebase_phone_login", user.username);
       return send(
         res,
@@ -820,7 +852,7 @@ function createApp(opts = {}) {
     }
 
     if (key === "POST /api/profile/update") {
-      const user = requireUser(req);
+      const user = await requireUser(req);
       rateLimit(req, "profile", 40, 5 * 60 * 1000);
       const body = await readJson(req);
 
@@ -830,8 +862,8 @@ function createApp(opts = {}) {
       const favTeam = typeof body.favTeam === "string" ? body.favTeam.trim().slice(0, 50) : undefined;
       const favPlayer = typeof body.favPlayer === "string" ? body.favPlayer.trim().slice(0, 50) : undefined;
 
-      const updated = db.updateProfile(user.id, { displayName, bio, avatar, favTeam, favPlayer });
-      const stats = game.stats(user.id);
+      const updated = await db.updateProfile(user.id, { displayName, bio, avatar, favTeam, favPlayer });
+      const stats = await game.stats(user.id);
 
       return send(res, 200, {
         ok: true,
@@ -854,12 +886,12 @@ function createApp(opts = {}) {
     if (key === "POST /api/auth/logout") {
       await readJson(req);
       const token = cookies(req)[COOKIE];
-      if (token) db.deleteSession(auth.hashToken(token));
+      if (token) await db.deleteSession(auth.hashToken(token));
       return send(res, 204, null, { "set-cookie": sessionCookie(req, "", 0) });
     }
 
     if (key === "GET /api/me") {
-      const user = currentUser(req);
+      const user = await currentUser(req);
       if (!user) return send(res, 200, { user: null, day: core.todayKey(now()), now: now() });
       return send(res, 200, {
         user: {
@@ -876,31 +908,31 @@ function createApp(opts = {}) {
           phoneConnected: Boolean(user.phone),
           createdAt: user.created_at,
         },
-        stats: game.stats(user.id),
+        stats: await game.stats(user.id),
         day: core.todayKey(now()),
         now: now(),
       });
     }
 
     if (key === "GET /api/state") {
-      const user = requireUser(req);
-      return send(res, 200, game.present(game.loadState(user.id)));
+      const user = await requireUser(req);
+      return send(res, 200, game.present(await game.loadState(user.id)));
     }
 
     if (key === "POST /api/puzzle/start") {
-      const user = requireUser(req);
+      const user = await requireUser(req);
       rateLimit(req, "play", 600, 10 * 60 * 1000);
       const { mode, idx } = puzzleArgs(await readJson(req));
-      return engineResult(res, req, game.start(user.id, mode, idx));
+      return engineResult(res, req, await game.start(user.id, mode, idx));
     }
 
     if (key === "POST /api/puzzle/guess") {
-      const user = requireUser(req);
+      const user = await requireUser(req);
       rateLimit(req, "play", 600, 10 * 60 * 1000);
       const body = await readJson(req);
       const { mode, idx } = puzzleArgs(body);
       if (typeof body.name !== "string") return fail(res, 400, "unknown_player");
-      const r = game.guess(user.id, mode, idx, body.name);
+      const r = await game.guess(user.id, mode, idx, body.name);
       if (!r.ok) return fail(res, 400, r.error);
       const p = r.state.modes[mode].puzzles[idx];
       const extra = { rank: r.rank, solved: r.solved, guess: p.guesses[p.guesses.length - 1] };
@@ -909,29 +941,29 @@ function createApp(opts = {}) {
     }
 
     if (key === "POST /api/puzzle/hint") {
-      const user = requireUser(req);
+      const user = await requireUser(req);
       rateLimit(req, "play", 600, 10 * 60 * 1000);
       const { mode, idx } = puzzleArgs(await readJson(req));
-      const r = game.hint(user.id, mode, idx);
+      const r = await game.hint(user.id, mode, idx);
       return engineResult(res, req, r, r.ok ? { hint: r.hint } : null);
     }
 
     if (key === "POST /api/puzzle/giveup") {
-      const user = requireUser(req);
+      const user = await requireUser(req);
       rateLimit(req, "play", 600, 10 * 60 * 1000);
       const { mode, idx } = puzzleArgs(await readJson(req));
-      const r = game.giveUp(user.id, mode, idx);
+      const r = await game.giveUp(user.id, mode, idx);
       return engineResult(res, req, r, r.ok ? { answer: game.answerOf(r.state, mode, idx) } : null);
     }
 
     if (key === "GET /api/leaderboard/today") {
-      const user = currentUser(req);
-      return send(res, 200, game.leaderboardToday(user ? user.id : null, Number(query.get("limit")) || undefined));
+      const user = await currentUser(req);
+      return send(res, 200, await game.leaderboardToday(user ? user.id : null, Number(query.get("limit")) || undefined));
     }
 
     if (key === "GET /api/leaderboard/alltime") {
-      const user = currentUser(req);
-      return send(res, 200, game.leaderboardAllTime(user ? user.id : null, Number(query.get("limit")) || undefined));
+      const user = await currentUser(req);
+      return send(res, 200, await game.leaderboardAllTime(user ? user.id : null, Number(query.get("limit")) || undefined));
     }
 
     return fail(res, 404, "not_found", "No such endpoint.");
