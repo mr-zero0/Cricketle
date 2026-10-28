@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cricketle Admin Portal</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111827;
+      --surface-elevated: #1a2336;
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.25);
+      --gold: #f59e0b;
+      --gold-glow: rgba(245, 158, 11, 0.25);
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.2);
+      --radius: 12px;
+      --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(ellipse at 20% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 0%, rgba(245, 158, 11, 0.06) 0%, transparent 60%);
+    }
+
+    header {
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #042f2e;
+    }
+    .btn-primary:hover {
+      background: #059669;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: var(--surface-elevated);
+      color: var(--text);
+      border-color: var(--surface-border);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .btn-danger:hover {
+      background: var(--danger);
+      color: #fff;
+      box-shadow: 0 0 16px var(--danger-glow);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px 20px;
+    }
+
+    /* Auth Gate */
+    #auth-view {
+      max-width: 420px;
+      margin: 60px auto 0;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      padding: 32px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .auth-icon {
+      font-size: 42px;
+      margin-bottom: 16px;
+      display: inline-block;
+      filter: drop-shadow(0 0 12px var(--gold-glow));
+    }
+
+    #auth-view h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    #auth-view p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--surface-border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 16px;
+      transition: border 0.15s ease;
+    }
+    .input-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .metric-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--surface-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .metric-info h4 {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .metric-info .metric-val {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    /* User Management Panel */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .panel-header h3 {
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 280px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--surface-border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* Table */
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: var(--surface-elevated);
+      padding: 12px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--surface-border);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      border: 1px solid var(--surface-border);
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .user-handle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .phone-tag {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--surface-elevated);
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #e5e7eb;
+    }
+
+    .tag-admin {
+      background: var(--gold-glow);
+      color: #fbbf24;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
+
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      max-width: 440px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    /* Toast Alert */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      z-index: 120;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <a href="/" class="brand">
+      <span class="brand-badge">Admin</span>
+      <h1>Cricketle Manager</h1>
+    </a>
+    <div class="header-actions">
+      <a href="/" class="btn btn-secondary btn-sm">🎮 Back to Game</a>
+      <button id="btn-logout" class="btn btn-secondary btn-sm" style="display: none;">Sign Out</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. Auth Gate (Displayed if not logged in as admin) -->
+    <div id="auth-view" style="display: none;">
+      <div class="auth-icon">👑</div>
+      <h2>Admin Authentication</h2>
+      <p>Enter your Master Admin Key or Password from <code>.env</code></p>
+      <form id="form-login">
+        <input type="password" id="admin-pass" class="input-field" placeholder="Admin Key / Password" required autofocus />
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Unlock Admin Portal</button>
+      </form>
+    </div>
+
+    <!-- 2. Dashboard View -->
+    <div id="dashboard-view" style="display: none;">
+      <!-- Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon">👥</div>
+          <div class="metric-info">
+            <h4>Total Players</h4>
+            <div class="metric-val" id="metric-players">0</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">☁️</div>
+          <div class="metric-info">
+            <h4>Database Engine</h4>
+            <div class="metric-val" id="metric-db" style="font-size: 16px; font-weight: 700; color: #10b981;">Connecting...</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">📅</div>
+          <div class="metric-info">
+            <h4>Current Day (IST)</h4>
+            <div class="metric-val" id="metric-day" style="font-size: 18px; font-family: var(--font-mono);">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player Management -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>👥 Player Directory</h3>
+          <div class="search-box">
+            <input type="text" id="user-search" class="search-input" placeholder="Search by username or mobile..." />
+            <button id="btn-refresh" class="btn btn-secondary btn-sm">🔄 Refresh</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Mobile Number</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">Loading players...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- PIN Reset Modal -->
+  <div id="modal-reset" class="modal-backdrop" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🔑 Reset Player PIN</h3>
+        <button class="close-btn" onclick="closeResetModal()">✕</button>
+      </div>
+      <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+        Setting a new PIN for <strong id="reset-target-name" style="color: #fff;"></strong> (<span id="reset-target-phone" style="font-family: var(--font-mono);"></span>).
+      </p>
+      <form id="form-reset-pin">
+        <input type="hidden" id="reset-user-id" />
+        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; color: var(--text-muted);">New PIN (4 to 8 digits)</label>
+        <input type="text" id="reset-new-pin" class="input-field" placeholder="e.g. 123456" pattern="\d{4,8}" required />
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button type="button" class="btn btn-secondary" onclick="generateRandomPin()" style="flex: 1;">🎲 Generate</button>
+          <button type="submit" class="btn btn-primary" style="flex: 2;">Save New PIN</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const avatarIcons = {
+      batter: "🏏",
+      bowler: "⚡",
+      wicketkeeper: "🧤",
+      allrounder: "🔥",
+      captain: "👑",
+      legend: "⭐",
+    };
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.style.borderColor = isError ? "var(--danger)" : "var(--accent)";
+      t.style.display = "flex";
+      setTimeout(() => { t.style.display = "none"; }, 3500);
+    }
+
+    async function api(path, opts = {}) {
+      const res = await fetch(path, {
+        headers: { "Content-Type": "application/json", ...opts.headers },
+        ...opts,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || data.error || `HTTP ${res.status}`);
+      }
+      return data;
+    }
+
+    async function checkAuth() {
+      try {
+        const stats = await api("/api/admin/stats");
+        showDashboard(stats);
+      } catch (_) {
+        showLogin();
+      }
+    }
+
+    function showLogin() {
+      document.getElementById("auth-view").style.display = "block";
+      document.getElementById("dashboard-view").style.display = "none";
+      document.getElementById("btn-logout").style.display = "none";
+    }
+
+    function showDashboard(stats) {
+      document.getElementById("auth-view").style.display = "none";
+      document.getElementById("dashboard-view").style.display = "block";
+      document.getElementById("btn-logout").style.display = "inline-flex";
+
+      if (stats) {
+        document.getElementById("metric-players").textContent = stats.totalUsers || 0;
+        document.getElementById("metric-db").textContent = stats.dbEngine || "Database";
+        document.getElementById("metric-day").textContent = stats.day || "-";
+      }
+      loadUsers();
+    }
+
+    let searchTimeout = null;
+    document.getElementById("user-search").addEventListener("input", (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        loadUsers(e.target.value);
+      }, 300);
+    });
+
+    document.getElementById("btn-refresh").addEventListener("click", () => {
+      loadUsers(document.getElementById("user-search").value);
+    });
+
+    async function loadUsers(search = "") {
+      const tbody = document.getElementById("users-tbody");
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">Loading players...</td></tr>';
+
+      try {
+        const query = search ? `?search=${encodeURIComponent(search)}` : "";
+        const data = await api(`/api/admin/users${query}`);
+        document.getElementById("metric-players").textContent = data.total || 0;
+
+        if (!data.users || data.users.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">No players found.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.users.map(u => {
+          const icon = avatarIcons[u.avatar] || "🏏";
+          const dateStr = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "-";
+          const phone = u.phone || "No phone";
+          const adminTag = u.isAdmin ? '<span class="tag-admin">Admin</span>' : '';
+
+          return `
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar">${icon}</div>
+                  <div>
+                    <div class="user-name">${escapeHtml(u.displayName || u.username)}${adminTag}</div>
+                    <div class="user-handle">@${escapeHtml(u.username)}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="phone-tag">${escapeHtml(phone)}</span>
+              </td>
+              <td style="color: var(--text-muted);">${dateStr}</td>
+              <td>
+                <div class="action-group">
+                  <button class="btn btn-secondary btn-sm" onclick="openResetModal(${u.id}, '${escapeHtml(u.username)}', '${escapeHtml(phone)}')">🔑 Reset PIN</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id}, '${escapeHtml(u.username)}')">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--danger); padding: 36px;">Failed to load players: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    document.getElementById("form-login").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const pass = document.getElementById("admin-pass").value;
+      try {
+        await api("/api/admin/login", {
+          method: "POST",
+          body: JSON.stringify({ key: pass }),
+        });
+        showToast("✅ Admin login successful!");
+        checkAuth();
+      } catch (err) {
+        showToast(err.message || "Invalid Admin Key", true);
+      }
+    });
+
+    document.getElementById("btn-logout").addEventListener("click", async () => {
+      try {
+        await api("/api/admin/logout", { method: "POST" });
+        showToast("Signed out.");
+        showLogin();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    // Reset Modal
+    function openResetModal(id, username, phone) {
+      document.getElementById("reset-user-id").value = id;
+      document.getElementById("reset-target-name").textContent = "@" + username;
+      document.getElementById("reset-target-phone").textContent = phone;
+      document.getElementById("reset-new-pin").value = "";
+      document.getElementById("modal-reset").style.display = "flex";
+    }
+
+    function closeResetModal() {
+      document.getElementById("modal-reset").style.display = "none";
+    }
+
+    function generateRandomPin() {
+      const pin = Math.floor(100000 + Math.random() * 900000);
+      document.getElementById("reset-new-pin").value = pin;
+    }
+
+    document.getElementById("form-reset-pin").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const userId = document.getElementById("reset-user-id").value;
+      const newPin = document.getElementById("reset-new-pin").value;
+      try {
+        const res = await api("/api/admin/user/reset-pin", {
+          method: "POST",
+          body: JSON.stringify({ userId, newPin }),
+        });
+        showToast(res.message || "PIN reset successfully!");
+        closeResetModal();
+      } catch (err) {
+        showToast(err.message || "Failed to reset PIN", true);
+      }
+    });
+
+    async function deleteUser(userId, username) {
+      if (!confirm(`Are you sure you want to permanently delete player @${username}?`)) {
+        return;
+      }
+      try {
+        await api("/api/admin/user/delete", {
+          method: "POST",
+          body: JSON.stringify({ userId }),
+        });
+        showToast(`Player @${username} deleted.`);
+        loadUsers(document.getElementById("user-search").value);
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/[&<>"']/g, (m) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[m]));
+    }
+
+    checkAuth();
+  </script>
+</body>
+</html>

@@ -178,6 +178,9 @@ function createApp(opts = {}) {
   const firebaseAuthDomain = opts.firebaseAuthDomain !== undefined ? opts.firebaseAuthDomain : (process.env.FIREBASE_AUTH_DOMAIN || (firebaseProjectId ? `${firebaseProjectId}.firebaseapp.com` : ""));
   const firebaseAppId = opts.firebaseAppId !== undefined ? opts.firebaseAppId : (process.env.FIREBASE_APP_ID || "");
 
+  const adminKey = opts.adminKey || process.env.ADMIN_KEY || "cricketle_admin_2026";
+  const adminPhone = opts.adminPhone ? normalizePhone(opts.adminPhone) : (process.env.ADMIN_PHONE ? normalizePhone(process.env.ADMIN_PHONE) : "");
+
   // ---------- helpers ----------
 
   function normalizePhone(rawPhone) {
@@ -186,6 +189,23 @@ function createApp(opts = {}) {
     if (/^[6-9]\d{9}$/.test(phone)) phone = "+91" + phone;
     else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) phone = "+" + phone;
     return phone;
+  }
+
+  function isAdmin(user, req) {
+    if (user && (user.is_admin || user.isAdmin)) return true;
+    if (adminPhone && user && user.phone === adminPhone) return true;
+    const h = req && req.headers && req.headers["x-admin-key"];
+    if (h && h === adminKey) return true;
+    const c = req && cookies(req)["cricketle_admin"];
+    if (c && c === auth.hashToken(adminKey)) return true;
+    return false;
+  }
+
+  function requireAdmin(req, user) {
+    if (!isAdmin(user, req)) {
+      throw new HttpError(403, "forbidden", "Admin access required.");
+    }
+    return true;
   }
 
   function send(res, status, body, headers) {
@@ -223,8 +243,19 @@ function createApp(opts = {}) {
 
   async function currentUser(req) {
     const token = cookies(req)[COOKIE];
-    if (!token) return null;
-    return await db.sessionUser(auth.hashToken(token), now());
+    if (!token) {
+      if (isAdmin(null, req)) {
+        return { id: 0, username: "admin", display_name: "Administrator", isAdmin: true, is_admin: 1 };
+      }
+      return null;
+    }
+    const user = await db.sessionUser(auth.hashToken(token), now());
+    if (user) {
+      user.isAdmin = isAdmin(user, req);
+    } else if (isAdmin(null, req)) {
+      return { id: 0, username: "admin", display_name: "Administrator", isAdmin: true, is_admin: 1 };
+    }
+    return user;
   }
 
   async function requireUser(req) {
@@ -906,6 +937,7 @@ function createApp(opts = {}) {
           favPlayer: user.fav_player || "",
           googleConnected: Boolean(user.google_id),
           phoneConnected: Boolean(user.phone),
+          isAdmin: Boolean(user.isAdmin),
           createdAt: user.created_at,
         },
         stats: await game.stats(user.id),
@@ -964,6 +996,94 @@ function createApp(opts = {}) {
     if (key === "GET /api/leaderboard/alltime") {
       const user = await currentUser(req);
       return send(res, 200, await game.leaderboardAllTime(user ? user.id : null, Number(query.get("limit")) || undefined));
+    }
+
+    // ---------- Admin Endpoints ----------
+
+    if (key === "POST /api/admin/login") {
+      rateLimit(req, "admin_auth", 15, 15 * 60 * 1000);
+      const body = await readJson(req);
+      const keyInput = String(body.key || body.password || body.pin || "").trim();
+      if (!keyInput || keyInput !== adminKey) {
+        return fail(res, 401, "invalid_admin_key", "Incorrect admin password or key.");
+      }
+      const adminCookieVal = auth.hashToken(adminKey);
+      return send(res, 200, { ok: true, admin: true }, {
+        "set-cookie": `cricketle_admin=${adminCookieVal}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 3600}`,
+      });
+    }
+
+    if (key === "POST /api/admin/logout") {
+      return send(res, 200, { ok: true }, {
+        "set-cookie": "cricketle_admin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0",
+      });
+    }
+
+    if (key === "GET /api/admin/stats") {
+      const user = await currentUser(req);
+      requireAdmin(req, user);
+      const usersList = await db.listUsers(1, 0);
+      const isSupabase = db instanceof SupabaseDb;
+      return send(res, 200, {
+        ok: true,
+        totalUsers: usersList.total,
+        dbEngine: isSupabase ? "Supabase PostgreSQL" : "Local SQLite",
+        day: core.todayKey(now()),
+      });
+    }
+
+    if (key === "GET /api/admin/users") {
+      const user = await currentUser(req);
+      requireAdmin(req, user);
+      const limit = Math.min(Number(query.get("limit")) || 50, 200);
+      const offset = Math.max(Number(query.get("offset")) || 0, 0);
+      const search = String(query.get("search") || "").trim();
+      const result = await db.listUsers(limit, offset, search);
+      return send(res, 200, {
+        ok: true,
+        users: (result.rows || []).map((u) => ({
+          id: u.id,
+          username: u.username,
+          displayName: u.display_name || u.displayName || u.username,
+          phone: u.phone || null,
+          email: u.email || null,
+          avatar: u.avatar || "batter",
+          bio: u.bio || "",
+          favTeam: u.fav_team || u.favTeam || "",
+          isAdmin: Boolean(u.is_admin || u.isAdmin || (adminPhone && u.phone === adminPhone)),
+          createdAt: u.created_at || u.createdAt,
+        })),
+        total: result.total,
+      });
+    }
+
+    if (key === "POST /api/admin/user/reset-pin") {
+      const user = await currentUser(req);
+      requireAdmin(req, user);
+      const body = await readJson(req);
+      const userId = Number(body.userId);
+      const newPin = String(body.newPin || "").trim();
+      if (!userId) return fail(res, 400, "missing_user_id", "User ID is required.");
+      if (!/^\d{4,8}$/.test(newPin)) return fail(res, 400, "invalid_pin", "New PIN must be 4 to 8 numbers.");
+      const updated = await db.adminResetPin(userId, auth.hashPassword(newPin));
+      if (!updated) return fail(res, 404, "user_not_found", "User not found.");
+      log("admin_reset_pin", updated.username, userId);
+      return send(res, 200, {
+        ok: true,
+        message: `PIN for @${updated.username} successfully reset to ${newPin}`,
+        user: { id: updated.id, username: updated.username, phone: updated.phone },
+      });
+    }
+
+    if (key === "POST /api/admin/user/delete") {
+      const user = await currentUser(req);
+      requireAdmin(req, user);
+      const body = await readJson(req);
+      const userId = Number(body.userId);
+      if (!userId) return fail(res, 400, "missing_user_id", "User ID is required.");
+      await db.adminDeleteUser(userId);
+      log("admin_delete_user", userId);
+      return send(res, 200, { ok: true, message: "User account deleted." });
     }
 
     return fail(res, 404, "not_found", "No such endpoint.");
@@ -1030,6 +1150,7 @@ function createApp(opts = {}) {
       else res.end();
     });
     if (pathname.startsWith("/api/")) done(api(req, res, pathname, url.searchParams));
+    else if (pathname === "/admin" || pathname === "/admin/") serveStatic(req, res, "/admin.html");
     else serveStatic(req, res, pathname);
   });
 
