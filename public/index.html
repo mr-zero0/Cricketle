@@ -10,7 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script>
@@ -197,57 +196,17 @@
         </div>
       </div>
 
-      <div id="auth-card" class="card auth" hidden>
-        <div class="google-auth-wrap">
-          <button id="google-btn" class="btn google-btn" type="button">
-            <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-            </svg>
-            <span>Continue with Google</span>
-          </button>
-          <div id="g_id_onload" hidden></div>
+      <div id="auth-card" class="card auth auth-card-clean" hidden>
+        <div class="auth-clean-header">
+          <div class="pill-mobile-auth">
+            <svg class="icon-inline" aria-hidden="true" style="width:14px;height:14px;"><use href="#i-phone"/></svg>
+            <span>Mobile OTP Sign-In</span>
+          </div>
+          <h3 class="auth-title">Welcome to Cricketle</h3>
+          <p class="muted small-text">Fast & secure mobile login. Progress saved for 24 hours.</p>
         </div>
 
-        <div class="auth-divider"><span>or sign in with password or mobile</span></div>
-
-        <div class="segmented tabs pos-0" role="tablist" aria-label="Sign in, create account, or mobile OTP">
-          <span class="seg-thumb" aria-hidden="true"></span>
-          <button id="tab-signin" class="seg active" type="button" role="tab" aria-selected="true" aria-controls="auth-form">Sign in</button>
-          <button id="tab-signup" class="seg" type="button" role="tab" aria-selected="false" aria-controls="auth-form">Create account</button>
-          <button id="tab-otp" class="seg" type="button" role="tab" aria-selected="false" aria-controls="otp-form">📱 Mobile OTP</button>
-        </div>
-        <form id="auth-form" novalidate>
-          <div id="auth-summary" class="error-summary" role="alert" tabindex="-1" hidden></div>
-          <div class="field" id="display-name-field" hidden>
-            <label for="auth-display-name">Display Name (optional)</label>
-            <input id="auth-display-name" name="displayName" type="text" maxlength="30" placeholder="e.g. Aman · Virat Fan" aria-describedby="auth-display-name-help" />
-            <p id="auth-display-name-help" class="help-text">Shown on leaderboards and your profile.</p>
-          </div>
-          <div class="field">
-            <label for="auth-username">Username</label>
-            <input id="auth-username" name="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" aria-describedby="auth-username-help auth-username-error" />
-            <p id="auth-username-help" class="help-text">3–20 letters, numbers or underscores.</p>
-            <p id="auth-username-error" class="field-error" aria-live="polite"></p>
-          </div>
-          <div class="field">
-            <label for="auth-password">Password</label>
-            <input id="auth-password" name="password" type="password" autocomplete="current-password" required minlength="6" aria-describedby="auth-password-help auth-password-error" />
-            <p id="auth-password-help" class="help-text">At least 6 characters.</p>
-            <p id="auth-password-error" class="field-error" aria-live="polite"></p>
-          </div>
-          <div class="field" id="confirm-field" hidden>
-            <label for="auth-confirm">Confirm password</label>
-            <input id="auth-confirm" name="confirm" type="password" autocomplete="new-password" aria-describedby="auth-confirm-error" />
-            <p id="auth-confirm-error" class="field-error" aria-live="polite"></p>
-          </div>
-          <button id="auth-submit" class="btn primary big" type="submit">Sign in</button>
-          <p class="muted small-text">Your password is encrypted with scrypt. Results follow your account across all devices.</p>
-        </form>
-
-        <form id="otp-form" novalidate hidden>
+        <form id="otp-form" novalidate>
           <div id="otp-summary" class="error-summary" role="alert" tabindex="-1" hidden></div>
 
           <div id="otp-step-phone">
@@ -266,12 +225,12 @@
                   <option value="+64">🇳🇿 +64</option>
                   <option value="+971">🇦🇪 +971</option>
                 </select>
-                <input id="otp-phone" name="phone" type="tel" autocomplete="tel" placeholder="98765 43210" required maxlength="15" aria-describedby="otp-phone-help" />
+                <input id="otp-phone" name="phone" type="tel" autocomplete="tel" placeholder="87554 28254" required maxlength="15" aria-describedby="otp-phone-help" />
               </div>
-              <p id="otp-phone-help" class="help-text">Real SMS verification via Google Firebase (10,000 free SMS/mo).</p>
+              <p id="otp-phone-help" class="help-text">Real SMS verification with 6-digit code via Google Firebase.</p>
             </div>
             <div id="recaptcha-container"></div>
-            <button id="otp-send-btn" class="btn primary big" type="button">
+            <button id="otp-send-btn" class="btn primary big full-width" type="button">
               <svg class="icon-inline" aria-hidden="true" style="width:18px;height:18px;"><use href="#i-phone"/></svg>
               <span>Send OTP Verification Code</span>
             </button>
@@ -281,10 +240,9 @@
             <div class="otp-banner" id="otp-code-banner">
               <div class="otp-banner-icon" id="otp-banner-icon">📱</div>
               <div class="otp-banner-content">
-                <div class="otp-banner-title" id="otp-banner-title">SMS Sent via OTP.dev</div>
-                <div class="otp-banner-text" id="otp-banner-text">We sent a 6-digit code to <strong id="otp-sent-phone">your phone</strong>. Check your SMS inbox.</div>
+                <div class="otp-banner-title" id="otp-banner-title">Real SMS Sent</div>
+                <div class="otp-banner-text" id="otp-banner-text">We sent a 6-digit verification code to <strong id="otp-sent-phone">your phone</strong>. Check your SMS inbox.</div>
               </div>
-              <button id="otp-autofill-btn" type="button" class="btn small otp-fill-btn" hidden>Auto-fill</button>
             </div>
 
             <div class="field">
@@ -299,7 +257,7 @@
             <div class="field" id="otp-display-name-wrap">
               <label for="otp-display-name">Display Name (optional)</label>
               <input id="otp-display-name" name="displayName" type="text" maxlength="30" placeholder="e.g. Aman · Master Blaster" />
-              <p class="help-text">Visible to friends on leaderboards and results.</p>
+              <p class="help-text">Visible on leaderboards and results.</p>
             </div>
 
             <div class="otp-actions">
@@ -308,7 +266,7 @@
             </div>
           </div>
 
-          <p class="muted small-text" style="margin-top:var(--space-3);">Cricketle mobile authentication is completely free with zero ads or tracking.</p>
+          <p class="muted small-text" style="margin-top:var(--space-3);text-align:center;">Cricketle mobile authentication is 100% free with zero ads or tracking. Active for 24 hours.</p>
         </form>
       </div>
 
@@ -360,49 +318,6 @@
     <form method="dialog" class="confirm-actions">
       <button type="submit" value="cancel" class="btn">Keep playing</button>
       <button type="submit" value="ok" class="btn danger">Give up</button>
-    </form>
-  </dialog>
-
-  <dialog id="google-modal" class="google-modal" aria-labelledby="google-modal-title">
-    <button class="dialog-close icon-btn" type="button" data-close aria-label="Close"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
-    <div class="google-modal-head">
-      <svg class="google-icon-lg" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-      </svg>
-      <div>
-        <h2 id="google-modal-title">Sign in with Google</h2>
-        <p class="muted small-text">Fast, one-click account creation for Cricketle</p>
-      </div>
-    </div>
-    <div class="google-accounts-list">
-      <button class="google-account-btn" type="button" data-google-email="cricketer.fan@gmail.com" data-google-name="Cricket Champion">
-        <div class="google-avatar" style="background:#ea4335">C</div>
-        <div class="google-acc-info">
-          <span class="acc-name">Cricket Champion</span>
-          <span class="acc-email">cricketer.fan@gmail.com</span>
-        </div>
-      </button>
-      <button class="google-account-btn" type="button" data-google-email="aman.cricket@gmail.com" data-google-name="Mohd Aman">
-        <div class="google-avatar" style="background:#4285f4">M</div>
-        <div class="google-acc-info">
-          <span class="acc-name">Mohd Aman</span>
-          <span class="acc-email">aman.cricket@gmail.com</span>
-        </div>
-      </button>
-    </div>
-    <form id="custom-google-form" class="custom-google-form">
-      <div class="field">
-        <label for="custom-google-name">Or enter your Google Name</label>
-        <input id="custom-google-name" type="text" placeholder="e.g. Virat Fan" required />
-      </div>
-      <div class="field">
-        <label for="custom-google-email">Google Email</label>
-        <input id="custom-google-email" type="email" placeholder="you@gmail.com" required />
-      </div>
-      <button type="submit" class="btn primary full-width">Continue with this Google Account</button>
     </form>
   </dialog>
 

@@ -1390,3 +1390,44 @@ dialog form { margin-top: var(--space-4); text-align: right; }
   align-items: center;
   margin: 0.5rem 0;
 }
+
+.auth-card-clean {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-5);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(17, 26, 46, 0.95), rgba(11, 18, 32, 0.95));
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6), 0 0 24px rgba(56, 189, 248, 0.08);
+}
+
+.auth-clean-header {
+  text-align: center;
+  margin-bottom: var(--space-4);
+}
+
+.pill-mobile-auth {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #86efac;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.auth-title {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
+  color: #f8fafc;
+}
+
+.full-width {
+  width: 100%;
+}

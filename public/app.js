@@ -1459,164 +1459,33 @@
   }
 
   function renderAuthTab() {
-    const tab = app.authTab || "signin";
-    const parent = $("tab-signin").parentElement;
-    parent.classList.remove("pos-0", "pos-1", "pos-2");
-
-    const isSignin = tab === "signin";
-    const isSignup = tab === "signup";
-    const isOtp = tab === "otp";
-
-    if (isSignin) parent.classList.add("pos-0");
-    else if (isSignup) parent.classList.add("pos-1");
-    else if (isOtp) parent.classList.add("pos-2");
-
-    $("tab-signin").classList.toggle("active", isSignin);
-    $("tab-signin").setAttribute("aria-selected", String(isSignin));
-    $("tab-signup").classList.toggle("active", isSignup);
-    $("tab-signup").setAttribute("aria-selected", String(isSignup));
-    if ($("tab-otp")) {
-      $("tab-otp").classList.toggle("active", isOtp);
-      $("tab-otp").setAttribute("aria-selected", String(isOtp));
-    }
-
-    if (isOtp) {
-      $("auth-form").hidden = true;
-      $("otp-form").hidden = false;
-      clearOtpErrors();
-    } else {
-      $("auth-form").hidden = false;
-      $("otp-form").hidden = true;
-      $("confirm-field").hidden = !isSignup;
-      if ($("display-name-field")) $("display-name-field").hidden = !isSignup;
-      $("auth-password").setAttribute("autocomplete", isSignup ? "new-password" : "current-password");
-      $("auth-submit").textContent = isSignup ? "Create account" : "Sign in";
-      clearAuthErrors();
-    }
+    if ($("otp-form")) $("otp-form").hidden = false;
+    clearOtpErrors();
   }
 
   function fieldError(id, text) {
-    const field = $(id).closest(".field");
-    field.classList.toggle("invalid", Boolean(text));
-    $(id + "-error").textContent = text || "";
-    $(id).setAttribute("aria-invalid", text ? "true" : "false");
+    const el = $(id);
+    if (!el) return;
+    const field = el.closest(".field");
+    if (field) field.classList.toggle("invalid", Boolean(text));
+    const errEl = $(id + "-error");
+    if (errEl) errEl.textContent = text || "";
+    el.setAttribute("aria-invalid", text ? "true" : "false");
   }
 
   function clearAuthErrors() {
     for (const id of ["auth-username", "auth-password", "auth-confirm"]) fieldError(id, "");
-    $("auth-summary").hidden = true;
-    $("auth-summary").innerHTML = "";
-  }
-
-  function validateAuth(onlyId) {
-    const signup = app.authTab === "signup";
-    const errors = [];
-    const u = $("auth-username").value.trim();
-    const p = $("auth-password").value;
-    const c = $("auth-confirm").value;
-    const check = (id, text) => { if (!onlyId || onlyId === id) fieldError(id, text); if (text) errors.push({ id, text }); };
-    check("auth-username", !u ? "Enter a username." : !/^[A-Za-z0-9_]{3,20}$/.test(u) ? "Use 3–20 letters, numbers or underscores." : "");
-    check("auth-password", !p ? "Enter a password." : p.length < 6 ? "Use at least 6 characters." : "");
-    if (signup) check("auth-confirm", c !== p ? "Passwords do not match." : "");
-    return errors;
-  }
-
-  async function submitAuth(ev) {
-    ev.preventDefault();
-    const errors = validateAuth();
     const summary = $("auth-summary");
-    if (errors.length) {
-      summary.hidden = false;
-      summary.innerHTML = `<h3>There is a problem</h3><ul>${errors.map((e) => `<li><a href="#${e.id}">${escapeHtml(e.text)}</a></li>`).join("")}</ul>`;
-      summary.focus();
-      return;
-    }
-    summary.hidden = true;
-    const btn = $("auth-submit");
-    btn.classList.add("loading");
-    btn.disabled = true;
-    const signup = app.authTab === "signup";
-    try {
-      const payload = {
-        username: $("auth-username").value.trim(),
-        password: $("auth-password").value,
-      };
-      if (signup && $("auth-display-name") && $("auth-display-name").value.trim()) {
-        payload.displayName = $("auth-display-name").value.trim();
-      }
-      const res = await api("POST", signup ? "/api/auth/register" : "/api/auth/login", payload);
-      $("auth-form").reset();
-      await becomeUser(res.user);
-      toast(signup ? `Welcome, ${res.user.displayName || res.user.username}. Your results now count for the leaderboard.` : `Welcome back, ${res.user.displayName || res.user.username}.`, "success");
-      location.hash = "#play";
-    } catch (err) {
-      if (err.code === "username_taken") fieldError("auth-username", "That username is taken.");
-      else if (err.code === "invalid_username") fieldError("auth-username", err.message);
-      else if (err.code === "invalid_password") fieldError("auth-password", err.message);
-      else if (err.code === "bad_credentials") fieldError("auth-password", "Wrong username or password.");
-      summary.hidden = false;
-      summary.innerHTML = `<h3>${escapeHtml(err.message)}</h3>`;
-      summary.focus();
-    } finally {
-      btn.classList.remove("loading");
-      btn.disabled = false;
+    if (summary) {
+      summary.hidden = true;
+      summary.innerHTML = "";
     }
   }
 
-  // Google Sign-In handler
-  async function handleGoogleLogin(payload) {
-    try {
-      const modal = $("google-modal");
-      if (modal && modal.close) modal.close();
-      const res = await api("POST", "/api/auth/google", payload);
-      await becomeUser(res.user);
-      toast(`Signed in as ${res.user.displayName || res.user.username}!`, "success");
-      location.hash = "#play";
-    } catch (err) {
-      toast(err.message || "Google sign in failed.", "error");
-    }
-  }
-
-  function initGoogleAuth() {
-    const btn = $("google-btn");
-    const modal = $("google-modal");
-    if (btn) {
-      btn.addEventListener("click", () => {
-        if (app.offline) {
-          toast("Google sign-in connects when running the Cricketle server (npm start).", "error");
-          return;
-        }
-        if (modal && modal.showModal) modal.showModal();
-      });
-    }
-
-    // Modal quick account buttons
-    document.querySelectorAll(".google-account-btn").forEach((ab) => {
-      ab.addEventListener("click", () => {
-        handleGoogleLogin({
-          sub: "google_" + ab.dataset.googleEmail,
-          email: ab.dataset.googleEmail,
-          name: ab.dataset.googleName,
-        });
-      });
-    });
-
-    // Custom Google form in modal
-    const customForm = $("custom-google-form");
-    if (customForm) {
-      customForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const name = $("custom-google-name").value.trim();
-        const email = $("custom-google-email").value.trim();
-        if (!name || !email) return;
-        handleGoogleLogin({
-          sub: "google_" + email,
-          email,
-          name,
-        });
-      });
-    }
-  }
+  function validateAuth() { return []; }
+  async function submitAuth(ev) { if (ev && ev.preventDefault) ev.preventDefault(); }
+  async function handleGoogleLogin() {}
+  function initGoogleAuth() {}
 
   // ---------- Mobile Phone OTP Auth ----------
 
@@ -1768,13 +1637,16 @@
             if (recaptchaWidgetId !== null && window.grecaptcha) {
               try { grecaptcha.reset(recaptchaWidgetId); } catch (_) {}
             }
-            const msg = fbErr.code === "auth/invalid-phone-number"
-              ? "Invalid mobile number format. Please check your country code and digits."
-              : fbErr.code === "auth/quota-exceeded"
-              ? "Daily SMS quota exceeded."
-              : fbErr.code === "auth/too-many-requests"
-              ? "Too many attempts. Please wait a moment and try again."
-              : (fbErr.message || "Failed to send SMS via Firebase.");
+            let msg = fbErr.message || "Failed to send SMS via Firebase.";
+            if (fbErr.code === "auth/operation-not-allowed" || (msg && msg.toLowerCase().includes("region"))) {
+              msg = "SMS Region Policy: Please enable India (+91) in Firebase Console > Authentication > Settings > SMS region policy.";
+            } else if (fbErr.code === "auth/invalid-phone-number") {
+              msg = "Invalid mobile number format. Please check the digits.";
+            } else if (fbErr.code === "auth/quota-exceeded") {
+              msg = "Daily SMS quota exceeded. Please try later.";
+            } else if (fbErr.code === "auth/too-many-requests") {
+              msg = "Too many attempts. Please wait a moment and try again.";
+            }
             throw new Error(msg);
           }
 
@@ -2054,12 +1926,18 @@
   $("tab-alltime").addEventListener("click", () => setBoardTab("alltime"));
   $("board-refresh").addEventListener("click", () => loadBoard(true));
 
-  $("tab-signin").addEventListener("click", () => { app.authTab = "signin"; renderAuthTab(); });
-  $("tab-signup").addEventListener("click", () => { app.authTab = "signup"; renderAuthTab(); });
-  $("auth-form").addEventListener("submit", submitAuth);
+  if ($("tab-signin")) $("tab-signin").addEventListener("click", () => { app.authTab = "signin"; renderAuthTab(); });
+  if ($("tab-signup")) $("tab-signup").addEventListener("click", () => { app.authTab = "signup"; renderAuthTab(); });
+  if ($("auth-form")) $("auth-form").addEventListener("submit", submitAuth);
   for (const id of ["auth-username", "auth-password", "auth-confirm"]) {
-    $(id).addEventListener("blur", () => { if ($(id).value) validateAuth(id); });
-    $(id).addEventListener("input", () => { if ($(id).closest(".field").classList.contains("invalid")) validateAuth(id); });
+    const el = $(id);
+    if (el) {
+      el.addEventListener("blur", () => { if (el.value) validateAuth(id); });
+      el.addEventListener("input", () => {
+        const f = el.closest(".field");
+        if (f && f.classList.contains("invalid")) validateAuth(id);
+      });
+    }
   }
 
   window.addEventListener("hashchange", showView);
@@ -2070,7 +1948,6 @@
 
   async function bootstrap() {
     fillHelp();
-    initGoogleAuth();
     initOtpAuth();
     try {
       const me = await api("GET", "/api/me");
@@ -2089,17 +1966,24 @@
       app.store = new LocalStore();
       const p = app.store.getProfile();
       if (p && p.phone) {
-        app.user = {
-          username: p.username || ("player_" + p.phone.slice(-4)),
-          displayName: p.displayName || ("Cricketer " + p.phone.slice(-4)),
-          phone: p.phone,
-          avatar: p.avatar || "allrounder",
-          bio: p.bio || "",
-          favTeam: p.favTeam || "",
-          favPlayer: p.favPlayer || "",
-          phoneConnected: true,
-          isOffline: true,
-        };
+        const isExpired = p.loginTime && (Date.now() - p.loginTime > 24 * 60 * 60 * 1000);
+        if (isExpired) {
+          delete p.phone;
+          delete p.loginTime;
+          app.store.saveProfile(p);
+        } else {
+          app.user = {
+            username: p.username || ("player_" + p.phone.slice(-4)),
+            displayName: p.displayName || ("Cricketer " + p.phone.slice(-4)),
+            phone: p.phone,
+            avatar: p.avatar || "allrounder",
+            bio: p.bio || "",
+            favTeam: p.favTeam || "",
+            favPlayer: p.favPlayer || "",
+            phoneConnected: true,
+            isOffline: true,
+          };
+        }
       }
       if (!(err instanceof ApiError && (err.status === 0 || err.status === 404 || err.status === 405))) console.warn("Cricketle: server unavailable", err);
     }
