@@ -1522,7 +1522,10 @@
 
     if (step === "number" && $("otp-phone")) $("otp-phone").focus();
     if (step === "signin" && $("phone-pin-signin")) $("phone-pin-signin").focus();
-    if (step === "register" && $("phone-pin-register")) $("phone-pin-register").focus();
+    if (step === "register") {
+      if ($("phone-username")) $("phone-username").focus();
+      else if ($("phone-pin-register")) $("phone-pin-register").focus();
+    }
     if (step === "reset" && $("phone-pin-reset")) $("phone-pin-reset").focus();
   }
 
@@ -1698,18 +1701,28 @@
 
     // Step 2B: New player registration
     const registerBtn = $("phone-register-btn");
+    const regUsernameInput = $("phone-username");
     const regPinInput = $("phone-pin-register");
     const regConfirmInput = $("phone-pin-confirm");
-    const regNameInput = $("phone-display-name");
 
     const handleRegister = async () => {
       clearPhoneAuthErrors();
+      const username = (regUsernameInput ? regUsernameInput.value : "").trim();
       const pin = (regPinInput ? regPinInput.value : "").trim();
       const confirmPin = (regConfirmInput ? regConfirmInput.value : "").trim();
-      const displayName = (regNameInput ? regNameInput.value.trim() : "") || undefined;
 
+      if (!username) {
+        showPhoneAuthError("Please choose a username for the leaderboard.");
+        if (regUsernameInput) regUsernameInput.focus();
+        return;
+      }
+      if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) {
+        showPhoneAuthError("Usernames must be 3-20 letters, numbers, or underscores.");
+        if (regUsernameInput) regUsernameInput.focus();
+        return;
+      }
       if (!/^\d{4,8}$/.test(pin)) {
-        showPhoneAuthError("Please choose a 4 to 6 digit secret PIN.");
+        showPhoneAuthError("Please choose a 6-digit secret PIN.");
         if (regPinInput) regPinInput.focus();
         return;
       }
@@ -1730,13 +1743,13 @@
           const p = app.store.getProfile();
           p.phone = activePhone;
           p.pin = pin;
-          p.username = p.username || ("player_" + activePhone.slice(-4));
-          if (displayName) p.displayName = displayName;
+          p.username = username;
+          p.displayName = username;
           p.loginTime = Date.now();
           app.store.saveProfile(p);
           user = {
             username: p.username,
-            displayName: p.displayName || ("Cricketer " + activePhone.slice(-4)),
+            displayName: p.displayName,
             phone: activePhone,
             avatar: p.avatar || "allrounder",
             bio: p.bio || "",
@@ -1751,14 +1764,14 @@
         } else {
           const res = await api("POST", "/api/auth/phone/register", {
             phone: activePhone,
+            username,
             pin,
-            displayName,
           });
           user = res.user;
           await becomeUser(user);
         }
 
-        toast(`Account created! Welcome to Cricketle, ${user.displayName || user.username}!`, "success");
+        toast(`Welcome to Cricketle, @${user.username}!`, "success");
         switchPhoneStep("number");
         location.hash = "#play";
         showView();
@@ -1773,6 +1786,14 @@
     };
 
     if (registerBtn) registerBtn.addEventListener("click", handleRegister);
+    if (regUsernameInput) {
+      regUsernameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (regPinInput) regPinInput.focus();
+        }
+      });
+    }
     if (regConfirmInput) {
       regConfirmInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {

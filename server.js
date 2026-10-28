@@ -422,6 +422,7 @@ function createApp(opts = {}) {
         ok: true,
         phone,
         exists: Boolean(user),
+        username: user ? user.username : null,
         displayName: user ? (user.display_name || user.username) : null,
       });
     }
@@ -438,28 +439,51 @@ function createApp(opts = {}) {
         return fail(res, 400, "invalid_pin", "PIN must be 4 to 8 numbers.");
       }
       if (db.userByPhone(phone)) {
-        return fail(res, 409, "phone_exists", "An account already exists for this mobile number. Please sign in.");
+        return fail(res, 409, "phone_exists", "This mobile number is already registered. Please sign in or reset your PIN.");
       }
 
-      const lastDigits = phone.slice(-4);
-      const baseUsername = "Player_" + lastDigits;
-      let username = baseUsername;
-      let suffix = 1;
-      while (db.userByName(username) && suffix < 1000) {
-        username = "Player_" + lastDigits + "_" + suffix;
-        suffix++;
+      let username = "";
+      if (typeof body.username === "string" && body.username.trim()) {
+        const candidate = body.username.trim();
+        if (!auth.validUsername(candidate)) {
+          return fail(res, 400, "invalid_username", "Username must be 3-20 letters, numbers, or underscores.");
+        }
+        if (db.userByName(candidate)) {
+          return fail(res, 409, "username_taken", "That username is already taken. Please choose another.");
+        }
+        username = candidate;
+      } else {
+        const lastDigits = phone.slice(-4);
+        const baseUsername = "Player_" + lastDigits;
+        username = baseUsername;
+        let suffix = 1;
+        while (db.userByName(username) && suffix < 1000) {
+          username = "Player_" + lastDigits + "_" + suffix;
+          suffix++;
+        }
       }
 
       const displayName = typeof body.displayName === "string" && body.displayName.trim()
         ? body.displayName.trim().slice(0, 30)
-        : "Cricketer " + lastDigits;
+        : username;
 
-      const user = db.createUser(username, auth.hashPassword(pin), now(), {
-        displayName,
-        phone,
-        avatar: "allrounder",
-        bio: "Cricket fan playing on Cricketle",
-      });
+      let user;
+      try {
+        user = db.createUser(username, auth.hashPassword(pin), now(), {
+          displayName,
+          phone,
+          avatar: "allrounder",
+          bio: "Cricket fan playing on Cricketle",
+        });
+      } catch (err) {
+        if (err.code === "phone_taken") {
+          return fail(res, 409, "phone_exists", "This mobile number is already registered. Please sign in or reset your PIN.");
+        }
+        if (err.code === "username_taken") {
+          return fail(res, 409, "username_taken", "That username is already taken. Please choose another.");
+        }
+        throw err;
+      }
 
       const token = auth.newToken();
       db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);

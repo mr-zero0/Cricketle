@@ -214,7 +214,7 @@
                   <option value="+64">🇳🇿 +64</option>
                   <option value="+971">🇦🇪 +971</option>
                 </select>
-                <input id="otp-phone" name="phone" type="tel" autocomplete="tel" placeholder="87554 28254" required maxlength="15" aria-describedby="otp-phone-help" />
+                <input id="otp-phone" name="phone" type="tel" autocomplete="tel" placeholder="Mobile number" required maxlength="15" aria-describedby="otp-phone-help" />
               </div>
               <p id="otp-phone-help" class="help-text">Instant mobile access · Zero credit card or autopay needed.</p>
             </div>
@@ -248,31 +248,29 @@
             </button>
           </div>
 
-          <!-- Step 2B: New Player PIN Setup -->
+          <!-- Step 2B: New Player Username & PIN Setup -->
           <div id="phone-step-register" hidden>
             <div class="user-greeting-banner">
               <div class="user-greeting-icon">⭐</div>
               <div class="user-greeting-meta">
-                <div class="user-greeting-name">New Player Setup</div>
-                <div class="user-greeting-phone"><span id="phone-register-number"></span> · <button id="phone-change-btn-2" type="button" class="link-btn">Change number</button></div>
+                <div class="user-greeting-name">Create Your Profile</div>
+                <div class="user-greeting-phone"><span id="phone-register-number"></span> · <button id="phone-change-btn-2" type="button" class="link-btn">Change</button></div>
               </div>
             </div>
 
             <div class="field">
-              <label for="phone-pin-register">Set a 6-Digit Secret PIN</label>
+              <label for="phone-username">Choose Username (shown on Leaderboard)</label>
+              <input id="phone-username" name="username" type="text" maxlength="20" placeholder="e.g. cricket_champ" required autocomplete="username" />
+            </div>
+
+            <div class="field">
+              <label for="phone-pin-register">Set 6-Digit PIN</label>
               <input id="phone-pin-register" name="newPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
-              <p class="help-text">Keep this 6-digit PIN in mind to sign in anytime.</p>
             </div>
 
             <div class="field">
-              <label for="phone-pin-confirm">Confirm Secret PIN</label>
+              <label for="phone-pin-confirm">Confirm 6-Digit PIN</label>
               <input id="phone-pin-confirm" name="confirmPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
-            </div>
-
-            <div class="field">
-              <label for="phone-display-name">Display Name (optional)</label>
-              <input id="phone-display-name" name="displayName" type="text" maxlength="30" placeholder="e.g. Aman · Master Blaster" />
-              <p class="help-text">Visible on leaderboards and results.</p>
             </div>
 
             <button id="phone-register-btn" class="btn primary big full-width" type="button">
@@ -318,7 +316,7 @@
       </div>
     </section>
 
-    <footer class="credit">Made by Aman</footer>
+    <footer class="credit">Cricketle · Daily Cricket Challenge</footer>
   </main>
 
   <nav class="tabbar" aria-label="Primary">

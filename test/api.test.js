@@ -583,39 +583,49 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     assert.equal(check1.status, 200, check1.text);
     assert.equal(check1.json.exists, false);
 
-    // 2. Register new player with 6-digit PIN
+    // 2. Register new player with custom username and 6-digit PIN
     const regRes = await c.post("/api/auth/phone/register", {
       phone: testPhone,
+      username: "cricket_champ",
       pin: "875542",
-      displayName: "Rohit Striker",
     });
     assert.equal(regRes.status, 201, regRes.text);
     assert.equal(regRes.json.ok, true);
     assert.equal(regRes.json.user.phone, testPhone);
-    assert.equal(regRes.json.user.displayName, "Rohit Striker");
+    assert.equal(regRes.json.user.username, "cricket_champ");
     assert.equal(regRes.json.user.phoneConnected, true);
 
-    // 3. Verify session works with /api/me
+    // 3. Verify session works with /api/me and returns custom username
     const me1 = await c.get("/api/me");
     assert.equal(me1.status, 200);
     assert.equal(me1.json.user.phone, testPhone);
-    assert.equal(me1.json.user.displayName, "Rohit Striker");
+    assert.equal(me1.json.user.username, "cricket_champ");
 
-    // 4. Duplicate registration rejected
-    const dupRes = await c.post("/api/auth/phone/register", {
+    // 4. Duplicate phone re-creation rejected
+    const dupPhone = await c.post("/api/auth/phone/register", {
       phone: testPhone,
+      username: "another_user",
       pin: "875542",
     });
-    assert.equal(dupRes.status, 409);
-    assert.equal(dupRes.json.error, "phone_exists");
+    assert.equal(dupPhone.status, 409);
+    assert.equal(dupPhone.json.error, "phone_exists");
 
-    // 5. Check now returns exists: true and displayName
+    // 5. Duplicate username rejection
+    const dupUser = await c.post("/api/auth/phone/register", {
+      phone: "+919876543299",
+      username: "cricket_champ",
+      pin: "123456",
+    });
+    assert.equal(dupUser.status, 409);
+    assert.equal(dupUser.json.error, "username_taken");
+
+    // 6. Check now returns exists: true and custom username
     const check2 = await c.post("/api/auth/phone/check", { phone: testPhone });
     assert.equal(check2.status, 200);
     assert.equal(check2.json.exists, true);
-    assert.equal(check2.json.displayName, "Rohit Striker");
+    assert.equal(check2.json.username, "cricket_champ");
 
-    // 6. Login in a separate client: bad PIN fails
+    // 7. Login in a separate client: bad PIN fails
     const c2 = client(app.base);
     const badLogin = await c2.post("/api/auth/phone/login", {
       phone: testPhone,
@@ -624,15 +634,16 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     assert.equal(badLogin.status, 401);
     assert.equal(badLogin.json.error, "bad_pin");
 
-    // 7. Login with correct PIN succeeds
+    // 8. Login with correct PIN succeeds
     const goodLogin = await c2.post("/api/auth/phone/login", {
       phone: testPhone,
       pin: "875542",
     });
     assert.equal(goodLogin.status, 200, goodLogin.text);
     assert.equal(goodLogin.json.user.phone, testPhone);
+    assert.equal(goodLogin.json.user.username, "cricket_champ");
 
-    // 8. Reset PIN
+    // 9. Reset PIN
     const c3 = client(app.base);
     const resetRes = await c3.post("/api/auth/phone/reset", {
       phone: testPhone,
@@ -640,7 +651,7 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     });
     assert.equal(resetRes.status, 200, resetRes.text);
 
-    // 9. Old PIN fails, new PIN succeeds
+    // 10. Old PIN fails, new PIN succeeds
     const oldPinLogin = await c.post("/api/auth/phone/login", {
       phone: testPhone,
       pin: "875542",
@@ -652,6 +663,14 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
       pin: "112233",
     });
     assert.equal(newPinLogin.status, 200);
+
+    // 11. Custom username appears on leaderboard when solving
+    await solve(c, "easy", 0, "2026-10-27");
+    const board = await c.get("/api/leaderboard/today");
+    assert.equal(board.status, 200);
+    const row = board.json.rows.find((r) => r.username === "cricket_champ");
+    assert.ok(row, "custom username should appear on leaderboard");
+    assert.equal(row.username, "cricket_champ");
   } finally {
     await app.close();
   }
