@@ -1629,10 +1629,16 @@
   async function initFirebasePhone() {
     try {
       if (typeof window === "undefined" || !window.firebase || !window.firebase.auth) return;
-      const res = await api("GET", "/api/config/firebase");
-      if (res && res.enabled && res.config) {
+      let config = window.FIREBASE_CONFIG || null;
+      if (!config) {
+        try {
+          const res = await api("GET", "/api/config/firebase");
+          if (res && res.enabled && res.config) config = res.config;
+        } catch (_) {}
+      }
+      if (config && config.apiKey && config.projectId) {
         if (!firebase.apps.length) {
-          firebase.initializeApp(res.config);
+          firebase.initializeApp(config);
         }
         firebaseEnabled = true;
         setupRecaptchaVerifier();
