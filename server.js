@@ -365,14 +365,23 @@ function createApp(opts = {}) {
     if (key === "POST /api/auth/login") {
       rateLimit(req, "auth", 20, 15 * 60 * 1000);
       const body = await readJson(req);
-      const username = typeof body.username === "string" ? body.username.trim() : "";
-      const row = username ? await db.userByName(username) : null;
-      if (!row || !row.pass_hash || !auth.verifyPassword(String(body.password || ""), row.pass_hash)) {
-        return fail(res, 401, "bad_credentials", "Wrong username or password.");
+      const identifier = typeof body.username === "string" ? body.username.trim() : (typeof body.identifier === "string" ? body.identifier.trim() : "");
+      const pin = String(body.pin !== undefined ? body.pin : (body.password !== undefined ? body.password : "")).trim();
+      if (!identifier || !pin) {
+        return fail(res, 400, "missing_fields", "Please enter both username and PIN.");
+      }
+      let row = await db.userByName(identifier);
+      if (!row) {
+        const norm = normalizePhone(identifier);
+        if (norm) row = await db.userByPhone(norm);
+      }
+      if (!row || !row.pass_hash || !auth.verifyPassword(pin, row.pass_hash)) {
+        return fail(res, 401, "bad_credentials", "Incorrect username or PIN.");
       }
       const token = auth.newToken();
       await db.createSession(auth.hashToken(token), row.id, now(), SESSION_TTL_MS);
       return send(res, 200, {
+        ok: true,
         user: {
           id: row.id,
           username: row.username,
@@ -381,7 +390,10 @@ function createApp(opts = {}) {
           bio: row.bio || "",
           favTeam: row.fav_team || "",
           favPlayer: row.fav_player || "",
+          phone: row.phone || null,
+          phoneConnected: Boolean(row.phone),
           googleConnected: Boolean(row.google_id),
+          isAdmin: isAdmin(row, req),
           createdAt: row.created_at,
         },
       }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });

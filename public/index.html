@@ -198,22 +198,58 @@
       <div id="auth-card" class="card auth auth-card-clean" hidden>
         <div class="auth-clean-header">
           <div class="pill-mobile-auth">
-            <svg class="icon-inline" aria-hidden="true" style="width:14px;height:14px;"><use href="#i-phone"/></svg>
-            <span>Mobile Sign-In</span>
+            <svg class="icon-inline" aria-hidden="true" style="width:14px;height:14px;"><use href="#i-user"/></svg>
+            <span>Player Sign-In</span>
           </div>
           <h3 class="auth-title">Welcome to Cricketle</h3>
-          <p class="muted small-text">Fast & secure mobile login. Progress saved for 24 hours.</p>
+          <p class="muted small-text">Sign in with your Username and PIN to save progress and join leaderboards.</p>
         </div>
 
-        <form id="otp-form" novalidate>
-          <div id="otp-summary" class="error-summary" role="alert" tabindex="-1" hidden></div>
+        <div class="auth-tabs" role="tablist">
+          <button type="button" id="tab-auth-signin" class="auth-tab-btn active" role="tab" aria-selected="true">Sign In</button>
+          <button type="button" id="tab-auth-register" class="auth-tab-btn" role="tab" aria-selected="false">Create Account</button>
+        </div>
 
-          <!-- Step 1: Mobile Phone Number Entry -->
-          <div id="phone-step-number">
+        <form id="auth-form" novalidate>
+          <div id="auth-summary" class="error-summary" role="alert" tabindex="-1" hidden></div>
+
+          <!-- Tab 1: Returning Player Sign-In with Username & PIN -->
+          <div id="auth-view-signin">
             <div class="field">
-              <label for="otp-phone">Mobile Phone Number</label>
+              <label for="signin-username">Username or Mobile Number</label>
+              <input id="signin-username" name="username" type="text" placeholder="e.g. aman" required autocomplete="username" />
+            </div>
+
+            <div class="field">
+              <div class="flex-between">
+                <label for="signin-pin">6-Digit Secret PIN</label>
+                <button id="auth-to-reset-btn" type="button" class="link-btn">Forgot PIN?</button>
+              </div>
+              <input id="signin-pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="current-password" required />
+            </div>
+
+            <button id="auth-signin-btn" class="btn primary big full-width" type="button">
+              <span>Sign In & Play</span>
+              <svg class="icon-inline" aria-hidden="true" style="width:16px;height:16px;"><use href="#i-arrow"/></svg>
+            </button>
+
+            <p class="auth-footer-prompt">
+              New to Cricketle? <button type="button" id="auth-switch-to-register" class="link-btn">Create an account</button>
+            </p>
+          </div>
+
+          <!-- Tab 2: New Player Registration (Unique Username + Phone + PIN) -->
+          <div id="auth-view-register" hidden>
+            <div class="field">
+              <label for="register-username">Choose Unique Username</label>
+              <input id="register-username" name="username" type="text" maxlength="20" placeholder="e.g. cricket_champ" required autocomplete="username" />
+              <p class="help-text">3-20 letters or numbers. Permanently unique on leaderboards.</p>
+            </div>
+
+            <div class="field">
+              <label for="register-phone">Mobile Phone Number</label>
               <div class="phone-input-wrap">
-                <select id="otp-country-code" class="country-select" aria-label="Country Code">
+                <select id="register-country-code" class="country-select" aria-label="Country Code">
                   <option value="+91" selected>🇮🇳 +91</option>
                   <option value="+44">🇬🇧 +44</option>
                   <option value="+61">🇦🇺 +61</option>
@@ -225,94 +261,77 @@
                   <option value="+64">🇳🇿 +64</option>
                   <option value="+971">🇦🇪 +971</option>
                 </select>
-                <input id="otp-phone" name="phone" type="tel" autocomplete="tel" placeholder="Mobile number" required maxlength="15" aria-describedby="otp-phone-help" />
+                <input id="register-phone" name="phone" type="tel" autocomplete="tel" placeholder="Mobile number" required maxlength="15" />
               </div>
-              <p id="otp-phone-help" class="help-text">Instant mobile access · Zero credit card or autopay needed.</p>
+              <p class="help-text">Linked 1-to-1 to your account for PIN recovery. 100% Free.</p>
             </div>
-            <button id="phone-continue-btn" class="btn primary big full-width" type="button">
-              <span>Continue with Mobile</span>
+
+            <div class="field">
+              <label for="register-pin">Set 6-Digit PIN</label>
+              <input id="register-pin" name="newPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" required />
+            </div>
+
+            <div class="field">
+              <label for="register-pin-confirm">Confirm 6-Digit PIN</label>
+              <input id="register-pin-confirm" name="confirmPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" required />
+            </div>
+
+            <button id="auth-register-btn" class="btn primary big full-width" type="button">
+              <span>Create Account & Play</span>
               <svg class="icon-inline" aria-hidden="true" style="width:16px;height:16px;"><use href="#i-arrow"/></svg>
             </button>
+
+            <p class="auth-footer-prompt">
+              Already have an account? <button type="button" id="auth-switch-to-signin" class="link-btn">Sign In</button>
+            </p>
           </div>
 
-          <!-- Step 2A: Returning Player PIN Login -->
-          <div id="phone-step-signin" hidden>
-            <div class="user-greeting-banner">
-              <div class="user-greeting-icon">🏏</div>
-              <div class="user-greeting-meta">
-                <div class="user-greeting-name" id="user-greeting-name">Welcome back!</div>
-                <div class="user-greeting-phone"><span id="phone-signin-number"></span> · <button id="phone-change-btn-1" type="button" class="link-btn">Change number</button></div>
-              </div>
-            </div>
-
-            <div class="field">
-              <div class="flex-between">
-                <label for="phone-pin-signin">Enter 6-Digit Secret PIN</label>
-                <button id="phone-forgot-pin-btn" type="button" class="link-btn">Reset PIN</button>
-              </div>
-              <input id="phone-pin-signin" name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="current-password" />
-              <p class="help-text">Enter your 6-digit PIN to sign in.</p>
-            </div>
-
-            <button id="phone-login-btn" class="btn primary big full-width" type="button">
-              <span>Sign In & Play</span>
-            </button>
-          </div>
-
-          <!-- Step 2B: New Player Username & PIN Setup -->
-          <div id="phone-step-register" hidden>
-            <div class="user-greeting-banner">
-              <div class="user-greeting-icon">⭐</div>
-              <div class="user-greeting-meta">
-                <div class="user-greeting-name">Create Your Profile</div>
-                <div class="user-greeting-phone"><span id="phone-register-number"></span> · <button id="phone-change-btn-2" type="button" class="link-btn">Change</button></div>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="phone-username">Choose Username (shown on Leaderboard)</label>
-              <input id="phone-username" name="username" type="text" maxlength="20" placeholder="e.g. cricket_champ" required autocomplete="username" />
-            </div>
-
-            <div class="field">
-              <label for="phone-pin-register">Set 6-Digit PIN</label>
-              <input id="phone-pin-register" name="newPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
-            </div>
-
-            <div class="field">
-              <label for="phone-pin-confirm">Confirm 6-Digit PIN</label>
-              <input id="phone-pin-confirm" name="confirmPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
-            </div>
-
-            <button id="phone-register-btn" class="btn primary big full-width" type="button">
-              <span>Create Account & Play</span>
-            </button>
-          </div>
-
-          <!-- Step 2C: Reset PIN -->
-          <div id="phone-step-reset" hidden>
+          <!-- View 3: Reset PIN via Registered Mobile Number -->
+          <div id="auth-view-reset" hidden>
             <div class="user-greeting-banner">
               <div class="user-greeting-icon">🔑</div>
               <div class="user-greeting-meta">
                 <div class="user-greeting-name">Reset Secret PIN</div>
-                <div class="user-greeting-phone"><span id="phone-reset-number"></span> · <button id="phone-change-btn-3" type="button" class="link-btn">Cancel</button></div>
+                <div class="user-greeting-phone">Enter your registered mobile number</div>
               </div>
             </div>
 
             <div class="field">
-              <label for="phone-pin-reset">Choose New 6-Digit PIN</label>
-              <input id="phone-pin-reset" name="resetPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
-              <p class="help-text">Enter 4-6 digits for your new PIN.</p>
+              <label for="reset-phone">Registered Mobile Phone Number</label>
+              <div class="phone-input-wrap">
+                <select id="reset-country-code" class="country-select" aria-label="Country Code">
+                  <option value="+91" selected>🇮🇳 +91</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+61">🇦🇺 +61</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+92">🇵🇰 +92</option>
+                  <option value="+880">🇧🇩 +880</option>
+                  <option value="+94">🇱🇰 +94</option>
+                  <option value="+27">🇿🇦 +27</option>
+                  <option value="+64">🇳🇿 +64</option>
+                  <option value="+971">🇦🇪 +971</option>
+                </select>
+                <input id="reset-phone" name="phone" type="tel" autocomplete="tel" placeholder="Mobile number" required maxlength="15" />
+              </div>
             </div>
 
             <div class="field">
-              <label for="phone-pin-reset-confirm">Confirm New PIN</label>
-              <input id="phone-pin-reset-confirm" name="resetConfirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
+              <label for="reset-new-pin">Choose New 6-Digit PIN</label>
+              <input id="reset-new-pin" name="resetPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" required />
             </div>
 
-            <button id="phone-reset-btn" class="btn primary big full-width" type="button">
+            <div class="field">
+              <label for="reset-pin-confirm">Confirm New PIN</label>
+              <input id="reset-pin-confirm" name="resetConfirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" required />
+            </div>
+
+            <button id="auth-reset-btn" class="btn primary big full-width" type="button">
               <span>Update PIN & Sign In</span>
             </button>
+
+            <p class="auth-footer-prompt">
+              <button type="button" id="auth-reset-to-signin" class="link-btn">← Back to Sign In</button>
+            </p>
           </div>
 
           <p class="muted small-text" style="margin-top:var(--space-3);text-align:center;">100% Free · Zero autopay mandates · Active for 24 hours.</p>

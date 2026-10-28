@@ -1510,8 +1510,9 @@
   }
 
   function renderAuthTab() {
-    if ($("otp-form")) $("otp-form").hidden = false;
-    clearOtpErrors();
+    if ($("auth-card")) $("auth-card").hidden = false;
+    clearPhoneAuthErrors();
+    switchAuthView("signin");
   }
 
   function fieldError(id, text) {
@@ -1538,12 +1539,10 @@
   async function handleGoogleLogin() {}
   function initGoogleAuth() {}
 
-  // ---------- Mobile Phone & PIN Authentication (Option A) ----------
-
-  let activePhone = "";
+  // ---------- Player Authentication (Username & PIN) ----------
 
   function clearPhoneAuthErrors() {
-    const summary = $("otp-summary") || $("auth-summary");
+    const summary = $("auth-summary") || $("otp-summary");
     if (summary) {
       summary.hidden = true;
       summary.innerHTML = "";
@@ -1551,7 +1550,7 @@
   }
 
   function showPhoneAuthError(msg) {
-    const summary = $("otp-summary") || $("auth-summary");
+    const summary = $("auth-summary") || $("otp-summary");
     if (summary) {
       summary.hidden = false;
       summary.innerHTML = `<h3>${escapeHtml(msg)}</h3>`;
@@ -1559,25 +1558,30 @@
     }
   }
 
-  function switchPhoneStep(step) {
+  function switchAuthView(view) {
     clearPhoneAuthErrors();
-    const stepNumber = $("phone-step-number");
-    const stepSignin = $("phone-step-signin");
-    const stepRegister = $("phone-step-register");
-    const stepReset = $("phone-step-reset");
+    const tabSignin = $("tab-auth-signin");
+    const tabRegister = $("tab-auth-register");
+    const viewSignin = $("auth-view-signin");
+    const viewRegister = $("auth-view-register");
+    const viewReset = $("auth-view-reset");
 
-    if (stepNumber) stepNumber.hidden = step !== "number";
-    if (stepSignin) stepSignin.hidden = step !== "signin";
-    if (stepRegister) stepRegister.hidden = step !== "register";
-    if (stepReset) stepReset.hidden = step !== "reset";
-
-    if (step === "number" && $("otp-phone")) $("otp-phone").focus();
-    if (step === "signin" && $("phone-pin-signin")) $("phone-pin-signin").focus();
-    if (step === "register") {
-      if ($("phone-username")) $("phone-username").focus();
-      else if ($("phone-pin-register")) $("phone-pin-register").focus();
+    if (tabSignin) {
+      tabSignin.classList.toggle("active", view === "signin");
+      tabSignin.setAttribute("aria-selected", String(view === "signin"));
     }
-    if (step === "reset" && $("phone-pin-reset")) $("phone-pin-reset").focus();
+    if (tabRegister) {
+      tabRegister.classList.toggle("active", view === "register");
+      tabRegister.setAttribute("aria-selected", String(view === "register"));
+    }
+
+    if (viewSignin) viewSignin.hidden = view !== "signin";
+    if (viewRegister) viewRegister.hidden = view !== "register";
+    if (viewReset) viewReset.hidden = view !== "reset";
+
+    if (view === "signin" && $("signin-username")) $("signin-username").focus();
+    if (view === "register" && $("register-username")) $("register-username").focus();
+    if (view === "reset" && $("reset-phone")) $("reset-phone").focus();
   }
 
   function clearOtpErrors() {
@@ -1589,197 +1593,153 @@
   }
 
   function initPhoneAuth() {
-    // Step 1: Continue with Mobile
-    const continueBtn = $("phone-continue-btn");
-    const phoneInput = $("otp-phone");
+    // Tab switching
+    const tabSignin = $("tab-auth-signin");
+    const tabRegister = $("tab-auth-register");
+    const toRegisterBtn = $("auth-switch-to-register");
+    const toSigninBtn = $("auth-switch-to-signin");
+    const toResetBtn = $("auth-to-reset-btn");
+    const resetToSigninBtn = $("auth-reset-to-signin");
 
-    const handlePhoneContinue = async () => {
+    if (tabSignin) tabSignin.addEventListener("click", () => switchAuthView("signin"));
+    if (tabRegister) tabRegister.addEventListener("click", () => switchAuthView("register"));
+    if (toRegisterBtn) toRegisterBtn.addEventListener("click", () => switchAuthView("register"));
+    if (toSigninBtn) toSigninBtn.addEventListener("click", () => switchAuthView("signin"));
+    if (toResetBtn) toResetBtn.addEventListener("click", () => switchAuthView("reset"));
+    if (resetToSigninBtn) resetToSigninBtn.addEventListener("click", () => switchAuthView("signin"));
+
+    // 1. Sign In (Username & PIN)
+    const signinBtn = $("auth-signin-btn");
+    const signinUser = $("signin-username");
+    const signinPin = $("signin-pin");
+
+    const handleSignin = async () => {
       clearPhoneAuthErrors();
-      const countryCode = ($("otp-country-code") && $("otp-country-code").value) || "+91";
-      const raw = (phoneInput ? phoneInput.value : "").trim().replace(/[\s\-()]/g, "");
-      if (!raw) {
-        showPhoneAuthError("Please enter your mobile phone number.");
-        if (phoneInput) phoneInput.focus();
+      const identifier = (signinUser ? signinUser.value : "").trim();
+      const pin = (signinPin ? signinPin.value : "").trim();
+
+      if (!identifier) {
+        showPhoneAuthError("Please enter your username or mobile number.");
+        if (signinUser) signinUser.focus();
         return;
       }
-      const fullPhone = raw.startsWith("+") ? raw : countryCode + raw.replace(/^0+/, "");
-      if (!/^\+[1-9]\d{9,14}$/.test(fullPhone)) {
-        showPhoneAuthError("Please enter a valid mobile number (e.g. 98765 43210).");
-        if (phoneInput) phoneInput.focus();
-        return;
-      }
-
-      activePhone = fullPhone;
-      if (continueBtn) {
-        continueBtn.classList.add("loading");
-        continueBtn.disabled = true;
-      }
-
-      try {
-        let exists = false;
-        let displayName = "";
-
-        if (app.offline) {
-          const p = app.store && app.store.getProfile ? app.store.getProfile() : null;
-          exists = Boolean(p && p.phone === fullPhone && p.pin);
-          displayName = p ? (p.displayName || p.username || "") : "";
-        } else {
-          const res = await api("POST", "/api/auth/phone/check", { phone: fullPhone });
-          exists = Boolean(res && res.exists);
-          displayName = (res && res.displayName) || "";
-        }
-
-        if (exists) {
-          // Existing user -> prompt for PIN
-          if ($("user-greeting-name")) $("user-greeting-name").textContent = displayName ? `Welcome back, ${displayName}!` : "Welcome back!";
-          if ($("phone-signin-number")) $("phone-signin-number").textContent = fullPhone;
-          if ($("phone-pin-signin")) $("phone-pin-signin").value = "";
-          switchPhoneStep("signin");
-        } else {
-          // New player -> prompt to set PIN
-          if ($("phone-register-number")) $("phone-register-number").textContent = fullPhone;
-          if ($("phone-pin-register")) $("phone-pin-register").value = "";
-          if ($("phone-pin-confirm")) $("phone-pin-confirm").value = "";
-          switchPhoneStep("register");
-        }
-      } catch (err) {
-        showPhoneAuthError(err.message || "Failed to check mobile number. Please try again.");
-      } finally {
-        if (continueBtn) {
-          continueBtn.classList.remove("loading");
-          continueBtn.disabled = false;
-        }
-      }
-    };
-
-    if (continueBtn) continueBtn.addEventListener("click", handlePhoneContinue);
-    if (phoneInput) {
-      phoneInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          handlePhoneContinue();
-        }
-      });
-    }
-
-    // Change number buttons
-    const changeBtn1 = $("phone-change-btn-1");
-    const changeBtn2 = $("phone-change-btn-2");
-    const changeBtn3 = $("phone-change-btn-3");
-    if (changeBtn1) changeBtn1.addEventListener("click", () => switchPhoneStep("number"));
-    if (changeBtn2) changeBtn2.addEventListener("click", () => switchPhoneStep("number"));
-    if (changeBtn3) changeBtn3.addEventListener("click", () => switchPhoneStep("signin"));
-
-    // Forgot / Reset PIN trigger
-    const forgotPinBtn = $("phone-forgot-pin-btn");
-    if (forgotPinBtn) {
-      forgotPinBtn.addEventListener("click", () => {
-        if ($("phone-reset-number")) $("phone-reset-number").textContent = activePhone;
-        if ($("phone-pin-reset")) $("phone-pin-reset").value = "";
-        if ($("phone-pin-reset-confirm")) $("phone-pin-reset-confirm").value = "";
-        switchPhoneStep("reset");
-      });
-    }
-
-    // Step 2A: Returning user sign-in
-    const loginBtn = $("phone-login-btn");
-    const signinPinInput = $("phone-pin-signin");
-
-    const handleLogin = async () => {
-      clearPhoneAuthErrors();
-      const pin = (signinPinInput ? signinPinInput.value : "").trim();
       if (!/^\d{4,8}$/.test(pin)) {
         showPhoneAuthError("Please enter your 4 to 6 digit secret PIN.");
-        if (signinPinInput) signinPinInput.focus();
+        if (signinPin) signinPin.focus();
         return;
       }
 
-      if (loginBtn) {
-        loginBtn.classList.add("loading");
-        loginBtn.disabled = true;
+      if (signinBtn) {
+        signinBtn.classList.add("loading");
+        signinBtn.disabled = true;
       }
 
       try {
         let user;
         if (app.offline) {
           const p = app.store.getProfile();
-          if (p.pin && p.pin !== pin) throw new Error("Incorrect PIN. Please try again or reset your PIN.");
+          const match = p && ((p.username && p.username.toLowerCase() === identifier.toLowerCase()) || p.phone === identifier);
+          if (!match || (p.pin && p.pin !== pin)) {
+            throw new Error("Incorrect username or PIN.");
+          }
           p.loginTime = Date.now();
           app.store.saveProfile(p);
           user = {
-            username: p.username || ("player_" + activePhone.slice(-4)),
-            displayName: p.displayName || ("Cricketer " + activePhone.slice(-4)),
-            phone: activePhone,
+            username: p.username || identifier,
+            displayName: p.displayName || p.username || identifier,
+            phone: p.phone || null,
             avatar: p.avatar || "allrounder",
             bio: p.bio || "",
             favTeam: p.favTeam || "",
             favPlayer: p.favPlayer || "",
-            phoneConnected: true,
+            phoneConnected: Boolean(p.phone),
             isOffline: true,
           };
           app.user = user;
           renderNav();
           renderProfile();
         } else {
-          const res = await api("POST", "/api/auth/phone/login", { phone: activePhone, pin });
+          const res = await api("POST", "/api/auth/login", { username: identifier, pin });
           user = res.user;
           await becomeUser(user);
         }
 
-        toast(`Welcome back, ${user.displayName || user.username}!`, "success");
-        switchPhoneStep("number");
+        toast(`Welcome back, @${user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
-        showPhoneAuthError(err.message || "Incorrect PIN. Try again or reset your PIN.");
+        showPhoneAuthError(err.message || "Incorrect username or PIN. Please try again.");
       } finally {
-        if (loginBtn) {
-          loginBtn.classList.remove("loading");
-          loginBtn.disabled = false;
+        if (signinBtn) {
+          signinBtn.classList.remove("loading");
+          signinBtn.disabled = false;
         }
       }
     };
 
-    if (loginBtn) loginBtn.addEventListener("click", handleLogin);
-    if (signinPinInput) {
-      signinPinInput.addEventListener("keydown", (e) => {
+    if (signinBtn) signinBtn.addEventListener("click", handleSignin);
+    if (signinUser) {
+      signinUser.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          handleLogin();
+          if (signinPin) signinPin.focus();
+        }
+      });
+    }
+    if (signinPin) {
+      signinPin.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleSignin();
         }
       });
     }
 
-    // Step 2B: New player registration
-    const registerBtn = $("phone-register-btn");
-    const regUsernameInput = $("phone-username");
-    const regPinInput = $("phone-pin-register");
-    const regConfirmInput = $("phone-pin-confirm");
+    // 2. Account Registration (Unique Username + Mobile + PIN)
+    const registerBtn = $("auth-register-btn");
+    const regUsername = $("register-username");
+    const regPhone = $("register-phone");
+    const regCountry = $("register-country-code");
+    const regPin = $("register-pin");
+    const regConfirm = $("register-pin-confirm");
 
     const handleRegister = async () => {
       clearPhoneAuthErrors();
-      const username = (regUsernameInput ? regUsernameInput.value : "").trim();
-      const pin = (regPinInput ? regPinInput.value : "").trim();
-      const confirmPin = (regConfirmInput ? regConfirmInput.value : "").trim();
+      const username = (regUsername ? regUsername.value : "").trim();
+      const countryCode = (regCountry && regCountry.value) || "+91";
+      const rawPhone = (regPhone ? regPhone.value : "").trim().replace(/[\s\-()]/g, "");
+      const pin = (regPin ? regPin.value : "").trim();
+      const confirmPin = (regConfirm ? regConfirm.value : "").trim();
 
       if (!username) {
         showPhoneAuthError("Please choose a username for the leaderboard.");
-        if (regUsernameInput) regUsernameInput.focus();
+        if (regUsername) regUsername.focus();
         return;
       }
       if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) {
         showPhoneAuthError("Usernames must be 3-20 letters, numbers, or underscores.");
-        if (regUsernameInput) regUsernameInput.focus();
+        if (regUsername) regUsername.focus();
+        return;
+      }
+      if (!rawPhone) {
+        showPhoneAuthError("Please enter your mobile phone number for PIN recovery.");
+        if (regPhone) regPhone.focus();
+        return;
+      }
+      const fullPhone = rawPhone.startsWith("+") ? rawPhone : countryCode + rawPhone.replace(/^0+/, "");
+      if (!/^\+[1-9]\d{9,14}$/.test(fullPhone)) {
+        showPhoneAuthError("Please enter a valid mobile number (e.g. 98765 43210).");
+        if (regPhone) regPhone.focus();
         return;
       }
       if (!/^\d{4,8}$/.test(pin)) {
         showPhoneAuthError("Please choose a 6-digit secret PIN.");
-        if (regPinInput) regPinInput.focus();
+        if (regPin) regPin.focus();
         return;
       }
       if (pin !== confirmPin) {
         showPhoneAuthError("PINs do not match. Please re-enter.");
-        if (regConfirmInput) regConfirmInput.focus();
+        if (regConfirm) regConfirm.focus();
         return;
       }
 
@@ -1792,7 +1752,7 @@
         let user;
         if (app.offline) {
           const p = app.store.getProfile();
-          p.phone = activePhone;
+          p.phone = fullPhone;
           p.pin = pin;
           p.username = username;
           p.displayName = username;
@@ -1801,7 +1761,7 @@
           user = {
             username: p.username,
             displayName: p.displayName,
-            phone: activePhone,
+            phone: fullPhone,
             avatar: p.avatar || "allrounder",
             bio: p.bio || "",
             favTeam: p.favTeam || "",
@@ -1814,7 +1774,7 @@
           renderProfile();
         } else {
           const res = await api("POST", "/api/auth/phone/register", {
-            phone: activePhone,
+            phone: fullPhone,
             username,
             pin,
           });
@@ -1823,11 +1783,13 @@
         }
 
         toast(`Welcome to Cricketle, @${user.username}!`, "success");
-        switchPhoneStep("number");
         location.hash = "#play";
         showView();
       } catch (err) {
         showPhoneAuthError(err.message || "Failed to create account. Try again.");
+        if (err.code === "username_taken" && regUsername) {
+          regUsername.focus();
+        }
       } finally {
         if (registerBtn) {
           registerBtn.classList.remove("loading");
@@ -1837,16 +1799,8 @@
     };
 
     if (registerBtn) registerBtn.addEventListener("click", handleRegister);
-    if (regUsernameInput) {
-      regUsernameInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          if (regPinInput) regPinInput.focus();
-        }
-      });
-    }
-    if (regConfirmInput) {
-      regConfirmInput.addEventListener("keydown", (e) => {
+    if (regConfirm) {
+      regConfirm.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
           handleRegister();
@@ -1854,24 +1808,39 @@
       });
     }
 
-    // Step 2C: Reset PIN
-    const resetBtn = $("phone-reset-btn");
-    const resetPinInput = $("phone-pin-reset");
-    const resetConfirmInput = $("phone-pin-reset-confirm");
+    // 3. Reset PIN
+    const resetBtn = $("auth-reset-btn");
+    const resetPhone = $("reset-phone");
+    const resetCountry = $("reset-country-code");
+    const resetNewPin = $("reset-new-pin");
+    const resetConfirm = $("reset-pin-confirm");
 
     const handleReset = async () => {
       clearPhoneAuthErrors();
-      const newPin = (resetPinInput ? resetPinInput.value : "").trim();
-      const confirmPin = (resetConfirmInput ? resetConfirmInput.value : "").trim();
+      const countryCode = (resetCountry && resetCountry.value) || "+91";
+      const rawPhone = (resetPhone ? resetPhone.value : "").trim().replace(/[\s\-()]/g, "");
+      const newPin = (resetNewPin ? resetNewPin.value : "").trim();
+      const confirmPin = (resetConfirm ? resetConfirm.value : "").trim();
 
+      if (!rawPhone) {
+        showPhoneAuthError("Please enter your registered mobile phone number.");
+        if (resetPhone) resetPhone.focus();
+        return;
+      }
+      const fullPhone = rawPhone.startsWith("+") ? rawPhone : countryCode + rawPhone.replace(/^0+/, "");
+      if (!/^\+[1-9]\d{9,14}$/.test(fullPhone)) {
+        showPhoneAuthError("Please enter a valid mobile number.");
+        if (resetPhone) resetPhone.focus();
+        return;
+      }
       if (!/^\d{4,8}$/.test(newPin)) {
         showPhoneAuthError("Please enter a 4 to 6 digit new PIN.");
-        if (resetPinInput) resetPinInput.focus();
+        if (resetNewPin) resetNewPin.focus();
         return;
       }
       if (newPin !== confirmPin) {
         showPhoneAuthError("New PINs do not match. Please re-enter.");
-        if (resetConfirmInput) resetConfirmInput.focus();
+        if (resetConfirm) resetConfirm.focus();
         return;
       }
 
@@ -1884,14 +1853,14 @@
         let user;
         if (app.offline) {
           const p = app.store.getProfile();
-          p.phone = activePhone;
+          if (p.phone !== fullPhone) throw new Error("No account found with this phone number.");
           p.pin = newPin;
           p.loginTime = Date.now();
           app.store.saveProfile(p);
           user = {
-            username: p.username || ("player_" + activePhone.slice(-4)),
-            displayName: p.displayName || ("Cricketer " + activePhone.slice(-4)),
-            phone: activePhone,
+            username: p.username || ("player_" + fullPhone.slice(-4)),
+            displayName: p.displayName || ("Cricketer " + fullPhone.slice(-4)),
+            phone: fullPhone,
             avatar: p.avatar || "allrounder",
             bio: p.bio || "",
             favTeam: p.favTeam || "",
@@ -1903,13 +1872,12 @@
           renderNav();
           renderProfile();
         } else {
-          const res = await api("POST", "/api/auth/phone/reset", { phone: activePhone, newPin });
+          const res = await api("POST", "/api/auth/phone/reset", { phone: fullPhone, newPin });
           user = res.user;
           await becomeUser(user);
         }
 
-        toast(`Secret PIN updated! Welcome, ${user.displayName || user.username}!`, "success");
-        switchPhoneStep("number");
+        toast(`Secret PIN updated! Welcome, @${user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
@@ -1923,8 +1891,8 @@
     };
 
     if (resetBtn) resetBtn.addEventListener("click", handleReset);
-    if (resetConfirmInput) {
-      resetConfirmInput.addEventListener("keydown", (e) => {
+    if (resetConfirm) {
+      resetConfirm.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
           handleReset();
@@ -1932,12 +1900,9 @@
       });
     }
 
-    // Form submit preventDefault
-    const otpForm = $("otp-form");
-    if (otpForm) {
-      otpForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-      });
+    const authForm = $("auth-form") || $("otp-form");
+    if (authForm) {
+      authForm.addEventListener("submit", (e) => e.preventDefault());
     }
   }
 

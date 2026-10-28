@@ -610,7 +610,7 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     assert.equal(dupPhone.status, 409);
     assert.equal(dupPhone.json.error, "phone_exists");
 
-    // 5. Duplicate username rejection
+    // 5. Duplicate username rejection (exact and case-insensitive)
     const dupUser = await c.post("/api/auth/phone/register", {
       phone: "+919876543299",
       username: "cricket_champ",
@@ -618,6 +618,14 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     });
     assert.equal(dupUser.status, 409);
     assert.equal(dupUser.json.error, "username_taken");
+
+    const dupUserCase = await c.post("/api/auth/phone/register", {
+      phone: "+919876543298",
+      username: "Cricket_Champ",
+      pin: "123456",
+    });
+    assert.equal(dupUserCase.status, 409);
+    assert.equal(dupUserCase.json.error, "username_taken");
 
     // 6. Check now returns exists: true and custom username
     const check2 = await c.post("/api/auth/phone/check", { phone: testPhone });
@@ -664,7 +672,34 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     });
     assert.equal(newPinLogin.status, 200);
 
-    // 11. Custom username appears on leaderboard when solving
+    // 11. Direct Username + PIN sign-in via POST /api/auth/login
+    const c4 = client(app.base);
+    const badPinAuth = await c4.post("/api/auth/login", {
+      username: "cricket_champ",
+      pin: "999999",
+    });
+    assert.equal(badPinAuth.status, 401);
+    assert.equal(badPinAuth.json.error, "bad_credentials");
+
+    const nonExistentAuth = await c4.post("/api/auth/login", {
+      username: "ghost_player",
+      pin: "112233",
+    });
+    assert.equal(nonExistentAuth.status, 401);
+
+    const goodUserPinAuth = await c4.post("/api/auth/login", {
+      username: "Cricket_Champ", // verifies case-insensitive match
+      pin: "112233",
+    });
+    assert.equal(goodUserPinAuth.status, 200);
+    assert.equal(goodUserPinAuth.json.ok, true);
+    assert.equal(goodUserPinAuth.json.user.username, "cricket_champ");
+
+    const meUserPin = await c4.get("/api/me");
+    assert.equal(meUserPin.status, 200);
+    assert.equal(meUserPin.json.user.username, "cricket_champ");
+
+    // 12. Custom username appears on leaderboard when solving
     await solve(c, "easy", 0, "2026-10-27");
     const board = await c.get("/api/leaderboard/today");
     assert.equal(board.status, 200);
