@@ -168,6 +168,22 @@
           h.push(item);
           localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
         }
+        if (app.user && app.user.id && typeof SupabaseDirect !== "undefined") {
+          SupabaseDirect.request("POST", "/puzzles", {
+            user_id: app.user.id,
+            day: item.day,
+            mode: item.mode,
+            idx: item.idx,
+            status: item.status,
+            guesses: item.guesses,
+            hints: item.hints,
+            started_at: item.started_at,
+            finished_at: item.finished_at,
+            points: item.points || 0,
+          }, { Prefer: "resolution=merge-duplicates" }).catch((err) => {
+            CricketleLog.warn("SYNC", "Failed to sync puzzle to Supabase Cloud", err);
+          });
+        }
       } catch (_) { /* ignore */ }
     }
     getStats() {
@@ -500,10 +516,10 @@
       rankEl.innerHTML = app.stats.todayRank
         ? `<a href="#leaderboard">Rank <strong>#${app.stats.todayRank}</strong> of ${app.stats.todayTotal}</a>`
         : `<a href="#leaderboard">Finish a puzzle to be ranked</a>`;
-    } else if (!app.offline) {
-      rankEl.innerHTML = `<a href="#profile">Sign in to be ranked</a>`;
+    } else if (app.user) {
+      rankEl.innerHTML = `<a href="#leaderboard">Finish a puzzle to be ranked</a>`;
     } else {
-      rankEl.textContent = "";
+      rankEl.innerHTML = `<a href="#profile">Sign in to be ranked</a>`;
     }
   }
 
@@ -1065,11 +1081,11 @@
     $("tab-alltime").setAttribute("aria-selected", String(tab === "alltime"));
     setSegmented($("tab-today").parentElement, tab === "alltime");
 
-    if (app.offline) {
+    if (app.offline && !data) {
       me.hidden = true;
       list.innerHTML = "";
       emptyEl.hidden = false;
-      emptyEl.textContent = "Leaderboards need the Cricketle server. Start it with npm start and open the server address.";
+      emptyEl.textContent = "Connecting to live leaderboard...";
       $("board-updated").textContent = "";
       return;
     }
@@ -1127,7 +1143,6 @@
   }
 
   async function loadBoard(force) {
-    if (app.offline) { renderBoard(); return; }
     const tab = app.board.tab;
     const cached = app.board.data[tab];
     if (cached && !force && Date.now() - cached.loadedAt < 30 * 1000) { renderBoard(); return; }
@@ -1136,7 +1151,71 @@
     app.board.loading = true;
     $("board-refresh").classList.add("loading");
     try {
-      const data = await api("GET", tab === "today" ? "/api/leaderboard/today" : "/api/leaderboard/alltime");
+      let data = null;
+      if (!app.offline) {
+        data = await api("GET", tab === "today" ? "/api/leaderboard/today" : "/api/leaderboard/alltime");
+      } else {
+        const userId = app.user ? app.user.id : null;
+        if (tab === "today") {
+          const day = core.todayKey();
+          const rows = (await SupabaseDirect.request("POST", "/rpc/get_leaderboard_today", { p_day: day, p_limit: 50 })) || [];
+          let me = null;
+          if (userId) {
+            me = rows.find((r) => Number(r.user_id) === Number(userId)) || null;
+            if (!me) {
+              try {
+                const meRows = await SupabaseDirect.request("POST", "/rpc/get_leaderboard_today_user", { p_day: day, p_user_id: userId });
+                if (meRows && meRows.length) me = meRows[0];
+              } catch (_) {}
+            }
+          }
+          const rowFn = (r) => ({
+            rank: Number(r.rank),
+            username: r.username,
+            displayName: r.display_name || r.username,
+            avatar: r.avatar || "batter",
+            points: Number(r.points),
+            solved: Number(r.solved),
+            guesses: Number(r.guesses),
+            seconds: Math.round(Number(r.ms) / 1000),
+            me: Number(r.user_id) === Number(userId),
+          });
+          data = {
+            day,
+            total: rows.length ? Number(rows[0].total) : (me ? Number(me.total) : 0),
+            rows: rows.map(rowFn),
+            me: me ? rowFn(me) : null,
+          };
+        } else {
+          const rows = (await SupabaseDirect.request("POST", "/rpc/get_leaderboard_alltime", { p_limit: 50 })) || [];
+          let me = null;
+          if (userId) {
+            me = rows.find((r) => Number(r.user_id) === Number(userId)) || null;
+            if (!me) {
+              try {
+                const meRows = await SupabaseDirect.request("POST", "/rpc/get_leaderboard_alltime_user", { p_user_id: userId });
+                if (meRows && meRows.length) me = meRows[0];
+              } catch (_) {}
+            }
+          }
+          const rowFn = (r) => ({
+            rank: Number(r.rank),
+            username: r.username,
+            displayName: r.display_name || r.username,
+            avatar: r.avatar || "batter",
+            points: Number(r.points),
+            solved: Number(r.solved),
+            days: Number(r.days),
+            title: core.rankTitle(Number(r.points)).title,
+            me: Number(r.user_id) === Number(userId),
+          });
+          data = {
+            total: rows.length ? Number(rows[0].total) : (me ? Number(me.total) : 0),
+            rows: rows.map(rowFn),
+            me: me ? rowFn(me) : null,
+          };
+        }
+      }
       data.loadedAt = Date.now();
       app.board.data[tab] = data;
     } catch (err) {
@@ -1532,9 +1611,24 @@
 
         if (app.user) {
           try {
-            const res = await api("POST", "/api/profile/update", { displayName, bio, avatar, favTeam, favPlayer });
-            app.user = res.user;
-            app.stats = res.stats;
+            if (!app.offline) {
+              const res = await api("POST", "/api/profile/update", { displayName, bio, avatar, favTeam, favPlayer });
+              app.user = res.user;
+              app.stats = res.stats;
+            } else {
+              const updated = await SupabaseDirect.request("PATCH", `/users?id=eq.${app.user.id}`, {
+                display_name: displayName,
+                bio,
+                avatar,
+                fav_team: favTeam,
+                fav_player: favPlayer,
+              }, { Prefer: "return=representation" });
+              if (Array.isArray(updated) && updated[0]) {
+                const u = updated[0];
+                app.user = SupabaseDirect.formatUser(u);
+                try { localStorage.setItem("cricketle:v2:session", JSON.stringify(app.user)); } catch (_) {}
+              }
+            }
             toast("Profile updated successfully!", "success");
             app.profileTab = "stats";
             renderProfile();
@@ -2198,7 +2292,9 @@
   }
 
   async function signOut() {
-    try { await api("POST", "/api/auth/logout", {}); } catch (_) { /* ignore */ }
+    if (!app.offline) {
+      try { await api("POST", "/api/auth/logout", {}); } catch (_) { /* ignore */ }
+    }
     try { localStorage.removeItem("cricketle:v2:session"); } catch (_) {}
     becomeGuest();
     toast("Signed out. Playing as a guest on this device.");
@@ -2208,10 +2304,32 @@
 
   async function becomeUser(user) {
     app.user = user;
-    app.store = new RemoteStore();
+    app.store = app.offline ? new LocalStore() : new RemoteStore();
     app.board.data = {};
     CricketleLog.auth("SIGN_IN", `Authenticated as @${user.username} (${user.displayName || user.username})`);
-    await refreshStats();
+    if (!app.offline) {
+      await refreshStats();
+    } else {
+      if (app.store && app.store.getStats) app.stats = app.store.getStats();
+      if (app.user && app.user.id && app.store && app.store.getHistory) {
+        const today = core.todayKey();
+        const h = app.store.getHistory().filter((p) => p.day === today);
+        for (const item of h) {
+          SupabaseDirect.request("POST", "/puzzles", {
+            user_id: app.user.id,
+            day: item.day,
+            mode: item.mode,
+            idx: item.idx,
+            status: item.status,
+            guesses: item.guesses,
+            hints: item.hints,
+            started_at: item.started_at,
+            finished_at: item.finished_at,
+            points: item.points || 0,
+          }, { Prefer: "resolution=merge-duplicates" }).catch(() => {});
+        }
+      }
+    }
     await reload();
     renderNav();
     renderProfile();
@@ -2240,6 +2358,13 @@
 
   async function refreshStats() {
     if (!app.user) return;
+    if (app.offline) {
+      if (app.store && app.store.getStats) app.stats = app.store.getStats();
+      renderTracker();
+      if (app.view === "profile") renderProfile();
+      if (app.view === "leaderboard") loadBoard(true);
+      return;
+    }
     try {
       const me = await api("GET", "/api/me");
       if (me.user) { app.stats = me.stats; if (app.store && app.store.sync) app.store.sync(me); }
@@ -2335,47 +2460,62 @@
   async function bootstrap() {
     fillHelp();
     initPhoneAuth();
-    try {
-      const me = await api("GET", "/api/me");
-      app.offline = false;
-      if (me.user) {
-        app.user = me.user;
-        app.stats = me.stats;
-        app.store = new RemoteStore();
-        app.store.sync(me);
-      } else {
-        app.store = new LocalStore();
-      }
-    } catch (err) {
-      // Running on a static host (GitHub Pages, file://) without local Node server
+    const isStaticHost = Boolean(location.hostname.endsWith("github.io") || location.protocol === "file:");
+    if (isStaticHost) {
       app.offline = true;
       app.store = new LocalStore();
-
-      // Clear any legacy mock credentials from earlier builds
-      try {
-        const p = app.store.getProfile();
-        if (p && p.phone) {
-          delete p.phone;
-          delete p.pin;
-          delete p.loginTime;
-          app.store.saveProfile(p);
-        }
-      } catch (_) {}
-
-      // Restore verified Supabase cloud session if present
       try {
         const saved = JSON.parse(localStorage.getItem("cricketle:v2:session"));
         if (saved && saved.username) {
           app.user = saved;
+          app.stats = app.store.getStats();
         }
       } catch (_) {}
+    } else {
+      try {
+        const me = await api("GET", "/api/me");
+        app.offline = false;
+        if (me.user) {
+          app.user = me.user;
+          app.stats = me.stats;
+          app.store = new RemoteStore();
+          app.store.sync(me);
+        } else {
+          app.store = new LocalStore();
+        }
+      } catch (err) {
+        // Running on a static host without local Node server
+        app.offline = true;
+        app.store = new LocalStore();
 
-      if (!(err instanceof ApiError && (err.status === 0 || err.status === 404 || err.status === 405))) console.warn("Cricketle: server unavailable", err);
+        // Restore verified Supabase cloud session if present
+        try {
+          const saved = JSON.parse(localStorage.getItem("cricketle:v2:session"));
+          if (saved && saved.username) {
+            app.user = saved;
+            app.stats = app.store.getStats();
+          }
+        } catch (_) {}
+
+        if (!(err instanceof ApiError && (err.status === 0 || err.status === 404 || err.status === 405))) console.warn("Cricketle: server unavailable", err);
+      }
     }
+
+    // Clear any legacy mock credentials from earlier builds
+    try {
+      const p = app.store.getProfile();
+      if (p && p.phone) {
+        delete p.phone;
+        delete p.pin;
+        delete p.loginTime;
+        app.store.saveProfile(p);
+      }
+    } catch (_) {}
+
     try {
       await reload();
     } catch (err) {
-      if (app.store.kind === "remote") { app.offline = false; await becomeGuest(); } else throw err;
+      if (app.store && app.store.kind === "remote") { app.offline = false; await becomeGuest(); } else throw err;
     }
     showView();
     CricketleLog.info("READY", `Cricketle ready · Day: ${core.todayKey()} · Mode: ${app.mode} · Storage: ${app.store.kind}`);
