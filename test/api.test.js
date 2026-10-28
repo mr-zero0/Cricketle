@@ -436,3 +436,64 @@ test("profile updates change display name, avatar, bio and favorite team", async
   } finally { await app.close(); }
 });
 
+test("mobile OTP login sends code, verifies, and logs in player", async () => {
+  const app = await boot();
+  try {
+    const c = client(app.base);
+    // Request OTP for phone
+    const sendRes = await c.post("/api/auth/otp/send", { phone: "+919876543210" });
+    assert.equal(sendRes.status, 200, sendRes.text);
+    assert.equal(sendRes.json.ok, true);
+    assert.ok(sendRes.json.devOtp);
+    assert.equal(sendRes.json.devOtp.length, 6);
+
+    // Verify with invalid OTP fails
+    const badVerify = await c.post("/api/auth/otp/verify", {
+      phone: "+919876543210",
+      code: "000000",
+    });
+    assert.equal(badVerify.status, 400);
+
+    // Verify with correct OTP succeeds
+    const goodVerify = await c.post("/api/auth/otp/verify", {
+      phone: "+919876543210",
+      code: sendRes.json.devOtp,
+      displayName: "Dhoni Fan",
+    });
+    assert.equal(goodVerify.status, 200, goodVerify.text);
+    assert.equal(goodVerify.json.user.displayName, "Dhoni Fan");
+    assert.equal(goodVerify.json.user.phone, "+919876543210");
+    assert.equal(goodVerify.json.user.phoneConnected, true);
+
+    // Check /api/me has session
+    const me = await c.get("/api/me");
+    assert.equal(me.status, 200);
+    assert.equal(me.json.user.displayName, "Dhoni Fan");
+    assert.equal(me.json.user.phone, "+919876543210");
+  } finally { await app.close(); }
+});
+
+test("mobile OTP rejects invalid phone formats and expired codes", async () => {
+  const app = await boot();
+  try {
+    const c = client(app.base);
+    const badPhone = await c.post("/api/auth/otp/send", { phone: "123" });
+    assert.equal(badPhone.status, 400);
+
+    const sendRes = await c.post("/api/auth/otp/send", { phone: "+919999988888" });
+    assert.equal(sendRes.status, 200);
+
+    // Fast-forward past 5 minutes (301 seconds)
+    app.setNow(app.getNow() + 301 * 1000);
+
+    const expiredVerify = await c.post("/api/auth/otp/verify", {
+      phone: "+919999988888",
+      code: sendRes.json.devOtp,
+    });
+    assert.equal(expiredVerify.status, 400);
+    assert.equal(expiredVerify.json.error, "otp_expired");
+  } finally { await app.close(); }
+});
+
+
+

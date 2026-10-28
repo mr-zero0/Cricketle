@@ -333,7 +333,14 @@ button:disabled { cursor: not-allowed; }
 }
 .segmented.right .seg-thumb { transform: translateX(calc(100% + 4px)); }
 body.hard .segmented:not(.tabs) .seg-thumb { background: var(--accent-deep); box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4); }
-.segmented.tabs .seg-thumb { background: var(--card-3); border: 1px solid var(--border-strong); box-shadow: none; }
+.segmented.tabs { grid-template-columns: repeat(3, 1fr); }
+.segmented.tabs .seg-thumb { width: calc(33.333% - 6px); background: var(--card-3); border: 1px solid var(--border-strong); box-shadow: none; }
+.segmented.tabs.pos-0 .seg-thumb { transform: translateX(0); }
+.segmented.tabs.pos-1 .seg-thumb { transform: translateX(calc(100% + 4px)); }
+.segmented.tabs.pos-2 .seg-thumb { transform: translateX(calc(200% + 8px)); }
+@media (max-width: 480px) {
+  .segmented.tabs .seg { font-size: 0.82rem; padding: 0 4px; }
+}
 .seg {
   position: relative; z-index: 1;
   min-height: 44px;
@@ -1207,4 +1214,155 @@ dialog form { margin-top: var(--space-4); text-align: right; }
   fill: currentColor;
 }
 
+/* ---------- Mobile OTP Authentication ---------- */
 
+.phone-input-wrap {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+.country-select {
+  flex: 0 0 auto;
+  max-width: 120px;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: var(--card-2);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--dur-fast);
+}
+.country-select:focus {
+  border-color: var(--mode);
+}
+.country-select option {
+  background: #0f172a;
+  color: #f8fafc;
+}
+.phone-input-wrap input {
+  flex: 1;
+}
+
+.otp-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.05)), var(--card-solid);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.15);
+  animation: fade-in 300ms var(--ease-out);
+}
+.otp-banner-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  flex: none;
+}
+.otp-banner-content {
+  flex: 1;
+  min-width: 0;
+}
+.otp-banner-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: #4ade80;
+  margin-bottom: 2px;
+}
+.otp-banner-text {
+  font-size: 0.92rem;
+  color: var(--fg);
+}
+.otp-code-highlight {
+  display: inline-block;
+  padding: 1px 8px;
+  margin-left: 4px;
+  border-radius: 6px;
+  background: rgba(34, 197, 94, 0.25);
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 1.15rem;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  border: 1px dashed rgba(74, 222, 128, 0.6);
+}
+.otp-fill-btn {
+  background: #22c55e;
+  color: #052e16 !important;
+  font-weight: 700;
+  border: none;
+  flex: none;
+  transition: transform var(--dur-fast), background var(--dur-fast);
+}
+.otp-fill-btn:hover {
+  background: #4ade80;
+  transform: translateY(-1px);
+}
+.otp-code-input {
+  font-family: monospace;
+  font-size: 1.5rem !important;
+  letter-spacing: 0.35em !important;
+  text-align: center;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.link-btn {
+  background: transparent;
+  border: none;
+  color: var(--mode);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.link-btn:hover {
+  color: #ffffff;
+}
+.otp-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.otp-actions .btn.primary {
+  flex: 2;
+}
+.otp-actions .btn:not(.primary) {
+  flex: 1;
+}
+
+.pill-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #86efac;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.pill-phone svg {
+  width: 12px;
+  height: 12px;
+}

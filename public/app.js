@@ -105,6 +105,13 @@
     saveProfile(p) {
       try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (_) { /* ignore */ }
     }
+    setOtp(phone, code) {
+      this._otp = { phone, code, expires: Date.now() + 5 * 60 * 1000 };
+      return code;
+    }
+    verifyOtp(phone, code) {
+      return Boolean(this._otp && this._otp.phone === phone && this._otp.code === code && Date.now() < this._otp.expires);
+    }
     getHistory() {
       try {
         const h = JSON.parse(localStorage.getItem(HISTORY_KEY));
@@ -1309,8 +1316,12 @@
                 <span>${pUser.googleConnected ? '<span class="pill-google"><svg class="google-icon-sm" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Connected</span>' : '<span class="muted">Not linked</span>'}</span>
               </div>
               <div style="display:flex;justify-content:space-between;padding-bottom:var(--space-2);border-bottom:1px solid var(--border);">
+                <span class="muted">Mobile Phone</span>
+                <span>${pUser.phone ? `<span class="pill-phone"><svg aria-hidden="true" style="width:12px;height:12px;vertical-align:-1px;"><use href="#i-phone"/></svg> ${escapeHtml(pUser.phone)}</span>` : '<span class="muted">Not linked</span>'}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:var(--space-2);border-bottom:1px solid var(--border);">
                 <span class="muted">Security</span>
-                <span>Password encrypted with scrypt</span>
+                <span>Password encrypted with scrypt · Mobile OTP ready</span>
               </div>
             </div>
             <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
@@ -1341,6 +1352,7 @@
             <h3 class="profile-display-name">${escapeHtml(pUser.displayName)}</h3>
             <span class="profile-username">${pUser.isGuest ? "· Guest" : `@${escapeHtml(pUser.username)}`}</span>
             ${pUser.googleConnected ? `<span class="pill-google"><svg class="google-icon-sm" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Google</span>` : ""}
+            ${pUser.phone ? `<span class="pill-phone"><svg aria-hidden="true" style="width:12px;height:12px;vertical-align:-1px;"><use href="#i-phone"/></svg> Phone</span>` : ""}
           </div>
           <div class="profile-tag-row">
             <span class="title-badge"><svg aria-hidden="true"><use href="#i-trophy"/></svg> ${escapeHtml(title.title)}</span>
@@ -1447,17 +1459,40 @@
   }
 
   function renderAuthTab() {
-    const signup = app.authTab === "signup";
-    $("tab-signin").classList.toggle("active", !signup);
-    $("tab-signin").setAttribute("aria-selected", String(!signup));
-    $("tab-signup").classList.toggle("active", signup);
-    $("tab-signup").setAttribute("aria-selected", String(signup));
-    setSegmented($("tab-signin").parentElement, signup);
-    $("confirm-field").hidden = !signup;
-    if ($("display-name-field")) $("display-name-field").hidden = !signup;
-    $("auth-password").setAttribute("autocomplete", signup ? "new-password" : "current-password");
-    $("auth-submit").textContent = signup ? "Create account" : "Sign in";
-    clearAuthErrors();
+    const tab = app.authTab || "signin";
+    const parent = $("tab-signin").parentElement;
+    parent.classList.remove("pos-0", "pos-1", "pos-2");
+
+    const isSignin = tab === "signin";
+    const isSignup = tab === "signup";
+    const isOtp = tab === "otp";
+
+    if (isSignin) parent.classList.add("pos-0");
+    else if (isSignup) parent.classList.add("pos-1");
+    else if (isOtp) parent.classList.add("pos-2");
+
+    $("tab-signin").classList.toggle("active", isSignin);
+    $("tab-signin").setAttribute("aria-selected", String(isSignin));
+    $("tab-signup").classList.toggle("active", isSignup);
+    $("tab-signup").setAttribute("aria-selected", String(isSignup));
+    if ($("tab-otp")) {
+      $("tab-otp").classList.toggle("active", isOtp);
+      $("tab-otp").setAttribute("aria-selected", String(isOtp));
+    }
+
+    if (isOtp) {
+      $("auth-form").hidden = true;
+      $("otp-form").hidden = false;
+      clearOtpErrors();
+    } else {
+      $("auth-form").hidden = false;
+      $("otp-form").hidden = true;
+      $("confirm-field").hidden = !isSignup;
+      if ($("display-name-field")) $("display-name-field").hidden = !isSignup;
+      $("auth-password").setAttribute("autocomplete", isSignup ? "new-password" : "current-password");
+      $("auth-submit").textContent = isSignup ? "Create account" : "Sign in";
+      clearAuthErrors();
+    }
   }
 
   function fieldError(id, text) {
@@ -1583,6 +1618,186 @@
     }
   }
 
+  // ---------- Mobile Phone OTP Auth ----------
+
+  let otpCountdownTimer = null;
+
+  function clearOtpErrors() {
+    const summary = $("otp-summary");
+    if (summary) {
+      summary.hidden = true;
+      summary.innerHTML = "";
+    }
+  }
+
+  function showOtpError(msg) {
+    const summary = $("otp-summary");
+    if (summary) {
+      summary.hidden = false;
+      summary.innerHTML = `<h3>${escapeHtml(msg)}</h3>`;
+      summary.focus();
+    }
+  }
+
+  function startOtpTimer(expiresAt) {
+    if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+    const update = () => {
+      const exp = typeof expiresAt === "number" ? expiresAt : new Date(expiresAt).getTime();
+      const remainingMs = Math.max(0, exp - Date.now());
+      const totalSec = Math.floor(remainingMs / 1000);
+      const mins = String(Math.floor(totalSec / 60)).padStart(2, "0");
+      const secs = String(totalSec % 60).padStart(2, "0");
+      if ($("otp-timer")) $("otp-timer").textContent = `${mins}:${secs}`;
+      if (totalSec <= 0) {
+        clearInterval(otpCountdownTimer);
+        if ($("otp-resend-btn")) $("otp-resend-btn").disabled = false;
+      }
+    };
+    update();
+    otpCountdownTimer = setInterval(update, 1000);
+    if ($("otp-resend-btn")) $("otp-resend-btn").disabled = true;
+  }
+
+  function initOtpAuth() {
+    const tabOtp = $("tab-otp");
+    if (tabOtp) {
+      tabOtp.addEventListener("click", () => {
+        app.authTab = "otp";
+        renderAuthTab();
+      });
+    }
+
+    const sendBtn = $("otp-send-btn");
+    if (sendBtn) {
+      sendBtn.addEventListener("click", async () => {
+        clearOtpErrors();
+        const countryCode = ($("otp-country-code") && $("otp-country-code").value) || "+91";
+        let rawPhone = ($("otp-phone").value || "").trim().replace(/[\s\-()]/g, "");
+        if (!rawPhone) {
+          showOtpError("Please enter your mobile phone number.");
+          $("otp-phone").focus();
+          return;
+        }
+        let fullPhone = rawPhone.startsWith("+") ? rawPhone : countryCode + rawPhone.replace(/^0+/, "");
+
+        sendBtn.classList.add("loading");
+        sendBtn.disabled = true;
+
+        try {
+          let res;
+          if (app.offline) {
+            const devCode = String(Math.floor(100000 + Math.random() * 900000));
+            if (app.store && app.store.setOtp) app.store.setOtp(fullPhone, devCode);
+            res = { ok: true, phone: fullPhone, devOtp: devCode, expiresAt: Date.now() + 5 * 60 * 1000 };
+          } else {
+            res = await api("POST", "/api/auth/otp/send", { phone: fullPhone });
+          }
+
+          app.otpPhone = res.phone;
+          app.latestDevOtp = res.devOtp;
+
+          if ($("otp-delivered-code")) $("otp-delivered-code").textContent = res.devOtp || "Sent!";
+          $("otp-step-phone").hidden = true;
+          $("otp-step-verify").hidden = false;
+          startOtpTimer(res.expiresAt || (Date.now() + 5 * 60 * 1000));
+          toast("Free login code delivered! Tap auto-fill to sign in instantly.", "success");
+          if ($("otp-code")) {
+            $("otp-code").value = "";
+            $("otp-code").focus();
+          }
+        } catch (err) {
+          showOtpError(err.message || "Could not send OTP code. Try again.");
+        } finally {
+          sendBtn.classList.remove("loading");
+          sendBtn.disabled = false;
+        }
+      });
+    }
+
+    const autofillBtn = $("otp-autofill-btn");
+    if (autofillBtn) {
+      autofillBtn.addEventListener("click", () => {
+        if (app.latestDevOtp && $("otp-code")) {
+          $("otp-code").value = app.latestDevOtp;
+          $("otp-code").focus();
+          toast("Auto-filled code: " + app.latestDevOtp, "info");
+        }
+      });
+    }
+
+    const changePhoneBtn = $("otp-change-phone");
+    if (changePhoneBtn) {
+      changePhoneBtn.addEventListener("click", () => {
+        if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+        $("otp-step-verify").hidden = true;
+        $("otp-step-phone").hidden = false;
+        clearOtpErrors();
+        $("otp-phone").focus();
+      });
+    }
+
+    const resendBtn = $("otp-resend-btn");
+    if (resendBtn) {
+      resendBtn.addEventListener("click", () => {
+        if (sendBtn) sendBtn.click();
+      });
+    }
+
+    const otpForm = $("otp-form");
+    if (otpForm) {
+      otpForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearOtpErrors();
+        const code = ($("otp-code").value || "").trim().replace(/\D/g, "");
+        if (code.length !== 6) {
+          showOtpError("Enter the 6-digit code.");
+          $("otp-code").focus();
+          return;
+        }
+
+        const verifyBtn = $("otp-verify-btn");
+        verifyBtn.classList.add("loading");
+        verifyBtn.disabled = true;
+
+        try {
+          const displayName = ($("otp-display-name") ? $("otp-display-name").value.trim() : "") || undefined;
+          let user;
+
+          if (app.offline) {
+            const valid = app.store && app.store.verifyOtp ? app.store.verifyOtp(app.otpPhone, code) : (code === app.latestDevOtp);
+            if (!valid) throw new Error("Invalid or expired OTP code.");
+            const p = app.store.getProfile();
+            p.phone = app.otpPhone;
+            if (displayName) p.displayName = displayName;
+            app.store.saveProfile(p);
+            user = { username: "player_" + app.otpPhone.slice(-4), displayName: p.displayName, phone: app.otpPhone };
+            app.user = user;
+          } else {
+            const res = await api("POST", "/api/auth/otp/verify", {
+              phone: app.otpPhone,
+              code,
+              displayName,
+            });
+            user = res.user;
+            await becomeUser(user);
+          }
+
+          if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+          $("otp-form").reset();
+          $("otp-step-verify").hidden = true;
+          $("otp-step-phone").hidden = false;
+          toast(`Welcome, ${user.displayName || user.username}! Mobile OTP verified.`, "success");
+          location.hash = "#play";
+        } catch (err) {
+          showOtpError(err.message || "Failed to verify code.");
+        } finally {
+          verifyBtn.classList.remove("loading");
+          verifyBtn.disabled = false;
+        }
+      });
+    }
+  }
+
   async function signOut() {
     try { await api("POST", "/api/auth/logout", {}); } catch (_) { /* ignore */ }
     becomeGuest();
@@ -1699,6 +1914,7 @@
   async function bootstrap() {
     fillHelp();
     initGoogleAuth();
+    initOtpAuth();
     try {
       const me = await api("GET", "/api/me");
       app.offline = false;

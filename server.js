@@ -9,6 +9,7 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
+const crypto = require("node:crypto");
 
 const core = require("./public/game-core.js");
 const { Db } = require("./lib/db.js");
@@ -323,6 +324,124 @@ function createApp(opts = {}) {
       );
     }
 
+    if (key === "POST /api/auth/otp/send") {
+      rateLimit(req, "otp_send", 20, 10 * 60 * 1000);
+      const body = await readJson(req);
+      const rawPhone = typeof body.phone === "string" ? body.phone.trim() : "";
+      let phone = rawPhone.replace(/[\s\-\(\)]/g, "");
+      if (!phone) {
+        return fail(res, 400, "missing_phone", "Please provide a valid mobile number.");
+      }
+      if (/^[6-9]\d{9}$/.test(phone)) {
+        phone = "+91" + phone;
+      } else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) {
+        phone = "+" + phone;
+      }
+      if (!/^\+[1-9]\d{9,14}$/.test(phone)) {
+        return fail(res, 400, "invalid_phone", "Please enter a valid mobile number with country code (e.g. +91 98765 43210).");
+      }
+
+      // Generate 6-digit cryptographically secure OTP
+      const code = String(crypto.randomInt(100000, 1000000));
+      const codeHash = crypto.createHash("sha256").update(phone + ":" + code).digest("hex");
+      const expiresAt = now() + 5 * 60 * 1000; // 5 minutes
+
+      db.setOtp(phone, codeHash, expiresAt, now());
+      log("otp_sent", phone);
+
+      // Return response with devOtp so it works 100% FREE without paid SMS credentials!
+      return send(res, 200, {
+        ok: true,
+        phone,
+        message: "OTP sent successfully! Valid for 5 minutes.",
+        devOtp: code,
+        expiresAt,
+      });
+    }
+
+    if (key === "POST /api/auth/otp/verify") {
+      rateLimit(req, "otp_verify", 30, 10 * 60 * 1000);
+      const body = await readJson(req);
+      const rawPhone = typeof body.phone === "string" ? body.phone.trim() : "";
+      let phone = rawPhone.replace(/[\s\-\(\)]/g, "");
+      if (/^[6-9]\d{9}$/.test(phone)) phone = "+91" + phone;
+      else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) phone = "+" + phone;
+
+      const code = typeof body.code === "string" ? body.code.trim() : "";
+      if (!phone || !code) {
+        return fail(res, 400, "missing_fields", "Mobile number and 6-digit OTP code are required.");
+      }
+
+      const otpRecord = db.getOtp(phone);
+      if (!otpRecord || otpRecord.expires_at < now()) {
+        return fail(res, 400, "otp_expired", "OTP has expired or was not requested. Please request a new OTP.");
+      }
+
+      if (otpRecord.attempts >= 5) {
+        db.deleteOtp(phone);
+        return fail(res, 400, "otp_locked", "Too many incorrect attempts. Please request a fresh OTP.");
+      }
+
+      const expectedHash = crypto.createHash("sha256").update(phone + ":" + code).digest("hex");
+      if (expectedHash !== otpRecord.code_hash) {
+        db.incrementOtpAttempts(phone);
+        const remaining = 5 - (otpRecord.attempts + 1);
+        return fail(res, 400, "invalid_otp", `Incorrect OTP code. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`);
+      }
+
+      // Valid OTP: delete it immediately so it cannot be reused
+      db.deleteOtp(phone);
+
+      let user = db.userByPhone(phone);
+      if (!user) {
+        const lastDigits = phone.slice(-4);
+        const baseUsername = "Player_" + lastDigits;
+        let username = baseUsername;
+        let suffix = 1;
+        while (db.userByName(username) && suffix < 1000) {
+          username = "Player_" + lastDigits + "_" + suffix;
+          suffix++;
+        }
+
+        const displayName = (typeof body.displayName === "string" && body.displayName.trim())
+          ? body.displayName.trim().slice(0, 30)
+          : "Cricketer " + lastDigits;
+
+        user = db.createUser(username, null, now(), {
+          displayName,
+          phone,
+          avatar: "allrounder",
+          bio: "Cricket fan playing on Cricketle",
+        });
+      }
+
+      const token = auth.newToken();
+      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      log("otp_login", user.username);
+      return send(
+        res,
+        200,
+        {
+          ok: true,
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.display_name || user.displayName || user.username,
+            email: user.email,
+            phone: user.phone || phone,
+            avatar: user.avatar || "allrounder",
+            bio: user.bio || "",
+            favTeam: user.fav_team || user.favTeam || "",
+            favPlayer: user.fav_player || user.favPlayer || "",
+            googleConnected: Boolean(user.google_id),
+            phoneConnected: true,
+            createdAt: user.created_at || user.createdAt,
+          },
+        },
+        { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) }
+      );
+    }
+
     if (key === "POST /api/profile/update") {
       const user = requireUser(req);
       rateLimit(req, "profile", 40, 5 * 60 * 1000);
@@ -371,11 +490,13 @@ function createApp(opts = {}) {
           username: user.username,
           displayName: user.display_name || user.username,
           email: user.email || null,
+          phone: user.phone || null,
           avatar: user.avatar || "batter",
           bio: user.bio || "",
           favTeam: user.fav_team || "",
           favPlayer: user.fav_player || "",
           googleConnected: Boolean(user.google_id),
+          phoneConnected: Boolean(user.phone),
           createdAt: user.created_at,
         },
         stats: game.stats(user.id),
