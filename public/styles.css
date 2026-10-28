@@ -1383,3 +1383,10 @@ dialog form { margin-top: var(--space-4); text-align: right; }
   width: 12px;
   height: 12px;
 }
+
+#recaptcha-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem 0;
+}

@@ -11,6 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to the game</a>
@@ -256,8 +258,9 @@
                 </select>
                 <input id="otp-phone" name="phone" type="tel" autocomplete="tel" placeholder="98765 43210" required maxlength="15" aria-describedby="otp-phone-help" />
               </div>
-              <p id="otp-phone-help" class="help-text">Real SMS verification via OTP.dev (or instant code if testing).</p>
+              <p id="otp-phone-help" class="help-text">Real SMS verification via Google Firebase (10,000 free SMS/mo).</p>
             </div>
+            <div id="recaptcha-container"></div>
             <button id="otp-send-btn" class="btn primary big" type="button">
               <svg class="icon-inline" aria-hidden="true" style="width:18px;height:18px;"><use href="#i-phone"/></svg>
               <span>Send OTP Verification Code</span>

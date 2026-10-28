@@ -1621,6 +1621,53 @@
   // ---------- Mobile Phone OTP Auth ----------
 
   let otpCountdownTimer = null;
+  let firebaseEnabled = false;
+  let firebaseConfirmationResult = null;
+  let recaptchaVerifier = null;
+  let recaptchaWidgetId = null;
+
+  async function initFirebasePhone() {
+    try {
+      if (typeof window === "undefined" || !window.firebase || !window.firebase.auth) return;
+      const res = await api("GET", "/api/config/firebase");
+      if (res && res.enabled && res.config) {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(res.config);
+        }
+        firebaseEnabled = true;
+        setupRecaptchaVerifier();
+      }
+    } catch (_) {
+      firebaseEnabled = false;
+    }
+  }
+
+  function setupRecaptchaVerifier() {
+    if (!firebaseEnabled || !window.firebase || !window.firebase.auth) return null;
+    const container = $("recaptcha-container");
+    if (!container) return null;
+    if (!recaptchaVerifier) {
+      try {
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
+          size: "invisible",
+          callback: () => {},
+          "expired-callback": () => {
+            if (recaptchaWidgetId !== null && window.grecaptcha) {
+              try { grecaptcha.reset(recaptchaWidgetId); } catch (_) {}
+            }
+          },
+        });
+        recaptchaVerifier.render().then((widgetId) => {
+          recaptchaWidgetId = widgetId;
+        }).catch((err) => {
+          console.warn("Recaptcha render warning:", err);
+        });
+      } catch (err) {
+        console.warn("Could not setup RecaptchaVerifier:", err);
+      }
+    }
+    return recaptchaVerifier;
+  }
 
   function clearOtpErrors() {
     const summary = $("otp-summary");
@@ -1659,6 +1706,8 @@
   }
 
   function initOtpAuth() {
+    initFirebasePhone();
+
     const tabOtp = $("tab-otp");
     if (tabOtp) {
       tabOtp.addEventListener("click", () => {
@@ -1685,7 +1734,30 @@
 
         try {
           let res;
-          if (app.offline) {
+          if (firebaseEnabled && window.firebase && window.firebase.auth) {
+            setupRecaptchaVerifier();
+            if (!recaptchaVerifier) throw new Error("Verification widget unavailable.");
+            try {
+              firebaseConfirmationResult = await firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier);
+              res = {
+                ok: true,
+                phone: fullPhone,
+                realSms: true,
+                provider: "firebase",
+                expiresAt: Date.now() + 5 * 60 * 1000,
+              };
+            } catch (fbErr) {
+              if (recaptchaWidgetId !== null && window.grecaptcha) {
+                try { grecaptcha.reset(recaptchaWidgetId); } catch (_) {}
+              }
+              const msg = fbErr.code === "auth/invalid-phone-number"
+                ? "Invalid phone number format."
+                : fbErr.code === "auth/quota-exceeded"
+                ? "Daily SMS quota exceeded. Please try later."
+                : (fbErr.message || "Failed to send SMS via Firebase.");
+              throw new Error(msg);
+            }
+          } else if (app.offline) {
             const devCode = String(Math.floor(100000 + Math.random() * 900000));
             if (app.store && app.store.setOtp) app.store.setOtp(fullPhone, devCode);
             res = { ok: true, phone: fullPhone, devOtp: devCode, expiresAt: Date.now() + 5 * 60 * 1000 };
@@ -1703,10 +1775,10 @@
 
           if (res.realSms) {
             if (bannerIcon) bannerIcon.textContent = "📱";
-            if (bannerTitle) bannerTitle.textContent = "Real SMS Sent (OTP.dev)";
+            if (bannerTitle) bannerTitle.textContent = res.provider === "firebase" ? "Real SMS Sent (Google Firebase)" : "Real SMS Sent (OTP.dev)";
             if (bannerText) bannerText.innerHTML = `We sent a 6-digit code via SMS to <strong>${escapeHtml(res.phone)}</strong>. Check your phone's SMS inbox!`;
             if (autofillBtn) autofillBtn.hidden = true;
-            toast(`Real SMS sent to ${res.phone} via OTP.dev! Check your phone.`, "success");
+            toast(`Real SMS sent to ${res.phone}! Check your phone.`, "success");
           } else {
             if (bannerIcon) bannerIcon.textContent = "⚡";
             if (bannerTitle) bannerTitle.textContent = "Free OTP Sandbox";
@@ -1746,6 +1818,7 @@
     if (changePhoneBtn) {
       changePhoneBtn.addEventListener("click", () => {
         if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+        firebaseConfirmationResult = null;
         $("otp-step-verify").hidden = true;
         $("otp-step-phone").hidden = false;
         clearOtpErrors();
@@ -1756,6 +1829,9 @@
     const resendBtn = $("otp-resend-btn");
     if (resendBtn) {
       resendBtn.addEventListener("click", () => {
+        if (recaptchaWidgetId !== null && window.grecaptcha) {
+          try { grecaptcha.reset(recaptchaWidgetId); } catch (_) {}
+        }
         if (sendBtn) sendBtn.click();
       });
     }
@@ -1780,7 +1856,42 @@
           const displayName = ($("otp-display-name") ? $("otp-display-name").value.trim() : "") || undefined;
           let user;
 
-          if (app.offline) {
+          if (firebaseConfirmationResult) {
+            const credential = await firebaseConfirmationResult.confirm(code);
+            const verifiedPhone = (credential.user && credential.user.phoneNumber) || app.otpPhone;
+            const idToken = credential.user ? await credential.user.getIdToken() : "";
+
+            if (app.offline) {
+              const p = app.store.getProfile();
+              p.phone = verifiedPhone;
+              p.username = p.username || ("player_" + verifiedPhone.slice(-4));
+              if (displayName) p.displayName = displayName;
+              app.store.saveProfile(p);
+              user = {
+                username: p.username,
+                displayName: p.displayName || p.username,
+                phone: verifiedPhone,
+                avatar: p.avatar || "allrounder",
+                bio: p.bio || "",
+                favTeam: p.favTeam || "",
+                favPlayer: p.favPlayer || "",
+                phoneConnected: true,
+                isOffline: true,
+              };
+              app.user = user;
+              renderNav();
+              renderProfile();
+            } else {
+              const res = await api("POST", "/api/auth/firebase-phone", {
+                phone: verifiedPhone,
+                displayName,
+                idToken,
+              });
+              user = res.user;
+              await becomeUser(user);
+            }
+            firebaseConfirmationResult = null;
+          } else if (app.offline) {
             const valid = app.store && app.store.verifyOtp ? app.store.verifyOtp(app.otpPhone, code) : (code === app.latestDevOtp);
             if (!valid) throw new Error("Invalid or expired OTP code.");
             const p = app.store.getProfile();

@@ -518,6 +518,60 @@ test("mobile OTP uses OTP.dev configuration when otpDevKey is provided", async (
   }
 });
 
+test("GET /api/config/firebase returns enabled status and public configuration", async () => {
+  const app = createApp({
+    dbPath: ":memory:",
+    rateLimit: false,
+    log: false,
+    firebaseApiKey: "AIzaSyFakeKey123",
+    firebaseProjectId: "cricketle-app",
+    firebaseAuthDomain: "cricketle-app.firebaseapp.com",
+    firebaseAppId: "1:123:web:abc",
+  });
+  await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
+  const base = "http://127.0.0.1:" + app.server.address().port;
+  try {
+    const c = client(base);
+    const res = await c.get("/api/config/firebase");
+    assert.equal(res.status, 200);
+    assert.equal(res.json.enabled, true);
+    assert.equal(res.json.config.apiKey, "AIzaSyFakeKey123");
+    assert.equal(res.json.config.projectId, "cricketle-app");
+    assert.equal(res.json.config.authDomain, "cricketle-app.firebaseapp.com");
+  } finally {
+    await new Promise((resolve) => app.close(resolve));
+  }
+});
+
+test("POST /api/auth/firebase-phone logs in or creates player and establishes session cookie", async () => {
+  const app = await boot();
+  try {
+    const c = client(app.base);
+    const res = await c.post("/api/auth/firebase-phone", {
+      phone: "+919876543210",
+      displayName: "Virat Century",
+    });
+    assert.equal(res.status, 200, res.text);
+    assert.equal(res.json.ok, true);
+    assert.equal(res.json.user.phone, "+919876543210");
+    assert.equal(res.json.user.displayName, "Virat Century");
+    assert.equal(res.json.user.phoneConnected, true);
+
+    // Verify session was set and me endpoint recognizes player
+    const me = await c.get("/api/me");
+    assert.equal(me.status, 200);
+    assert.equal(me.json.user.phone, "+919876543210");
+    assert.equal(me.json.user.displayName, "Virat Century");
+
+    // Invalid phone rejection
+    const bad = await c.post("/api/auth/firebase-phone", { phone: "123" });
+    assert.equal(bad.status, 400);
+    assert.equal(bad.json.error, "invalid_phone");
+  } finally {
+    await app.close();
+  }
+});
+
 
 
 

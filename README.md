@@ -58,8 +58,14 @@ All responses are JSON. POST bodies must be `application/json` from the same ori
 | `GET` | `/api/health` | IST day and server time |
 | `POST` | `/api/auth/register` | `{ username, password }` → session cookie |
 | `POST` | `/api/auth/login` | `{ username, password }` |
+| `POST` | `/api/auth/google` | Google One-Tap / OAuth sign-in |
+| `GET` | `/api/config/firebase` | Public Firebase Phone configuration status |
+| `POST` | `/api/auth/firebase-phone` | Verified Firebase phone token login (10,000 free real SMS/mo) |
+| `POST` | `/api/auth/otp/send` | Send mobile verification OTP code |
+| `POST` | `/api/auth/otp/verify` | Verify mobile 6-digit OTP code |
 | `POST` | `/api/auth/logout` | Ends session |
 | `GET` | `/api/me` | Current user, stats, ranks, streaks, title |
+| `POST` | `/api/profile/update` | Update display name, avatar, bio, and favorite team |
 | `GET` | `/api/state` | Today's puzzles (signed in) |
 | `POST` | `/api/puzzle/start` | `{ mode, idx }` starts the puzzle timer |
 | `POST` | `/api/puzzle/guess` | `{ mode, idx, name }` → rank, solved, state |

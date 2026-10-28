@@ -141,6 +141,11 @@ function createApp(opts = {}) {
   const otpDevSender = opts.otpDevSender || process.env.OTP_DEV_SENDER || "OTP.dev";
   const otpDevTemplate = opts.otpDevTemplate || process.env.OTP_DEV_TEMPLATE || "";
 
+  const firebaseApiKey = opts.firebaseApiKey !== undefined ? opts.firebaseApiKey : (process.env.FIREBASE_API_KEY || "");
+  const firebaseProjectId = opts.firebaseProjectId !== undefined ? opts.firebaseProjectId : (process.env.FIREBASE_PROJECT_ID || "");
+  const firebaseAuthDomain = opts.firebaseAuthDomain !== undefined ? opts.firebaseAuthDomain : (process.env.FIREBASE_AUTH_DOMAIN || (firebaseProjectId ? `${firebaseProjectId}.firebaseapp.com` : ""));
+  const firebaseAppId = opts.firebaseAppId !== undefined ? opts.firebaseAppId : (process.env.FIREBASE_APP_ID || "");
+
   // ---------- helpers ----------
 
   function send(res, status, body, headers) {
@@ -562,6 +567,80 @@ function createApp(opts = {}) {
       );
     }
 
+    if (key === "GET /api/config/firebase") {
+      return send(res, 200, {
+        enabled: Boolean(firebaseApiKey && firebaseProjectId),
+        config: (firebaseApiKey && firebaseProjectId) ? {
+          apiKey: firebaseApiKey,
+          authDomain: firebaseAuthDomain,
+          projectId: firebaseProjectId,
+          appId: firebaseAppId,
+        } : null,
+      });
+    }
+
+    if (key === "POST /api/auth/firebase-phone") {
+      rateLimit(req, "firebase_phone", 30, 10 * 60 * 1000);
+      const body = await readJson(req);
+      const rawPhone = typeof body.phone === "string" ? body.phone.trim() : "";
+      let phone = rawPhone.replace(/[\s\-\(\)]/g, "");
+      if (/^[6-9]\d{9}$/.test(phone)) phone = "+91" + phone;
+      else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) phone = "+" + phone;
+
+      if (!phone || !/^\+[1-9]\d{9,14}$/.test(phone)) {
+        return fail(res, 400, "invalid_phone", "Valid phone number required.");
+      }
+
+      let user = db.userByPhone(phone);
+      if (!user) {
+        const lastDigits = phone.slice(-4);
+        const baseUsername = "Player_" + lastDigits;
+        let username = baseUsername;
+        let suffix = 1;
+        while (db.userByName(username) && suffix < 1000) {
+          username = "Player_" + lastDigits + "_" + suffix;
+          suffix++;
+        }
+
+        const displayName = (typeof body.displayName === "string" && body.displayName.trim())
+          ? body.displayName.trim().slice(0, 30)
+          : "Cricketer " + lastDigits;
+
+        user = db.createUser(username, null, now(), {
+          displayName,
+          phone,
+          avatar: "allrounder",
+          bio: "Cricket fan playing on Cricketle",
+        });
+      }
+
+      const token = auth.newToken();
+      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      log("firebase_phone_login", user.username);
+      return send(
+        res,
+        200,
+        {
+          ok: true,
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.display_name || user.displayName || user.username,
+            email: user.email,
+            phone: user.phone || phone,
+            avatar: user.avatar || "allrounder",
+            bio: user.bio || "",
+            favTeam: user.fav_team || user.favTeam || "",
+            favPlayer: user.fav_player || user.favPlayer || "",
+            googleConnected: Boolean(user.google_id),
+            phoneConnected: true,
+            createdAt: user.created_at || user.createdAt,
+          },
+        },
+        { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) }
+      );
+    }
+
     if (key === "POST /api/profile/update") {
       const user = requireUser(req);
       rateLimit(req, "profile", 40, 5 * 60 * 1000);
@@ -714,12 +793,12 @@ function createApp(opts = {}) {
     if (ext === ".html") {
       headers["content-security-policy"] = [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client",
+        "script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://www.gstatic.com https://*.firebaseio.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style",
         "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: https://lh3.googleusercontent.com https://*.googleusercontent.com",
-        "connect-src 'self' https://accounts.google.com/gsi/",
-        "frame-src https://accounts.google.com/gsi/",
+        "img-src 'self' data: https://lh3.googleusercontent.com https://*.googleusercontent.com https://www.gstatic.com",
+        "connect-src 'self' https://accounts.google.com/gsi/ https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
+        "frame-src https://accounts.google.com/gsi/ https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/ https://*.firebaseapp.com",
         "frame-ancestors 'none'",
         "base-uri 'self'",
       ].join("; ");
