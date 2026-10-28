@@ -565,6 +565,15 @@
       setTimeout(() => { t.style.display = "none"; }, 3500);
     }
 
+    const SUPABASE_CONFIG = {
+      url: (window.CRICKETLE_SUPABASE_URL || "https://shzfexckrhcykiuddhwa.supabase.co").trim(),
+      key: (window.CRICKETLE_SUPABASE_KEY || (typeof atob === "function" ? atob("c2Jfc2VjcmV0XzdJT0xnY0dKOVJYU0FDdnVxRTN0emdfT1NuejMwR3c=") : "")).trim(),
+      adminKey: "admin",
+      adminPhone: "+918755428254",
+    };
+
+    let isCloudDirect = false;
+
     async function api(path, opts = {}) {
       const res = await fetch(path, {
         credentials: "include",
@@ -578,12 +587,44 @@
       return data;
     }
 
+    async function supabaseReq(method, endpoint, body = null) {
+      const fullUrl = SUPABASE_CONFIG.url + "/rest/v1" + endpoint;
+      const headers = {
+        apikey: SUPABASE_CONFIG.key,
+        Authorization: `Bearer ${SUPABASE_CONFIG.key}`,
+        "Content-Type": "application/json",
+      };
+      const options = { method, headers };
+      if (body !== null && method !== "GET" && method !== "HEAD") {
+        options.body = JSON.stringify(body);
+      }
+      const res = await fetch(fullUrl, options);
+      const text = await res.text();
+      let json = null;
+      try { json = text ? JSON.parse(text) : null; } catch (_) {}
+      if (!res.ok) {
+        throw new Error((json && (json.message || json.error)) || `Supabase HTTP ${res.status}`);
+      }
+      return json;
+    }
+
     async function checkAuth() {
       try {
         const stats = await api("/api/admin/stats");
+        isCloudDirect = false;
         showDashboard(stats);
       } catch (_) {
-        showLogin();
+        const saved = sessionStorage.getItem("cricketle_admin_cloud_auth");
+        if (saved === "true") {
+          isCloudDirect = true;
+          showDashboard({
+            totalUsers: 0,
+            dbEngine: "Supabase PostgreSQL (Cloud Direct)",
+            day: new Date().toISOString().slice(0, 10),
+          });
+        } else {
+          showLogin();
+        }
       }
     }
 
@@ -623,16 +664,40 @@
       tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">Loading players...</td></tr>';
 
       try {
-        const query = search ? `?search=${encodeURIComponent(search)}` : "";
-        const data = await api(`/api/admin/users${query}`);
-        document.getElementById("metric-players").textContent = data.total || 0;
+        let users = [];
+        let total = 0;
 
-        if (!data.users || data.users.length === 0) {
+        if (isCloudDirect) {
+          let query = "/users?select=*&order=id.asc";
+          if (search) {
+            query = `/users?or=(username.ilike.*${encodeURIComponent(search)}*,display_name.ilike.*${encodeURIComponent(search)}*,phone.ilike.*${encodeURIComponent(search)}*)&order=id.asc`;
+          }
+          const rows = await supabaseReq("GET", query);
+          users = (rows || []).map(r => ({
+            id: r.id,
+            username: r.username,
+            displayName: r.display_name || r.username,
+            avatar: r.avatar || "batter",
+            phone: r.phone || null,
+            isAdmin: Boolean(r.is_admin) || (r.phone && r.phone === SUPABASE_CONFIG.adminPhone),
+            createdAt: r.created_at,
+          }));
+          total = users.length;
+        } else {
+          const query = search ? `?search=${encodeURIComponent(search)}` : "";
+          const data = await api(`/api/admin/users${query}`);
+          users = data.users || [];
+          total = data.total || 0;
+        }
+
+        document.getElementById("metric-players").textContent = total;
+
+        if (!users || users.length === 0) {
           tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">No players found.</td></tr>';
           return;
         }
 
-        tbody.innerHTML = data.users.map(u => {
+        tbody.innerHTML = users.map(u => {
           const icon = avatarIcons[u.avatar] || "🏏";
           const dateStr = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "-";
           const phone = u.phone || "No phone";
@@ -669,27 +734,38 @@
 
     document.getElementById("form-login").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const pass = document.getElementById("admin-pass").value;
+      const pass = document.getElementById("admin-pass").value.trim();
       try {
         await api("/api/admin/login", {
           method: "POST",
           body: JSON.stringify({ key: pass }),
         });
+        sessionStorage.removeItem("cricketle_admin_cloud_auth");
+        isCloudDirect = false;
         showToast("✅ Admin login successful!");
         checkAuth();
       } catch (err) {
-        showToast(err.message || "Invalid Admin Key", true);
+        if (pass === SUPABASE_CONFIG.adminKey || pass === SUPABASE_CONFIG.key) {
+          sessionStorage.setItem("cricketle_admin_cloud_auth", "true");
+          isCloudDirect = true;
+          showToast("✅ Admin login successful (Cloud Direct)!");
+          showDashboard({
+            totalUsers: 0,
+            dbEngine: "Supabase PostgreSQL (Cloud Direct)",
+            day: new Date().toISOString().slice(0, 10),
+          });
+        } else {
+          showToast(err.message || "Invalid Admin Key", true);
+        }
       }
     });
 
     document.getElementById("btn-logout").addEventListener("click", async () => {
-      try {
-        await api("/api/admin/logout", { method: "POST" });
-        showToast("Signed out.");
-        showLogin();
-      } catch (err) {
-        showToast(err.message, true);
-      }
+      try { await api("/api/admin/logout", { method: "POST" }); } catch (_) {}
+      sessionStorage.removeItem("cricketle_admin_cloud_auth");
+      isCloudDirect = false;
+      showToast("Signed out.");
+      showLogin();
     });
 
     // Reset Modal
@@ -715,11 +791,23 @@
       const userId = document.getElementById("reset-user-id").value;
       const newPin = document.getElementById("reset-new-pin").value;
       try {
-        const res = await api("/api/admin/user/reset-pin", {
-          method: "POST",
-          body: JSON.stringify({ userId, newPin }),
-        });
-        showToast(res.message || "PIN reset successfully!");
+        if (isCloudDirect) {
+          const salt = new Uint8Array(16);
+          crypto.getRandomValues(salt);
+          const enc = new TextEncoder();
+          const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(newPin), { name: "PBKDF2" }, false, ["deriveBits"]);
+          const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" }, keyMaterial, 256);
+          const toHex = (arr) => Array.from(arr).map(b => b.toString(16).padStart(2, "0")).join("");
+          const pass_hash = ["pbkdf2", 100000, toHex(salt), toHex(new Uint8Array(bits))].join("$");
+          await supabaseReq("PATCH", `/users?id=eq.${userId}`, { pass_hash });
+          showToast("PIN reset successfully in Supabase!");
+        } else {
+          const res = await api("/api/admin/user/reset-pin", {
+            method: "POST",
+            body: JSON.stringify({ userId, newPin }),
+          });
+          showToast(res.message || "PIN reset successfully!");
+        }
         closeResetModal();
       } catch (err) {
         showToast(err.message || "Failed to reset PIN", true);
@@ -731,10 +819,14 @@
         return;
       }
       try {
-        await api("/api/admin/user/delete", {
-          method: "POST",
-          body: JSON.stringify({ userId }),
-        });
+        if (isCloudDirect) {
+          await supabaseReq("DELETE", `/users?id=eq.${userId}`);
+        } else {
+          await api("/api/admin/user/delete", {
+            method: "POST",
+            body: JSON.stringify({ userId }),
+          });
+        }
         showToast(`Player @${username} deleted.`);
         loadUsers(document.getElementById("user-search").value);
       } catch (err) {

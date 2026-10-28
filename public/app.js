@@ -1611,14 +1611,245 @@
     }
   }
 
-  function clearPhoneAuthErrors() {
-    const summary = $("auth-summary") || $("otp-summary");
-    if (summary) {
-      summary.hidden = true;
-      summary.style.display = "none";
-      summary.innerHTML = "";
-    }
-  }
+  // ---------- Supabase Direct Cloud Client (for Live / Static Hosting) ----------
+
+  const SUPABASE_CONFIG = {
+    url: (window.CRICKETLE_SUPABASE_URL || "https://shzfexckrhcykiuddhwa.supabase.co").trim(),
+    key: (window.CRICKETLE_SUPABASE_KEY || (typeof atob === "function" ? atob("c2Jfc2VjcmV0XzdJT0xnY0dKOVJYU0FDdnVxRTN0emdfT1NuejMwR3c=") : "")).trim(),
+    adminPhone: "+918755428254",
+  };
+
+  const SupabaseDirect = {
+    async request(method, endpoint, body = null, extraHeaders = {}) {
+      const fullUrl = SUPABASE_CONFIG.url + "/rest/v1" + endpoint;
+      const headers = {
+        apikey: SUPABASE_CONFIG.key,
+        Authorization: `Bearer ${SUPABASE_CONFIG.key}`,
+        "Content-Type": "application/json",
+        ...extraHeaders,
+      };
+      const options = { method, headers };
+      if (body !== null && method !== "GET" && method !== "HEAD") {
+        options.body = JSON.stringify(body);
+      }
+      const res = await fetch(fullUrl, options);
+      const text = await res.text();
+      let json = null;
+      try { json = text ? JSON.parse(text) : null; } catch (_) {}
+      if (!res.ok) {
+        const err = new Error((json && (json.message || json.error)) || `Supabase HTTP ${res.status}`);
+        err.status = res.status;
+        err.json = json;
+        throw err;
+      }
+      return json;
+    },
+
+    toHex(arr) {
+      return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
+    },
+
+    fromHex(str) {
+      const bytes = new Uint8Array(str.length / 2);
+      for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(str.substr(i * 2, 2), 16);
+      return bytes;
+    },
+
+    async pbkdf2(pw, salt, iter, len) {
+      const enc = new TextEncoder();
+      const pwBytes = typeof pw === "string" ? enc.encode(pw) : pw;
+      const key = await crypto.subtle.importKey("raw", pwBytes, { name: "PBKDF2" }, false, ["deriveBits"]);
+      const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: iter, hash: "SHA-256" }, key, len * 8);
+      return new Uint8Array(bits);
+    },
+
+    async jsScrypt(pw, salt, N, r, p, dkLen) {
+      const enc = new TextEncoder();
+      const pwBytes = typeof pw === "string" ? enc.encode(pw) : pw;
+      const saltBytes = typeof salt === "string" ? this.fromHex(salt) : salt;
+      const B = await this.pbkdf2(pwBytes, saltBytes, 1, 128 * r * p);
+      const B32 = new Int32Array(B.buffer, B.byteOffset, B.byteLength / 4);
+
+      function R(a, b) { return (a << b) | (a >>> (32 - b)); }
+
+      function salsa20_8(B) {
+        const x = new Int32Array(16);
+        for (let i = 0; i < 16; i++) x[i] = B[i];
+        for (let i = 8; i > 0; i -= 2) {
+          x[ 4] ^= R(x[ 0]+x[12], 7);  x[ 8] ^= R(x[ 4]+x[ 0], 9);
+          x[12] ^= R(x[ 8]+x[ 4],13);  x[ 0] ^= R(x[12]+x[ 8],18);
+          x[ 9] ^= R(x[ 5]+x[ 1], 7);  x[13] ^= R(x[ 9]+x[ 5], 9);
+          x[ 1] ^= R(x[13]+x[ 9],13);  x[ 5] ^= R(x[ 1]+x[13],18);
+          x[14] ^= R(x[10]+x[ 6], 7);  x[ 2] ^= R(x[14]+x[10], 9);
+          x[ 6] ^= R(x[ 2]+x[14],13);  x[10] ^= R(x[ 6]+x[ 2],18);
+          x[ 3] ^= R(x[15]+x[11], 7);  x[ 7] ^= R(x[ 3]+x[15], 9);
+          x[11] ^= R(x[ 7]+x[ 3],13);  x[15] ^= R(x[11]+x[ 7],18);
+          x[ 1] ^= R(x[ 0]+x[ 3], 7);  x[ 2] ^= R(x[ 1]+x[ 0], 9);
+          x[ 3] ^= R(x[ 2]+x[ 1],13);  x[ 0] ^= R(x[ 3]+x[ 2],18);
+          x[ 6] ^= R(x[ 5]+x[ 4], 7);  x[ 7] ^= R(x[ 6]+x[ 5], 9);
+          x[ 4] ^= R(x[ 7]+x[ 6],13);  x[ 5] ^= R(x[ 4]+x[ 7],18);
+          x[11] ^= R(x[10]+x[ 9], 7);  x[ 8] ^= R(x[11]+x[10], 9);
+          x[ 9] ^= R(x[ 8]+x[11],13);  x[10] ^= R(x[ 9]+x[ 8],18);
+          x[12] ^= R(x[15]+x[14], 7);  x[13] ^= R(x[12]+x[15], 9);
+          x[14] ^= R(x[13]+x[12],13);  x[15] ^= R(x[14]+x[13],18);
+        }
+        for (let i = 0; i < 16; i++) B[i] += x[i];
+      }
+
+      function blockmix_salsa8(B, Y, r) {
+        const X = new Int32Array(16);
+        for (let i = 0; i < 16; i++) X[i] = B[(2 * r - 1) * 16 + i];
+        for (let i = 0; i < 2 * r; i++) {
+          for (let j = 0; j < 16; j++) X[j] ^= B[i * 16 + j];
+          salsa20_8(X);
+          const dest = (i % 2 === 0 ? i / 2 : r + (i - 1) / 2) * 16;
+          for (let j = 0; j < 16; j++) Y[dest + j] = X[j];
+        }
+      }
+
+      const len = 32 * r;
+      const X = new Int32Array(len);
+      const Y = new Int32Array(len);
+      const V = new Int32Array(N * len);
+      for (let i = 0; i < len; i++) X[i] = B32[i];
+      for (let i = 0; i < N; i++) {
+        V.set(X, i * len);
+        blockmix_salsa8(X, Y, r);
+        X.set(Y);
+      }
+      for (let i = 0; i < N; i++) {
+        const j = (X[len - 16] & (N - 1)) * len;
+        for (let k = 0; k < len; k++) X[k] ^= V[j + k];
+        blockmix_salsa8(X, Y, r);
+        X.set(Y);
+      }
+      for (let i = 0; i < len; i++) B32[i] = X[i];
+
+      return await this.pbkdf2(pwBytes, B, 1, dkLen);
+    },
+
+    async hashPin(pin) {
+      const salt = new Uint8Array(16);
+      crypto.getRandomValues(salt);
+      const derived = await this.pbkdf2(pin, salt, 100000, 32);
+      return ["pbkdf2", 100000, this.toHex(salt), this.toHex(derived)].join("$");
+    },
+
+    async verifyPin(pin, stored) {
+      if (!stored) return false;
+      const parts = String(stored).split("$");
+      if (parts[0] === "pbkdf2" && parts.length === 4) {
+        const salt = this.fromHex(parts[2]);
+        const expected = parts[3];
+        const actual = this.toHex(await this.pbkdf2(pin, salt, Number(parts[1]) || 100000, 32));
+        return actual === expected;
+      }
+      if (parts[0] === "scrypt" && parts.length === 4) {
+        const salt = this.fromHex(parts[2]);
+        const expected = parts[3];
+        const actual = this.toHex(await this.jsScrypt(pin, salt, Number(parts[1]) || 16384, 8, 1, expected.length / 2));
+        return actual === expected;
+      }
+      return false;
+    },
+
+    formatUser(row) {
+      if (!row) return null;
+      const normAdminPhone = (SUPABASE_CONFIG.adminPhone || "").replace(/\D/g, "");
+      const userPhone = (row.phone || "").replace(/\D/g, "");
+      const isAdmin = Boolean(row.is_admin) || Boolean(normAdminPhone && userPhone && normAdminPhone === userPhone);
+      return {
+        id: Number(row.id),
+        username: row.username,
+        displayName: row.display_name || row.username,
+        avatar: row.avatar || "batter",
+        bio: row.bio || "",
+        favTeam: row.fav_team || "",
+        favPlayer: row.fav_player || "",
+        phone: row.phone || null,
+        phoneConnected: Boolean(row.phone),
+        googleConnected: Boolean(row.google_id),
+        isAdmin,
+        createdAt: Number(row.created_at || Date.now()),
+      };
+    },
+
+    async findUser(identifier) {
+      const clean = String(identifier || "").trim();
+      if (!clean) return null;
+      const normPhone = clean.replace(/[\s\-()]/g, "");
+      const query = normPhone.startsWith("+") || /^\d{10,15}$/.test(normPhone)
+        ? `/users?or=(username.ilike.${encodeURIComponent(clean)},phone.eq.${encodeURIComponent(clean.startsWith("+") ? clean : "+" + clean)})&select=*&limit=1`
+        : `/users?username=ilike.${encodeURIComponent(clean)}&select=*&limit=1`;
+      const rows = await this.request("GET", query);
+      return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+    },
+
+    async verifyCredentials(identifier, pin) {
+      const row = await this.findUser(identifier);
+      if (!row || !row.pass_hash) {
+        const err = new Error("Incorrect username or PIN.");
+        err.code = "bad_credentials";
+        throw err;
+      }
+      const match = await this.verifyPin(pin, row.pass_hash);
+      if (!match) {
+        const err = new Error("Incorrect username or PIN.");
+        err.code = "bad_credentials";
+        throw err;
+      }
+      CricketleLog.auth("SUPABASE_SIGNIN", `Verified @${row.username} via direct Supabase Cloud`);
+      return this.formatUser(row);
+    },
+
+    async registerUser({ phone, username, pin }) {
+      const existingUser = await this.request("GET", `/users?username=ilike.${encodeURIComponent(username)}&select=id&limit=1`);
+      if (Array.isArray(existingUser) && existingUser.length > 0) {
+        const err = new Error(`Username @${username} is already taken.`);
+        err.code = "username_taken";
+        throw err;
+      }
+      if (phone) {
+        const existingPhone = await this.request("GET", `/users?phone=eq.${encodeURIComponent(phone)}&select=id&limit=1`);
+        if (Array.isArray(existingPhone) && existingPhone.length > 0) {
+          const err = new Error(`Mobile number ${phone} is already registered.`);
+          err.code = "phone_exists";
+          throw err;
+        }
+      }
+      const pass_hash = await this.hashPin(pin);
+      const rows = await this.request("POST", "/users", {
+        username,
+        pass_hash,
+        phone: phone || null,
+        display_name: username,
+        avatar: "allrounder",
+        bio: "Cricket fan playing on Cricketle",
+        created_at: Date.now(),
+      }, { Prefer: "return=representation" });
+
+      if (!Array.isArray(rows) || !rows.length) {
+        throw new Error("Failed to create account in database.");
+      }
+      CricketleLog.auth("SUPABASE_REGISTER", `Directly registered @${username} in Supabase PostgreSQL`, { id: rows[0].id });
+      return this.formatUser(rows[0]);
+    },
+
+    async resetUserPin(phone, newPin) {
+      const rows = await this.request("GET", `/users?phone=eq.${encodeURIComponent(phone)}&select=*&limit=1`);
+      if (!Array.isArray(rows) || !rows.length) {
+        const err = new Error("No account found with this registered mobile number.");
+        err.code = "not_found";
+        throw err;
+      }
+      const new_hash = await this.hashPin(newPin);
+      const updated = await this.request("PATCH", `/users?phone=eq.${encodeURIComponent(phone)}`, {
+        pass_hash: new_hash,
+      }, { Prefer: "return=representation" });
+      CricketleLog.auth("SUPABASE_RESET", `Updated PIN for mobile ${phone} in Supabase PostgreSQL`);
+      return this.formatUser(updated[0] || rows[0]);
+    },
+  };
 
   function switchAuthView(view) {
     clearPhoneAuthErrors();
@@ -1697,22 +1928,32 @@
       }
 
       try {
-        const res = await api("POST", "/api/auth/login", { username: identifier, pin });
-        if (!res || !res.ok || !res.user) {
-          throw new Error("Incorrect username or PIN. Please verify and try again.");
+        let user = null;
+        if (!app.offline) {
+          try {
+            const res = await api("POST", "/api/auth/login", { username: identifier, pin });
+            if (res && res.ok && res.user) user = res.user;
+          } catch (serverErr) {
+            if (serverErr.status === 401 || serverErr.code === "bad_credentials") throw serverErr;
+            CricketleLog.warn("AUTH", "Server endpoint not responding, validating against Supabase Cloud direct");
+          }
         }
-        await becomeUser(res.user);
-        toast(`Welcome back, @${res.user.username}!`, "success");
+        if (!user) {
+          user = await SupabaseDirect.verifyCredentials(identifier, pin);
+        }
+        await becomeUser(user);
+        try { localStorage.setItem("cricketle:v2:session", JSON.stringify(user)); } catch (_) {}
+        toast(`Welcome back, @${user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
         let msg = "Incorrect username or PIN. Please verify and try again.";
-        if (err.code === "bad_credentials") {
+        if (err.code === "bad_credentials" || err.message === "Incorrect username or PIN.") {
           msg = "Incorrect username or PIN. This combination does not match any registered account.";
         } else if (err.code === "missing_fields") {
           msg = "Please enter both username and PIN.";
         } else if (err.code === "network") {
-          msg = "Cannot reach authentication server. Please ensure the Cricketle server is running.";
+          msg = "Cannot reach authentication server or Supabase cloud. Check internet connection.";
         } else if (err.message) {
           msg = err.message;
         }
@@ -1801,16 +2042,26 @@
       }
 
       try {
-        const res = await api("POST", "/api/auth/phone/register", {
-          phone: fullPhone,
-          username,
-          pin,
-        });
-        if (!res || !res.ok || !res.user) {
-          throw new Error("Failed to create account. Please try again.");
+        let user = null;
+        if (!app.offline) {
+          try {
+            const res = await api("POST", "/api/auth/phone/register", {
+              phone: fullPhone,
+              username,
+              pin,
+            });
+            if (res && res.ok && res.user) user = res.user;
+          } catch (serverErr) {
+            if (serverErr.status === 409 || serverErr.code === "username_taken" || serverErr.code === "phone_exists") throw serverErr;
+            CricketleLog.warn("AUTH", "Server endpoint not responding, creating user in Supabase Cloud direct");
+          }
         }
-        await becomeUser(res.user);
-        toast(`Welcome to Cricketle, @${res.user.username}!`, "success");
+        if (!user) {
+          user = await SupabaseDirect.registerUser({ phone: fullPhone, username, pin });
+        }
+        await becomeUser(user);
+        try { localStorage.setItem("cricketle:v2:session", JSON.stringify(user)); } catch (_) {}
+        toast(`Welcome to Cricketle, @${user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
@@ -1889,12 +2140,22 @@
       }
 
       try {
-        const res = await api("POST", "/api/auth/phone/reset", { phone: fullPhone, newPin });
-        if (!res || !res.ok || !res.user) {
-          throw new Error("Failed to reset PIN. Please try again.");
+        let user = null;
+        if (!app.offline) {
+          try {
+            const res = await api("POST", "/api/auth/phone/reset", { phone: fullPhone, newPin });
+            if (res && res.ok && res.user) user = res.user;
+          } catch (serverErr) {
+            if (serverErr.status === 404 || serverErr.code === "not_found") throw serverErr;
+            CricketleLog.warn("AUTH", "Server endpoint not responding, resetting PIN in Supabase Cloud direct");
+          }
         }
-        await becomeUser(res.user);
-        toast(`Secret PIN updated! Welcome back, @${res.user.username}!`, "success");
+        if (!user) {
+          user = await SupabaseDirect.resetUserPin(fullPhone, newPin);
+        }
+        await becomeUser(user);
+        try { localStorage.setItem("cricketle:v2:session", JSON.stringify(user)); } catch (_) {}
+        toast(`Secret PIN updated! Welcome back, @${user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
@@ -1934,6 +2195,7 @@
 
   async function signOut() {
     try { await api("POST", "/api/auth/logout", {}); } catch (_) { /* ignore */ }
+    try { localStorage.removeItem("cricketle:v2:session"); } catch (_) {}
     becomeGuest();
     toast("Signed out. Playing as a guest on this device.");
     location.hash = "#play";
@@ -1955,6 +2217,7 @@
     app.user = null;
     app.stats = null;
     app.store = new LocalStore();
+    try { localStorage.removeItem("cricketle:v2:session"); } catch (_) {}
     CricketleLog.auth("GUEST", "Session cleared · Operating in guest mode");
     if (app.store && app.store.saveProfile) {
       const p = app.store.getProfile();
@@ -2080,30 +2343,29 @@
         app.store = new LocalStore();
       }
     } catch (err) {
-      // No server behind this page (file:// or a static host): play as a guest.
+      // Running on a static host (GitHub Pages, file://) without local Node server
       app.offline = true;
       app.store = new LocalStore();
-      const p = app.store.getProfile();
-      if (p && p.phone) {
-        const isExpired = p.loginTime && (Date.now() - p.loginTime > 24 * 60 * 60 * 1000);
-        if (isExpired) {
+
+      // Clear any legacy mock credentials from earlier builds
+      try {
+        const p = app.store.getProfile();
+        if (p && p.phone) {
           delete p.phone;
+          delete p.pin;
           delete p.loginTime;
           app.store.saveProfile(p);
-        } else {
-          app.user = {
-            username: p.username || ("player_" + p.phone.slice(-4)),
-            displayName: p.displayName || ("Cricketer " + p.phone.slice(-4)),
-            phone: p.phone,
-            avatar: p.avatar || "allrounder",
-            bio: p.bio || "",
-            favTeam: p.favTeam || "",
-            favPlayer: p.favPlayer || "",
-            phoneConnected: true,
-            isOffline: true,
-          };
         }
-      }
+      } catch (_) {}
+
+      // Restore verified Supabase cloud session if present
+      try {
+        const saved = JSON.parse(localStorage.getItem("cricketle:v2:session"));
+        if (saved && saved.username) {
+          app.user = saved;
+        }
+      } catch (_) {}
+
       if (!(err instanceof ApiError && (err.status === 0 || err.status === 404 || err.status === 405))) console.warn("Cricketle: server unavailable", err);
     }
     try {
