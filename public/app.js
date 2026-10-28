@@ -1768,10 +1768,23 @@
             if (!valid) throw new Error("Invalid or expired OTP code.");
             const p = app.store.getProfile();
             p.phone = app.otpPhone;
+            p.username = p.username || ("player_" + app.otpPhone.slice(-4));
             if (displayName) p.displayName = displayName;
             app.store.saveProfile(p);
-            user = { username: "player_" + app.otpPhone.slice(-4), displayName: p.displayName, phone: app.otpPhone };
+            user = {
+              username: p.username,
+              displayName: p.displayName || p.username,
+              phone: app.otpPhone,
+              avatar: p.avatar || "allrounder",
+              bio: p.bio || "",
+              favTeam: p.favTeam || "",
+              favPlayer: p.favPlayer || "",
+              phoneConnected: true,
+              isOffline: true,
+            };
             app.user = user;
+            renderNav();
+            renderProfile();
           } else {
             const res = await api("POST", "/api/auth/otp/verify", {
               phone: app.otpPhone,
@@ -1788,6 +1801,7 @@
           $("otp-step-phone").hidden = false;
           toast(`Welcome, ${user.displayName || user.username}! Mobile OTP verified.`, "success");
           location.hash = "#play";
+          showView();
         } catch (err) {
           showOtpError(err.message || "Failed to verify code.");
         } finally {
@@ -1803,6 +1817,7 @@
     becomeGuest();
     toast("Signed out. Playing as a guest on this device.");
     location.hash = "#play";
+    showView();
   }
 
   async function becomeUser(user) {
@@ -1811,6 +1826,7 @@
     app.board.data = {};
     await refreshStats();
     await reload();
+    renderNav();
     renderProfile();
   }
 
@@ -1818,8 +1834,16 @@
     app.user = null;
     app.stats = null;
     app.store = new LocalStore();
+    if (app.store && app.store.saveProfile) {
+      const p = app.store.getProfile();
+      if (p.phone) {
+        delete p.phone;
+        app.store.saveProfile(p);
+      }
+    }
     app.board.data = {};
     try { await reload(); } catch (err) { handleError(err); }
+    renderNav();
     renderProfile();
   }
 
@@ -1930,6 +1954,20 @@
       // No server behind this page (file:// or a static host): play as a guest.
       app.offline = true;
       app.store = new LocalStore();
+      const p = app.store.getProfile();
+      if (p && p.phone) {
+        app.user = {
+          username: p.username || ("player_" + p.phone.slice(-4)),
+          displayName: p.displayName || ("Cricketer " + p.phone.slice(-4)),
+          phone: p.phone,
+          avatar: p.avatar || "allrounder",
+          bio: p.bio || "",
+          favTeam: p.favTeam || "",
+          favPlayer: p.favPlayer || "",
+          phoneConnected: true,
+          isOffline: true,
+        };
+      }
       if (!(err instanceof ApiError && (err.status === 0 || err.status === 404 || err.status === 405))) console.warn("Cricketle: server unavailable", err);
     }
     try {

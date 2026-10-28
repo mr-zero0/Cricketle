@@ -1350,6 +1350,23 @@ dialog form { margin-top: var(--space-4); text-align: right; }
   flex: 1;
 }
 
+#otp-step-phone:not([hidden]),
+#otp-step-verify:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+#otp-expiry-hint {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+#otp-display-name-wrap {
+  margin-top: 2px;
+}
+
 .pill-phone {
   display: inline-flex;
   align-items: center;
