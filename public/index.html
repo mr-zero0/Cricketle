@@ -256,22 +256,22 @@
                 </select>
                 <input id="otp-phone" name="phone" type="tel" autocomplete="tel" placeholder="98765 43210" required maxlength="15" aria-describedby="otp-phone-help" />
               </div>
-              <p id="otp-phone-help" class="help-text">Free instant OTP verification. No SMS gateway charges or paid service required.</p>
+              <p id="otp-phone-help" class="help-text">Real SMS verification via OTP.dev (or instant code if testing).</p>
             </div>
             <button id="otp-send-btn" class="btn primary big" type="button">
               <svg class="icon-inline" aria-hidden="true" style="width:18px;height:18px;"><use href="#i-phone"/></svg>
-              <span>Send Free OTP Code</span>
+              <span>Send OTP Verification Code</span>
             </button>
           </div>
 
           <div id="otp-step-verify" hidden>
             <div class="otp-banner" id="otp-code-banner">
-              <div class="otp-banner-icon">⚡</div>
+              <div class="otp-banner-icon" id="otp-banner-icon">📱</div>
               <div class="otp-banner-content">
-                <div class="otp-banner-title">100% Free OTP Delivery</div>
-                <div class="otp-banner-text">Your login code is: <strong id="otp-delivered-code" class="otp-code-highlight">------</strong></div>
+                <div class="otp-banner-title" id="otp-banner-title">SMS Sent via OTP.dev</div>
+                <div class="otp-banner-text" id="otp-banner-text">We sent a 6-digit code to <strong id="otp-sent-phone">your phone</strong>. Check your SMS inbox.</div>
               </div>
-              <button id="otp-autofill-btn" type="button" class="btn small otp-fill-btn">Auto-fill</button>
+              <button id="otp-autofill-btn" type="button" class="btn small otp-fill-btn" hidden>Auto-fill</button>
             </div>
 
             <div class="field">

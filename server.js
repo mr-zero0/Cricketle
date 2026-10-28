@@ -11,6 +11,74 @@ const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
 
+// Automatically load .env configuration if present
+function loadEnv() {
+  const envPath = path.join(__dirname, ".env");
+  if (fs.existsSync(envPath)) {
+    try {
+      const content = fs.readFileSync(envPath, "utf8");
+      for (const line of content.split("\n")) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) continue;
+        const eq = trimmed.indexOf("=");
+        if (eq > 0) {
+          const k = trimmed.slice(0, eq).trim();
+          const v = trimmed.slice(eq + 1).trim().replace(/^['"]|['"]$/g, "");
+          if (process.env[k] === undefined) process.env[k] = v;
+        }
+      }
+    } catch (_) {}
+  }
+}
+loadEnv();
+
+// OTP.dev Real SMS API dispatch and verification
+async function sendOtpDev({ key, channel = "sms", sender = "OTP.dev", template = "", phone, code }) {
+  const digits = String(phone).replace(/\D/g, "");
+  const payload = {
+    data: {
+      channel: channel || "sms",
+      sender: sender || "OTP.dev",
+      phone: digits,
+      code: String(code),
+      code_length: String(code).length,
+    },
+  };
+  if (template) payload.data.template = template;
+
+  const res = await fetch("https://api.otp.dev/v1/verifications", {
+    method: "POST",
+    headers: {
+      "X-OTP-Key": key,
+      "accept": "application/json",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const text = await res.text();
+  let json = null;
+  try { json = JSON.parse(text); } catch (_) {}
+  return { ok: res.ok, status: res.status, json, text };
+}
+
+async function verifyOtpDev({ key, phone, code }) {
+  const digits = String(phone).replace(/\D/g, "");
+  const url = `https://api.otp.dev/v1/verifications?code=${encodeURIComponent(code)}&phone=${encodeURIComponent(digits)}`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "X-OTP-Key": key,
+      "accept": "application/json",
+    },
+  });
+  const text = await res.text();
+  let json = null;
+  try { json = JSON.parse(text); } catch (_) {}
+  const valid = res.ok && json && Array.isArray(json.data) && json.data.length > 0;
+  return { ok: res.ok, valid, json };
+}
+
 const core = require("./public/game-core.js");
 const { Db } = require("./lib/db.js");
 const auth = require("./lib/auth.js");
@@ -67,6 +135,11 @@ function createApp(opts = {}) {
   const game = new GameService(db, { now, secret });
   const publicDir = opts.publicDir || PUBLIC_DIR;
   const limiter = opts.rateLimit === false ? null : new Map();
+
+  const otpDevKey = opts.otpDevKey || process.env.OTP_DEV_KEY || process.env.OTP_DEV_API_KEY || "";
+  const otpDevChannel = opts.otpDevChannel || process.env.OTP_DEV_CHANNEL || "sms";
+  const otpDevSender = opts.otpDevSender || process.env.OTP_DEV_SENDER || "OTP.dev";
+  const otpDevTemplate = opts.otpDevTemplate || process.env.OTP_DEV_TEMPLATE || "";
 
   // ---------- helpers ----------
 
@@ -349,12 +422,41 @@ function createApp(opts = {}) {
       db.setOtp(phone, codeHash, expiresAt, now());
       log("otp_sent", phone);
 
-      // Return response with devOtp so it works 100% FREE without paid SMS credentials!
+      let realSms = false;
+      let gatewayMessage = null;
+
+      if (otpDevKey) {
+        try {
+          const otpRes = await sendOtpDev({
+            key: otpDevKey,
+            channel: otpDevChannel,
+            sender: otpDevSender,
+            template: otpDevTemplate,
+            phone,
+            code,
+          });
+          if (otpRes.ok) {
+            realSms = true;
+            log("otp_dev_sent", phone, otpRes.status);
+          } else {
+            log("otp_dev_error", phone, otpRes.status, otpRes.text);
+            gatewayMessage = (otpRes.json && (otpRes.json.message || otpRes.json.error)) || "OTP.dev delivery failed";
+          }
+        } catch (err) {
+          log("otp_dev_exception", err);
+          gatewayMessage = err.message || "Failed to reach OTP.dev";
+        }
+      }
+
       return send(res, 200, {
         ok: true,
         phone,
-        message: "OTP sent successfully! Valid for 5 minutes.",
-        devOtp: code,
+        realSms,
+        channel: otpDevChannel,
+        message: realSms
+          ? `Real SMS sent to ${phone} via OTP.dev!`
+          : (gatewayMessage ? `Gateway: ${gatewayMessage}. Test code provided below.` : "OTP code ready. (Set OTP_DEV_KEY in .env for real SMS delivery via OTP.dev)"),
+        devOtp: realSms ? undefined : code,
         expiresAt,
       });
     }
@@ -374,6 +476,7 @@ function createApp(opts = {}) {
 
       const otpRecord = db.getOtp(phone);
       if (!otpRecord || otpRecord.expires_at < now()) {
+        if (otpRecord) db.deleteOtp(phone);
         return fail(res, 400, "otp_expired", "OTP has expired or was not requested. Please request a new OTP.");
       }
 
@@ -382,10 +485,27 @@ function createApp(opts = {}) {
         return fail(res, 400, "otp_locked", "Too many incorrect attempts. Please request a fresh OTP.");
       }
 
+      let isValid = false;
       const expectedHash = crypto.createHash("sha256").update(phone + ":" + code).digest("hex");
-      if (expectedHash !== otpRecord.code_hash) {
+      if (expectedHash === otpRecord.code_hash) {
+        isValid = true;
+      }
+
+      // Also check OTP.dev remote verification if key is present
+      if (!isValid && otpDevKey) {
+        try {
+          const remoteCheck = await verifyOtpDev({ key: otpDevKey, phone, code });
+          if (remoteCheck.valid) isValid = true;
+        } catch (_) {}
+      }
+
+      if (!isValid) {
         db.incrementOtpAttempts(phone);
         const remaining = 5 - (otpRecord.attempts + 1);
+        if (remaining <= 0) {
+          db.deleteOtp(phone);
+          return fail(res, 400, "otp_locked", "Too many incorrect attempts. Please request a fresh OTP.");
+        }
         return fail(res, 400, "invalid_otp", `Incorrect OTP code. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`);
       }
 

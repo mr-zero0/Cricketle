@@ -1696,11 +1696,28 @@
           app.otpPhone = res.phone;
           app.latestDevOtp = res.devOtp;
 
-          if ($("otp-delivered-code")) $("otp-delivered-code").textContent = res.devOtp || "Sent!";
+          const bannerIcon = $("otp-banner-icon");
+          const bannerTitle = $("otp-banner-title");
+          const bannerText = $("otp-banner-text");
+          const autofillBtn = $("otp-autofill-btn");
+
+          if (res.realSms) {
+            if (bannerIcon) bannerIcon.textContent = "📱";
+            if (bannerTitle) bannerTitle.textContent = "Real SMS Sent (OTP.dev)";
+            if (bannerText) bannerText.innerHTML = `We sent a 6-digit code via SMS to <strong>${escapeHtml(res.phone)}</strong>. Check your phone's SMS inbox!`;
+            if (autofillBtn) autofillBtn.hidden = true;
+            toast(`Real SMS sent to ${res.phone} via OTP.dev! Check your phone.`, "success");
+          } else {
+            if (bannerIcon) bannerIcon.textContent = "⚡";
+            if (bannerTitle) bannerTitle.textContent = "Free OTP Sandbox";
+            if (bannerText) bannerText.innerHTML = `Your code is: <strong id="otp-delivered-code" class="otp-code-highlight">${res.devOtp || "------"}</strong>`;
+            if (autofillBtn) autofillBtn.hidden = !res.devOtp;
+            toast(res.devOtp ? "Test OTP code ready! Tap auto-fill to verify." : "OTP code sent!", "info");
+          }
+
           $("otp-step-phone").hidden = true;
           $("otp-step-verify").hidden = false;
           startOtpTimer(res.expiresAt || (Date.now() + 5 * 60 * 1000));
-          toast("Free login code delivered! Tap auto-fill to sign in instantly.", "success");
           if ($("otp-code")) {
             $("otp-code").value = "";
             $("otp-code").focus();

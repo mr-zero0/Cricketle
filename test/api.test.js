@@ -495,5 +495,29 @@ test("mobile OTP rejects invalid phone formats and expired codes", async () => {
   } finally { await app.close(); }
 });
 
+test("mobile OTP uses OTP.dev configuration when otpDevKey is provided", async () => {
+  let now = T0;
+  const app = createApp({
+    dbPath: ":memory:",
+    now: () => now,
+    rateLimit: false,
+    log: false,
+    secret: "",
+    otpDevKey: "test_key_mock",
+  });
+  await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
+  const base = "http://127.0.0.1:" + app.server.address().port;
+  try {
+    const c = client(base);
+    const res = await c.post("/api/auth/otp/send", { phone: "+919876543210" });
+    assert.equal(res.status, 200);
+    assert.equal(res.json.ok, true);
+    assert.equal(res.json.channel, "sms");
+  } finally {
+    await new Promise((resolve) => app.close(resolve));
+  }
+});
+
+
 
 
