@@ -1615,7 +1615,7 @@
 
   const SUPABASE_CONFIG = {
     url: (window.CRICKETLE_SUPABASE_URL || "https://shzfexckrhcykiuddhwa.supabase.co").trim(),
-    key: (window.CRICKETLE_SUPABASE_ANON_KEY || localStorage.getItem("cricketle:supabase_anon_key") || window.CRICKETLE_SUPABASE_KEY || (typeof atob === "function" ? atob("c2Jfc2VjcmV0XzdJT0xnY0dKOVJYU0FDdnVxRTN0emdfT1NuejMwR3c=") : "")).trim(),
+    key: (window.CRICKETLE_SUPABASE_KEY || window.CRICKETLE_SUPABASE_ANON_KEY || (typeof atob === "function" ? atob("c2JfcHVibGlzaGFibGVfLXV5V29BWkdzb0pxUDBYRElySktkZ182cDZpdDE3Mw==") : "")).trim(),
     adminPhone: "+918755428254",
   };
 
