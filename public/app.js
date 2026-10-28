@@ -539,6 +539,7 @@
         note = `<p class="done-note">That's all six for today. New puzzles at midnight IST.</p>`;
       }
     }
+    const puzzleTiles = guessTiles(p.guesses, poolSize());
     win.innerHTML = `
       <p class="eyebrow">${modeLabel(app.mode)} · Puzzle ${idx() + 1} · ${lost ? "the answer was" : "you got it"}</p>
       <h2 tabindex="-1" id="win-title">${escapeHtml(title)}</h2>
@@ -549,6 +550,7 @@
         <div class="win-stat" role="listitem"><span class="v">${p.hints}</span><span class="k">hint${p.hints === 1 ? "" : "s"}</span></div>
         <div class="win-stat points" role="listitem"><span class="v">${lost ? 0 : "+" + p.points}</span><span class="k">points</span></div>
       </div>
+      ${puzzleTiles ? `<div class="win-tiles" aria-label="Guess heat progression: ${puzzleTiles}" title="Your guess heat progression">${puzzleTiles}</div>` : ""}
       ${note}
       <div class="actions">${actions}</div>`;
     $("share-btn").addEventListener("click", share);
@@ -778,6 +780,22 @@
     return `${dd}-${mmm}-${yy}`;
   }
 
+  function guessTiles(guesses, pSize) {
+    if (!guesses || !guesses.length) return "";
+    const tiles = guesses.map((g) => {
+      const t = core.tier(g.rank, pSize);
+      if (t.key === "answer") return "🟩";
+      if (t.key === "hot") return "🟧";
+      if (t.key === "warm") return "🟨";
+      if (t.key === "cool") return "🟦";
+      return "⬜";
+    });
+    if (tiles.length > 15) {
+      return tiles.slice(0, 7).join("") + "…" + tiles.slice(-6).join("");
+    }
+    return tiles.join("");
+  }
+
   function buildShareText() {
     const ps = puzzles();
     const now = app.store.now();
@@ -787,6 +805,7 @@
     const allDone = core.modeDone(app.state, app.mode);
     const totalPts = ps.reduce((s, q) => s + (q.points || 0), 0);
     const solvedCount = ps.filter((q) => q.status === "solved").length;
+    const pSize = poolSize();
 
     // Dot-separated guess sequence: e.g. (# 1.2.3) or (# 1.2.4)
     const guessSeq = ps.map((q) => {
@@ -795,21 +814,36 @@
       return String(q.guesses.length);
     }).join(".");
 
-    const icons = ["1️⃣", "2️⃣", "3️⃣"];
     const puzzleLines = ps.map((q, i) => {
-      if (!core.isFinished(q)) return `${icons[i]} ⏳ In progress / Not started`;
-      if (q.status === "gaveUp") return `${icons[i]} ❌ Gave up (${q.guesses.length} guesses)`;
-      return `${icons[i]} ✅ ${q.points} pts (${q.guesses.length} guess${q.guesses.length === 1 ? "" : "es"}, ${q.hints || 0} hints)`;
+      const label = `P${i + 1}`;
+      if (!core.isFinished(q)) {
+        if (q.status === "active" && q.guesses.length > 0) {
+          const tiles = guessTiles(q.guesses, pSize);
+          return `${label}: ${tiles} ⏳ In progress (${q.guesses.length} guesses)`;
+        }
+        return `${label}: ⏳ Not started`;
+      }
+      const tiles = guessTiles(q.guesses, pSize);
+      if (q.status === "gaveUp") {
+        return `${label}: ${tiles} ❌ Gave up (${q.guesses.length} guesses)`;
+      }
+      const hintsText = q.hints > 0 ? `, ${q.hints} hint${q.hints === 1 ? "" : "s"}` : "";
+      return `${label}: ${tiles} · ${q.points} pts (${q.guesses.length} guess${q.guesses.length === 1 ? "" : "es"}${hintsText})`;
     });
 
     const streak = (app.stats && app.stats.currentStreak) ? ` · 🔥 ${app.stats.currentStreak}-day streak` : "";
     const siteUrl = "https://mr-zero0.github.io/Cricketle";
     const dateFormatted = formatDayDDMMMYY(app.day);
 
+    const modeHeadline = allDone
+      ? `${mode} Mode · Finished (3/3 Solved)`
+      : `${mode} Mode · Puzzle ${idx() + 1} of 3 (${solvedCount}/3 Solved)`;
+    const timeLabel = allDone ? "Total Time (3 puzzles)" : "Total Time";
+
     const lines = [
       `🏏 Cricketle · ${dateFormatted} (# ${guessSeq})`,
-      `${mode} Mode · ${allDone ? `Finished (${solvedCount}/${core.PUZZLES_PER_DAY} Solved)` : `Puzzle ${idx() + 1} of 3`}`,
-      `⏱️ Total Time (3 puzzles): ${totalTime}`,
+      `${modeHeadline}`,
+      `⏱️ ${timeLabel}: ${totalTime}`,
       `🏆 Points: ${totalPts} pts${streak}`,
       ``,
       ...puzzleLines,
@@ -821,16 +855,15 @@
 
   function openWhatsApp(text) {
     const encoded = encodeURIComponent(text);
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isMobile) {
-      // Use direct whatsapp:// scheme on mobile to pass the entire message into chat compose
-      window.location.href = `whatsapp://send?text=${encoded}`;
-      setTimeout(() => {
-        window.open(`https://wa.me/?text=${encoded}`, "_blank");
-      }, 700);
-    } else {
-      // Use wa.me on desktop to open WhatsApp Web/Desktop with entire message intact
-      window.open(`https://wa.me/?text=${encoded}`, "_blank");
+    // WhatsApp's official, universal web and mobile gateway is https://api.whatsapp.com/send?text=
+    // 1. Android: Opened directly by WhatsApp app via Verified App Links with full UTF-8 emoji support
+    // 2. iOS: Opened directly by WhatsApp app via Universal Links with full UTF-8 emoji support
+    // 3. Desktop: Opens WhatsApp Web or prompts WhatsApp Desktop with full UTF-8 emoji support
+    // Note: Never use whatsapp://send?text= which corrupts UTF-8 emojis into replacement characters (diamonds with ?) on Android and Windows.
+    const url = `https://api.whatsapp.com/send?text=${encoded}`;
+    const win = window.open(url, "_blank");
+    if (!win || win.closed || typeof win.closed === "undefined") {
+      window.location.href = url;
     }
   }
 
@@ -844,8 +877,25 @@
       toast("Result copied to clipboard!", "success");
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(ok, () => toast("Could not copy automatically."));
+      navigator.clipboard.writeText(text).then(ok, () => fallbackCopy(text, ok));
     } else {
+      fallbackCopy(text, ok);
+    }
+  }
+
+  function fallbackCopy(text, cb) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      cb();
+    } catch (_) {
       toast("Could not access clipboard.");
     }
   }
@@ -857,11 +907,10 @@
 
     if (navigator.share && isMobile) {
       try {
-        // Crucial: Only pass 'text' without 'url' property, so WhatsApp does not drop the message
-        await navigator.share({ text });
+        await navigator.share({ title: "Cricketle", text });
         return;
       } catch (err) {
-        if (err.name === "AbortError") return;
+        if (err && err.name === "AbortError") return;
       }
     }
 
