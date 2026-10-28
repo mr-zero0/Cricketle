@@ -699,6 +699,31 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     assert.equal(meUserPin.status, 200);
     assert.equal(meUserPin.json.user.username, "cricket_champ");
 
+    // 11b. Mobile phone + PIN sign-in via POST /api/auth/login (10-digit and international formats)
+    const cPhone1 = client(app.base);
+    const phone10Auth = await cPhone1.post("/api/auth/login", {
+      username: "9876543210",
+      pin: "112233",
+    });
+    assert.equal(phone10Auth.status, 200, "10-digit phone login should succeed");
+    assert.equal(phone10Auth.json.user.username, "cricket_champ");
+
+    const cPhone2 = client(app.base);
+    const phoneFullAuth = await cPhone2.post("/api/auth/login", {
+      username: "+919876543210",
+      pin: "112233",
+    });
+    assert.equal(phoneFullAuth.status, 200, "Full +91 phone login should succeed");
+    assert.equal(phoneFullAuth.json.user.username, "cricket_champ");
+
+    const cPhone3 = client(app.base);
+    const phoneSpacedAuth = await cPhone3.post("/api/auth/login", {
+      username: "9876 543 210",
+      pin: "112233",
+    });
+    assert.equal(phoneSpacedAuth.status, 200, "Spaced phone login should succeed");
+    assert.equal(phoneSpacedAuth.json.user.username, "cricket_champ");
+
     // 12. Custom username appears on leaderboard when solving
     await solve(c, "easy", 0, "2026-10-27");
     const board = await c.get("/api/leaderboard/today");

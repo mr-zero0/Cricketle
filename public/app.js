@@ -1875,10 +1875,17 @@
     async findUser(identifier) {
       const clean = String(identifier || "").trim();
       if (!clean) return null;
-      const normPhone = clean.replace(/[\s\-()]/g, "");
-      const query = normPhone.startsWith("+") || /^\d{10,15}$/.test(normPhone)
-        ? `/users?or=(username.ilike.${encodeURIComponent(clean)},phone.eq.${encodeURIComponent(clean.startsWith("+") ? clean : "+" + clean)})&select=*&limit=1`
-        : `/users?username=ilike.${encodeURIComponent(clean)}&select=*&limit=1`;
+      const digits = clean.replace(/\D/g, "");
+      let query;
+      if (digits.length >= 7) {
+        const last10 = digits.length >= 10 ? digits.slice(-10) : digits;
+        const fullWithPlus = clean.startsWith("+")
+          ? clean.replace(/[\s\-()]/g, "")
+          : (digits.startsWith("91") && digits.length === 12 ? "+" + digits : "+91" + last10);
+        query = `/users?or=(username.ilike.${encodeURIComponent(clean)},phone.like.*${encodeURIComponent(last10)},phone.eq.${encodeURIComponent(fullWithPlus)})&select=*&limit=1`;
+      } else {
+        query = `/users?username=ilike.${encodeURIComponent(clean)}&select=*&limit=1`;
+      }
       const rows = await this.request("GET", query);
       return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
     },
@@ -1934,18 +1941,25 @@
     },
 
     async resetUserPin(phone, newPin) {
-      const rows = await this.request("GET", `/users?phone=eq.${encodeURIComponent(phone)}&select=*&limit=1`);
+      const cleanPhone = String(phone || "").trim();
+      const digits = cleanPhone.replace(/\D/g, "");
+      const last10 = digits.length >= 10 ? digits.slice(-10) : digits;
+      const rows = await this.request(
+        "GET",
+        `/users?or=(phone.eq.${encodeURIComponent(cleanPhone)},phone.like.*${encodeURIComponent(last10)})&select=*&limit=1`
+      );
       if (!Array.isArray(rows) || !rows.length) {
         const err = new Error("No account found with this registered mobile number.");
         err.code = "not_found";
         throw err;
       }
+      const targetUser = rows[0];
       const new_hash = await this.hashPin(newPin);
-      const updated = await this.request("PATCH", `/users?phone=eq.${encodeURIComponent(phone)}`, {
+      const updated = await this.request("PATCH", `/users?id=eq.${targetUser.id}`, {
         pass_hash: new_hash,
       }, { Prefer: "return=representation" });
-      CricketleLog.auth("SUPABASE_RESET", `Updated PIN for mobile ${phone} in Supabase PostgreSQL`);
-      return this.formatUser(updated[0] || rows[0]);
+      CricketleLog.auth("SUPABASE_RESET", `Updated PIN for @${targetUser.username} (${targetUser.phone}) in Supabase PostgreSQL`);
+      return this.formatUser(updated[0] || targetUser);
     },
   };
 

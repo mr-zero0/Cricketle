@@ -199,9 +199,12 @@ function createApp(opts = {}) {
   function normalizePhone(rawPhone) {
     if (typeof rawPhone !== "string") return "";
     let phone = rawPhone.replace(/[\s\-\(\)]/g, "");
-    if (/^[6-9]\d{9}$/.test(phone)) phone = "+91" + phone;
+    if (phone.startsWith("00")) phone = "+" + phone.slice(2);
+    else if (phone.startsWith("0") && /^[6-9]\d{9}$/.test(phone.slice(1))) phone = "+91" + phone.slice(1);
+    else if (/^[6-9]\d{9}$/.test(phone)) phone = "+91" + phone;
+    else if (/^91[6-9]\d{9}$/.test(phone)) phone = "+" + phone;
     else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) phone = "+" + phone;
-    return phone;
+    return /^\+[1-9]\d{8,14}$/.test(phone) ? phone : "";
   }
 
   function isAdmin(user, req) {
