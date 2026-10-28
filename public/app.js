@@ -1498,7 +1498,7 @@
               </div>
             </div>
             <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
-              ${pUser.isAdmin ? `<a href="/admin" target="_blank" class="btn primary" style="background:linear-gradient(135deg, #f59e0b, #d97706);color:#000;font-weight:700;display:inline-flex;align-items:center;gap:6px;text-decoration:none;">👑 Open Admin Portal</a>` : ""}
+              ${pUser.isAdmin ? `<a href="admin.html" target="_blank" class="btn primary" style="background:linear-gradient(135deg, #f59e0b, #d97706);color:#000;font-weight:700;display:inline-flex;align-items:center;gap:6px;text-decoration:none;">👑 Open Admin Portal</a>` : ""}
               <button id="signout-btn" class="btn danger" type="button"><svg aria-hidden="true"><use href="#i-logout"/></svg> Sign out</button>
             </div>
           `}
