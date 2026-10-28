@@ -148,6 +148,14 @@ function createApp(opts = {}) {
 
   // ---------- helpers ----------
 
+  function normalizePhone(rawPhone) {
+    if (typeof rawPhone !== "string") return "";
+    let phone = rawPhone.replace(/[\s\-\(\)]/g, "");
+    if (/^[6-9]\d{9}$/.test(phone)) phone = "+91" + phone;
+    else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) phone = "+" + phone;
+    return phone;
+  }
+
   function send(res, status, body, headers) {
     const h = Object.assign({
       "content-type": "application/json; charset=utf-8",
@@ -400,6 +408,152 @@ function createApp(opts = {}) {
         },
         { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) }
       );
+    }
+
+    if (key === "POST /api/auth/phone/check") {
+      rateLimit(req, "auth", 40, 10 * 60 * 1000);
+      const body = await readJson(req);
+      const phone = normalizePhone(body.phone);
+      if (!phone || !/^\+[1-9]\d{9,14}$/.test(phone)) {
+        return fail(res, 400, "invalid_phone", "Please enter a valid mobile number with country code (e.g. +91 98765 43210).");
+      }
+      const user = db.userByPhone(phone);
+      return send(res, 200, {
+        ok: true,
+        phone,
+        exists: Boolean(user),
+        displayName: user ? (user.display_name || user.username) : null,
+      });
+    }
+
+    if (key === "POST /api/auth/phone/register") {
+      rateLimit(req, "auth", 20, 15 * 60 * 1000);
+      const body = await readJson(req);
+      const phone = normalizePhone(body.phone);
+      if (!phone || !/^\+[1-9]\d{9,14}$/.test(phone)) {
+        return fail(res, 400, "invalid_phone", "Please enter a valid mobile number with country code.");
+      }
+      const pin = String(body.pin || "").trim();
+      if (!/^\d{4,8}$/.test(pin)) {
+        return fail(res, 400, "invalid_pin", "PIN must be 4 to 8 numbers.");
+      }
+      if (db.userByPhone(phone)) {
+        return fail(res, 409, "phone_exists", "An account already exists for this mobile number. Please sign in.");
+      }
+
+      const lastDigits = phone.slice(-4);
+      const baseUsername = "Player_" + lastDigits;
+      let username = baseUsername;
+      let suffix = 1;
+      while (db.userByName(username) && suffix < 1000) {
+        username = "Player_" + lastDigits + "_" + suffix;
+        suffix++;
+      }
+
+      const displayName = typeof body.displayName === "string" && body.displayName.trim()
+        ? body.displayName.trim().slice(0, 30)
+        : "Cricketer " + lastDigits;
+
+      const user = db.createUser(username, auth.hashPassword(pin), now(), {
+        displayName,
+        phone,
+        avatar: "allrounder",
+        bio: "Cricket fan playing on Cricketle",
+      });
+
+      const token = auth.newToken();
+      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      log("phone_register", user.username, phone);
+      return send(res, 201, {
+        ok: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          displayName: user.displayName || user.username,
+          phone: user.phone || phone,
+          avatar: user.avatar || "allrounder",
+          bio: user.bio || "",
+          favTeam: user.favTeam || "",
+          favPlayer: user.favPlayer || "",
+          googleConnected: false,
+          phoneConnected: true,
+          createdAt: user.createdAt,
+        },
+      }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
+    }
+
+    if (key === "POST /api/auth/phone/login") {
+      rateLimit(req, "auth", 20, 15 * 60 * 1000);
+      const body = await readJson(req);
+      const phone = normalizePhone(body.phone);
+      if (!phone) {
+        return fail(res, 400, "invalid_phone", "Please enter a valid mobile number.");
+      }
+      const pin = String(body.pin || "").trim();
+      const user = db.userByPhone(phone);
+      if (!user || !user.pass_hash || !auth.verifyPassword(pin, user.pass_hash)) {
+        return fail(res, 401, "bad_pin", "Incorrect PIN for this mobile number. Try again or reset your PIN.");
+      }
+
+      const token = auth.newToken();
+      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      log("phone_login", user.username, phone);
+      return send(res, 200, {
+        ok: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          displayName: user.display_name || user.username,
+          email: user.email || null,
+          phone: user.phone || phone,
+          avatar: user.avatar || "allrounder",
+          bio: user.bio || "",
+          favTeam: user.fav_team || "",
+          favPlayer: user.fav_player || "",
+          googleConnected: Boolean(user.google_id),
+          phoneConnected: true,
+          createdAt: user.created_at,
+        },
+      }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
+    }
+
+    if (key === "POST /api/auth/phone/reset") {
+      rateLimit(req, "auth", 10, 15 * 60 * 1000);
+      const body = await readJson(req);
+      const phone = normalizePhone(body.phone);
+      if (!phone) {
+        return fail(res, 400, "invalid_phone", "Please enter a valid mobile number.");
+      }
+      const newPin = String(body.newPin || "").trim();
+      if (!/^\d{4,8}$/.test(newPin)) {
+        return fail(res, 400, "invalid_pin", "New PIN must be 4 to 8 numbers.");
+      }
+      const user = db.userByPhone(phone);
+      if (!user) {
+        return fail(res, 404, "not_found", "No account found with this phone number.");
+      }
+
+      db.updatePassword(user.id, auth.hashPassword(newPin));
+      const token = auth.newToken();
+      db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+      log("phone_pin_reset", user.username, phone);
+      return send(res, 200, {
+        ok: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          displayName: user.display_name || user.username,
+          email: user.email || null,
+          phone: user.phone || phone,
+          avatar: user.avatar || "allrounder",
+          bio: user.bio || "",
+          favTeam: user.fav_team || "",
+          favPlayer: user.fav_player || "",
+          googleConnected: Boolean(user.google_id),
+          phoneConnected: true,
+          createdAt: user.created_at,
+        },
+      }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
     }
 
     if (key === "POST /api/auth/otp/send") {

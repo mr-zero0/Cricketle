@@ -10,18 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script>
-    window.FIREBASE_CONFIG = {
-      apiKey: "AIzaSyCpNctxtVG-SQuk7UQCKBWfLeJLk9AO-f0",
-      authDomain: "cricketle-ed209.firebaseapp.com",
-      projectId: "cricketle-ed209",
-      storageBucket: "cricketle-ed209.firebasestorage.app",
-      messagingSenderId: "847228057426",
-      appId: "1:847228057426:web:bd3927228af22e2d55ac8b"
-    };
-  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to the game</a>
@@ -200,7 +188,7 @@
         <div class="auth-clean-header">
           <div class="pill-mobile-auth">
             <svg class="icon-inline" aria-hidden="true" style="width:14px;height:14px;"><use href="#i-phone"/></svg>
-            <span>Mobile OTP Sign-In</span>
+            <span>Mobile Sign-In</span>
           </div>
           <h3 class="auth-title">Welcome to Cricketle</h3>
           <p class="muted small-text">Fast & secure mobile login. Progress saved for 24 hours.</p>
@@ -209,7 +197,8 @@
         <form id="otp-form" novalidate>
           <div id="otp-summary" class="error-summary" role="alert" tabindex="-1" hidden></div>
 
-          <div id="otp-step-phone">
+          <!-- Step 1: Mobile Phone Number Entry -->
+          <div id="phone-step-number">
             <div class="field">
               <label for="otp-phone">Mobile Phone Number</label>
               <div class="phone-input-wrap">
@@ -227,46 +216,97 @@
                 </select>
                 <input id="otp-phone" name="phone" type="tel" autocomplete="tel" placeholder="87554 28254" required maxlength="15" aria-describedby="otp-phone-help" />
               </div>
-              <p id="otp-phone-help" class="help-text">Real SMS verification with 6-digit code via Google Firebase.</p>
+              <p id="otp-phone-help" class="help-text">Instant mobile access · Zero credit card or autopay needed.</p>
             </div>
-            <div id="recaptcha-container"></div>
-            <button id="otp-send-btn" class="btn primary big full-width" type="button">
-              <svg class="icon-inline" aria-hidden="true" style="width:18px;height:18px;"><use href="#i-phone"/></svg>
-              <span>Send OTP Verification Code</span>
+            <button id="phone-continue-btn" class="btn primary big full-width" type="button">
+              <span>Continue with Mobile</span>
+              <svg class="icon-inline" aria-hidden="true" style="width:16px;height:16px;"><use href="#i-arrow"/></svg>
             </button>
           </div>
 
-          <div id="otp-step-verify" hidden>
-            <div class="otp-banner" id="otp-code-banner">
-              <div class="otp-banner-icon" id="otp-banner-icon">📱</div>
-              <div class="otp-banner-content">
-                <div class="otp-banner-title" id="otp-banner-title">Real SMS Sent</div>
-                <div class="otp-banner-text" id="otp-banner-text">We sent a 6-digit verification code to <strong id="otp-sent-phone">your phone</strong>. Check your SMS inbox.</div>
+          <!-- Step 2A: Returning Player PIN Login -->
+          <div id="phone-step-signin" hidden>
+            <div class="user-greeting-banner">
+              <div class="user-greeting-icon">🏏</div>
+              <div class="user-greeting-meta">
+                <div class="user-greeting-name" id="user-greeting-name">Welcome back!</div>
+                <div class="user-greeting-phone"><span id="phone-signin-number"></span> · <button id="phone-change-btn-1" type="button" class="link-btn">Change number</button></div>
               </div>
             </div>
 
             <div class="field">
               <div class="flex-between">
-                <label for="otp-code">6-Digit Verification Code</label>
-                <button id="otp-change-phone" type="button" class="link-btn">Change number</button>
+                <label for="phone-pin-signin">Enter 6-Digit Secret PIN</label>
+                <button id="phone-forgot-pin-btn" type="button" class="link-btn">Reset PIN</button>
               </div>
-              <input id="otp-code" name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="one-time-code" required />
-              <p class="help-text" id="otp-expiry-hint">Expires in <span id="otp-timer">05:00</span></p>
+              <input id="phone-pin-signin" name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="current-password" />
+              <p class="help-text">Enter your 6-digit PIN to sign in.</p>
             </div>
 
-            <div class="field" id="otp-display-name-wrap">
-              <label for="otp-display-name">Display Name (optional)</label>
-              <input id="otp-display-name" name="displayName" type="text" maxlength="30" placeholder="e.g. Aman · Master Blaster" />
+            <button id="phone-login-btn" class="btn primary big full-width" type="button">
+              <span>Sign In & Play</span>
+            </button>
+          </div>
+
+          <!-- Step 2B: New Player PIN Setup -->
+          <div id="phone-step-register" hidden>
+            <div class="user-greeting-banner">
+              <div class="user-greeting-icon">⭐</div>
+              <div class="user-greeting-meta">
+                <div class="user-greeting-name">New Player Setup</div>
+                <div class="user-greeting-phone"><span id="phone-register-number"></span> · <button id="phone-change-btn-2" type="button" class="link-btn">Change number</button></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="phone-pin-register">Set a 6-Digit Secret PIN</label>
+              <input id="phone-pin-register" name="newPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
+              <p class="help-text">Keep this 6-digit PIN in mind to sign in anytime.</p>
+            </div>
+
+            <div class="field">
+              <label for="phone-pin-confirm">Confirm Secret PIN</label>
+              <input id="phone-pin-confirm" name="confirmPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
+            </div>
+
+            <div class="field">
+              <label for="phone-display-name">Display Name (optional)</label>
+              <input id="phone-display-name" name="displayName" type="text" maxlength="30" placeholder="e.g. Aman · Master Blaster" />
               <p class="help-text">Visible on leaderboards and results.</p>
             </div>
 
-            <div class="otp-actions">
-              <button id="otp-verify-btn" class="btn primary big" type="submit">Verify & Sign In</button>
-              <button id="otp-resend-btn" class="btn" type="button" disabled>Resend</button>
-            </div>
+            <button id="phone-register-btn" class="btn primary big full-width" type="button">
+              <span>Create Account & Play</span>
+            </button>
           </div>
 
-          <p class="muted small-text" style="margin-top:var(--space-3);text-align:center;">Cricketle mobile authentication is 100% free with zero ads or tracking. Active for 24 hours.</p>
+          <!-- Step 2C: Reset PIN -->
+          <div id="phone-step-reset" hidden>
+            <div class="user-greeting-banner">
+              <div class="user-greeting-icon">🔑</div>
+              <div class="user-greeting-meta">
+                <div class="user-greeting-name">Reset Secret PIN</div>
+                <div class="user-greeting-phone"><span id="phone-reset-number"></span> · <button id="phone-change-btn-3" type="button" class="link-btn">Cancel</button></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="phone-pin-reset">Choose New 6-Digit PIN</label>
+              <input id="phone-pin-reset" name="resetPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
+              <p class="help-text">Enter 4-6 digits for your new PIN.</p>
+            </div>
+
+            <div class="field">
+              <label for="phone-pin-reset-confirm">Confirm New PIN</label>
+              <input id="phone-pin-reset-confirm" name="resetConfirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" />
+            </div>
+
+            <button id="phone-reset-btn" class="btn primary big full-width" type="button">
+              <span>Update PIN & Sign In</span>
+            </button>
+          </div>
+
+          <p class="muted small-text" style="margin-top:var(--space-3);text-align:center;">100% Free · Zero autopay mandates · Active for 24 hours.</p>
         </form>
       </div>
 

@@ -1351,10 +1351,50 @@ dialog form { margin-top: var(--space-4); text-align: right; }
 }
 
 #otp-step-phone:not([hidden]),
-#otp-step-verify:not([hidden]) {
+#otp-step-verify:not([hidden]),
+#phone-step-number:not([hidden]),
+#phone-step-signin:not([hidden]),
+#phone-step-register:not([hidden]),
+#phone-step-reset:not([hidden]) {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+.user-greeting-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.user-greeting-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.user-greeting-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-greeting-name {
+  font-weight: 700;
+  color: #f8fafc;
+  font-size: 0.98rem;
+}
+
+.user-greeting-phone {
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
 }
 
 #otp-expiry-hint {
@@ -1431,3 +1471,4 @@ dialog form { margin-top: var(--space-4); text-align: right; }
 .full-width {
   width: 100%;
 }
+

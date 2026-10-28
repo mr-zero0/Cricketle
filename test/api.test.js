@@ -572,6 +572,87 @@ test("POST /api/auth/firebase-phone logs in or creates player and establishes se
   }
 });
 
+test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
+  const app = await boot();
+  try {
+    const c = client(app.base);
+    const testPhone = "+919876543210";
 
+    // 1. Check unregistered phone returns exists: false
+    const check1 = await c.post("/api/auth/phone/check", { phone: testPhone });
+    assert.equal(check1.status, 200, check1.text);
+    assert.equal(check1.json.exists, false);
 
+    // 2. Register new player with 6-digit PIN
+    const regRes = await c.post("/api/auth/phone/register", {
+      phone: testPhone,
+      pin: "875542",
+      displayName: "Rohit Striker",
+    });
+    assert.equal(regRes.status, 201, regRes.text);
+    assert.equal(regRes.json.ok, true);
+    assert.equal(regRes.json.user.phone, testPhone);
+    assert.equal(regRes.json.user.displayName, "Rohit Striker");
+    assert.equal(regRes.json.user.phoneConnected, true);
 
+    // 3. Verify session works with /api/me
+    const me1 = await c.get("/api/me");
+    assert.equal(me1.status, 200);
+    assert.equal(me1.json.user.phone, testPhone);
+    assert.equal(me1.json.user.displayName, "Rohit Striker");
+
+    // 4. Duplicate registration rejected
+    const dupRes = await c.post("/api/auth/phone/register", {
+      phone: testPhone,
+      pin: "875542",
+    });
+    assert.equal(dupRes.status, 409);
+    assert.equal(dupRes.json.error, "phone_exists");
+
+    // 5. Check now returns exists: true and displayName
+    const check2 = await c.post("/api/auth/phone/check", { phone: testPhone });
+    assert.equal(check2.status, 200);
+    assert.equal(check2.json.exists, true);
+    assert.equal(check2.json.displayName, "Rohit Striker");
+
+    // 6. Login in a separate client: bad PIN fails
+    const c2 = client(app.base);
+    const badLogin = await c2.post("/api/auth/phone/login", {
+      phone: testPhone,
+      pin: "000000",
+    });
+    assert.equal(badLogin.status, 401);
+    assert.equal(badLogin.json.error, "bad_pin");
+
+    // 7. Login with correct PIN succeeds
+    const goodLogin = await c2.post("/api/auth/phone/login", {
+      phone: testPhone,
+      pin: "875542",
+    });
+    assert.equal(goodLogin.status, 200, goodLogin.text);
+    assert.equal(goodLogin.json.user.phone, testPhone);
+
+    // 8. Reset PIN
+    const c3 = client(app.base);
+    const resetRes = await c3.post("/api/auth/phone/reset", {
+      phone: testPhone,
+      newPin: "112233",
+    });
+    assert.equal(resetRes.status, 200, resetRes.text);
+
+    // 9. Old PIN fails, new PIN succeeds
+    const oldPinLogin = await c.post("/api/auth/phone/login", {
+      phone: testPhone,
+      pin: "875542",
+    });
+    assert.equal(oldPinLogin.status, 401);
+
+    const newPinLogin = await c.post("/api/auth/phone/login", {
+      phone: testPhone,
+      pin: "112233",
+    });
+    assert.equal(newPinLogin.status, 200);
+  } finally {
+    await app.close();
+  }
+});

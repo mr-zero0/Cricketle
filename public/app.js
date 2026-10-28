@@ -1487,88 +1487,20 @@
   async function handleGoogleLogin() {}
   function initGoogleAuth() {}
 
-  // ---------- Mobile Phone OTP Auth ----------
+  // ---------- Mobile Phone & PIN Authentication (Option A) ----------
 
-  let otpCountdownTimer = null;
-  let firebaseEnabled = false;
-  let firebaseConfirmationResult = null;
-  let recaptchaVerifier = null;
-  let recaptchaWidgetId = null;
+  let activePhone = "";
 
-  async function ensureFirebase() {
-    if (firebaseEnabled && recaptchaVerifier) return true;
-    if (typeof window === "undefined") return false;
-
-    for (let i = 0; i < 30; i++) {
-      if (window.firebase && window.firebase.auth) break;
-      await new Promise((r) => setTimeout(r, 100));
-    }
-    if (!window.firebase || !window.firebase.auth) return false;
-
-    let config = window.FIREBASE_CONFIG || null;
-    if (!config) {
-      try {
-        const res = await api("GET", "/api/config/firebase");
-        if (res && res.enabled && res.config) config = res.config;
-      } catch (_) {}
-    }
-
-    if (config && config.apiKey && config.projectId) {
-      try {
-        if (!firebase.apps || !firebase.apps.length) {
-          firebase.initializeApp(config);
-        }
-        firebaseEnabled = true;
-        setupRecaptchaVerifier();
-        return true;
-      } catch (err) {
-        console.error("Firebase init failed:", err);
-      }
-    }
-    return false;
-  }
-
-  async function initFirebasePhone() {
-    await ensureFirebase();
-  }
-
-  function setupRecaptchaVerifier() {
-    if (!window.firebase || !window.firebase.auth) return null;
-    const container = $("recaptcha-container");
-    if (!container) return null;
-    if (!recaptchaVerifier) {
-      try {
-        recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
-          size: "invisible",
-          callback: () => {},
-          "expired-callback": () => {
-            if (recaptchaWidgetId !== null && window.grecaptcha) {
-              try { grecaptcha.reset(recaptchaWidgetId); } catch (_) {}
-            }
-          },
-        });
-        recaptchaVerifier.render().then((widgetId) => {
-          recaptchaWidgetId = widgetId;
-        }).catch((err) => {
-          console.warn("Recaptcha render warning:", err);
-        });
-      } catch (err) {
-        console.warn("Could not setup RecaptchaVerifier:", err);
-      }
-    }
-    return recaptchaVerifier;
-  }
-
-  function clearOtpErrors() {
-    const summary = $("otp-summary");
+  function clearPhoneAuthErrors() {
+    const summary = $("otp-summary") || $("auth-summary");
     if (summary) {
       summary.hidden = true;
       summary.innerHTML = "";
     }
   }
 
-  function showOtpError(msg) {
-    const summary = $("otp-summary");
+  function showPhoneAuthError(msg) {
+    const summary = $("otp-summary") || $("auth-summary");
     if (summary) {
       summary.hidden = false;
       summary.innerHTML = `<h3>${escapeHtml(msg)}</h3>`;
@@ -1576,243 +1508,363 @@
     }
   }
 
-  function startOtpTimer(expiresAt) {
-    if (otpCountdownTimer) clearInterval(otpCountdownTimer);
-    const update = () => {
-      const exp = typeof expiresAt === "number" ? expiresAt : new Date(expiresAt).getTime();
-      const remainingMs = Math.max(0, exp - Date.now());
-      const totalSec = Math.floor(remainingMs / 1000);
-      const mins = String(Math.floor(totalSec / 60)).padStart(2, "0");
-      const secs = String(totalSec % 60).padStart(2, "0");
-      if ($("otp-timer")) $("otp-timer").textContent = `${mins}:${secs}`;
-      if (totalSec <= 0) {
-        clearInterval(otpCountdownTimer);
-        if ($("otp-resend-btn")) $("otp-resend-btn").disabled = false;
-      }
-    };
-    update();
-    otpCountdownTimer = setInterval(update, 1000);
-    if ($("otp-resend-btn")) $("otp-resend-btn").disabled = true;
+  function switchPhoneStep(step) {
+    clearPhoneAuthErrors();
+    const stepNumber = $("phone-step-number");
+    const stepSignin = $("phone-step-signin");
+    const stepRegister = $("phone-step-register");
+    const stepReset = $("phone-step-reset");
+
+    if (stepNumber) stepNumber.hidden = step !== "number";
+    if (stepSignin) stepSignin.hidden = step !== "signin";
+    if (stepRegister) stepRegister.hidden = step !== "register";
+    if (stepReset) stepReset.hidden = step !== "reset";
+
+    if (step === "number" && $("otp-phone")) $("otp-phone").focus();
+    if (step === "signin" && $("phone-pin-signin")) $("phone-pin-signin").focus();
+    if (step === "register" && $("phone-pin-register")) $("phone-pin-register").focus();
+    if (step === "reset" && $("phone-pin-reset")) $("phone-pin-reset").focus();
   }
 
-  function initOtpAuth() {
-    initFirebasePhone();
+  function clearOtpErrors() {
+    clearPhoneAuthErrors();
+  }
 
-    const tabOtp = $("tab-otp");
-    if (tabOtp) {
-      tabOtp.addEventListener("click", () => {
-        app.authTab = "otp";
-        renderAuthTab();
-      });
-    }
+  function showOtpError(msg) {
+    showPhoneAuthError(msg);
+  }
 
-    const sendBtn = $("otp-send-btn");
-    if (sendBtn) {
-      sendBtn.addEventListener("click", async () => {
-        clearOtpErrors();
-        const countryCode = ($("otp-country-code") && $("otp-country-code").value) || "+91";
-        let rawPhone = ($("otp-phone").value || "").trim().replace(/[\s\-()]/g, "");
-        if (!rawPhone) {
-          showOtpError("Please enter your mobile phone number.");
-          $("otp-phone").focus();
-          return;
+  function initPhoneAuth() {
+    // Step 1: Continue with Mobile
+    const continueBtn = $("phone-continue-btn");
+    const phoneInput = $("otp-phone");
+
+    const handlePhoneContinue = async () => {
+      clearPhoneAuthErrors();
+      const countryCode = ($("otp-country-code") && $("otp-country-code").value) || "+91";
+      const raw = (phoneInput ? phoneInput.value : "").trim().replace(/[\s\-()]/g, "");
+      if (!raw) {
+        showPhoneAuthError("Please enter your mobile phone number.");
+        if (phoneInput) phoneInput.focus();
+        return;
+      }
+      const fullPhone = raw.startsWith("+") ? raw : countryCode + raw.replace(/^0+/, "");
+      if (!/^\+[1-9]\d{9,14}$/.test(fullPhone)) {
+        showPhoneAuthError("Please enter a valid mobile number (e.g. 98765 43210).");
+        if (phoneInput) phoneInput.focus();
+        return;
+      }
+
+      activePhone = fullPhone;
+      if (continueBtn) {
+        continueBtn.classList.add("loading");
+        continueBtn.disabled = true;
+      }
+
+      try {
+        let exists = false;
+        let displayName = "";
+
+        if (app.offline) {
+          const p = app.store && app.store.getProfile ? app.store.getProfile() : null;
+          exists = Boolean(p && p.phone === fullPhone && p.pin);
+          displayName = p ? (p.displayName || p.username || "") : "";
+        } else {
+          const res = await api("POST", "/api/auth/phone/check", { phone: fullPhone });
+          exists = Boolean(res && res.exists);
+          displayName = (res && res.displayName) || "";
         }
-        let fullPhone = rawPhone.startsWith("+") ? rawPhone : countryCode + rawPhone.replace(/^0+/, "");
 
-        sendBtn.classList.add("loading");
-        sendBtn.disabled = true;
+        if (exists) {
+          // Existing user -> prompt for PIN
+          if ($("user-greeting-name")) $("user-greeting-name").textContent = displayName ? `Welcome back, ${displayName}!` : "Welcome back!";
+          if ($("phone-signin-number")) $("phone-signin-number").textContent = fullPhone;
+          if ($("phone-pin-signin")) $("phone-pin-signin").value = "";
+          switchPhoneStep("signin");
+        } else {
+          // New player -> prompt to set PIN
+          if ($("phone-register-number")) $("phone-register-number").textContent = fullPhone;
+          if ($("phone-pin-register")) $("phone-pin-register").value = "";
+          if ($("phone-pin-confirm")) $("phone-pin-confirm").value = "";
+          switchPhoneStep("register");
+        }
+      } catch (err) {
+        showPhoneAuthError(err.message || "Failed to check mobile number. Please try again.");
+      } finally {
+        if (continueBtn) {
+          continueBtn.classList.remove("loading");
+          continueBtn.disabled = false;
+        }
+      }
+    };
 
-        try {
-          const ready = await ensureFirebase();
-          if (!ready) {
-            throw new Error("Connecting to Google Firebase Phone service... please refresh the page and try again.");
-          }
-
-          setupRecaptchaVerifier();
-          if (!recaptchaVerifier) throw new Error("Verification widget unavailable. Please refresh the page.");
-
-          try {
-            firebaseConfirmationResult = await firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier);
-          } catch (fbErr) {
-            if (recaptchaWidgetId !== null && window.grecaptcha) {
-              try { grecaptcha.reset(recaptchaWidgetId); } catch (_) {}
-            }
-            let msg = fbErr.message || "Failed to send SMS via Firebase.";
-            if (fbErr.code === "auth/operation-not-allowed" || (msg && msg.toLowerCase().includes("region"))) {
-              msg = "SMS Region Policy: Please enable India (+91) in Firebase Console > Authentication > Settings > SMS region policy.";
-            } else if (fbErr.code === "auth/invalid-phone-number") {
-              msg = "Invalid mobile number format. Please check the digits.";
-            } else if (fbErr.code === "auth/quota-exceeded") {
-              msg = "Daily SMS quota exceeded. Please try later.";
-            } else if (fbErr.code === "auth/too-many-requests") {
-              msg = "Too many attempts. Please wait a moment and try again.";
-            }
-            throw new Error(msg);
-          }
-
-          app.otpPhone = fullPhone;
-
-          const bannerIcon = $("otp-banner-icon");
-          const bannerTitle = $("otp-banner-title");
-          const bannerText = $("otp-banner-text");
-          const autofillBtn = $("otp-autofill-btn");
-
-          if (bannerIcon) bannerIcon.textContent = "📱";
-          if (bannerTitle) bannerTitle.textContent = "Real SMS Sent (Google Firebase)";
-          if (bannerText) bannerText.innerHTML = `We sent a 6-digit verification code to <strong>${escapeHtml(fullPhone)}</strong> via SMS. Check your phone's SMS inbox!`;
-          if (autofillBtn) autofillBtn.hidden = true;
-
-          toast(`Real SMS sent to ${fullPhone}! Check your phone's SMS inbox.`, "success");
-
-          $("otp-step-phone").hidden = true;
-          $("otp-step-verify").hidden = false;
-          startOtpTimer(Date.now() + 5 * 60 * 1000);
-          if ($("otp-code")) {
-            $("otp-code").value = "";
-            $("otp-code").focus();
-          }
-        } catch (err) {
-          showOtpError(err.message || "Could not send OTP code. Try again.");
-        } finally {
-          sendBtn.classList.remove("loading");
-          sendBtn.disabled = false;
+    if (continueBtn) continueBtn.addEventListener("click", handlePhoneContinue);
+    if (phoneInput) {
+      phoneInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handlePhoneContinue();
         }
       });
     }
 
-    const autofillBtn = $("otp-autofill-btn");
-    if (autofillBtn) {
-      autofillBtn.addEventListener("click", () => {
-        if (app.latestDevOtp && $("otp-code")) {
-          $("otp-code").value = app.latestDevOtp;
-          $("otp-code").focus();
-          toast("Auto-filled code: " + app.latestDevOtp, "info");
+    // Change number buttons
+    const changeBtn1 = $("phone-change-btn-1");
+    const changeBtn2 = $("phone-change-btn-2");
+    const changeBtn3 = $("phone-change-btn-3");
+    if (changeBtn1) changeBtn1.addEventListener("click", () => switchPhoneStep("number"));
+    if (changeBtn2) changeBtn2.addEventListener("click", () => switchPhoneStep("number"));
+    if (changeBtn3) changeBtn3.addEventListener("click", () => switchPhoneStep("signin"));
+
+    // Forgot / Reset PIN trigger
+    const forgotPinBtn = $("phone-forgot-pin-btn");
+    if (forgotPinBtn) {
+      forgotPinBtn.addEventListener("click", () => {
+        if ($("phone-reset-number")) $("phone-reset-number").textContent = activePhone;
+        if ($("phone-pin-reset")) $("phone-pin-reset").value = "";
+        if ($("phone-pin-reset-confirm")) $("phone-pin-reset-confirm").value = "";
+        switchPhoneStep("reset");
+      });
+    }
+
+    // Step 2A: Returning user sign-in
+    const loginBtn = $("phone-login-btn");
+    const signinPinInput = $("phone-pin-signin");
+
+    const handleLogin = async () => {
+      clearPhoneAuthErrors();
+      const pin = (signinPinInput ? signinPinInput.value : "").trim();
+      if (!/^\d{4,8}$/.test(pin)) {
+        showPhoneAuthError("Please enter your 4 to 6 digit secret PIN.");
+        if (signinPinInput) signinPinInput.focus();
+        return;
+      }
+
+      if (loginBtn) {
+        loginBtn.classList.add("loading");
+        loginBtn.disabled = true;
+      }
+
+      try {
+        let user;
+        if (app.offline) {
+          const p = app.store.getProfile();
+          if (p.pin && p.pin !== pin) throw new Error("Incorrect PIN. Please try again or reset your PIN.");
+          p.loginTime = Date.now();
+          app.store.saveProfile(p);
+          user = {
+            username: p.username || ("player_" + activePhone.slice(-4)),
+            displayName: p.displayName || ("Cricketer " + activePhone.slice(-4)),
+            phone: activePhone,
+            avatar: p.avatar || "allrounder",
+            bio: p.bio || "",
+            favTeam: p.favTeam || "",
+            favPlayer: p.favPlayer || "",
+            phoneConnected: true,
+            isOffline: true,
+          };
+          app.user = user;
+          renderNav();
+          renderProfile();
+        } else {
+          const res = await api("POST", "/api/auth/phone/login", { phone: activePhone, pin });
+          user = res.user;
+          await becomeUser(user);
+        }
+
+        toast(`Welcome back, ${user.displayName || user.username}!`, "success");
+        switchPhoneStep("number");
+        location.hash = "#play";
+        showView();
+      } catch (err) {
+        showPhoneAuthError(err.message || "Incorrect PIN. Try again or reset your PIN.");
+      } finally {
+        if (loginBtn) {
+          loginBtn.classList.remove("loading");
+          loginBtn.disabled = false;
+        }
+      }
+    };
+
+    if (loginBtn) loginBtn.addEventListener("click", handleLogin);
+    if (signinPinInput) {
+      signinPinInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleLogin();
         }
       });
     }
 
-    const changePhoneBtn = $("otp-change-phone");
-    if (changePhoneBtn) {
-      changePhoneBtn.addEventListener("click", () => {
-        if (otpCountdownTimer) clearInterval(otpCountdownTimer);
-        firebaseConfirmationResult = null;
-        $("otp-step-verify").hidden = true;
-        $("otp-step-phone").hidden = false;
-        clearOtpErrors();
-        $("otp-phone").focus();
-      });
-    }
+    // Step 2B: New player registration
+    const registerBtn = $("phone-register-btn");
+    const regPinInput = $("phone-pin-register");
+    const regConfirmInput = $("phone-pin-confirm");
+    const regNameInput = $("phone-display-name");
 
-    const resendBtn = $("otp-resend-btn");
-    if (resendBtn) {
-      resendBtn.addEventListener("click", () => {
-        if (recaptchaWidgetId !== null && window.grecaptcha) {
-          try { grecaptcha.reset(recaptchaWidgetId); } catch (_) {}
+    const handleRegister = async () => {
+      clearPhoneAuthErrors();
+      const pin = (regPinInput ? regPinInput.value : "").trim();
+      const confirmPin = (regConfirmInput ? regConfirmInput.value : "").trim();
+      const displayName = (regNameInput ? regNameInput.value.trim() : "") || undefined;
+
+      if (!/^\d{4,8}$/.test(pin)) {
+        showPhoneAuthError("Please choose a 4 to 6 digit secret PIN.");
+        if (regPinInput) regPinInput.focus();
+        return;
+      }
+      if (pin !== confirmPin) {
+        showPhoneAuthError("PINs do not match. Please re-enter.");
+        if (regConfirmInput) regConfirmInput.focus();
+        return;
+      }
+
+      if (registerBtn) {
+        registerBtn.classList.add("loading");
+        registerBtn.disabled = true;
+      }
+
+      try {
+        let user;
+        if (app.offline) {
+          const p = app.store.getProfile();
+          p.phone = activePhone;
+          p.pin = pin;
+          p.username = p.username || ("player_" + activePhone.slice(-4));
+          if (displayName) p.displayName = displayName;
+          p.loginTime = Date.now();
+          app.store.saveProfile(p);
+          user = {
+            username: p.username,
+            displayName: p.displayName || ("Cricketer " + activePhone.slice(-4)),
+            phone: activePhone,
+            avatar: p.avatar || "allrounder",
+            bio: p.bio || "",
+            favTeam: p.favTeam || "",
+            favPlayer: p.favPlayer || "",
+            phoneConnected: true,
+            isOffline: true,
+          };
+          app.user = user;
+          renderNav();
+          renderProfile();
+        } else {
+          const res = await api("POST", "/api/auth/phone/register", {
+            phone: activePhone,
+            pin,
+            displayName,
+          });
+          user = res.user;
+          await becomeUser(user);
         }
-        if (sendBtn) sendBtn.click();
+
+        toast(`Account created! Welcome to Cricketle, ${user.displayName || user.username}!`, "success");
+        switchPhoneStep("number");
+        location.hash = "#play";
+        showView();
+      } catch (err) {
+        showPhoneAuthError(err.message || "Failed to create account. Try again.");
+      } finally {
+        if (registerBtn) {
+          registerBtn.classList.remove("loading");
+          registerBtn.disabled = false;
+        }
+      }
+    };
+
+    if (registerBtn) registerBtn.addEventListener("click", handleRegister);
+    if (regConfirmInput) {
+      regConfirmInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleRegister();
+        }
       });
     }
 
+    // Step 2C: Reset PIN
+    const resetBtn = $("phone-reset-btn");
+    const resetPinInput = $("phone-pin-reset");
+    const resetConfirmInput = $("phone-pin-reset-confirm");
+
+    const handleReset = async () => {
+      clearPhoneAuthErrors();
+      const newPin = (resetPinInput ? resetPinInput.value : "").trim();
+      const confirmPin = (resetConfirmInput ? resetConfirmInput.value : "").trim();
+
+      if (!/^\d{4,8}$/.test(newPin)) {
+        showPhoneAuthError("Please enter a 4 to 6 digit new PIN.");
+        if (resetPinInput) resetPinInput.focus();
+        return;
+      }
+      if (newPin !== confirmPin) {
+        showPhoneAuthError("New PINs do not match. Please re-enter.");
+        if (resetConfirmInput) resetConfirmInput.focus();
+        return;
+      }
+
+      if (resetBtn) {
+        resetBtn.classList.add("loading");
+        resetBtn.disabled = true;
+      }
+
+      try {
+        let user;
+        if (app.offline) {
+          const p = app.store.getProfile();
+          p.phone = activePhone;
+          p.pin = newPin;
+          p.loginTime = Date.now();
+          app.store.saveProfile(p);
+          user = {
+            username: p.username || ("player_" + activePhone.slice(-4)),
+            displayName: p.displayName || ("Cricketer " + activePhone.slice(-4)),
+            phone: activePhone,
+            avatar: p.avatar || "allrounder",
+            bio: p.bio || "",
+            favTeam: p.favTeam || "",
+            favPlayer: p.favPlayer || "",
+            phoneConnected: true,
+            isOffline: true,
+          };
+          app.user = user;
+          renderNav();
+          renderProfile();
+        } else {
+          const res = await api("POST", "/api/auth/phone/reset", { phone: activePhone, newPin });
+          user = res.user;
+          await becomeUser(user);
+        }
+
+        toast(`Secret PIN updated! Welcome, ${user.displayName || user.username}!`, "success");
+        switchPhoneStep("number");
+        location.hash = "#play";
+        showView();
+      } catch (err) {
+        showPhoneAuthError(err.message || "Failed to reset PIN. Try again.");
+      } finally {
+        if (resetBtn) {
+          resetBtn.classList.remove("loading");
+          resetBtn.disabled = false;
+        }
+      }
+    };
+
+    if (resetBtn) resetBtn.addEventListener("click", handleReset);
+    if (resetConfirmInput) {
+      resetConfirmInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleReset();
+        }
+      });
+    }
+
+    // Form submit preventDefault
     const otpForm = $("otp-form");
     if (otpForm) {
-      otpForm.addEventListener("submit", async (e) => {
+      otpForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        clearOtpErrors();
-        const code = ($("otp-code").value || "").trim().replace(/\D/g, "");
-        if (code.length !== 6) {
-          showOtpError("Enter the 6-digit code.");
-          $("otp-code").focus();
-          return;
-        }
-
-        const verifyBtn = $("otp-verify-btn");
-        verifyBtn.classList.add("loading");
-        verifyBtn.disabled = true;
-
-        try {
-          const displayName = ($("otp-display-name") ? $("otp-display-name").value.trim() : "") || undefined;
-          let user;
-
-          if (firebaseConfirmationResult) {
-            const credential = await firebaseConfirmationResult.confirm(code);
-            const verifiedPhone = (credential.user && credential.user.phoneNumber) || app.otpPhone;
-            const idToken = credential.user ? await credential.user.getIdToken() : "";
-
-            if (app.offline) {
-              const p = app.store.getProfile();
-              p.phone = verifiedPhone;
-              p.username = p.username || ("player_" + verifiedPhone.slice(-4));
-              if (displayName) p.displayName = displayName;
-              app.store.saveProfile(p);
-              user = {
-                username: p.username,
-                displayName: p.displayName || p.username,
-                phone: verifiedPhone,
-                avatar: p.avatar || "allrounder",
-                bio: p.bio || "",
-                favTeam: p.favTeam || "",
-                favPlayer: p.favPlayer || "",
-                phoneConnected: true,
-                isOffline: true,
-              };
-              app.user = user;
-              renderNav();
-              renderProfile();
-            } else {
-              const res = await api("POST", "/api/auth/firebase-phone", {
-                phone: verifiedPhone,
-                displayName,
-                idToken,
-              });
-              user = res.user;
-              await becomeUser(user);
-            }
-            firebaseConfirmationResult = null;
-          } else if (app.offline) {
-            const valid = app.store && app.store.verifyOtp ? app.store.verifyOtp(app.otpPhone, code) : (code === app.latestDevOtp);
-            if (!valid) throw new Error("Invalid or expired OTP code.");
-            const p = app.store.getProfile();
-            p.phone = app.otpPhone;
-            p.username = p.username || ("player_" + app.otpPhone.slice(-4));
-            if (displayName) p.displayName = displayName;
-            app.store.saveProfile(p);
-            user = {
-              username: p.username,
-              displayName: p.displayName || p.username,
-              phone: app.otpPhone,
-              avatar: p.avatar || "allrounder",
-              bio: p.bio || "",
-              favTeam: p.favTeam || "",
-              favPlayer: p.favPlayer || "",
-              phoneConnected: true,
-              isOffline: true,
-            };
-            app.user = user;
-            renderNav();
-            renderProfile();
-          } else {
-            const res = await api("POST", "/api/auth/otp/verify", {
-              phone: app.otpPhone,
-              code,
-              displayName,
-            });
-            user = res.user;
-            await becomeUser(user);
-          }
-
-          if (otpCountdownTimer) clearInterval(otpCountdownTimer);
-          $("otp-form").reset();
-          $("otp-step-verify").hidden = true;
-          $("otp-step-phone").hidden = false;
-          toast(`Welcome, ${user.displayName || user.username}! Mobile OTP verified.`, "success");
-          location.hash = "#play";
-          showView();
-        } catch (err) {
-          showOtpError(err.message || "Failed to verify code.");
-        } finally {
-          verifyBtn.classList.remove("loading");
-          verifyBtn.disabled = false;
-        }
       });
     }
   }
@@ -1843,6 +1895,8 @@
       const p = app.store.getProfile();
       if (p.phone) {
         delete p.phone;
+        delete p.pin;
+        delete p.loginTime;
         app.store.saveProfile(p);
       }
     }
@@ -1948,7 +2002,7 @@
 
   async function bootstrap() {
     fillHelp();
-    initOtpAuth();
+    initPhoneAuth();
     try {
       const me = await api("GET", "/api/me");
       app.offline = false;
