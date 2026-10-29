@@ -966,7 +966,7 @@
     });
 
     const streak = (app.stats && app.stats.currentStreak) ? ` · 🔥 ${app.stats.currentStreak}-day streak` : "";
-    const siteUrl = "https://cricketle-sy03.onrender.com";
+    const siteUrl = "https://cricketle.onrender.com";
     const dateFormatted = formatDayDDMMMYY(app.day);
 
     const modeHeadline = allDone

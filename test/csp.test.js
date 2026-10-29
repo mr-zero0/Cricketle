@@ -35,16 +35,16 @@ for (const page of pages) {
 // The GitHub Pages copies of index.html / admin.html at the project root exist only
 // to send visitors to the hosted server, where accounts and leaderboards work.
 test("the GitHub Pages entry pages redirect to the hosted server, not to the static copy", () => {
-  const HOST = "https://cricketle-sy03.onrender.com/";
+  const HOST = "https://cricketle.onrender.com/";
   for (const page of ["index.html", "admin.html"]) {
     const html = fs.readFileSync(path.join(__dirname, "..", page), "utf8");
     assert.ok(html.includes(HOST), page + " names the hosted server");
     assert.ok(!/location\.replace\(\s*["']public\//.test(html), page + " must not redirect into public/");
     const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
-    for (const body of scripts) assert.ok(body.includes("cricketle-sy03.onrender.com"), page + " script redirects to the server");
+    for (const body of scripts) assert.ok(body.includes("cricketle.onrender.com"), page + " script redirects to the server");
   }
   const app = fs.readFileSync(path.join(PUBLIC, "app.js"), "utf8");
-  assert.match(app, /const siteUrl = "https:\/\/cricketle-sy03\.onrender\.com"/, "share links point at the hosted game");
+  assert.match(app, /const siteUrl = "https:\/\/cricketle\.onrender\.com"/, "share links point at the hosted game");
   const index = fs.readFileSync(path.join(PUBLIC, "index.html"), "utf8");
-  assert.ok(index.includes('<meta property="og:url" content="https://cricketle-sy03.onrender.com/" />'), "og:url is the hosted game");
+  assert.ok(index.includes('<meta property="og:url" content="https://cricketle.onrender.com/" />'), "og:url is the hosted game");
 });
