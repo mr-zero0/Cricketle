@@ -6,29 +6,38 @@
   <meta name="theme-color" content="#0b1220" />
   <meta name="description" content="Cricketle: guess the secret cricketer. Three puzzles a day in Easy and Hard, hints, a live timer and leaderboards." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://mr-zero0.github.io/Cricketle/" />
+  <meta property="og:url" content="https://cricketle.onrender.com/" />
   <meta property="og:title" content="Cricketle — Daily Cricket Guessing Game" />
   <meta property="og:description" content="Find the secret cricketer! 3 daily puzzles, hints, streaks, and badges." />
-  <meta property="og:image" content="https://mr-zero0.github.io/Cricketle/public/og-image.jpg" />
+  <meta property="og:image" content="https://cricketle.onrender.com/og-image.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="675" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Cricketle — Daily Cricket Guessing Game" />
   <meta name="twitter:description" content="Find the secret cricketer! 3 daily puzzles, hints, streaks, and badges." />
-  <meta name="twitter:image" content="https://mr-zero0.github.io/Cricketle/public/og-image.jpg" />
+  <meta name="twitter:image" content="https://cricketle.onrender.com/og-image.jpg" />
   <title>Cricketle</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2.2.4" />
+  <!-- Fonts load without blocking first paint: fetched early, applied by theme.js once ready. -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
+  <link rel="stylesheet" href="styles.css?v=2.4.0" />
+  <!-- Theme runs before first paint so day pages never flash the night tokens. -->
+  <script src="theme.js?v=2.4.0"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to the game</a>
   <canvas id="bg" aria-hidden="true"></canvas>
 
-  <svg hidden aria-hidden="true">
+  <svg class="sprite" aria-hidden="true" focusable="false">
     <defs>
-      <symbol id="i-ball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 5.5c3 3 3 10 0 13M17 5.5c-3 3-3 10 0 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.6 8l1.6.6M8.6 11l1.6.6M8.6 14l1.6.6M15.4 8l-1.6.6M15.4 11l-1.6.6M15.4 14l-1.6.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+      <symbol id="i-ball" viewBox="0 0 24 24"><radialGradient id="g-leather" cx="0.36" cy="0.32" r="0.75"><stop offset="0" stop-color="#ff8a78"/><stop offset="0.4" stop-color="#d92b28"/><stop offset="1" stop-color="#5e0d0d"/></radialGradient><circle cx="12" cy="12" r="10.6" fill="url(#g-leather)"/><path d="M9.2 1.9C5.3 7 5.3 17 9.2 22.1" fill="none" stroke="#6a1010" stroke-width="2.6" stroke-linecap="round"/><path d="M8.1 2.3C4.4 7.2 4.4 16.8 8.1 21.7M10.3 1.8C6.6 7 6.6 17 10.3 22.2" fill="none" stroke="#fff3df" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="1 1.1"/><ellipse cx="8.6" cy="7.4" rx="2.2" ry="3.2" transform="rotate(-25 8.6 7.4)" fill="#ffffff" opacity="0.28"/><circle cx="12" cy="12" r="10.6" fill="none" stroke="#000000" stroke-opacity="0.3" stroke-width="0.8"/></symbol>
+      <symbol id="i-ball-white" viewBox="0 0 24 24"><radialGradient id="g-white-ball" cx="0.36" cy="0.32" r="0.75"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#e2e8f0"/><stop offset="1" stop-color="#94a3b8"/></radialGradient><circle cx="12" cy="12" r="10.6" fill="url(#g-white-ball)"/><path d="M9.2 1.9C5.3 7 5.3 17 9.2 22.1" fill="none" stroke="#94a3b8" stroke-width="2.6" stroke-linecap="round"/><path d="M8.1 2.3C4.4 7.2 4.4 16.8 8.1 21.7M10.3 1.8C6.6 7 6.6 17 10.3 22.2" fill="none" stroke="#334155" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="1 1.1"/><circle cx="12" cy="12" r="10.6" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="0.8"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.6A8.5 8.5 0 0 1 9.4 4a8.5 8.5 0 1 0 10.6 10.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></symbol>
       <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
@@ -45,12 +54,13 @@
       <symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M15 8l4 4-4 4M19 12H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
       <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.3-5.2M19 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6L13 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><circle cx="15.5" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M14 7.2c1.8 2.4 1.8 7.2 0 9.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="1.2 1.2"/><path d="M2.5 9h6M1.5 12h7M2.5 15h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c-.5 2.5-3 5-4.5 7.5C6 12 5.5 14.5 7 17.5c1.2 2.4 3.3 3.5 5 3.5s3.8-1.1 5-3.5c1.5-3 1-5.5-.5-8C15 7 12.5 4.5 12 2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 12c-.5 1-1.5 2-1.5 3.2 0 1.5 1 2.3 1.5 2.3s1.5-.8 1.5-2.3c0-1.2-1-2.2-1.5-3.2Z" fill="currentColor"/></symbol>
-      <symbol id="i-medal" viewBox="0 0 24 24"><circle cx="12" cy="15" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.2 9.5 6 3h12l-2.2 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 12v3l2 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
-      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3s7 2.5 7 8c0 5-5 8.5-7 10-2-1.5-7-5-7-10 0-5.5 7-8 7-8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-      <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 8l4 6 5-8 5 8 4-6v10H3V8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-      <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-medal" viewBox="0 0 24 24"><circle cx="12" cy="15" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.2 9.5 6 3h12l-2.2 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.4 10.2c-1.9 2.6-1.9 7 0 9.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="1.2 1.2"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M5 12.5a7 7 0 0 1 14 0V14H5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 14h17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.5 14v3.5M10.5 14v5.5M13.5 14v5.5M17.5 14v3.5M6.5 17.5h11M10.5 19.5h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+      <symbol id="i-pads" viewBox="0 0 24 24"><rect x="4" y="3" width="6.5" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="3" width="6.5" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 9h6.5M4 15h6.5M13.5 9h6.5M13.5 15h6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+      <symbol id="i-crown" viewBox="0 0 24 24"><path d="M5 14a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 14H21a1.5 1.5 0 0 1 0 3H6a2.5 2.5 0 0 1-2.5-2.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 7V4.8M12 7c-1.4 1.8-2 4-2 7M12 7c1.4 1.8 2 4 2 7" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5c-2.6 1.5-2.6 9.5 0 11M12 3.5c2.6 1.5 2.6 9.5 0 11M6.5 9h11" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M12 14.5V18M8.5 21h7M9.5 18h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-bat" viewBox="0 0 24 24"><path d="M19.5 4.5l-2-2-4 4 2 2 4-4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 8.5L7 17l-3 3 3 0 8.5-8.5-2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-edit" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.81 13.47 3.81 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.03C9.36 7.03 9.09 7.09 8.87 7.33C8.65 7.57 8.02 8.16 8.02 9.36C8.02 10.56 8.9 11.71 9.02 11.87C9.14 12.04 10.74 14.51 13.2 15.57C13.78 15.82 14.24 15.98 14.6 16.09C15.19 16.28 15.72 16.25 16.14 16.19C16.61 16.12 17.59 15.6 17.79 15.03C18 14.47 18 13.99 17.93 13.88C17.86 13.78 17.7 13.72 17.45 13.6C17.21 13.48 16.01 12.89 15.79 12.81C15.57 12.73 15.4 12.69 15.24 12.93C15.08 13.17 14.6 13.72 14.46 13.88C14.32 14.04 14.17 14.06 13.93 13.94C13.69 13.82 12.9 13.56 11.97 12.73C11.24 12.08 10.75 11.28 10.61 11.04C10.47 10.8 10.59 10.67 10.71 10.55C10.82 10.44 10.96 10.26 11.08 10.12C11.2 9.98 11.24 9.88 11.32 9.72C11.4 9.56 11.36 9.42 11.3 9.3C11.24 9.18 10.76 8 10.56 7.53C10.37 7.07 10.17 7.13 10.02 7.12C9.88 7.11 9.71 7.11 9.53 7.03Z"/></symbol>
@@ -72,9 +82,15 @@
       <a href="#profile" class="nav-link" data-view="profile" id="nav-profile"><svg aria-hidden="true"><use href="#i-user"/></svg><span id="nav-profile-label">Sign in</span></a>
       <a href="admin.html" target="_blank" class="nav-link admin-nav-link" id="nav-admin" style="display:none;color:#fbbf24;font-weight:700;"><svg aria-hidden="true" style="width:16px;height:16px;"><use href="#i-crown"/></svg><span>Admin</span></a>
     </nav>
-    <button id="help-btn" class="icon-btn" type="button" aria-label="How to play">
-      <svg aria-hidden="true"><use href="#i-help"/></svg>
-    </button>
+    <div class="topbar-actions">
+      <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch to day">
+        <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+        <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+      </button>
+      <button id="help-btn" class="icon-btn" type="button" aria-label="How to play">
+        <svg aria-hidden="true"><use href="#i-help"/></svg>
+      </button>
+    </div>
   </header>
 
   <main id="main" class="app" tabindex="-1">
@@ -86,8 +102,7 @@
       <div class="col-main">
         <div id="guest-banner" class="banner" hidden>
           <svg aria-hidden="true"><use href="#i-trophy"/></svg>
-          <p><strong>Playing as a guest.</strong> Progress is saved on this device only. Sign in to keep your streak and join the leaderboard.</p>
-          <a href="#profile" class="btn small">Sign in</a>
+          <p><strong>Playing as a guest</strong> · <a href="#profile">Sign in to be ranked</a></p>
         </div>
 
         <div class="segmented" role="group" aria-label="Difficulty">
@@ -150,6 +165,8 @@
 
         <section id="win" class="win card" hidden></section>
 
+        <section id="gate" class="gate card" aria-live="polite" hidden></section>
+
         <section id="empty" class="empty" hidden>
           <svg class="empty-icon" aria-hidden="true"><use href="#i-stumps"/></svg>
           <p>No guesses yet. Start with someone famous and follow the heat.</p>
@@ -198,12 +215,8 @@
 
       <div id="auth-card" class="card auth auth-card-clean" hidden>
         <div class="auth-clean-header">
-          <div class="pill-mobile-auth">
-            <svg class="icon-inline" aria-hidden="true" style="width:14px;height:14px;"><use href="#i-user"/></svg>
-            <span>Player Sign-In</span>
-          </div>
           <h3 class="auth-title">Welcome to Cricketle</h3>
-          <p class="muted small-text">Sign in with your Username and PIN to save progress and join leaderboards.</p>
+          <p class="muted small-text">Username or mobile number, plus your PIN. That's all.</p>
         </div>
 
         <div class="auth-tabs" role="tablist">
@@ -214,124 +227,66 @@
         <form id="auth-form" novalidate>
           <div id="auth-summary" class="error-summary" role="alert" tabindex="-1" hidden></div>
 
-          <!-- Tab 1: Returning Player Sign-In with Username & PIN -->
+          <!-- Sign in: one identifier field. Digits reveal the country picker. -->
           <div id="auth-view-signin">
             <div class="field">
-              <label for="signin-username">Username or Mobile Number</label>
-              <input id="signin-username" name="username" type="text" placeholder="e.g. aman or 8755428254" required autocomplete="username" />
+              <label for="signin-identifier">Username or mobile number</label>
+              <div class="phone-input-wrap">
+                <select id="signin-country" class="country-select" aria-label="Country code" hidden></select>
+                <input id="signin-identifier" name="identifier" type="text" placeholder="e.g. aman or 9876543210" autocomplete="username" aria-describedby="signin-identifier-error" />
+              </div>
+              <p id="signin-identifier-error" class="field-error" aria-live="polite"></p>
             </div>
 
             <div class="field">
-              <div class="flex-between">
-                <label for="signin-pin">6-Digit Secret PIN</label>
-                <button id="auth-to-reset-btn" type="button" class="link-btn">Forgot PIN?</button>
-              </div>
-              <input id="signin-pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="current-password" required />
+              <label for="signin-pin">PIN</label>
+              <input id="signin-pin" name="pin" type="password" inputmode="numeric" pattern="\d{4,8}" maxlength="8" placeholder="••••••" class="pin-input" autocomplete="current-password" aria-describedby="signin-pin-error" />
+              <p id="signin-pin-error" class="field-error" aria-live="polite"></p>
+              <p class="help-text">Forgot your PIN? Ask the Cricketle admin to reset it.</p>
             </div>
 
-            <button id="auth-signin-btn" class="btn primary big full-width" type="button">
-              <span>Sign In & Play</span>
-              <svg class="icon-inline" aria-hidden="true" style="width:16px;height:16px;"><use href="#i-arrow"/></svg>
-            </button>
+            <button id="auth-signin-btn" class="btn primary big full-width" type="submit">Sign in</button>
 
             <p class="auth-footer-prompt">
-              New to Cricketle? <button type="button" id="auth-switch-to-register" class="link-btn">Create an account</button>
+              New here? <button type="button" id="auth-switch-to-register" class="link-btn">Create an account</button>
             </p>
           </div>
 
-          <!-- Tab 2: New Player Registration (Unique Username + Phone + PIN) -->
+          <!-- Create account: unique username + phone + 6-digit PIN. -->
           <div id="auth-view-register" hidden>
             <div class="field">
-              <label for="register-username">Choose Unique Username</label>
-              <input id="register-username" name="username" type="text" maxlength="20" placeholder="e.g. cricket_champ" required autocomplete="username" />
-              <p class="help-text">3-20 letters or numbers. Permanently unique on leaderboards.</p>
+              <label for="register-username">Username</label>
+              <input id="register-username" name="username" type="text" maxlength="20" placeholder="e.g. cricket_champ" autocomplete="username" aria-describedby="register-username-error" />
+              <p id="register-username-error" class="field-error" aria-live="polite"></p>
+              <p class="help-text">3-20 letters, numbers or underscores. Shown on the leaderboard.</p>
             </div>
 
             <div class="field">
-              <label for="register-phone">Mobile Phone Number</label>
+              <label for="register-phone">Mobile number</label>
               <div class="phone-input-wrap">
-                <select id="register-country-code" class="country-select" aria-label="Country Code">
-                  <option value="+91" selected>🇮🇳 +91</option>
-                  <option value="+44">🇬🇧 +44</option>
-                  <option value="+61">🇦🇺 +61</option>
-                  <option value="+1">🇺🇸 +1</option>
-                  <option value="+92">🇵🇰 +92</option>
-                  <option value="+880">🇧🇩 +880</option>
-                  <option value="+94">🇱🇰 +94</option>
-                  <option value="+27">🇿🇦 +27</option>
-                  <option value="+64">🇳🇿 +64</option>
-                  <option value="+971">🇦🇪 +971</option>
-                </select>
-                <input id="register-phone" name="phone" type="tel" autocomplete="tel" placeholder="Mobile number" required maxlength="15" />
+                <select id="register-country" class="country-select" aria-label="Country code"></select>
+                <input id="register-phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="10-digit mobile" maxlength="15" aria-describedby="register-phone-error" />
               </div>
-              <p class="help-text">Linked 1-to-1 to your account for PIN recovery. 100% Free.</p>
+              <p id="register-phone-error" class="field-error" aria-live="polite"></p>
+              <p class="help-text">Used to sign in and for an admin PIN reset. Never shown.</p>
             </div>
 
             <div class="field">
-              <label for="register-pin">Set 6-Digit PIN</label>
-              <input id="register-pin" name="newPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" required />
+              <label for="register-pin">6-digit PIN</label>
+              <input id="register-pin" name="newPin" type="password" inputmode="numeric" pattern="\d{6}" maxlength="6" placeholder="••••••" class="pin-input" autocomplete="new-password" aria-describedby="register-pin-error" />
+              <p id="register-pin-error" class="field-error" aria-live="polite"></p>
             </div>
 
             <div class="field">
-              <label for="register-pin-confirm">Confirm 6-Digit PIN</label>
-              <input id="register-pin-confirm" name="confirmPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" required />
+              <label for="register-pin-confirm">Confirm PIN</label>
+              <input id="register-pin-confirm" name="confirmPin" type="password" inputmode="numeric" pattern="\d{6}" maxlength="6" placeholder="••••••" class="pin-input" autocomplete="new-password" aria-describedby="register-pin-confirm-error" />
+              <p id="register-pin-confirm-error" class="field-error" aria-live="polite"></p>
             </div>
 
-            <button id="auth-register-btn" class="btn primary big full-width" type="button">
-              <span>Create Account & Play</span>
-              <svg class="icon-inline" aria-hidden="true" style="width:16px;height:16px;"><use href="#i-arrow"/></svg>
-            </button>
+            <button id="auth-register-btn" class="btn primary big full-width" type="submit">Create account</button>
 
             <p class="auth-footer-prompt">
-              Already have an account? <button type="button" id="auth-switch-to-signin" class="link-btn">Sign In</button>
-            </p>
-          </div>
-
-          <!-- View 3: Reset PIN via Registered Mobile Number -->
-          <div id="auth-view-reset" hidden>
-            <div class="user-greeting-banner">
-              <div class="user-greeting-icon">🔑</div>
-              <div class="user-greeting-meta">
-                <div class="user-greeting-name">Reset Secret PIN</div>
-                <div class="user-greeting-phone">Enter your registered mobile number</div>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="reset-phone">Registered Mobile Phone Number</label>
-              <div class="phone-input-wrap">
-                <select id="reset-country-code" class="country-select" aria-label="Country Code">
-                  <option value="+91" selected>🇮🇳 +91</option>
-                  <option value="+44">🇬🇧 +44</option>
-                  <option value="+61">🇦🇺 +61</option>
-                  <option value="+1">🇺🇸 +1</option>
-                  <option value="+92">🇵🇰 +92</option>
-                  <option value="+880">🇧🇩 +880</option>
-                  <option value="+94">🇱🇰 +94</option>
-                  <option value="+27">🇿🇦 +27</option>
-                  <option value="+64">🇳🇿 +64</option>
-                  <option value="+971">🇦🇪 +971</option>
-                </select>
-                <input id="reset-phone" name="phone" type="tel" autocomplete="tel" placeholder="Mobile number" required maxlength="15" />
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="reset-new-pin">Choose New 6-Digit PIN</label>
-              <input id="reset-new-pin" name="resetPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" required />
-            </div>
-
-            <div class="field">
-              <label for="reset-pin-confirm">Confirm New PIN</label>
-              <input id="reset-pin-confirm" name="resetConfirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="• • • • • •" class="otp-code-input" autocomplete="new-password" required />
-            </div>
-
-            <button id="auth-reset-btn" class="btn primary big full-width" type="button">
-              <span>Update PIN & Sign In</span>
-            </button>
-
-            <p class="auth-footer-prompt">
-              <button type="button" id="auth-reset-to-signin" class="link-btn">← Back to Sign In</button>
+              Already have an account? <button type="button" id="auth-switch-to-signin" class="link-btn">Sign in</button>
             </p>
           </div>
         </form>
@@ -356,27 +311,35 @@
 
   <div id="toasts" class="toasts" aria-live="polite" aria-atomic="false"></div>
 
-  <dialog id="help" aria-labelledby="help-title">
+  <dialog id="onboard" class="sheet onboard" aria-labelledby="onboard-title">
     <button class="dialog-close icon-btn" type="button" data-close aria-label="Close"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
-    <h2 id="help-title">How to play</h2>
-    <p>A secret cricketer is picked for each puzzle. Guess any cricketer and you get a <strong>rank</strong>: <strong>1</strong> is the answer, and the lower the number, the closer you are.</p>
-    <ul class="legend">
-      <li><span class="swatch hot"></span><span id="legend-hot"></span></li>
-      <li><span class="swatch warm"></span><span id="legend-warm"></span></li>
-      <li><span class="swatch cool"></span><span id="legend-cool"></span></li>
-      <li><span class="swatch cold"></span><span id="legend-cold"></span></li>
+    <div class="onboard-head">
+      <span class="onboard-ball" aria-hidden="true"><svg><use href="#i-ball"/></svg></span>
+      <h2 id="onboard-title">Cricketle</h2>
+      <p class="onboard-lede">Guess the secret cricketer. Every guess tells you how close you are.</p>
+    </div>
+    <ul class="onboard-rows">
+      <li><span class="onboard-icon"><svg aria-hidden="true"><use href="#i-stumps"/></svg></span><span>Rank 1 is the answer. Lower is closer.</span></li>
+      <li><span class="onboard-icon"><svg aria-hidden="true"><use href="#i-bulb"/></svg></span><span>3 hints per puzzle. Each costs 10 points.</span></li>
+      <li><span class="onboard-icon"><svg aria-hidden="true"><use href="#i-clock"/></svg></span><span>3 puzzles a day in each mode. The first is free.</span></li>
     </ul>
-    <p>Closeness comes from nation, role, batting hand, bowling style, era, IPL teams, ICC titles and career numbers.</p>
-    <h3>Modes</h3>
-    <p><strong>Easy</strong> picks from <strong id="pool-easy"></strong> well-known players and shows tags for what each guess shares with the answer. <strong>Hard</strong> uses all <strong id="pool-hard"></strong> players and shows only the rank.</p>
-    <h3>Three puzzles a day</h3>
-    <p>Each mode has <strong>three puzzles a day</strong>. They unlock one at a time, are the same for everyone who is signed in, and reset at midnight IST. A finished puzzle can be reviewed but not replayed.</p>
-    <h3>Hints and points</h3>
-    <p>Every puzzle has <strong>three hints</strong>: nation, then role, then era. Each costs 10 points.</p>
-    <p>A solve is worth <strong>100 points</strong>, minus 3 per guess after the first, 10 per hint and 1 per 20 seconds. Hard mode counts <strong>1.5×</strong>. Giving up scores 0.</p>
-    <h3>Leaderboards and ranks</h3>
-    <p>Sign in to appear on <strong>today's</strong> and the <strong>all-time</strong> leaderboard. All-time points also earn you a title: <span id="ladder"></span>.</p>
-    <form method="dialog"><button type="submit" class="btn primary">Got it</button></form>
+    <details id="onboard-scoring" class="onboard-details">
+      <summary>Scoring details</summary>
+      <ul class="legend">
+        <li><span class="swatch hot"></span><span id="legend-hot"></span></li>
+        <li><span class="swatch warm"></span><span id="legend-warm"></span></li>
+        <li><span class="swatch cool"></span><span id="legend-cool"></span></li>
+        <li><span class="swatch cold"></span><span id="legend-cold"></span></li>
+      </ul>
+      <p>Closeness comes from nation, role, batting hand, bowling style, era, IPL teams, ICC titles and career numbers.</p>
+      <p><strong>Easy</strong> picks from <strong id="pool-easy"></strong> well-known players and shows what each guess shares with the answer. <strong>Hard</strong> uses all <strong id="pool-hard"></strong> players and shows only the rank.</p>
+      <p>A solve is worth <strong>100 points</strong>, minus 3 per guess after the first, 10 per hint and 1 per 20 seconds. Hard mode counts <strong>1.5×</strong>. Giving up scores 0. Puzzles reset at midnight IST.</p>
+      <p>All-time points earn a title: <span id="ladder"></span>.</p>
+    </details>
+    <div class="onboard-actions">
+      <button id="onboard-play" class="btn primary big full-width" type="button">Play</button>
+      <a id="onboard-signin" href="#profile" class="link-btn">Sign in</a>
+    </div>
   </dialog>
 
   <dialog id="confirm" aria-labelledby="confirm-title">
@@ -388,9 +351,9 @@
     </form>
   </dialog>
 
-  <script src="players.js?v=2.2.4" charset="utf-8"></script>
-  <script src="game-core.js?v=2.2.4" charset="utf-8"></script>
-  <script src="bg.js?v=2.2.4" charset="utf-8"></script>
-  <script src="app.js?v=2.2.4" charset="utf-8"></script>
+  <script src="players.js?v=2.4.0" charset="utf-8" defer></script>
+  <script src="game-core.js?v=2.4.0" charset="utf-8" defer></script>
+  <script src="bg.js?v=2.4.0" charset="utf-8" defer></script>
+  <script src="app.js?v=2.4.0" charset="utf-8" defer></script>
 </body>
 </html>

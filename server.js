@@ -5,14 +5,19 @@
 //   PORT=8080 npm start
 //   CRICKETLE_DB=path.db   (default ./data/cricketle.db)
 //   CRICKETLE_SECRET=...   (default: generated once and stored in the database)
+//   ADMIN_KEY=...          (optional; the /admin portal is disabled when unset)
 
 const http = require("node:http");
 const fs = require("node:fs");
+const zlib = require("node:zlib");
 const path = require("node:path");
 const crypto = require("node:crypto");
 
 // Automatically load .env configuration if present
 function loadEnv() {
+  // Tests set CRICKETLE_SKIP_DOTENV so a developer's .env (often pointing at a
+  // real Supabase project) can never leak into a test server.
+  if (process.env.CRICKETLE_SKIP_DOTENV) return;
   const envPath = path.join(__dirname, ".env");
   if (fs.existsSync(envPath)) {
     try {
@@ -32,59 +37,13 @@ function loadEnv() {
 }
 loadEnv();
 
-// OTP.dev Real SMS API dispatch and verification
-async function sendOtpDev({ key, channel = "sms", sender = "OTP.dev", template = "", phone, code }) {
-  const digits = String(phone).replace(/\D/g, "");
-  const payload = {
-    data: {
-      channel: channel || "sms",
-      sender: sender || "OTP.dev",
-      phone: digits,
-      code: String(code),
-      code_length: String(code).length,
-    },
-  };
-  if (template) payload.data.template = template;
-
-  const res = await fetch("https://api.otp.dev/v1/verifications", {
-    method: "POST",
-    headers: {
-      "X-OTP-Key": key,
-      "accept": "application/json",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-
-  const text = await res.text();
-  let json = null;
-  try { json = JSON.parse(text); } catch (_) {}
-  return { ok: res.ok, status: res.status, json, text };
-}
-
-async function verifyOtpDev({ key, phone, code }) {
-  const digits = String(phone).replace(/\D/g, "");
-  const url = `https://api.otp.dev/v1/verifications?code=${encodeURIComponent(code)}&phone=${encodeURIComponent(digits)}`;
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      "X-OTP-Key": key,
-      "accept": "application/json",
-    },
-  });
-  const text = await res.text();
-  let json = null;
-  try { json = JSON.parse(text); } catch (_) {}
-  const valid = res.ok && json && Array.isArray(json.data) && json.data.length > 0;
-  return { ok: res.ok, valid, json };
-}
-
 const core = require("./public/game-core.js");
 const { Db } = require("./lib/db.js");
 const { SupabaseDb } = require("./lib/supabase-db.js");
 const auth = require("./lib/auth.js");
 const { GameService } = require("./lib/game.js");
 const { createLogger } = require("./lib/logger.js");
+const { toE164 } = require("./lib/phone.js");
 
 const COOKIE = "cricketle_sid";
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
@@ -113,9 +72,11 @@ const MESSAGES = {
   unknown_player: "Pick a player from the list.",
   already_guessed: "You already guessed that player.",
   no_hints_left: "No hints left for this puzzle.",
+  sign_in_required: "Sign up or sign in to play the next puzzle.",
   bad_mode: "Unknown mode.",
   bad_index: "Unknown puzzle.",
   bad_state: "Bad request.",
+  pin_locked: "Too many wrong PINs. Try again in 15 minutes.",
 };
 
 class HttpError extends Error {
@@ -160,6 +121,7 @@ function createApp(opts = {}) {
 
   // CRICKETLE_SECRET=public uses the public seed (same answers as guests); only for local testing.
   const envSecret = process.env.CRICKETLE_SECRET;
+  let secretReady = Promise.resolve();
   let secret = "";
   if (opts.secret !== undefined) {
     secret = opts.secret;
@@ -168,53 +130,122 @@ function createApp(opts = {}) {
   } else if (envSecret) {
     secret = envSecret;
   } else if (typeof db.getOrCreateSecret === "function") {
+    // Supabase resolves the secret asynchronously. `ready` rejects if it cannot
+    // be loaded so the process refuses to serve accounts on the public seed.
     try {
       const res = db.getOrCreateSecret();
       if (typeof res === "string") secret = res;
       else if (res && typeof res.then === "function") {
-        res.then((s) => { if (s && game) game.secret = s; }).catch(() => {});
+        secretReady = res.then((s) => {
+          if (!s) throw new Error("empty answer secret");
+          if (game) game.secret = s;
+        });
+        secretReady.catch(() => {}); // surfaced through app.ready, not as an unhandled rejection
       }
-    } catch (_) {}
+    } catch (err) {
+      secretReady = Promise.reject(err);
+      secretReady.catch(() => {});
+    }
   }
 
   const game = new GameService(db, { now, secret });
   const publicDir = opts.publicDir || PUBLIC_DIR;
   const limiter = opts.rateLimit === false ? null : new Map();
+  // Keys tracked per in-memory counter map before expired entries are pruned.
+  const MAX_TRACKED = opts.maxTrackedKeys || 5000;
 
-  const otpDevKey = opts.otpDevKey || process.env.OTP_DEV_KEY || process.env.OTP_DEV_API_KEY || "";
-  const otpDevChannel = opts.otpDevChannel || process.env.OTP_DEV_CHANNEL || "sms";
-  const otpDevSender = opts.otpDevSender || process.env.OTP_DEV_SENDER || "OTP.dev";
-  const otpDevTemplate = opts.otpDevTemplate || process.env.OTP_DEV_TEMPLATE || "";
+  // Proxy headers (x-forwarded-for / -proto) are attacker-controlled unless a
+  // trusted proxy in front of us sets them. Render does: TRUST_PROXY=1 there.
+  const trustProxy = opts.trustProxy !== undefined
+    ? Boolean(opts.trustProxy)
+    : /^(1|true|yes)$/i.test(String(process.env.TRUST_PROXY || ""));
 
-  const firebaseApiKey = opts.firebaseApiKey !== undefined ? opts.firebaseApiKey : (process.env.FIREBASE_API_KEY || "");
-  const firebaseProjectId = opts.firebaseProjectId !== undefined ? opts.firebaseProjectId : (process.env.FIREBASE_PROJECT_ID || "");
-  const firebaseAuthDomain = opts.firebaseAuthDomain !== undefined ? opts.firebaseAuthDomain : (process.env.FIREBASE_AUTH_DOMAIN || (firebaseProjectId ? `${firebaseProjectId}.firebaseapp.com` : ""));
-  const firebaseAppId = opts.firebaseAppId !== undefined ? opts.firebaseAppId : (process.env.FIREBASE_APP_ID || "");
+  function clientIp(req) {
+    if (trustProxy) {
+      const xff = String(req.headers["x-forwarded-for"] || "").split(",").map((x) => x.trim()).filter(Boolean);
+      if (xff.length) return xff[xff.length - 1]; // the hop our proxy appended
+    }
+    return req.socket.remoteAddress || "?";
+  }
 
-  const adminKey = opts.adminKey || process.env.ADMIN_KEY || "cricketle_admin_2026";
+  // Drops expired entries from a {key -> {hits, windowMs}} map. Never wipes
+  // live state: a flood of fresh keys must not reset anyone else's counter.
+  function prune(map, t) {
+    for (const [k, v] of map) {
+      if (!v.hits.length || t - v.hits[v.hits.length - 1] >= v.windowMs) map.delete(k);
+    }
+  }
+
+  // Wrong-PIN protection per identifier (not per IP, so it also works behind a
+  // shared NAT). Always on; `rateLimit: false` only disables the IP limiter.
+  const PIN_MAX_FAILURES = 10;
+  const PIN_WINDOW_MS = 15 * 60 * 1000;
+  const pinFailures = new Map();
+  // Keyed by account id when the identifier resolves (username and phone share
+  // one budget), by the lower-cased identifier otherwise.
+  function pinKey(row, identifier) { return row ? "u:" + row.id : "i:" + String(identifier).toLowerCase(); }
+  function pinLocked(key) {
+    const t = now();
+    const entry = pinFailures.get(key);
+    if (!entry) return false;
+    entry.hits = entry.hits.filter((x) => t - x < PIN_WINDOW_MS);
+    return entry.hits.length >= PIN_MAX_FAILURES;
+  }
+  function recordPinFailure(key) {
+    const t = now();
+    const entry = pinFailures.get(key) || { hits: [], windowMs: PIN_WINDOW_MS };
+    entry.hits.push(t);
+    pinFailures.set(key, entry);
+    if (pinFailures.size > MAX_TRACKED) prune(pinFailures, t);
+  }
+  function clearPinFailures(key) { pinFailures.delete(key); }
+  // Verified against when no account matches, so a miss costs the same time as a hit.
+  const DUMMY_HASH = auth.hashPassword("000000");
+
+  // Accounts whose PIN is not 6 digits are nudged towards an admin reset. The
+  // server only learns the length at sign-in, so the flag lives in memory per
+  // session token and is never stored.
+  const pinNeedsUpdateBySession = new Map();
+
+  // Admin access is opt-in: with no ADMIN_KEY configured there is no admin at all.
+  const adminKey = opts.adminKey !== undefined ? String(opts.adminKey) : String(process.env.ADMIN_KEY || "");
   const adminPhone = opts.adminPhone ? normalizePhone(opts.adminPhone) : (process.env.ADMIN_PHONE ? normalizePhone(process.env.ADMIN_PHONE) : "");
 
   // ---------- helpers ----------
 
-  function normalizePhone(rawPhone) {
-    if (typeof rawPhone !== "string") return "";
-    let phone = rawPhone.replace(/[\s\-\(\)]/g, "");
-    if (phone.startsWith("00")) phone = "+" + phone.slice(2);
-    else if (phone.startsWith("0") && /^[6-9]\d{9}$/.test(phone.slice(1))) phone = "+91" + phone.slice(1);
-    else if (/^[6-9]\d{9}$/.test(phone)) phone = "+91" + phone;
-    else if (/^91[6-9]\d{9}$/.test(phone)) phone = "+" + phone;
-    else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) phone = "+" + phone;
-    return /^\+[1-9]\d{8,14}$/.test(phone) ? phone : "";
-  }
+  // Requests must carry the country code: strict E.164 or nothing.
+  function normalizePhone(rawPhone) { return toE164(rawPhone); }
 
   function isAdmin(user, req) {
     if (user && (user.is_admin || user.isAdmin)) return true;
     if (adminPhone && user && user.phone === adminPhone) return true;
+    if (!adminKey) return false;
     const h = req && req.headers && req.headers["x-admin-key"];
-    if (h && h === adminKey) return true;
+    if (h && safeEqual(h, adminKey)) return true;
     const c = req && cookies(req)["cricketle_admin"];
-    if (c && c === auth.hashToken(adminKey)) return true;
+    if (c && adminSessionValid(c)) return true;
     return false;
+  }
+
+  // Admin console sessions: random tokens, stored hashed in memory with an
+  // expiry, revoked on logout. A server restart signs admins out, which is fine.
+  const ADMIN_SESSION_TTL_MS = 7 * 24 * 3600 * 1000;
+  const adminSessions = new Map(); // tokenHash -> expiresAt
+  function adminSessionValid(token) {
+    const exp = adminSessions.get(auth.hashToken(token));
+    if (!exp) return false;
+    if (exp <= now()) { adminSessions.delete(auth.hashToken(token)); return false; }
+    return true;
+  }
+  function adminCookie(req, token, maxAgeSec) {
+    const parts = ["cricketle_admin=" + token, "Path=/", "HttpOnly", "SameSite=Lax", "Max-Age=" + maxAgeSec];
+    if (isSecure(req)) parts.push("Secure");
+    return parts.join("; ");
+  }
+  function safeEqual(a, b) {
+    const ha = crypto.createHash("sha256").update(String(a)).digest();
+    const hb = crypto.createHash("sha256").update(String(b)).digest();
+    return crypto.timingSafeEqual(ha, hb);
   }
 
   function requireAdmin(req, user) {
@@ -236,7 +267,8 @@ function createApp(opts = {}) {
 
   function fail(res, status, code, message) {
     res._failError = { status, code, message: message || MESSAGES[code] || code };
-    send(res, status, { error: code, message: message || MESSAGES[code] || code });
+    const requestId = res.req && res.req.id;
+    send(res, status, { error: code, message: message || MESSAGES[code] || code, requestId });
   }
 
   function cookies(req) {
@@ -249,7 +281,8 @@ function createApp(opts = {}) {
   }
 
   function isSecure(req) {
-    return Boolean(req.socket.encrypted) || String(req.headers["x-forwarded-proto"] || "").startsWith("https");
+    if (req.socket.encrypted) return true;
+    return trustProxy && String(req.headers["x-forwarded-proto"] || "").split(",")[0].trim() === "https";
   }
 
   function sessionCookie(req, token, maxAge) {
@@ -283,7 +316,14 @@ function createApp(opts = {}) {
   async function requireUser(req) {
     const user = await currentUser(req);
     if (!user) throw new HttpError(401, "unauthorized", "Sign in to play for the leaderboard.");
+    if (!user.id) throw new HttpError(403, "admin_not_player", "The admin key is not a player account. Sign in as a player.");
     return user;
+  }
+
+  // Query limits: a positive integer up to `max`, else the default.
+  function clampLimit(raw, max, dflt) {
+    const n = Math.trunc(Number(raw));
+    return Number.isFinite(n) && n >= 1 ? Math.min(n, max) : dflt;
   }
 
   function readJson(req) {
@@ -318,12 +358,15 @@ function createApp(opts = {}) {
   }
 
   // Sliding-window limiter per IP and bucket.
-  function rateLimit(req, bucket, max, windowMs) {
-    if (!limiter) return;
-    const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "?").split(",")[0].trim();
+  // With { defer: true } the hit is not recorded; the returned function spends
+  // it (used by sign-up so rejected attempts do not burn the budget).
+  function rateLimit(req, bucket, max, windowMs, options) {
+    if (!limiter) return () => {};
+    const ip = clientIp(req);
     const key = bucket + "|" + ip;
     const t = now();
-    const hits = (limiter.get(key) || []).filter((x) => t - x < windowMs);
+    const entry = limiter.get(key) || { hits: [], windowMs };
+    const hits = entry.hits.filter((x) => t - x < windowMs);
     if (hits.length >= max) {
       logger.warn("SECURITY", `Rate limit exceeded for bucket "${bucket}" by IP ${ip} (${hits.length}/${max} in ${windowMs / 1000}s)`, {
         bucket,
@@ -332,9 +375,14 @@ function createApp(opts = {}) {
       });
       throw new HttpError(429, "rate_limited", "Too many requests. Try again in a few minutes.");
     }
-    hits.push(t);
-    limiter.set(key, hits);
-    if (limiter.size > 5000) limiter.clear();
+    const spend = () => {
+      hits.push(now());
+      limiter.set(key, { hits, windowMs });
+      if (limiter.size > MAX_TRACKED) prune(limiter, now());
+    };
+    if (options && options.defer) return spend;
+    spend();
+    return () => {};
   }
 
   function engineResult(res, req, r, extra) {
@@ -358,63 +406,41 @@ function createApp(opts = {}) {
       return send(res, 200, { ok: true, day: core.todayKey(now()), now: now(), puzzlesPerDay: core.PUZZLES_PER_DAY });
     }
 
-    if (key === "POST /api/auth/register") {
-      rateLimit(req, "auth", 20, 15 * 60 * 1000);
-      const body = await readJson(req);
-      const username = typeof body.username === "string" ? body.username.trim() : "";
-      if (!auth.validUsername(username)) return fail(res, 400, "invalid_username", "Usernames are 3-20 letters, numbers or underscores.");
-      if (!auth.validPassword(body.password)) return fail(res, 400, "invalid_password", "Passwords need at least 6 characters.");
-      const displayName = typeof body.displayName === "string" && body.displayName.trim() ? body.displayName.trim().slice(0, 30) : username;
-      const avatar = typeof body.avatar === "string" ? body.avatar.trim().slice(0, 50) : "batter";
-
-      let user;
-      try {
-        user = await db.createUser(username, auth.hashPassword(body.password), now(), { displayName, avatar });
-      } catch (err) {
-        if (err.code === "username_taken") {
-          logger.authWarn("register_conflict", `Registration rejected: username "${username}" is taken`, { username });
-          return fail(res, 409, "username_taken", "That username is taken.");
-        }
-        throw err;
-      }
-      const token = auth.newToken();
-      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      logger.auth("register_success", `New user registered @${user.username}`, { username: user.username, id: user.id });
-      return send(res, 201, {
-        user: {
-          id: user.id,
-          username: user.username,
-          displayName: user.displayName || user.username,
-          avatar: user.avatar || "batter",
-          bio: user.bio || "",
-          favTeam: user.favTeam || "",
-          favPlayer: user.favPlayer || "",
-          googleConnected: false,
-          createdAt: user.createdAt,
-        },
-      }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
-    }
-
     if (key === "POST /api/auth/login") {
       rateLimit(req, "auth", 20, 15 * 60 * 1000);
       const body = await readJson(req);
-      const identifier = typeof body.username === "string" ? body.username.trim() : (typeof body.identifier === "string" ? body.identifier.trim() : "");
-      const pin = String(body.pin !== undefined ? body.pin : (body.password !== undefined ? body.password : "")).trim();
+      const rawId = typeof body.identifier === "string" ? body.identifier : (typeof body.username === "string" ? body.username : "");
+      const identifier = rawId.trim();
+      const pin = String(body.pin !== undefined ? body.pin : "").trim();
       if (!identifier || !pin) {
-        logger.authWarn("login_bad_input", "Sign in rejected: missing username or PIN");
+        logger.authWarn("login_bad_input", "Sign in rejected: missing identifier or PIN");
         return fail(res, 400, "missing_fields", "Please enter both username and PIN.");
       }
-      let row = await db.userByName(identifier);
+      // Exact username, else exact E.164 phone. Nothing is guessed.
+      let row = auth.validUsername(identifier) ? await db.userByName(identifier) : null;
       if (!row) {
-        const norm = normalizePhone(identifier);
-        if (norm) row = await db.userByPhone(norm);
+        const e164 = normalizePhone(identifier);
+        if (e164) row = await db.userByPhone(e164);
       }
-      if (!row || !row.pass_hash || !auth.verifyPassword(pin, row.pass_hash)) {
-        logger.authWarn("login_failed", `Incorrect username or PIN attempt for "${identifier}"`, { identifier });
+      const lockKey = pinKey(row, identifier);
+      if (pinLocked(lockKey)) {
+        logger.authWarn("login_locked", "PIN locked after repeated failures", { identifier });
+        return fail(res, 429, "pin_locked");
+      }
+      // A miss still runs scrypt so timing does not reveal whether the account exists.
+      const ok = auth.verifyPassword(pin, row && row.pass_hash ? row.pass_hash : DUMMY_HASH) && Boolean(row && row.pass_hash);
+      if (!ok) {
+        recordPinFailure(lockKey);
+        logger.authWarn("login_failed", "Incorrect username or PIN", { identifier, known: Boolean(row) });
         return fail(res, 401, "bad_credentials", "Incorrect username or PIN.");
       }
+      clearPinFailures(lockKey);
       const token = auth.newToken();
-      await db.createSession(auth.hashToken(token), row.id, now(), SESSION_TTL_MS);
+      const tokenHash = auth.hashToken(token);
+      await db.createSession(tokenHash, row.id, now(), SESSION_TTL_MS);
+      const pinNeedsUpdate = pin.length !== 6;
+      if (pinNeedsUpdate) pinNeedsUpdateBySession.set(tokenHash, true);
+      if (pinNeedsUpdateBySession.size > 5000) pinNeedsUpdateBySession.clear();
       logger.auth("login_success", `Player @${row.username} signed in successfully`, { username: row.username, id: row.id });
       return send(res, 200, {
         ok: true,
@@ -422,132 +448,29 @@ function createApp(opts = {}) {
           id: row.id,
           username: row.username,
           displayName: row.display_name || row.username,
-          avatar: row.avatar || "batter",
+          avatar: core.normalizeAvatarId(row.avatar),
           bio: row.bio || "",
           favTeam: row.fav_team || "",
           favPlayer: row.fav_player || "",
           phone: row.phone || null,
           phoneConnected: Boolean(row.phone),
-          googleConnected: Boolean(row.google_id),
           isAdmin: isAdmin(row, req),
+          pinNeedsUpdate,
           createdAt: row.created_at,
         },
       }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
     }
 
-    if (key === "POST /api/auth/google") {
-      rateLimit(req, "auth", 30, 15 * 60 * 1000);
-      const body = await readJson(req);
-      let googleId = "";
-      let email = "";
-      let name = "";
-      let picture = "";
-
-      if (body.credential && typeof body.credential === "string") {
-        try {
-          const parts = body.credential.split(".");
-          if (parts.length === 3) {
-            const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
-            googleId = payload.sub || "";
-            email = payload.email || "";
-            name = payload.name || payload.given_name || "";
-            picture = payload.picture || "";
-          }
-        } catch (_) {
-          return fail(res, 400, "invalid_google_token", "Invalid Google credentials.");
-        }
-      } else if (body.sub && typeof body.sub === "string") {
-        googleId = body.sub;
-        email = body.email || "";
-        name = body.name || "";
-        picture = body.picture || "";
-      }
-
-      if (!googleId) {
-        return fail(res, 400, "missing_google_id", "Google account information was not received.");
-      }
-
-      let user = await db.userByGoogleId(googleId);
-      if (!user && email) {
-        user = await db.userByEmail(email);
-        if (user) {
-          user = await db.linkGoogle(user.id, googleId, email, picture);
-        }
-      }
-
-      if (!user) {
-        let baseUsername = (name || email.split("@")[0] || "Cricketer")
-          .replace(/[^A-Za-z0-9_]/g, "_")
-          .slice(0, 15);
-        if (baseUsername.length < 3) baseUsername = "Player_" + baseUsername;
-
-        let username = baseUsername;
-        let suffix = 1;
-        while ((await db.userByName(username)) && suffix < 1000) {
-          username = (baseUsername.slice(0, 14) + "_" + suffix).slice(0, 20);
-          suffix++;
-        }
-
-        user = await db.createUser(username, null, now(), {
-          displayName: name || username,
-          email,
-          googleId,
-          avatar: "captain",
-          bio: "Cricket enthusiast · Signed in with Google",
-        });
-      }
-
-      const token = auth.newToken();
-      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      logger.auth("google_signin_success", `Google sign-in for @${user.username}`, { user: user.username, email });
-      return send(
-        res,
-        200,
-        {
-          user: {
-            id: user.id,
-            username: user.username,
-            displayName: user.display_name || user.displayName || user.username,
-            email: user.email,
-            avatar: user.avatar || "captain",
-            bio: user.bio || "",
-            favTeam: user.fav_team || user.favTeam || "",
-            favPlayer: user.fav_player || user.favPlayer || "",
-            googleConnected: true,
-            createdAt: user.created_at || user.createdAt,
-          },
-        },
-        { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) }
-      );
-    }
-
-    if (key === "POST /api/auth/phone/check") {
-      rateLimit(req, "auth", 40, 10 * 60 * 1000);
-      const body = await readJson(req);
-      const phone = normalizePhone(body.phone);
-      if (!phone || !/^\+[1-9]\d{9,14}$/.test(phone)) {
-        return fail(res, 400, "invalid_phone", "Please enter a valid mobile number with country code (e.g. +91 98765 43210).");
-      }
-      const user = await db.userByPhone(phone);
-      return send(res, 200, {
-        ok: true,
-        phone,
-        exists: Boolean(user),
-        username: user ? user.username : null,
-        displayName: user ? (user.display_name || user.username) : null,
-      });
-    }
-
     if (key === "POST /api/auth/phone/register") {
-      rateLimit(req, "auth", 20, 15 * 60 * 1000);
+      const spendSignup = rateLimit(req, "signup", 5, 60 * 60 * 1000, { defer: true });
       const body = await readJson(req);
       const phone = normalizePhone(body.phone);
       if (!phone || !/^\+[1-9]\d{9,14}$/.test(phone)) {
         return fail(res, 400, "invalid_phone", "Please enter a valid mobile number with country code.");
       }
       const pin = String(body.pin || "").trim();
-      if (!/^\d{4,8}$/.test(pin)) {
-        return fail(res, 400, "invalid_pin", "PIN must be 4 to 8 numbers.");
+      if (!/^\d{6}$/.test(pin)) {
+        return fail(res, 400, "invalid_pin", "PIN must be exactly 6 digits.");
       }
       if (await db.userByPhone(phone)) {
         logger.authWarn("phone_register_conflict", `Registration rejected: mobile number already registered`, { phone });
@@ -603,6 +526,7 @@ function createApp(opts = {}) {
       const token = auth.newToken();
       await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
       logger.auth("phone_register_success", `New player registered via phone @${user.username}`, { user: user.username, phone, id: user.id });
+      spendSignup();
       return send(res, 201, {
         ok: true,
         user: {
@@ -610,7 +534,7 @@ function createApp(opts = {}) {
           username: user.username,
           displayName: user.displayName || user.username,
           phone: user.phone || phone,
-          avatar: user.avatar || "allrounder",
+          avatar: core.normalizeAvatarId(user.avatar),
           bio: user.bio || "",
           favTeam: user.favTeam || "",
           favPlayer: user.favPlayer || "",
@@ -619,321 +543,6 @@ function createApp(opts = {}) {
           createdAt: user.createdAt,
         },
       }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
-    }
-
-    if (key === "POST /api/auth/phone/login") {
-      rateLimit(req, "auth", 20, 15 * 60 * 1000);
-      const body = await readJson(req);
-      const phone = normalizePhone(body.phone);
-      if (!phone) {
-        return fail(res, 400, "invalid_phone", "Please enter a valid mobile number.");
-      }
-      const pin = String(body.pin || "").trim();
-      const user = await db.userByPhone(phone);
-      if (!user || !user.pass_hash || !auth.verifyPassword(pin, user.pass_hash)) {
-        logger.authWarn("phone_login_failed", `Incorrect PIN attempt for mobile`, { phone });
-        return fail(res, 401, "bad_pin", "Incorrect PIN for this mobile number. Try again or reset your PIN.");
-      }
-
-      const token = auth.newToken();
-      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      logger.auth("phone_login_success", `Player @${user.username} signed in via phone`, { user: user.username, phone, id: user.id });
-      return send(res, 200, {
-        ok: true,
-        user: {
-          id: user.id,
-          username: user.username,
-          displayName: user.display_name || user.username,
-          email: user.email || null,
-          phone: user.phone || phone,
-          avatar: user.avatar || "allrounder",
-          bio: user.bio || "",
-          favTeam: user.fav_team || "",
-          favPlayer: user.fav_player || "",
-          googleConnected: Boolean(user.google_id),
-          phoneConnected: true,
-          createdAt: user.created_at,
-        },
-      }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
-    }
-
-    if (key === "POST /api/auth/phone/reset") {
-      rateLimit(req, "auth", 10, 15 * 60 * 1000);
-      const body = await readJson(req);
-      const phone = normalizePhone(body.phone);
-      if (!phone) {
-        return fail(res, 400, "invalid_phone", "Please enter a valid mobile number.");
-      }
-      const newPin = String(body.newPin || "").trim();
-      if (!/^\d{4,8}$/.test(newPin)) {
-        return fail(res, 400, "invalid_pin", "New PIN must be 4 to 8 numbers.");
-      }
-      const user = await db.userByPhone(phone);
-      if (!user) {
-        logger.authWarn("phone_reset_failed", `PIN reset requested for non-existent phone`, { phone });
-        return fail(res, 404, "not_found", "No account found with this phone number.");
-      }
-
-      await db.updatePassword(user.id, auth.hashPassword(newPin));
-      const token = auth.newToken();
-      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      logger.auth("phone_pin_reset", `Secret PIN reset for user @${user.username}`, { user: user.username, phone, id: user.id });
-      return send(res, 200, {
-        ok: true,
-        user: {
-          id: user.id,
-          username: user.username,
-          displayName: user.display_name || user.username,
-          email: user.email || null,
-          phone: user.phone || phone,
-          avatar: user.avatar || "allrounder",
-          bio: user.bio || "",
-          favTeam: user.fav_team || "",
-          favPlayer: user.fav_player || "",
-          googleConnected: Boolean(user.google_id),
-          phoneConnected: true,
-          createdAt: user.created_at,
-        },
-      }, { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) });
-    }
-
-    if (key === "POST /api/auth/otp/send") {
-      rateLimit(req, "otp_send", 20, 10 * 60 * 1000);
-      const body = await readJson(req);
-      const rawPhone = typeof body.phone === "string" ? body.phone.trim() : "";
-      let phone = rawPhone.replace(/[\s\-\(\)]/g, "");
-      if (!phone) {
-        return fail(res, 400, "missing_phone", "Please provide a valid mobile number.");
-      }
-      if (/^[6-9]\d{9}$/.test(phone)) {
-        phone = "+91" + phone;
-      } else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) {
-        phone = "+" + phone;
-      }
-      if (!/^\+[1-9]\d{9,14}$/.test(phone)) {
-        return fail(res, 400, "invalid_phone", "Please enter a valid mobile number with country code (e.g. +91 98765 43210).");
-      }
-
-      // Generate 6-digit cryptographically secure OTP
-      const code = String(crypto.randomInt(100000, 1000000));
-      const codeHash = crypto.createHash("sha256").update(phone + ":" + code).digest("hex");
-      const expiresAt = now() + 5 * 60 * 1000; // 5 minutes
-
-      await db.setOtp(phone, codeHash, expiresAt, now());
-      log("otp_sent", phone);
-
-      let realSms = false;
-      let gatewayMessage = null;
-
-      if (otpDevKey) {
-        try {
-          const otpRes = await sendOtpDev({
-            key: otpDevKey,
-            channel: otpDevChannel,
-            sender: otpDevSender,
-            template: otpDevTemplate,
-            phone,
-            code,
-          });
-          if (otpRes.ok) {
-            realSms = true;
-            log("otp_dev_sent", phone, otpRes.status);
-          } else {
-            log("otp_dev_error", phone, otpRes.status, otpRes.text);
-            gatewayMessage = (otpRes.json && (otpRes.json.message || otpRes.json.error)) || "OTP.dev delivery failed";
-          }
-        } catch (err) {
-          log("otp_dev_exception", err);
-          gatewayMessage = err.message || "Failed to reach OTP.dev";
-        }
-      }
-
-      return send(res, 200, {
-        ok: true,
-        phone,
-        realSms,
-        channel: otpDevChannel,
-        message: realSms
-          ? `Real SMS sent to ${phone} via OTP.dev!`
-          : (gatewayMessage ? `Gateway: ${gatewayMessage}. Test code provided below.` : "OTP code ready. (Set OTP_DEV_KEY in .env for real SMS delivery via OTP.dev)"),
-        devOtp: realSms ? undefined : code,
-        expiresAt,
-      });
-    }
-
-    if (key === "POST /api/auth/otp/verify") {
-      rateLimit(req, "otp_verify", 30, 10 * 60 * 1000);
-      const body = await readJson(req);
-      const rawPhone = typeof body.phone === "string" ? body.phone.trim() : "";
-      let phone = rawPhone.replace(/[\s\-\(\)]/g, "");
-      if (/^[6-9]\d{9}$/.test(phone)) phone = "+91" + phone;
-      else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) phone = "+" + phone;
-
-      const code = typeof body.code === "string" ? body.code.trim() : "";
-      if (!phone || !code) {
-        return fail(res, 400, "missing_fields", "Mobile number and 6-digit OTP code are required.");
-      }
-
-      const otpRecord = await db.getOtp(phone);
-      if (!otpRecord || otpRecord.expires_at < now()) {
-        if (otpRecord) await db.deleteOtp(phone);
-        return fail(res, 400, "otp_expired", "OTP has expired or was not requested. Please request a new OTP.");
-      }
-
-      if (otpRecord.attempts >= 5) {
-        await db.deleteOtp(phone);
-        return fail(res, 400, "otp_locked", "Too many incorrect attempts. Please request a fresh OTP.");
-      }
-
-      let isValid = false;
-      const expectedHash = crypto.createHash("sha256").update(phone + ":" + code).digest("hex");
-      if (expectedHash === otpRecord.code_hash) {
-        isValid = true;
-      }
-
-      // Also check OTP.dev remote verification if key is present
-      if (!isValid && otpDevKey) {
-        try {
-          const remoteCheck = await verifyOtpDev({ key: otpDevKey, phone, code });
-          if (remoteCheck.valid) isValid = true;
-        } catch (_) {}
-      }
-
-      if (!isValid) {
-        await db.incrementOtpAttempts(phone);
-        const remaining = 5 - (otpRecord.attempts + 1);
-        if (remaining <= 0) {
-          await db.deleteOtp(phone);
-          return fail(res, 400, "otp_locked", "Too many incorrect attempts. Please request a fresh OTP.");
-        }
-        return fail(res, 400, "invalid_otp", `Incorrect OTP code. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`);
-      }
-
-      // Valid OTP: delete it immediately so it cannot be reused
-      await db.deleteOtp(phone);
-
-      let user = await db.userByPhone(phone);
-      if (!user) {
-        const lastDigits = phone.slice(-4);
-        const baseUsername = "Player_" + lastDigits;
-        let username = baseUsername;
-        let suffix = 1;
-        while ((await db.userByName(username)) && suffix < 1000) {
-          username = "Player_" + lastDigits + "_" + suffix;
-          suffix++;
-        }
-
-        const displayName = (typeof body.displayName === "string" && body.displayName.trim())
-          ? body.displayName.trim().slice(0, 30)
-          : "Cricketer " + lastDigits;
-
-        user = await db.createUser(username, null, now(), {
-          displayName,
-          phone,
-          avatar: "allrounder",
-          bio: "Cricket fan playing on Cricketle",
-        });
-      }
-
-      const token = auth.newToken();
-      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      log("otp_login", user.username);
-      return send(
-        res,
-        200,
-        {
-          ok: true,
-          user: {
-            id: user.id,
-            username: user.username,
-            displayName: user.display_name || user.displayName || user.username,
-            email: user.email,
-            phone: user.phone || phone,
-            avatar: user.avatar || "allrounder",
-            bio: user.bio || "",
-            favTeam: user.fav_team || user.favTeam || "",
-            favPlayer: user.fav_player || user.favPlayer || "",
-            googleConnected: Boolean(user.google_id),
-            phoneConnected: true,
-            createdAt: user.created_at || user.createdAt,
-          },
-        },
-        { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) }
-      );
-    }
-
-    if (key === "GET /api/config/firebase") {
-      return send(res, 200, {
-        enabled: Boolean(firebaseApiKey && firebaseProjectId),
-        config: (firebaseApiKey && firebaseProjectId) ? {
-          apiKey: firebaseApiKey,
-          authDomain: firebaseAuthDomain,
-          projectId: firebaseProjectId,
-          appId: firebaseAppId,
-        } : null,
-      });
-    }
-
-    if (key === "POST /api/auth/firebase-phone") {
-      rateLimit(req, "firebase_phone", 30, 10 * 60 * 1000);
-      const body = await readJson(req);
-      const rawPhone = typeof body.phone === "string" ? body.phone.trim() : "";
-      let phone = rawPhone.replace(/[\s\-\(\)]/g, "");
-      if (/^[6-9]\d{9}$/.test(phone)) phone = "+91" + phone;
-      else if (!phone.startsWith("+") && /^\d{10,14}$/.test(phone)) phone = "+" + phone;
-
-      if (!phone || !/^\+[1-9]\d{9,14}$/.test(phone)) {
-        return fail(res, 400, "invalid_phone", "Valid phone number required.");
-      }
-
-      let user = await db.userByPhone(phone);
-      if (!user) {
-        const lastDigits = phone.slice(-4);
-        const baseUsername = "Player_" + lastDigits;
-        let username = baseUsername;
-        let suffix = 1;
-        while ((await db.userByName(username)) && suffix < 1000) {
-          username = "Player_" + lastDigits + "_" + suffix;
-          suffix++;
-        }
-
-        const displayName = (typeof body.displayName === "string" && body.displayName.trim())
-          ? body.displayName.trim().slice(0, 30)
-          : "Cricketer " + lastDigits;
-
-        user = await db.createUser(username, null, now(), {
-          displayName,
-          phone,
-          avatar: "allrounder",
-          bio: "Cricket fan playing on Cricketle",
-        });
-      }
-
-      const token = auth.newToken();
-      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
-      log("firebase_phone_login", user.username);
-      return send(
-        res,
-        200,
-        {
-          ok: true,
-          user: {
-            id: user.id,
-            username: user.username,
-            displayName: user.display_name || user.displayName || user.username,
-            email: user.email,
-            phone: user.phone || phone,
-            avatar: user.avatar || "allrounder",
-            bio: user.bio || "",
-            favTeam: user.fav_team || user.favTeam || "",
-            favPlayer: user.fav_player || user.favPlayer || "",
-            googleConnected: Boolean(user.google_id),
-            phoneConnected: true,
-            createdAt: user.created_at || user.createdAt,
-          },
-        },
-        { "set-cookie": sessionCookie(req, token, SESSION_TTL_MS / 1000) }
-      );
     }
 
     if (key === "POST /api/profile/update") {
@@ -957,7 +566,7 @@ function createApp(opts = {}) {
           username: updated.username,
           displayName: updated.display_name || updated.username,
           email: updated.email,
-          avatar: updated.avatar || "batter",
+          avatar: core.normalizeAvatarId(updated.avatar),
           bio: updated.bio || "",
           favTeam: updated.fav_team || "",
           favPlayer: updated.fav_player || "",
@@ -971,7 +580,7 @@ function createApp(opts = {}) {
     if (key === "POST /api/auth/logout") {
       await readJson(req);
       const token = cookies(req)[COOKIE];
-      if (token) await db.deleteSession(auth.hashToken(token));
+      if (token) { await db.deleteSession(auth.hashToken(token)); pinNeedsUpdateBySession.delete(auth.hashToken(token)); }
       return send(res, 204, null, { "set-cookie": sessionCookie(req, "", 0) });
     }
 
@@ -985,13 +594,14 @@ function createApp(opts = {}) {
           displayName: user.display_name || user.username,
           email: user.email || null,
           phone: user.phone || null,
-          avatar: user.avatar || "batter",
+          avatar: core.normalizeAvatarId(user.avatar),
           bio: user.bio || "",
           favTeam: user.fav_team || "",
           favPlayer: user.fav_player || "",
           googleConnected: Boolean(user.google_id),
           phoneConnected: Boolean(user.phone),
           isAdmin: Boolean(user.isAdmin),
+          pinNeedsUpdate: Boolean(pinNeedsUpdateBySession.get(auth.hashToken(cookies(req)[COOKIE] || ""))),
           createdAt: user.created_at,
         },
         stats: await game.stats(user.id),
@@ -1029,31 +639,33 @@ function createApp(opts = {}) {
           user: user.username,
           mode,
           idx: idx + 1,
-          guess: body.name,
           error: r.error,
+          requestId: req.id,
         });
+        logger.debug("GAME", `rejected guess text: "${body.name}"`, { requestId: req.id });
         return fail(res, 400, r.error);
       }
       const p = r.state.modes[mode].puzzles[idx];
       const extra = { rank: r.rank, solved: r.solved, guess: p.guesses[p.guesses.length - 1] };
       if (r.solved) {
         extra.answer = game.answerOf(r.state, mode, idx);
-        logger.game("puzzle_solved", `🏆 Player @${user.username} SOLVED ${mode} puzzle #${idx + 1} (${body.name}) in ${p.guesses.length} guesses! Score: ${p.score} pts`, {
+        logger.game("puzzle_solved", `🏆 Player @${user.username} SOLVED ${mode} puzzle #${idx + 1} in ${p.guesses.length} guesses! Score: ${p.points} pts`, {
           user: user.username,
           mode,
           idx: idx + 1,
-          player: body.name,
           guesses: p.guesses.length,
-          score: p.score,
+          score: p.points,
+          requestId: req.id,
         });
       } else {
-        logger.game("guess_made", `@${user.username} guessed "${body.name}" on ${mode} #${idx + 1} -> Rank ${r.rank} (${p.guesses.length}/10 guesses)`, {
+        logger.game("guess_made", `@${user.username} guessed on ${mode} #${idx + 1} -> Rank ${r.rank} (guess ${p.guesses.length})`, {
           user: user.username,
           mode,
           idx: idx + 1,
-          guess: body.name,
           rank: r.rank,
+          requestId: req.id,
         });
+        logger.debug("GAME", `guess text: "${body.name}" -> rank ${r.rank}`, { requestId: req.id });
       }
       return engineResult(res, req, r, extra);
     }
@@ -1094,12 +706,12 @@ function createApp(opts = {}) {
 
     if (key === "GET /api/leaderboard/today") {
       const user = await currentUser(req);
-      return send(res, 200, await game.leaderboardToday(user ? user.id : null, Number(query.get("limit")) || undefined));
+      return send(res, 200, await game.leaderboardToday(user ? user.id : null, clampLimit(query.get("limit"), 50, 50)));
     }
 
     if (key === "GET /api/leaderboard/alltime") {
       const user = await currentUser(req);
-      return send(res, 200, await game.leaderboardAllTime(user ? user.id : null, Number(query.get("limit")) || undefined));
+      return send(res, 200, await game.leaderboardAllTime(user ? user.id : null, clampLimit(query.get("limit"), 50, 50)));
     }
 
     // ---------- Admin Endpoints ----------
@@ -1108,19 +720,20 @@ function createApp(opts = {}) {
       rateLimit(req, "admin_auth", 15, 15 * 60 * 1000);
       const body = await readJson(req);
       const keyInput = String(body.key || body.password || body.pin || "").trim();
-      if (!keyInput || keyInput !== adminKey) {
+      if (!adminKey || !keyInput || !safeEqual(keyInput, adminKey)) {
         return fail(res, 401, "invalid_admin_key", "Incorrect admin password or key.");
       }
-      const adminCookieVal = auth.hashToken(adminKey);
-      return send(res, 200, { ok: true, admin: true }, {
-        "set-cookie": `cricketle_admin=${adminCookieVal}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 3600}`,
-      });
+      const token = auth.newToken();
+      adminSessions.set(auth.hashToken(token), now() + ADMIN_SESSION_TTL_MS);
+      if (adminSessions.size > 100) for (const [h, exp] of adminSessions) if (exp <= now()) adminSessions.delete(h);
+      return send(res, 200, { ok: true, admin: true }, { "set-cookie": adminCookie(req, token, ADMIN_SESSION_TTL_MS / 1000) });
     }
 
     if (key === "POST /api/admin/logout") {
-      return send(res, 200, { ok: true }, {
-        "set-cookie": "cricketle_admin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0",
-      });
+      await readJson(req); // same-origin JSON like every other mutation
+      const c = cookies(req)["cricketle_admin"];
+      if (c) adminSessions.delete(auth.hashToken(c));
+      return send(res, 200, { ok: true }, { "set-cookie": adminCookie(req, "", 0) });
     }
 
     if (key === "GET /api/admin/stats") {
@@ -1139,8 +752,8 @@ function createApp(opts = {}) {
     if (key === "GET /api/admin/users") {
       const user = await currentUser(req);
       requireAdmin(req, user);
-      const limit = Math.min(Number(query.get("limit")) || 50, 200);
-      const offset = Math.max(Number(query.get("offset")) || 0, 0);
+      const limit = clampLimit(query.get("limit"), 200, 50);
+      const offset = Math.max(Math.trunc(Number(query.get("offset"))) || 0, 0);
       const search = String(query.get("search") || "").trim();
       const result = await db.listUsers(limit, offset, search);
       return send(res, 200, {
@@ -1151,7 +764,7 @@ function createApp(opts = {}) {
           displayName: u.display_name || u.displayName || u.username,
           phone: u.phone || null,
           email: u.email || null,
-          avatar: u.avatar || "batter",
+          avatar: core.normalizeAvatarId(u.avatar),
           bio: u.bio || "",
           favTeam: u.fav_team || u.favTeam || "",
           isAdmin: Boolean(u.is_admin || u.isAdmin || (adminPhone && u.phone === adminPhone)),
@@ -1168,7 +781,7 @@ function createApp(opts = {}) {
       const userId = Number(body.userId);
       const newPin = String(body.newPin || "").trim();
       if (!userId) return fail(res, 400, "missing_user_id", "User ID is required.");
-      if (!/^\d{4,8}$/.test(newPin)) return fail(res, 400, "invalid_pin", "New PIN must be 4 to 8 numbers.");
+      if (!/^\d{6}$/.test(newPin)) return fail(res, 400, "invalid_pin", "New PIN must be exactly 6 digits.");
       const updated = await db.adminResetPin(userId, auth.hashPassword(newPin));
       if (!updated) return fail(res, 404, "user_not_found", "User not found.");
       log("admin_reset_pin", updated.username, userId);
@@ -1216,30 +829,38 @@ function createApp(opts = {}) {
       res.writeHead(304, { "cache-control": "no-cache" });
       return res.end();
     }
+    // Assets referenced with ?v= are immutable per version; pages revalidate.
+    const versioned = /[?&]v=/.test(req.url || "");
     const headers = {
       "content-type": type,
-      "content-length": stat.size,
-      "cache-control": "no-cache",
+      "cache-control": versioned ? "public, max-age=31536000, immutable" : "no-cache",
       "last-modified": stat.mtime.toUTCString(),
       "x-content-type-options": "nosniff",
       "referrer-policy": "same-origin",
+      "vary": "accept-encoding",
     };
     if (ext === ".html") {
       headers["content-security-policy"] = [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://www.gstatic.com https://*.firebaseio.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style",
+        "script-src 'self'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: https://lh3.googleusercontent.com https://*.googleusercontent.com https://www.gstatic.com",
-        "connect-src 'self' https://accounts.google.com/gsi/ https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
-        "frame-src https://accounts.google.com/gsi/ https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/ https://*.firebaseapp.com",
+        "img-src 'self' data:",
+        "connect-src 'self'",
         "frame-ancestors 'none'",
         "base-uri 'self'",
       ].join("; ");
     }
+    // Text assets are gzipped on the fly (no build step, no dependencies).
+    const compressible = /^(text\/|application\/(json|manifest)|image\/svg)/.test(type);
+    const gzip = compressible && stat.size > 1024 && /\bgzip\b/.test(String(req.headers["accept-encoding"] || ""));
+    if (gzip) headers["content-encoding"] = "gzip";
+    else headers["content-length"] = stat.size;
     res.writeHead(200, headers);
     if (req.method === "HEAD") return res.end();
-    fs.createReadStream(file).pipe(res);
+    const stream = fs.createReadStream(file);
+    if (gzip) stream.pipe(zlib.createGzip({ level: 6 })).pipe(res);
+    else stream.pipe(res);
   }
 
   // ---------- dispatch ----------
@@ -1248,11 +869,16 @@ function createApp(opts = {}) {
     const startTime = Date.now();
     const url = new URL(req.url, "http://" + (req.headers.host || "localhost"));
     const pathname = url.pathname;
-    const clientIp = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "127.0.0.1").split(",")[0].trim();
+    const reqIp = clientIp(req);
+
+    // One id per request: on the response, in error bodies and in every log line.
+    req.id = crypto.randomBytes(8).toString("hex");
+    res.setHeader("x-request-id", req.id);
+    if (isSecure(req)) res.setHeader("strict-transport-security", "max-age=31536000; includeSubDomains");
 
     res.on("finish", () => {
       const latencyMs = Date.now() - startTime;
-      const meta = { ip: clientIp };
+      const meta = { ip: reqIp, requestId: req.id };
       if (req._user && req._user.username) meta.user = `@${req._user.username}`;
       if (res._failError) meta.error = res._failError.code;
 
@@ -1288,6 +914,7 @@ function createApp(opts = {}) {
     db,
     game,
     logger,
+    ready: secretReady,
     close(cb) {
       server.close(() => {
         try { db.close(); } catch (_) { /* already closed */ }
@@ -1299,8 +926,17 @@ function createApp(opts = {}) {
 
 if (require.main === module) {
   const port = Number(process.env.PORT) || 3000;
-  const app = createApp();
-  app.server.listen(port, () => {
+  // CRICKETLE_RATE_LIMIT=off disables the per-IP limiter (the e2e suite signs up
+  // more accounts per hour from one address than a real visitor ever would).
+  // The wrong-PIN lock stays on regardless.
+  // The e2e switch never applies to a production-looking environment.
+  const production = Boolean(process.env.SUPABASE_URL) || process.env.NODE_ENV === "production";
+  const app = createApp(process.env.CRICKETLE_RATE_LIMIT === "off" && !production ? { rateLimit: false } : {});
+  app.ready.catch((err) => {
+    console.error("[SYSTEM] Could not load the answer secret; refusing to start on the public seed:", err && err.message);
+    process.exit(1);
+  });
+  app.ready.then(() => app.server.listen(port, () => {
     const isSupabase = Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY));
     const dbType = isSupabase ? "Supabase PostgreSQL" : "Local SQLite";
     const banner = [
@@ -1314,7 +950,7 @@ if (require.main === module) {
       "===========================================================",
     ].join("\n");
     console.log(banner);
-  });
+  }));
   const stop = () => app.close(() => {
     console.log("[SYSTEM] Cricketle server shut down cleanly.");
     process.exit(0);

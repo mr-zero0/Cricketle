@@ -189,37 +189,40 @@ SELECT * FROM ranked WHERE user_id = p_user_id;
 $$;
 
 -- 6. OTP Codes Table (Optional)
-CREATE TABLE IF NOT EXISTS otp_codes (
-  phone TEXT PRIMARY KEY,
-  code_hash TEXT NOT NULL,
-  expires_at BIGINT NOT NULL,
-  attempts INTEGER NOT NULL DEFAULT 0,
-  created_at BIGINT NOT NULL
-);
+-- otp_codes existed in v2; v3 has no OTP. Safe to run repeatedly.
+DROP TABLE IF EXISTS otp_codes;
 
--- 7. Row Level Security (RLS) Configuration
--- Enables RLS while permitting full backend operation (via service_role or anon key):
+-- 7. Row Level Security (RLS)
+-- RLS is ON for every table and there are deliberately NO policies. Only the
+-- Node server talks to the database, using the service_role key, which bypasses
+-- RLS. The anon / publishable key must never be able to read or write anything:
+-- browsers no longer talk to Supabase directly.
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE puzzles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE otp_codes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow backend access" ON settings;
+DROP POLICY IF EXISTS "Allow backend access" ON users;
+DROP POLICY IF EXISTS "Allow backend access" ON sessions;
+DROP POLICY IF EXISTS "Allow backend access" ON puzzles;
 
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'settings' AND policyname = 'Allow backend access') THEN
-    CREATE POLICY "Allow backend access" ON settings FOR ALL USING (true) WITH CHECK (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'users' AND policyname = 'Allow backend access') THEN
-    CREATE POLICY "Allow backend access" ON users FOR ALL USING (true) WITH CHECK (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'sessions' AND policyname = 'Allow backend access') THEN
-    CREATE POLICY "Allow backend access" ON sessions FOR ALL USING (true) WITH CHECK (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'puzzles' AND policyname = 'Allow backend access') THEN
-    CREATE POLICY "Allow backend access" ON puzzles FOR ALL USING (true) WITH CHECK (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'otp_codes' AND policyname = 'Allow backend access') THEN
-    CREATE POLICY "Allow backend access" ON otp_codes FOR ALL USING (true) WITH CHECK (true);
-  END IF;
-END $$;
+-- 8. One-time phone normalisation (run once, after deploying v3).
+-- Numbers saved before the strict E.164 rule may be bare Indian mobiles. Rows
+-- whose normalised number already belongs to another account are left as they
+-- are (the unique index on phone would otherwise abort this whole script);
+-- list them afterwards with the SELECT below and merge or fix them by hand.
+UPDATE users SET phone = '+91' || phone
+  WHERE phone ~ '^[6-9][0-9]{9}$'
+    AND NOT EXISTS (SELECT 1 FROM users u2 WHERE u2.phone = '+91' || users.phone);
+UPDATE users SET phone = '+91' || substr(phone, 2)
+  WHERE phone ~ '^0[6-9][0-9]{9}$'
+    AND NOT EXISTS (SELECT 1 FROM users u2 WHERE u2.phone = '+91' || substr(users.phone, 2));
+UPDATE users SET phone = '+' || phone
+  WHERE phone ~ '^91[6-9][0-9]{9}$'
+    AND NOT EXISTS (SELECT 1 FROM users u2 WHERE u2.phone = '+' || users.phone);
+-- Leftovers (cannot sign in by phone until fixed):
+-- SELECT id, username, phone FROM users WHERE phone IS NOT NULL AND phone !~ '^\+[1-9][0-9]{7,14}$';
 
+-- 9. Usernames are unique regardless of case (lookups are case-insensitive).
+--    If this fails, two accounts differ only by case: rename one first.
+CREATE UNIQUE INDEX IF NOT EXISTS users_username_lower_uidx ON users (LOWER(username));

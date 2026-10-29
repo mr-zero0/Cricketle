@@ -475,3 +475,70 @@ test("totalElapsedMs sums elapsed time across all 3 puzzles in a mode", () => {
   assert.equal(core.formatTime(total), "00:50");
 });
 
+// ---------- guest gate ----------
+
+test("guests may play only the first puzzle of each mode", () => {
+  assert.equal(core.GUEST_PUZZLES_PER_MODE, 1);
+  assert.equal(core.guestCanPlay(0), true);
+  assert.equal(core.guestCanPlay(1), false);
+  assert.equal(core.guestCanPlay(2), false);
+});
+
+test("a guest who finished puzzle 1 gets sign_in_required on puzzle 2; a member does not", () => {
+  const day = core.todayKey(DAY_START + 9 * 3600 * 1000);
+  const now = DAY_START + 9 * 3600 * 1000;
+  let state = core.newDayState(day);
+  state = core.startPuzzle(state, "easy", 0, now, { guest: true }).state;
+  const answer = core.answerFor(day, "easy", 0).name;
+  state = core.applyGuess(state, "easy", 0, answer, now + 1000).state;
+  assert.equal(state.modes.easy.puzzles[1].status, "ready", "engine still unlocks puzzle 2");
+
+  const guest = core.startPuzzle(state, "easy", 1, now + 2000, { guest: true });
+  assert.equal(guest.ok, false);
+  assert.equal(guest.error, "sign_in_required");
+  assert.deepEqual(guest.state, state, "state unchanged");
+
+  const member = core.startPuzzle(state, "easy", 1, now + 2000);
+  assert.equal(member.ok, true);
+  assert.equal(member.state.modes.easy.puzzles[1].status, "active");
+});
+
+test("the guest allowance resets with the IST day, not the local day", () => {
+  // 23:30 IST on day D is still day D; 00:30 IST is D+1 even though UTC has not rolled over.
+  const lateD = DAY_START + 23.5 * 3600 * 1000;
+  const earlyD1 = DAY_START + 24.5 * 3600 * 1000;
+  assert.equal(core.todayKey(lateD), "2026-10-27");
+  assert.equal(core.todayKey(earlyD1), "2026-10-28");
+  const fresh = core.newDayState(core.todayKey(earlyD1));
+  assert.equal(core.startPuzzle(fresh, "easy", 0, earlyD1, { guest: true }).ok, true);
+});
+
+test("sceneForHour: day is 06:00 to 17:59 IST, night otherwise", () => {
+  assert.equal(core.sceneForHour(5), "night");
+  assert.equal(core.sceneForHour(6), "day");
+  assert.equal(core.sceneForHour(17), "day");
+  assert.equal(core.sceneForHour(18), "night");
+  assert.equal(core.sceneForHour(0), "night");
+});
+
+test("istHour converts a UTC instant to the IST hour of day", () => {
+  assert.equal(core.istHour(Date.UTC(2026, 9, 27, 0, 30)), 6); // 00:30 UTC = 06:00 IST
+  assert.equal(core.istHour(Date.UTC(2026, 9, 27, 12, 29)), 17); // 17:59 IST
+  assert.equal(core.istHour(Date.UTC(2026, 9, 27, 20, 0)), 1); // 01:30 IST next day
+});
+
+test("AVATARS are the nine cricket presets with symbol icons", () => {
+  assert.deepEqual(core.AVATARS.map((a) => a.id), ["batter", "bowler", "spinner", "keeper", "captain", "allrounder", "legend", "stumps", "pads"]);
+  for (const a of core.AVATARS) {
+    assert.match(a.icon, /^#i-[a-z-]+$/, a.id + " icon is a symbol reference");
+    assert.ok(a.bg && a.color && a.name && a.role, a.id);
+  }
+});
+
+test("normalizeAvatarId maps retired mascots and unknown ids to a cricket avatar", () => {
+  assert.equal(core.normalizeAvatarId("lion"), "captain");
+  assert.equal(core.normalizeAvatarId("eagle"), "allrounder");
+  assert.equal(core.normalizeAvatarId("nope"), "batter");
+  assert.equal(core.normalizeAvatarId(undefined), "batter");
+  assert.equal(core.normalizeAvatarId("keeper"), "keeper");
+});

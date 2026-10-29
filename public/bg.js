@@ -1,7 +1,9 @@
-// Cricketle background FX: floodlit night stadium on a <canvas>.
-// Floodlight beams, mown outfield with a pitch and stumps, drifting haze, a leather
+// Cricketle background FX: a cricket stadium on a <canvas>, by night or by day.
+// Night: floodlight beams and drifting haze. Day: blue sky, sun with bloom, slow
+// clouds, distant stands. Both: mown outfield with a pitch and stumps, a leather
 // ball spinning across the sky, willow bats tumbling in the depth, and a confetti
-// burst on a solve. DPR capped, paused when the tab is hidden, static under
+// burst on a solve. The scene follows window.CricketleTheme and cross-fades over
+// 600 ms. DPR capped, paused when the tab is hidden, static under
 // prefers-reduced-motion.
 //
 // Exposes window.CricketleFX = { burst(colors) }.
@@ -11,7 +13,7 @@
 
   const canvas = document.getElementById("bg");
   if (!canvas) return;
-  const ctx = canvas.getContext("2d");
+  let ctx = canvas.getContext("2d"); // swapped to an offscreen context while a layer is painted
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const TAU = Math.PI * 2;
 
@@ -26,17 +28,29 @@
   let nextBallAt = 3000;
   let nextBatAt = 1500;
 
+  // Scene blend: 0 = night (floodlit), 1 = day (sunlit). Eases towards the
+  // theme over FADE_MS under motion and snaps under reduced motion.
+  const FADE_MS = 600;
+  const theme = window.CricketleTheme;
+  let mix = theme && theme.current() === "day" ? 1 : 0;
+  let mixTarget = mix;
+  let clouds = [];
+  const SUN = { x: 0.8, y: 0.15 }; // fraction of the viewport
+
   // Light comes from the two floodlight towers at the top corners; shading uses this.
   const LIGHT = { x: -0.42, y: -0.5 }; // unit-ish offset for highlights
 
   // ---------- Setup ----------
 
   // Phones get a lighter scene: lower pixel ratio, fewer particles, no bats.
-  const small = () => w < 700 || matchMedia("(pointer: coarse)").matches;
+  const coarse = matchMedia("(pointer: coarse)");
+  let isSmall = false; // refreshed on resize; read every frame
+  const small = () => isSmall;
 
   function resize() {
     w = window.innerWidth;
     h = window.innerHeight;
+    isSmall = w < 700 || coarse.matches;
     dpr = Math.min(window.devicePixelRatio || 1, small() ? 1.5 : 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
@@ -44,7 +58,52 @@
     canvas.style.height = h + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     initParticles();
+    initClouds();
+    buildLayers();
     if (reduceMotion.matches) drawStatic();
+  }
+
+  // Static parts of each scene are painted once per resize into offscreen
+  // canvases and blitted every frame: a full-screen radial gradient per frame
+  // is what made phones struggle. Only clouds, the sun disc, the floodlight
+  // pulse, particles, balls and bats are drawn live.
+  let layers = {};
+  const PAINTERS = {
+    night: () => drawNightSky(),
+    glow: () => drawFloodlights(0, 1),
+    day: () => { drawDaySky(); drawSunBloom(); drawStands(); },
+    pitchNight: () => drawPitch(0),
+    pitchDay: () => drawPitch(1),
+  };
+
+  function paintLayer(name, paint) {
+    const off = document.createElement("canvas");
+    off.width = canvas.width;
+    off.height = canvas.height;
+    const main = ctx;
+    ctx = off.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    try { paint(); } finally { ctx = main; }
+    layers[name] = off;
+  }
+
+  // Layers are painted on first use, so startup only pays for the scene shown.
+  function buildLayers() { layers = {}; }
+
+  function blit(name) {
+    if (!layers[name]) paintLayer(name, PAINTERS[name]);
+    ctx.drawImage(layers[name], 0, 0, w, h);
+  }
+
+  // Sparse clouds, kept high so they never cover the cards. Phones get three.
+  function initClouds() {
+    const n = small() ? 3 : 5;
+    clouds = Array.from({ length: n }, (_, i) => ({
+      x: (i + Math.random()) * (w / n),
+      y: h * (0.12 + Math.random() * 0.22),
+      s: 0.6 + Math.random() * 0.8,
+      v: 4 + Math.random() * 6, // px per second, left to right
+    }));
   }
 
   function initParticles() {
@@ -62,8 +121,127 @@
 
   // ---------- Stadium ----------
 
-  function drawFloodlights(t) {
-    const pulse = 0.85 + 0.15 * Math.sin(t / 2600);
+  // Both skies are opaque so the canvas is a complete picture on its own.
+  function drawNightSky() {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, "#0b1220");
+    g.addColorStop(0.45, "#0f172a");
+    g.addColorStop(1, "#0b2a1c");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  function drawDaySky() {
+    const horizon = h * 0.62;
+    const g = ctx.createLinearGradient(0, 0, 0, horizon);
+    g.addColorStop(0, "#2f8fd6");
+    g.addColorStop(0.55, "#7cc0ee");
+    g.addColorStop(1, "#dff1ff");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, horizon + 1);
+  }
+
+  function sunGeom() { return { x: w * SUN.x, y: h * SUN.y, r: Math.min(w, h) * 0.055 }; }
+
+  function drawSunBloom() {
+    const { x, y, r } = sunGeom();
+    const bloom = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 7);
+    bloom.addColorStop(0, "rgba(255, 244, 200, 0.55)");
+    bloom.addColorStop(0.25, "rgba(255, 236, 170, 0.18)");
+    bloom.addColorStop(1, "rgba(255, 236, 170, 0)");
+    ctx.fillStyle = bloom;
+    ctx.fillRect(x - r * 7, y - r * 7, r * 14, r * 14);
+  }
+
+  function drawSunDisc(t) {
+    const { x, y, r } = sunGeom();
+    const pulse = 1 + 0.03 * Math.sin(t / 3000);
+    const disc = ctx.createRadialGradient(x, y, 0, x, y, r * pulse);
+    disc.addColorStop(0, "#fffbe6");
+    disc.addColorStop(0.7, "#ffe9a3");
+    disc.addColorStop(1, "rgba(255, 225, 140, 0.6)");
+    ctx.fillStyle = disc;
+    ctx.beginPath(); ctx.arc(x, y, r * pulse, 0, TAU); ctx.fill();
+  }
+
+  function drawCloud(c) {
+    const b = Math.min(w, h) * 0.06 * c.s;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+    ctx.beginPath();
+    ctx.ellipse(c.x, c.y, b * 1.6, b * 0.55, 0, 0, TAU);
+    ctx.ellipse(c.x - b * 0.7, c.y - b * 0.1, b * 0.8, b * 0.5, 0, 0, TAU);
+    ctx.ellipse(c.x + b * 0.3, c.y - b * 0.35, b * 0.9, b * 0.65, 0, 0, TAU);
+    ctx.ellipse(c.x + b * 0.9, c.y, b * 0.7, b * 0.45, 0, 0, TAU);
+    ctx.fill();
+    // shaded underside
+    ctx.fillStyle = "rgba(170, 200, 230, 0.35)";
+    ctx.beginPath(); ctx.ellipse(c.x + b * 0.1, c.y + b * 0.25, b * 1.5, b * 0.25, 0, 0, TAU); ctx.fill();
+  }
+
+  function drawClouds(dt) {
+    for (const c of clouds) {
+      c.x += c.v * dt;
+      const span = Math.min(w, h) * 0.12 * c.s;
+      if (c.x - span > w) c.x = -span;
+      drawCloud(c);
+    }
+  }
+
+  // Distant stands along the boundary: tiers of seats under a light roof line.
+  function drawStands() {
+    const horizon = h * 0.62;
+    const top = horizon - h * 0.11;
+    const tiers = 4;
+    const th = (horizon - top - 6) / tiers;
+    for (let i = 0; i < tiers; i++) {
+      ctx.fillStyle = i % 2 ? "rgba(96, 116, 146, 0.78)" : "rgba(126, 146, 176, 0.78)";
+      ctx.fillRect(0, top + 6 + i * th, w, th + 1);
+    }
+    ctx.fillStyle = "rgba(20, 30, 50, 0.22)"; // shadow under the roof
+    ctx.fillRect(0, top + 12, w, th * 0.6);
+    ctx.fillStyle = "rgba(240, 244, 248, 0.9)"; // boundary boards
+    ctx.fillRect(0, horizon - 5, w, 5);
+    ctx.fillStyle = "#e4ebf2"; // roof, slightly curved
+    ctx.beginPath();
+    ctx.moveTo(0, top + 8);
+    ctx.quadraticCurveTo(w / 2, top - 10, w, top + 8);
+    ctx.lineTo(w, top + 14);
+    ctx.quadraticCurveTo(w / 2, top - 4, 0, top + 14);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Draws the sky for the current blend and returns the pitch geometry.
+  function drawScene(dt, t) {
+    if (mix !== mixTarget) {
+      const step = (dt * 1000) / FADE_MS;
+      mix = mix < mixTarget ? Math.min(mixTarget, mix + step) : Math.max(mixTarget, mix - step);
+    }
+    blit("night");
+    if (mix < 1) {
+      ctx.save();
+      ctx.globalAlpha = (1 - mix) * floodPulse(t);
+      blit("glow");
+      ctx.restore();
+    }
+    if (mix > 0) {
+      ctx.save();
+      ctx.globalAlpha = mix;
+      blit("day");
+      drawSunDisc(t);
+      drawClouds(dt);
+      ctx.restore();
+    }
+    if (mix === 0) blit("pitchNight");
+    else if (mix === 1) blit("pitchDay");
+    else drawPitch(mix);
+    return pitchGeometry();
+  }
+
+  function floodPulse(t) { return 0.85 + 0.15 * Math.sin(t / 2600); }
+
+  function drawFloodlights(t, fixedPulse) {
+    const pulse = fixedPulse !== undefined ? fixedPulse : floodPulse(t);
     const spread = Math.max(w, h) * 0.95;
     ctx.globalCompositeOperation = "lighter";
     for (const L of [{ x: w * 0.08, y: -h * 0.08 }, { x: w * 0.92, y: -h * 0.08 }]) {
@@ -77,25 +255,46 @@
     ctx.globalCompositeOperation = "source-over";
   }
 
-  // Returns the pitch geometry so the stumps can sit on it.
-  function drawPitch() {
+  // Returns the pitch geometry so the stumps can sit on it. `day` is the scene
+  // blend (0 night, 1 day): sunlight brings up the outfield, stripes and creases.
+  function pitchGeometry() {
+    const top = h * 0.62;
+    const bh = (h - top) / 9;
+    const pw = Math.min(w * 0.22, 220);
+    const px = (w - pw) / 2;
+    return { px, pw, stripTop: top + bh * 2, creaseY: top + bh * 3.1 };
+  }
+
+  function drawPitch(day) {
     const top = h * 0.62;
     const bands = 9;
     const bh = (h - top) / bands;
+    if (day > 0) {
+      ctx.save();
+      ctx.globalAlpha = day;
+      const field = ctx.createLinearGradient(0, top, 0, h);
+      field.addColorStop(0, "#52b04c");
+      field.addColorStop(1, "#2f7d32");
+      ctx.fillStyle = field;
+      ctx.fillRect(0, top, w, h - top);
+      ctx.restore();
+    }
+    const sr = Math.round(34 + 156 * day), sg = Math.round(197 + 43 * day), sb = Math.round(94 + 56 * day);
     for (let i = 0; i < bands; i++) {
-      ctx.fillStyle = i % 2 ? "rgba(34, 197, 94, 0.035)" : "rgba(34, 197, 94, 0.015)";
+      const a = i % 2 ? 0.035 + 0.105 * day : 0.015 + 0.025 * day;
+      ctx.fillStyle = `rgba(${sr}, ${sg}, ${sb}, ${a})`;
       ctx.fillRect(0, top + i * bh, w, bh + 1);
     }
     const pw = Math.min(w * 0.22, 220);
     const px = (w - pw) / 2;
     const stripTop = top + bh * 2;
     const g = ctx.createLinearGradient(0, stripTop, 0, h);
-    g.addColorStop(0, "rgba(245, 222, 179, 0.03)");
-    g.addColorStop(1, "rgba(245, 222, 179, 0.07)");
+    g.addColorStop(0, `rgba(245, 222, 179, ${0.03 + 0.72 * day})`);
+    g.addColorStop(1, `rgba(232, 208, 160, ${0.07 + 0.83 * day})`);
     ctx.fillStyle = g;
     ctx.fillRect(px, stripTop, pw, h - stripTop);
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = `rgba(255, 255, 255, ${0.08 + 0.6 * day})`;
+    ctx.lineWidth = 1 + day;
     ctx.beginPath();
     ctx.moveTo(px - 14, top + bh * 3.1); ctx.lineTo(px + pw + 14, top + bh * 3.1);
     ctx.moveTo(px - 14, top + bh * 8.3); ctx.lineTo(px + pw + 14, top + bh * 8.3);
@@ -103,12 +302,25 @@
     return { px, pw, stripTop, creaseY: top + bh * 3.1 };
   }
 
-  function drawStumps(pitch) {
+  function drawStumps(pitch, day) {
     const cx = pitch.px + pitch.pw / 2;
     const baseY = pitch.creaseY - 4;
     const height = Math.min(110, Math.max(64, h * 0.11));
     const gap = height * 0.17;
     const sw = Math.max(5, height * 0.075);
+    if (day > 0) {
+      // Long shadow on the grass, cast away from the sun (upper right): down-left.
+      ctx.save();
+      ctx.globalAlpha = 0.28 * day;
+      ctx.translate(cx, baseY + 2);
+      ctx.transform(1, 0, 0.9, -0.28, 0, 0);
+      ctx.fillStyle = "#0a2a12";
+      for (let i = -1; i <= 1; i++) {
+        roundRect(i * gap - sw / 2, -height, sw, height, sw / 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
     ctx.save();
     ctx.globalAlpha = 0.72;
     // ground shadow
@@ -481,19 +693,26 @@
 
   function drawStatic() {
     ctx.clearRect(0, 0, w, h);
-    drawFloodlights(0);
-    drawStumps(drawPitch());
+    mix = mixTarget;
+    drawStumps(drawScene(0, 0), mix);
   }
+
+  // Phones render at 30 fps: half the paint work, no visible difference in a
+  // background. Desktops run at the display rate.
+  const MIN_FRAME_MS = 1000 / 30;
 
   function frame(now) {
     raf = 0;
+    if (small() && now - last < MIN_FRAME_MS - 1) {
+      if (!document.hidden) raf = requestAnimationFrame(frame);
+      return;
+    }
     const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
     last = now;
     elapsed += dt * 1000;
 
     ctx.clearRect(0, 0, w, h);
-    drawFloodlights(now);
-    const pitch = drawPitch();
+    const pitch = drawScene(dt, now);
     drawParticles(dt, now);
 
     // Far layer: bats drift behind the stumps and the ball.
@@ -502,7 +721,7 @@
       nextBatAt = elapsed + 12000 + Math.random() * 10000;
     }
     updateBats(dt, now);
-    drawStumps(pitch);
+    drawStumps(pitch, mix);
 
     if (elapsed >= nextBallAt && balls.length < 2) {
       spawnBall();
@@ -528,9 +747,23 @@
   document.addEventListener("visibilitychange", () => (document.hidden ? stop() : ensureRunning()));
   reduceMotion.addEventListener?.("change", () => (reduceMotion.matches ? (stop(), drawStatic()) : ensureRunning()));
   window.addEventListener("resize", resize);
+  if (theme) {
+    theme.onChange((scene) => {
+      mixTarget = scene === "day" ? 1 : 0;
+      if (reduceMotion.matches || document.hidden) drawStatic();
+    });
+  }
 
   resize();
-  ensureRunning();
+  // First paint gets a still frame; the animation starts once the page has
+  // loaded and the main thread is idle, so content and fonts come first.
+  drawStatic();
+  const start = () => {
+    if (typeof requestIdleCallback === "function") requestIdleCallback(ensureRunning, { timeout: 2000 });
+    else setTimeout(ensureRunning, 800);
+  };
+  if (document.readyState === "complete") start();
+  else window.addEventListener("load", start, { once: true });
 
   window.CricketleFX = { burst };
 })();

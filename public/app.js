@@ -20,12 +20,21 @@
     unknown_player: "Pick a player from the list.",
     already_guessed: "You already guessed that player.",
     no_hints_left: "No hints left for this puzzle.",
+    sign_in_required: "Sign up or sign in to play the next puzzle.",
     network: "Could not reach the server. Check your connection and try again.",
+    offline: "Accounts and leaderboards need the Cricketle server. Open the hosted game to sign in.",
   };
 
   const STARTERS = ["Virat Kohli", "Ricky Ponting", "AB de Villiers", "Babar Azam", "Chris Gayle"];
   const GUEST_KEY = "cricketle:v2:guest";
   const MODE_KEY = "cricketle:v2:mode";
+  const SEEN_HELP_KEY = "cricketle:v3:seen-help";
+
+  // localStorage can be missing, full or throwing (private mode, blocked
+  // storage). Nothing in the game may depend on it working.
+  function safeGet(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
+  function safeSet(key, value) { try { localStorage.setItem(key, value); } catch (_) { /* ignore */ } }
+  function safeRemove(key) { try { localStorage.removeItem(key); } catch (_) { /* ignore */ } }
 
   // ---------- Client Structured Logger ----------
 
@@ -146,13 +155,6 @@
     saveProfile(p) {
       try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (_) { /* ignore */ }
     }
-    setOtp(phone, code) {
-      this._otp = { phone, code, expires: Date.now() + 5 * 60 * 1000 };
-      return code;
-    }
-    verifyOtp(phone, code) {
-      return Boolean(this._otp && this._otp.phone === phone && this._otp.code === code && Date.now() < this._otp.expires);
-    }
     getHistory() {
       try {
         const h = JSON.parse(localStorage.getItem(HISTORY_KEY));
@@ -167,22 +169,6 @@
         if (!exists) {
           h.push(item);
           localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
-        }
-        if (app.user && app.user.id && typeof SupabaseDirect !== "undefined") {
-          SupabaseDirect.request("POST", "/puzzles", {
-            user_id: app.user.id,
-            day: item.day,
-            mode: item.mode,
-            idx: item.idx,
-            status: item.status,
-            guesses: item.guesses,
-            hints: item.hints,
-            started_at: item.started_at,
-            finished_at: item.finished_at,
-            points: item.points || 0,
-          }, { Prefer: "resolution=merge-duplicates" }).catch((err) => {
-            CricketleLog.warn("SYNC", "Failed to sync puzzle to Supabase Cloud", err);
-          });
         }
       } catch (_) { /* ignore */ }
     }
@@ -249,7 +235,7 @@
       return Object.assign(presentLocal(r.state, now), extras ? extras(r) : null);
     }
     async start(mode, idx) {
-      return this.run((s, now) => core.startPuzzle(s, mode, idx, now));
+      return this.run((s, now) => core.startPuzzle(s, mode, idx, now, { guest: true }));
     }
     async guess(mode, idx, name) {
       return this.run((s, now) => core.applyGuess(s, mode, idx, name, now), (r) => {
@@ -325,9 +311,11 @@
     authTab: "signin",
     lastGuess: null,
     busy: false,
+    // Guest gate per mode: "open" (tapped a locked puzzle), "closed" (dismissed) or unset (auto).
+    gate: { easy: null, hard: null },
   };
 
-  try { if (core.MODES.includes(localStorage.getItem(MODE_KEY))) app.mode = localStorage.getItem(MODE_KEY); } catch (_) { /* ignore */ }
+  if (core.MODES.includes(safeGet(MODE_KEY))) app.mode = safeGet(MODE_KEY);
 
   const puzzles = () => app.state.modes[app.mode].puzzles;
   const idx = () => app.current[app.mode];
@@ -335,6 +323,9 @@
   const isHard = () => app.mode === "hard";
   const poolSize = () => core.poolFor(app.mode).length;
   const modeLabel = (m) => (m === "hard" ? "Hard" : "Easy");
+  const isGuest = () => !app.user;
+  // A puzzle a guest may look at but not play.
+  const isGated = (i) => isGuest() && !core.guestCanPlay(i);
 
   function applyPresentation(p) {
     app.day = p.day;
@@ -385,10 +376,13 @@
     message.classList.toggle("warn", Boolean(warn));
   }
 
+  const TOAST_MAX = 80;
+
   function toast(text, kind) {
     const el = document.createElement("div");
     el.className = "toast" + (kind ? " " + kind : "");
-    el.textContent = text;
+    const t = String(text);
+    el.textContent = t.length > TOAST_MAX ? t.slice(0, TOAST_MAX - 1).trimEnd() + "…" : t;
     toasts.appendChild(el);
     while (toasts.children.length > 3) toasts.firstElementChild.remove();
     setTimeout(() => {
@@ -441,6 +435,7 @@
       becomeGuest();
       return;
     }
+    if (err instanceof ApiError && err.code === "sign_in_required") { showGate(); return; }
     const text = err instanceof ApiError ? err.message : "Something went wrong.";
     setMessage(text, true);
     if (!(err instanceof ApiError)) console.error(err);
@@ -458,7 +453,7 @@
     const n = poolSize();
     const width = Math.max(6, Math.round(100 * (1 - (g.rank - 1) / Math.max(1, n - 1))));
     const tags = g.rank === 1 ? [] : g.tags || [];
-    const classes = ["row", "tier-" + t.key, opts.flash ? "flash" : "", opts.enter ? "enter" : ""].filter(Boolean).join(" ");
+    const classes = ["row", "tier-" + t.key, opts.flash ? "flash" : "", opts.enter ? "enter heat-fade" : ""].filter(Boolean).join(" ");
     return `
       <li class="${classes}" data-name="${escapeHtml(g.name)}">
         <div class="bar" style="width:${width}%"></div>
@@ -487,18 +482,29 @@
 
     const parts = ps.map((p, i) => {
       const labels = { locked: "locked", ready: "ready to start", active: "in progress", solved: "solved", gaveUp: "given up" };
-      let cls = "dot " + p.status;
+      const gated = isGated(i) && !core.isFinished(p);
+      let cls = "dot " + (gated ? "gated" : p.status);
       if (i === idx()) cls += " current";
       if (i === idx() && celebrateDot) cls += " pop";
       let inner;
       if (p.status === "solved") inner = `<svg aria-hidden="true"><use href="#i-check"/></svg><span class="dot-pts">${p.points}</span>`;
       else if (p.status === "gaveUp") inner = `<svg aria-hidden="true"><use href="#i-flag"/></svg><span class="dot-pts">0</span>`;
-      else if (p.status === "locked") inner = `<svg aria-hidden="true"><use href="#i-lock"/></svg>`;
+      else if (gated || p.status === "locked") inner = `<svg aria-hidden="true"><use href="#i-lock"/></svg>`;
       else inner = `<span>${i + 1}</span>`;
-      return `<button type="button" class="${cls}" data-i="${i}" aria-label="Puzzle ${i + 1}: ${labels[p.status]}" ${p.status === "locked" ? "disabled" : ""} aria-current="${i === idx() ? "true" : "false"}">${inner}</button>`;
+      const label = gated ? "sign in to play" : labels[p.status];
+      const disabled = !gated && p.status === "locked";
+      return `<button type="button" class="${cls}" data-i="${i}" aria-label="Puzzle ${i + 1}: ${label}" ${disabled ? "disabled" : ""} aria-current="${i === idx() ? "true" : "false"}">${inner}</button>`;
     });
     dots.innerHTML = parts.join("");
     celebrateDot = false;
+    // The pop is one-shot: drop the class when the animation ends (or straight
+    // away under reduced motion, where no animationend ever fires).
+    const popped = dots.querySelector(".dot.pop");
+    if (popped) {
+      const done = () => popped.classList.remove("pop");
+      popped.addEventListener("animationend", done, { once: true });
+      setTimeout(done, reduceMotion.matches ? 0 : 400);
+    }
     trackerLabel.textContent = `${modeLabel(app.mode)} · Puzzle ${idx() + 1} of ${core.PUZZLES_PER_DAY}`;
 
     const pts = core.dayPoints(app.state);
@@ -585,7 +591,13 @@
       </button>
       <button id="share-btn" class="btn" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg> Copy result</button>`;
     let note = "";
-    if (nextReady) {
+    const otherFreeOpen = isGuest() && !core.isFinished(app.state.modes[otherMode].puzzles[0]);
+    if (nextReady && isGated(idx() + 1)) {
+      // Guest: the next puzzle needs an account; offer the other mode's free one.
+      if (otherFreeOpen) {
+        actions += `<button id="other-mode-btn" class="btn primary" type="button">Try ${modeLabel(otherMode)} mode, also free <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>`;
+      }
+    } else if (nextReady) {
       actions += `<button id="next-btn" class="btn primary" type="button">Next puzzle <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>`;
     } else if (allDone) {
       if (!otherDone) {
@@ -668,7 +680,69 @@
     input.disabled = !active;
     input.placeholder = isHard() ? "Type any cricketer's name" : "Type a well-known cricketer";
     renderWin();
+    renderGate();
     renderNav();
+  }
+
+  // ---------- Guest gate ----------
+  //
+  // Guests play puzzle 1 of each mode. The card appears when they finish it
+  // (auto), when they tap a locked puzzle (open), and goes away when dismissed
+  // (closed) until the next explicit tap.
+
+  function gateShouldShow() {
+    if (!isGuest() || !app.state) return false;
+    const st = app.gate[app.mode];
+    if (st === "open") return true;
+    if (st === "closed") return false;
+    const ps = puzzles();
+    const next = ps[idx() + 1];
+    return core.isFinished(puzzle()) && Boolean(next) && isGated(idx() + 1);
+  }
+
+  function showGate() {
+    app.gate[app.mode] = "open";
+    renderGate();
+    const g = $("gate");
+    if (g && !g.hidden) g.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "nearest" });
+  }
+
+  function hideGate() {
+    app.gate[app.mode] = "closed";
+    renderGate();
+  }
+
+  function openAuth(view) {
+    hideGate();
+    location.hash = "#profile";
+    showView();
+    const card = $("auth-card");
+    if (card) card.hidden = false;
+    switchAuthView(view);
+  }
+
+  function renderGate() {
+    const g = $("gate");
+    if (!g) return;
+    const show = gateShouldShow();
+    g.hidden = !show;
+    if (!show) { g.innerHTML = ""; return; }
+    const played = core.isFinished(puzzle()) || puzzles().some(core.isFinished);
+    const lead = played
+      ? `You've played today's free puzzle in ${modeLabel(app.mode)}.`
+      : `Puzzle 1 is free for guests.`;
+    g.innerHTML = `
+      <button id="gate-close" class="icon-btn gate-close" type="button" aria-label="Dismiss"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+      <span class="gate-icon" aria-hidden="true"><svg><use href="#i-lock"/></svg></span>
+      <h3>${lead}</h3>
+      <p>Sign up or sign in for all three, hints, streaks and the leaderboard.</p>
+      <div class="actions">
+        <button id="gate-signup" class="btn primary" type="button">Sign up</button>
+        <button id="gate-signin" class="btn" type="button">Sign in</button>
+      </div>`;
+    $("gate-close").addEventListener("click", hideGate);
+    $("gate-signup").addEventListener("click", () => openAuth("register"));
+    $("gate-signin").addEventListener("click", () => openAuth("signin"));
   }
 
   // ---------- Timer + countdown ----------
@@ -764,6 +838,7 @@
       setMessage("");
       if (res.solved) {
         celebrateDot = true;
+        app.gate[app.mode] = null; // a finished puzzle shows the gate again even if it was dismissed earlier
         window.CricketleFX?.burst(isHard() ? ["#f59e0b", "#fbbf24", "#f8fafc", "#22c55e"] : ["#22c55e", "#86efac", "#f8fafc", "#f59e0b"]);
       }
       render({ animateLast: true });
@@ -802,6 +877,7 @@
     try {
       setBusy(true);
       applyPresentation(await app.store.giveUp(app.mode, i));
+      app.gate[app.mode] = null;
       render();
       $("win-title")?.focus({ preventScroll: true });
       refreshStats();
@@ -819,6 +895,7 @@
 
   function viewPuzzle(i) {
     const ps = puzzles();
+    if (ps[i] && isGated(i) && !core.isFinished(ps[i])) { showGate(); return; }
     if (!ps[i] || ps[i].status === "locked" || i === idx()) return;
     app.current[app.mode] = i;
     setMessage("");
@@ -889,7 +966,7 @@
     });
 
     const streak = (app.stats && app.stats.currentStreak) ? ` · 🔥 ${app.stats.currentStreak}-day streak` : "";
-    const siteUrl = "https://mr-zero0.github.io/Cricketle";
+    const siteUrl = "https://cricketle.onrender.com";
     const dateFormatted = formatDayDDMMMYY(app.day);
 
     const modeHeadline = allDone
@@ -1128,18 +1205,23 @@
     } else {
       emptyEl.hidden = true;
       list.innerHTML = data.rows.map((r, i) => {
-        const sub = tab === "today"
-          ? `${r.solved} solved · ${r.guesses} guess${r.guesses === 1 ? "" : "es"} · ${formatSeconds(r.seconds)}`
-          : `<span class="title-chip">${escapeHtml(r.title)}</span> ${r.solved} solved · ${r.days} day${r.days === 1 ? "" : "s"}`;
+        const av = getAvatar(r.avatar);
+        let sub = "";
+        if (r.me) {
+          sub = tab === "today"
+            ? `<span class="board-time">${formatSeconds(r.seconds)}</span> · ${r.guesses} guess${r.guesses === 1 ? "" : "es"}`
+            : `<span class="title-chip">${escapeHtml(r.title)}</span> ${r.days} day${r.days === 1 ? "" : "s"}`;
+        }
         return `<li class="board-row${r.me ? " me" : ""}" style="--i:${i}">
           <span class="rank-badge r${r.rank}" aria-label="Rank ${r.rank}">${r.rank}</span>
-          <div class="board-who"><span class="board-name">${escapeHtml(r.username)}${r.me ? ' <span class="muted small-text">(you)</span>' : ""}</span><span class="board-sub">${sub}</span></div>
+          <span class="board-avatar" style="background:${av.bg}" aria-hidden="true">${avatarIcon(av)}</span>
+          <div class="board-who"><span class="board-name">${escapeHtml(r.username)}${r.me ? ' <span class="muted small-text">(you)</span>' : ""}</span>${sub ? `<span class="board-sub">${sub}</span>` : ""}</div>
           <div class="board-pts"><span class="v">${r.points}</span><span class="k">pts</span></div>
         </li>`;
       }).join("");
     }
     const when = new Date(data.loadedAt);
-    $("board-updated").textContent = `${tab === "today" ? "IST day " + data.day + " · " : ""}Updated ${when.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    $("board-updated").textContent = `Updated ${when.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
   }
 
   async function loadBoard(force) {
@@ -1155,66 +1237,7 @@
       if (!app.offline) {
         data = await api("GET", tab === "today" ? "/api/leaderboard/today" : "/api/leaderboard/alltime");
       } else {
-        const userId = app.user ? app.user.id : null;
-        if (tab === "today") {
-          const day = core.todayKey();
-          const rows = (await SupabaseDirect.request("POST", "/rpc/get_leaderboard_today", { p_day: day, p_limit: 50 })) || [];
-          let me = null;
-          if (userId) {
-            me = rows.find((r) => Number(r.user_id) === Number(userId)) || null;
-            if (!me) {
-              try {
-                const meRows = await SupabaseDirect.request("POST", "/rpc/get_leaderboard_today_user", { p_day: day, p_user_id: userId });
-                if (meRows && meRows.length) me = meRows[0];
-              } catch (_) {}
-            }
-          }
-          const rowFn = (r) => ({
-            rank: Number(r.rank),
-            username: r.username,
-            displayName: r.display_name || r.username,
-            avatar: r.avatar || "batter",
-            points: Number(r.points),
-            solved: Number(r.solved),
-            guesses: Number(r.guesses),
-            seconds: Math.round(Number(r.ms) / 1000),
-            me: Number(r.user_id) === Number(userId),
-          });
-          data = {
-            day,
-            total: rows.length ? Number(rows[0].total) : (me ? Number(me.total) : 0),
-            rows: rows.map(rowFn),
-            me: me ? rowFn(me) : null,
-          };
-        } else {
-          const rows = (await SupabaseDirect.request("POST", "/rpc/get_leaderboard_alltime", { p_limit: 50 })) || [];
-          let me = null;
-          if (userId) {
-            me = rows.find((r) => Number(r.user_id) === Number(userId)) || null;
-            if (!me) {
-              try {
-                const meRows = await SupabaseDirect.request("POST", "/rpc/get_leaderboard_alltime_user", { p_user_id: userId });
-                if (meRows && meRows.length) me = meRows[0];
-              } catch (_) {}
-            }
-          }
-          const rowFn = (r) => ({
-            rank: Number(r.rank),
-            username: r.username,
-            displayName: r.display_name || r.username,
-            avatar: r.avatar || "batter",
-            points: Number(r.points),
-            solved: Number(r.solved),
-            days: Number(r.days),
-            title: core.rankTitle(Number(r.points)).title,
-            me: Number(r.user_id) === Number(userId),
-          });
-          data = {
-            total: rows.length ? Number(rows[0].total) : (me ? Number(me.total) : 0),
-            rows: rows.map(rowFn),
-            me: me ? rowFn(me) : null,
-          };
-        }
+        throw new ApiError("offline", "Leaderboards need the Cricketle server. Open the hosted game to be ranked.", 0);
       }
       data.loadedAt = Date.now();
       app.board.data[tab] = data;
@@ -1242,8 +1265,11 @@
   ];
 
   function getAvatar(id) {
-    return (core.AVATARS && core.AVATARS.find((a) => a.id === id)) || (core.AVATARS && core.AVATARS[0]) || { id: "batter", name: "Master Blaster", role: "Batter", icon: "🏏", bg: "linear-gradient(135deg, #15803d, #22c55e)" };
+    const norm = core.normalizeAvatarId(id);
+    return core.AVATARS.find((a) => a.id === norm) || core.AVATARS[0];
   }
+
+  const avatarIcon = (a) => `<svg aria-hidden="true"><use href="${a.icon}"/></svg>`;
 
   function renderProfile() {
     $("offline-card").hidden = true;
@@ -1267,7 +1293,9 @@
         bio: app.user.bio || "",
         favTeam: app.user.favTeam || "",
         favPlayer: app.user.favPlayer || "",
-        googleConnected: Boolean(app.user.googleConnected),
+        phone: app.user.phone || null,
+        isAdmin: Boolean(app.user.isAdmin),
+        pinNeedsUpdate: Boolean(app.user.pinNeedsUpdate),
         isGuest: false,
       };
       s = app.stats || {};
@@ -1280,7 +1308,9 @@
         bio: gProfile.bio || "Playing in guest mode on this device.",
         favTeam: gProfile.favTeam || "India",
         favPlayer: gProfile.favPlayer || "Virat Kohli",
-        googleConnected: false,
+        phone: null,
+        isAdmin: false,
+        pinNeedsUpdate: false,
         isGuest: true,
       };
       s = (app.store && app.store.getStats) ? app.store.getStats() : {};
@@ -1318,7 +1348,16 @@
       }).join("");
 
       subViewHtml = `
-        <div class="streak-card card">
+        <div class="stat-grid">
+          <div class="stat-tile card hi"><span class="v">${s.todayPoints || 0}</span><span class="k">Today's points</span></div>
+          <div class="stat-tile card hi"><span class="v">${s.todayRank ? "#" + s.todayRank : "–"}</span><span class="k">Today's rank</span></div>
+          <div class="stat-tile card"><span class="v">${s.currentStreak || 0}</span><span class="k">Streak</span></div>
+          <div class="stat-tile card"><span class="v">${s.allTimePoints || 0}</span><span class="k">All-time points</span></div>
+        </div>
+
+        <details id="more-stats" class="more-stats">
+          <summary>More</summary>
+          <div class="streak-card card">
           <div class="streak-flame-box" aria-hidden="true">
             <svg><use href="#i-flame"/></svg>
           </div>
@@ -1330,24 +1369,20 @@
             ${weekDotsHtml}
           </div>
         </div>
-
-        <div class="stat-grid">
-          <div class="stat-tile card hi"><span class="v">${s.todayPoints || 0}</span><span class="k">Today's points</span></div>
-          <div class="stat-tile card hi"><span class="v">${s.todayRank ? "#" + s.todayRank : "–"}</span><span class="k">Today's rank</span></div>
-          <div class="stat-tile card"><span class="v">${s.allTimePoints || 0}</span><span class="k">All-time points</span></div>
-          <div class="stat-tile card"><span class="v">${s.allTimeRank ? "#" + s.allTimeRank : "–"}</span><span class="k">All-time rank</span></div>
-          <div class="stat-tile card"><span class="v">${s.solved || 0}</span><span class="k">Puzzles solved</span></div>
-          <div class="stat-tile card"><span class="v">${s.winRate || (s.solved ? 100 : 0)}%</span><span class="k">Win rate</span></div>
-          <div class="stat-tile card"><span class="v">${unlockedCount} / ${achievements.length}</span><span class="k">Badges</span></div>
-          <div class="stat-tile card"><span class="v">${s.daysPlayed || 0}</span><span class="k">Days active</span></div>
-        </div>
-
-        <div class="dist-card card">
+          <div class="stat-grid">
+            <div class="stat-tile card"><span class="v">${s.allTimeRank ? "#" + s.allTimeRank : "–"}</span><span class="k">All-time rank</span></div>
+            <div class="stat-tile card"><span class="v">${s.solved || 0}</span><span class="k">Puzzles solved</span></div>
+            <div class="stat-tile card"><span class="v">${s.winRate || (s.solved ? 100 : 0)}%</span><span class="k">Win rate</span></div>
+            <div class="stat-tile card"><span class="v">${unlockedCount} / ${achievements.length}</span><span class="k">Badges</span></div>
+            <div class="stat-tile card"><span class="v">${s.daysPlayed || 0}</span><span class="k">Days active</span></div>
+          </div>
+          <div class="dist-card card">
           <h4>Guess Distribution</h4>
           <div class="dist-bars">
             ${distRowsHtml}
           </div>
         </div>
+        </details>
       `;
     }
 
@@ -1402,7 +1437,7 @@
       const selectedAv = app.selectedAvatar || pUser.avatar || "batter";
       const avatarsGridHtml = (core.AVATARS || []).map((a) => `
         <div class="avatar-choice${a.id === selectedAv ? " active" : ""}" data-avatar-id="${a.id}">
-          <div class="avatar-choice-icon" style="background:${a.bg}">${a.icon}</div>
+          <div class="avatar-choice-icon" style="background:${a.bg}">${avatarIcon(a)}</div>
           <span class="avatar-choice-name">${escapeHtml(a.name)}</span>
           <span class="avatar-choice-role">${escapeHtml(a.role)}</span>
         </div>
@@ -1474,7 +1509,7 @@
             <div class="guest-callout-banner">
               <div class="guest-callout-text">
                 <h4>Save your progress</h4>
-                <p>Create an account or continue with Google to join global leaderboards and sync across devices.</p>
+                <p>Create an account to join the leaderboards and keep your streak across devices.</p>
               </div>
               <button id="guest-to-auth-btn" class="btn primary small" type="button">Sign In / Sign Up</button>
             </div>
@@ -1485,17 +1520,10 @@
                 <strong>@${escapeHtml(pUser.username)}</strong>
               </div>
               <div style="display:flex;justify-content:space-between;padding-bottom:var(--space-2);border-bottom:1px solid var(--border);">
-                <span class="muted">Google Account</span>
-                <span>${pUser.googleConnected ? '<span class="pill-google"><svg class="google-icon-sm" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Connected</span>' : '<span class="muted">Not linked</span>'}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding-bottom:var(--space-2);border-bottom:1px solid var(--border);">
-                <span class="muted">Mobile Phone</span>
+                <span class="muted">Mobile</span>
                 <span>${pUser.phone ? `<span class="pill-phone"><svg aria-hidden="true" style="width:12px;height:12px;vertical-align:-1px;"><use href="#i-phone"/></svg> ${escapeHtml(pUser.phone)}</span>` : '<span class="muted">Not linked</span>'}</span>
               </div>
-              <div style="display:flex;justify-content:space-between;padding-bottom:var(--space-2);border-bottom:1px solid var(--border);">
-                <span class="muted">Security</span>
-                <span>Password encrypted with scrypt · Mobile OTP ready</span>
-              </div>
+              ${pUser.pinNeedsUpdate ? '<p class="pin-nudge" style="margin:0;">Your PIN is not 6 digits. Ask the admin to reset it.</p>' : ""}
             </div>
             <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
               ${pUser.isAdmin ? `<a href="admin.html" target="_blank" class="btn primary" style="background:linear-gradient(135deg, #f59e0b, #d97706);color:#000;font-weight:700;display:inline-flex;align-items:center;gap:6px;text-decoration:none;">👑 Open Admin Portal</a>` : ""}
@@ -1510,15 +1538,15 @@
       ${pUser.isGuest ? `
         <div class="guest-callout-banner">
           <div class="guest-callout-text">
-            <h4>🏆 Playing as a Guest</h4>
-            <p>Your results & badges are saved locally. Sign in with Google to appear on global leaderboards!</p>
+            <h4>Playing as a guest</h4>
+            <p>Create an account to be ranked.</p>
           </div>
-          <button id="guest-signin-btn" class="btn primary small" type="button">Sign In / Join</button>
+          <button id="guest-signin-btn" class="btn primary small" type="button">Sign in</button>
         </div>
       ` : ""}
       <div class="profile-hero card">
         <div class="profile-avatar-wrap">
-          <div class="avatar-badge" style="background:${av.bg};" aria-hidden="true">${av.icon}</div>
+          <div class="avatar-badge" style="background:${av.bg};" aria-hidden="true">${avatarIcon(av)}</div>
           <button class="avatar-edit-trigger" id="avatar-edit-btn" type="button" title="Change Avatar" aria-label="Change Avatar"><svg aria-hidden="true"><use href="#i-edit"/></svg></button>
         </div>
         <div class="profile-hero-meta">
@@ -1526,7 +1554,7 @@
             <h3 class="profile-display-name">${escapeHtml(pUser.displayName)}</h3>
             <span class="profile-username">${pUser.isGuest ? "· Guest" : `@${escapeHtml(pUser.username)}`}</span>
             ${pUser.isAdmin ? `<span class="pill-admin" style="background:rgba(245, 158, 11, 0.2);color:#fbbf24;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;border:1px solid rgba(245, 158, 11, 0.4);display:inline-flex;align-items:center;gap:4px;">👑 Admin</span>` : ""}
-            ${pUser.googleConnected ? `<span class="pill-google"><svg class="google-icon-sm" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Google</span>` : ""}
+            
             ${pUser.phone ? `<span class="pill-phone"><svg aria-hidden="true" style="width:12px;height:12px;vertical-align:-1px;"><use href="#i-phone"/></svg> Phone</span>` : ""}
           </div>
           <div class="profile-tag-row">
@@ -1567,8 +1595,10 @@
     const editBtn = $("avatar-edit-btn");
     if (editBtn) editBtn.addEventListener("click", () => { app.profileTab = "edit"; renderProfile(); });
 
-    const guestSignin = $("guest-signin-btn") || $("guest-to-auth-btn");
+    const guestSignin = $("guest-signin-btn");
+    const guestToAuth = $("guest-to-auth-btn");
     if (guestSignin) guestSignin.addEventListener("click", () => { $("auth-card").hidden = false; renderAuthTab(); window.scrollTo({ top: $("auth-card").offsetTop - 20, behavior: "smooth" }); });
+    if (guestToAuth) guestToAuth.addEventListener("click", () => { $("auth-card").hidden = false; renderAuthTab(); window.scrollTo({ top: $("auth-card").offsetTop - 20, behavior: "smooth" }); });
 
     const signoutBtn = $("signout-btn");
     if (signoutBtn) signoutBtn.addEventListener("click", signOut);
@@ -1611,24 +1641,9 @@
 
         if (app.user) {
           try {
-            if (!app.offline) {
-              const res = await api("POST", "/api/profile/update", { displayName, bio, avatar, favTeam, favPlayer });
-              app.user = res.user;
-              app.stats = res.stats;
-            } else {
-              const updated = await SupabaseDirect.request("PATCH", `/users?id=eq.${app.user.id}`, {
-                display_name: displayName,
-                bio,
-                avatar,
-                fav_team: favTeam,
-                fav_player: favPlayer,
-              }, { Prefer: "return=representation" });
-              if (Array.isArray(updated) && updated[0]) {
-                const u = updated[0];
-                app.user = SupabaseDirect.formatUser(u);
-                try { localStorage.setItem("cricketle:v2:session", JSON.stringify(app.user)); } catch (_) {}
-              }
-            }
+            const res = await api("POST", "/api/profile/update", { displayName, bio, avatar, favTeam, favPlayer });
+            app.user = res.user;
+            app.stats = res.stats;
             toast("Profile updated successfully!", "success");
             app.profileTab = "stats";
             renderProfile();
@@ -1650,7 +1665,7 @@
 
   function renderAuthTab() {
     if ($("auth-card")) $("auth-card").hidden = false;
-    clearPhoneAuthErrors();
+    clearAuthErrors();
     switchAuthView("signin");
   }
 
@@ -1664,8 +1679,32 @@
     el.setAttribute("aria-invalid", text ? "true" : "false");
   }
 
+  // ---------- Player authentication (username or phone + PIN) ----------
+
+  const COUNTRY_CODES = [
+    ["+91", "IN"], ["+1", "US"], ["+44", "GB"], ["+61", "AU"], ["+64", "NZ"],
+    ["+27", "ZA"], ["+92", "PK"], ["+880", "BD"], ["+94", "LK"], ["+971", "AE"],
+  ];
+  const DEFAULT_COUNTRY = "+91";
+  const AUTH_FIELDS = ["signin-identifier", "signin-pin", "register-username", "register-phone", "register-pin", "register-pin-confirm"];
+
+  function flagEmoji(cc) {
+    return String.fromCodePoint(...Array.from(cc, (c) => 0x1f1e6 + c.charCodeAt(0) - 65));
+  }
+
+  function fillCountrySelect(sel) {
+    if (!sel || sel.options.length) return;
+    for (const [code, cc] of COUNTRY_CODES) {
+      const o = document.createElement("option");
+      o.value = code;
+      o.textContent = `${flagEmoji(cc)} ${code}`;
+      sel.appendChild(o);
+    }
+    sel.value = DEFAULT_COUNTRY;
+  }
+
   function clearAuthErrors() {
-    for (const id of ["auth-username", "auth-password", "auth-confirm"]) fieldError(id, "");
+    for (const id of AUTH_FIELDS) fieldError(id, "");
     const summary = $("auth-summary");
     if (summary) {
       summary.hidden = true;
@@ -1673,303 +1712,50 @@
     }
   }
 
-  function validateAuth() { return []; }
-  async function submitAuth(ev) { if (ev && ev.preventDefault) ev.preventDefault(); }
-  async function handleGoogleLogin() {}
-  function initGoogleAuth() {}
-
-  // ---------- Player Authentication (Username & PIN) ----------
-
-  function clearPhoneAuthErrors() {
-    const summary = $("auth-summary") || $("otp-summary");
-    if (summary) {
-      summary.hidden = true;
-      summary.innerHTML = "";
-    }
+  // Server-side failures only; input mistakes go inline under their field.
+  function showAuthSummary(msg) {
+    const summary = $("auth-summary");
+    if (!summary) return;
+    summary.hidden = false;
+    summary.innerHTML = `
+      <div class="auth-error-wrap">
+        <svg class="auth-error-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        <span class="auth-error-text">${escapeHtml(msg)}</span>
+      </div>`;
+    summary.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "nearest" });
+    summary.focus();
   }
 
-  function showPhoneAuthError(msg) {
-    const summary = $("auth-summary") || $("otp-summary");
-    if (summary) {
-      summary.hidden = false;
-      summary.style.display = "block";
-      summary.innerHTML = `
-        <div class="auth-error-wrap">
-          <svg class="auth-error-icon" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-          </svg>
-          <span class="auth-error-text">${escapeHtml(msg)}</span>
-        </div>`;
-      summary.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      summary.focus();
-    }
+  // Digits (spaces, dashes and brackets allowed) mean a phone number; anything
+  // else is a username. Returns the bare digits or null.
+  function phoneDigits(raw) {
+    const d = String(raw || "").replace(/[\s\-().]/g, "");
+    return /^\d+$/.test(d) ? d : null;
   }
 
-  // ---------- Supabase Direct Cloud Client (for Live / Static Hosting) ----------
+  function toE164(country, digits) {
+    return (country || DEFAULT_COUNTRY) + digits.replace(/^0+/, "");
+  }
 
-  const SUPABASE_CONFIG = {
-    url: (window.CRICKETLE_SUPABASE_URL || "https://shzfexckrhcykiuddhwa.supabase.co").trim(),
-    key: (window.CRICKETLE_SUPABASE_KEY || window.CRICKETLE_SUPABASE_ANON_KEY || (typeof atob === "function" ? atob("c2JfcHVibGlzaGFibGVfLXV5V29BWkdzb0pxUDBYRElySktkZ182cDZpdDE3Mw==") : "")).trim(),
-    adminPhone: "+918755428254",
-  };
-
-  const SupabaseDirect = {
-    async request(method, endpoint, body = null, extraHeaders = {}) {
-      const fullUrl = SUPABASE_CONFIG.url + "/rest/v1" + endpoint;
-      const headers = {
-        apikey: SUPABASE_CONFIG.key,
-        Authorization: `Bearer ${SUPABASE_CONFIG.key}`,
-        "Content-Type": "application/json",
-        ...extraHeaders,
-      };
-      const options = { method, headers };
-      if (body !== null && method !== "GET" && method !== "HEAD") {
-        options.body = JSON.stringify(body);
-      }
-      const res = await fetch(fullUrl, options);
-      const text = await res.text();
-      let json = null;
-      try { json = text ? JSON.parse(text) : null; } catch (_) {}
-      if (!res.ok) {
-        let msg = (json && (json.message || json.error)) || `Supabase HTTP ${res.status}`;
-        if (msg.includes("Forbidden use of secret API key in browser")) {
-          msg = "Supabase requires the public 'anon' key (starts with eyJ...) in browsers. Please provide your Supabase anon key to enable live browser auth, or play at http://localhost:3000.";
-        }
-        const err = new Error(msg);
-        err.status = res.status;
-        err.json = json;
-        throw err;
-      }
-      return json;
-    },
-
-    toHex(arr) {
-      return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
-    },
-
-    fromHex(str) {
-      const bytes = new Uint8Array(str.length / 2);
-      for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(str.substr(i * 2, 2), 16);
-      return bytes;
-    },
-
-    async pbkdf2(pw, salt, iter, len) {
-      const enc = new TextEncoder();
-      const pwBytes = typeof pw === "string" ? enc.encode(pw) : pw;
-      const key = await crypto.subtle.importKey("raw", pwBytes, { name: "PBKDF2" }, false, ["deriveBits"]);
-      const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: iter, hash: "SHA-256" }, key, len * 8);
-      return new Uint8Array(bits);
-    },
-
-    async jsScrypt(pw, salt, N, r, p, dkLen) {
-      const enc = new TextEncoder();
-      const pwBytes = typeof pw === "string" ? enc.encode(pw) : pw;
-      const saltBytes = typeof salt === "string" ? this.fromHex(salt) : salt;
-      const B = await this.pbkdf2(pwBytes, saltBytes, 1, 128 * r * p);
-      const B32 = new Int32Array(B.buffer, B.byteOffset, B.byteLength / 4);
-
-      function R(a, b) { return (a << b) | (a >>> (32 - b)); }
-
-      function salsa20_8(B) {
-        const x = new Int32Array(16);
-        for (let i = 0; i < 16; i++) x[i] = B[i];
-        for (let i = 8; i > 0; i -= 2) {
-          x[ 4] ^= R(x[ 0]+x[12], 7);  x[ 8] ^= R(x[ 4]+x[ 0], 9);
-          x[12] ^= R(x[ 8]+x[ 4],13);  x[ 0] ^= R(x[12]+x[ 8],18);
-          x[ 9] ^= R(x[ 5]+x[ 1], 7);  x[13] ^= R(x[ 9]+x[ 5], 9);
-          x[ 1] ^= R(x[13]+x[ 9],13);  x[ 5] ^= R(x[ 1]+x[13],18);
-          x[14] ^= R(x[10]+x[ 6], 7);  x[ 2] ^= R(x[14]+x[10], 9);
-          x[ 6] ^= R(x[ 2]+x[14],13);  x[10] ^= R(x[ 6]+x[ 2],18);
-          x[ 3] ^= R(x[15]+x[11], 7);  x[ 7] ^= R(x[ 3]+x[15], 9);
-          x[11] ^= R(x[ 7]+x[ 3],13);  x[15] ^= R(x[11]+x[ 7],18);
-          x[ 1] ^= R(x[ 0]+x[ 3], 7);  x[ 2] ^= R(x[ 1]+x[ 0], 9);
-          x[ 3] ^= R(x[ 2]+x[ 1],13);  x[ 0] ^= R(x[ 3]+x[ 2],18);
-          x[ 6] ^= R(x[ 5]+x[ 4], 7);  x[ 7] ^= R(x[ 6]+x[ 5], 9);
-          x[ 4] ^= R(x[ 7]+x[ 6],13);  x[ 5] ^= R(x[ 4]+x[ 7],18);
-          x[11] ^= R(x[10]+x[ 9], 7);  x[ 8] ^= R(x[11]+x[10], 9);
-          x[ 9] ^= R(x[ 8]+x[11],13);  x[10] ^= R(x[ 9]+x[ 8],18);
-          x[12] ^= R(x[15]+x[14], 7);  x[13] ^= R(x[12]+x[15], 9);
-          x[14] ^= R(x[13]+x[12],13);  x[15] ^= R(x[14]+x[13],18);
-        }
-        for (let i = 0; i < 16; i++) B[i] += x[i];
-      }
-
-      function blockmix_salsa8(B, Y, r) {
-        const X = new Int32Array(16);
-        for (let i = 0; i < 16; i++) X[i] = B[(2 * r - 1) * 16 + i];
-        for (let i = 0; i < 2 * r; i++) {
-          for (let j = 0; j < 16; j++) X[j] ^= B[i * 16 + j];
-          salsa20_8(X);
-          const dest = (i % 2 === 0 ? i / 2 : r + (i - 1) / 2) * 16;
-          for (let j = 0; j < 16; j++) Y[dest + j] = X[j];
-        }
-      }
-
-      const len = 32 * r;
-      const X = new Int32Array(len);
-      const Y = new Int32Array(len);
-      const V = new Int32Array(N * len);
-      for (let i = 0; i < len; i++) X[i] = B32[i];
-      for (let i = 0; i < N; i++) {
-        V.set(X, i * len);
-        blockmix_salsa8(X, Y, r);
-        X.set(Y);
-      }
-      for (let i = 0; i < N; i++) {
-        const j = (X[len - 16] & (N - 1)) * len;
-        for (let k = 0; k < len; k++) X[k] ^= V[j + k];
-        blockmix_salsa8(X, Y, r);
-        X.set(Y);
-      }
-      for (let i = 0; i < len; i++) B32[i] = X[i];
-
-      return await this.pbkdf2(pwBytes, B, 1, dkLen);
-    },
-
-    async hashPin(pin) {
-      const salt = new Uint8Array(16);
-      crypto.getRandomValues(salt);
-      const derived = await this.pbkdf2(pin, salt, 100000, 32);
-      return ["pbkdf2", 100000, this.toHex(salt), this.toHex(derived)].join("$");
-    },
-
-    async verifyPin(pin, stored) {
-      if (!stored) return false;
-      const parts = String(stored).split("$");
-      if (parts[0] === "pbkdf2" && parts.length === 4) {
-        const salt = this.fromHex(parts[2]);
-        const expected = parts[3];
-        const actual = this.toHex(await this.pbkdf2(pin, salt, Number(parts[1]) || 100000, 32));
-        return actual === expected;
-      }
-      if (parts[0] === "scrypt" && parts.length === 4) {
-        const salt = this.fromHex(parts[2]);
-        const expected = parts[3];
-        const actual = this.toHex(await this.jsScrypt(pin, salt, Number(parts[1]) || 16384, 8, 1, expected.length / 2));
-        return actual === expected;
-      }
-      return false;
-    },
-
-    formatUser(row) {
-      if (!row) return null;
-      const normAdminPhone = (SUPABASE_CONFIG.adminPhone || "").replace(/\D/g, "");
-      const userPhone = (row.phone || "").replace(/\D/g, "");
-      const isAdmin = Boolean(row.is_admin) || Boolean(normAdminPhone && userPhone && normAdminPhone === userPhone);
-      return {
-        id: Number(row.id),
-        username: row.username,
-        displayName: row.display_name || row.username,
-        avatar: row.avatar || "batter",
-        bio: row.bio || "",
-        favTeam: row.fav_team || "",
-        favPlayer: row.fav_player || "",
-        phone: row.phone || null,
-        phoneConnected: Boolean(row.phone),
-        googleConnected: Boolean(row.google_id),
-        isAdmin,
-        createdAt: Number(row.created_at || Date.now()),
-      };
-    },
-
-    async findUser(identifier) {
-      const clean = String(identifier || "").trim();
-      if (!clean) return null;
-      const digits = clean.replace(/\D/g, "");
-      let query;
-      if (digits.length >= 7) {
-        const last10 = digits.length >= 10 ? digits.slice(-10) : digits;
-        const fullWithPlus = clean.startsWith("+")
-          ? clean.replace(/[\s\-()]/g, "")
-          : (digits.startsWith("91") && digits.length === 12 ? "+" + digits : "+91" + last10);
-        query = `/users?or=(username.ilike.${encodeURIComponent(clean)},phone.like.*${encodeURIComponent(last10)},phone.eq.${encodeURIComponent(fullWithPlus)})&select=*&limit=1`;
-      } else {
-        query = `/users?username=ilike.${encodeURIComponent(clean)}&select=*&limit=1`;
-      }
-      const rows = await this.request("GET", query);
-      return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
-    },
-
-    async verifyCredentials(identifier, pin) {
-      const row = await this.findUser(identifier);
-      if (!row || !row.pass_hash) {
-        const err = new Error("Incorrect username or PIN.");
-        err.code = "bad_credentials";
-        throw err;
-      }
-      const match = await this.verifyPin(pin, row.pass_hash);
-      if (!match) {
-        const err = new Error("Incorrect username or PIN.");
-        err.code = "bad_credentials";
-        throw err;
-      }
-      CricketleLog.auth("SUPABASE_SIGNIN", `Verified @${row.username} via direct Supabase Cloud`);
-      return this.formatUser(row);
-    },
-
-    async registerUser({ phone, username, pin }) {
-      const existingUser = await this.request("GET", `/users?username=ilike.${encodeURIComponent(username)}&select=id&limit=1`);
-      if (Array.isArray(existingUser) && existingUser.length > 0) {
-        const err = new Error(`Username @${username} is already taken.`);
-        err.code = "username_taken";
-        throw err;
-      }
-      if (phone) {
-        const existingPhone = await this.request("GET", `/users?phone=eq.${encodeURIComponent(phone)}&select=id&limit=1`);
-        if (Array.isArray(existingPhone) && existingPhone.length > 0) {
-          const err = new Error(`Mobile number ${phone} is already registered.`);
-          err.code = "phone_exists";
-          throw err;
-        }
-      }
-      const pass_hash = await this.hashPin(pin);
-      const rows = await this.request("POST", "/users", {
-        username,
-        pass_hash,
-        phone: phone || null,
-        display_name: username,
-        avatar: "allrounder",
-        bio: "Cricket fan playing on Cricketle",
-        created_at: Date.now(),
-      }, { Prefer: "return=representation" });
-
-      if (!Array.isArray(rows) || !rows.length) {
-        throw new Error("Failed to create account in database.");
-      }
-      CricketleLog.auth("SUPABASE_REGISTER", `Directly registered @${username} in Supabase PostgreSQL`, { id: rows[0].id });
-      return this.formatUser(rows[0]);
-    },
-
-    async resetUserPin(phone, newPin) {
-      const cleanPhone = String(phone || "").trim();
-      const digits = cleanPhone.replace(/\D/g, "");
-      const last10 = digits.length >= 10 ? digits.slice(-10) : digits;
-      const rows = await this.request(
-        "GET",
-        `/users?or=(phone.eq.${encodeURIComponent(cleanPhone)},phone.like.*${encodeURIComponent(last10)})&select=*&limit=1`
-      );
-      if (!Array.isArray(rows) || !rows.length) {
-        const err = new Error("No account found with this registered mobile number.");
-        err.code = "not_found";
-        throw err;
-      }
-      const targetUser = rows[0];
-      const new_hash = await this.hashPin(newPin);
-      const updated = await this.request("PATCH", `/users?id=eq.${targetUser.id}`, {
-        pass_hash: new_hash,
-      }, { Prefer: "return=representation" });
-      CricketleLog.auth("SUPABASE_RESET", `Updated PIN for @${targetUser.username} (${targetUser.phone}) in Supabase PostgreSQL`);
-      return this.formatUser(updated[0] || targetUser);
-    },
-  };
+  // The country picker slides in beside the identifier once it looks numeric.
+  function setCountryVisible(sel, show) {
+    if (!sel || sel.hidden === !show) return;
+    sel.hidden = !show;
+    sel.classList.remove("slide-in");
+    if (show) {
+      void sel.offsetWidth; // restart the animation
+      sel.classList.add("slide-in");
+    }
+  }
 
   function switchAuthView(view) {
-    clearPhoneAuthErrors();
+    clearAuthErrors();
     const tabSignin = $("tab-auth-signin");
     const tabRegister = $("tab-auth-register");
     const viewSignin = $("auth-view-signin");
     const viewRegister = $("auth-view-register");
-    const viewReset = $("auth-view-reset");
 
     if (tabSignin) {
       tabSignin.classList.toggle("active", view === "signin");
@@ -1979,337 +1765,146 @@
       tabRegister.classList.toggle("active", view === "register");
       tabRegister.setAttribute("aria-selected", String(view === "register"));
     }
-
     if (viewSignin) viewSignin.hidden = view !== "signin";
     if (viewRegister) viewRegister.hidden = view !== "register";
-    if (viewReset) viewReset.hidden = view !== "reset";
 
-    if (view === "signin" && $("signin-username")) $("signin-username").focus();
-    if (view === "register" && $("register-username")) $("register-username").focus();
-    if (view === "reset" && $("reset-phone")) $("reset-phone").focus();
+    const first = $(view === "signin" ? "signin-identifier" : "register-username");
+    if (first) first.focus();
   }
 
-  function clearOtpErrors() {
-    clearPhoneAuthErrors();
-  }
-
-  function showOtpError(msg) {
-    showPhoneAuthError(msg);
+  function setAuthBusy(btn, busy) {
+    if (!btn) return;
+    btn.classList.toggle("loading", busy);
+    btn.disabled = busy;
   }
 
   function initPhoneAuth() {
-    // Tab switching
-    const tabSignin = $("tab-auth-signin");
-    const tabRegister = $("tab-auth-register");
-    const toRegisterBtn = $("auth-switch-to-register");
-    const toSigninBtn = $("auth-switch-to-signin");
-    const toResetBtn = $("auth-to-reset-btn");
-    const resetToSigninBtn = $("auth-reset-to-signin");
+    const form = $("auth-form");
+    if (!form) return;
 
-    if (tabSignin) tabSignin.addEventListener("click", () => switchAuthView("signin"));
-    if (tabRegister) tabRegister.addEventListener("click", () => switchAuthView("register"));
-    if (toRegisterBtn) toRegisterBtn.addEventListener("click", () => switchAuthView("register"));
-    if (toSigninBtn) toSigninBtn.addEventListener("click", () => switchAuthView("signin"));
-    if (toResetBtn) toResetBtn.addEventListener("click", () => switchAuthView("reset"));
-    if (resetToSigninBtn) resetToSigninBtn.addEventListener("click", () => switchAuthView("signin"));
+    fillCountrySelect($("signin-country"));
+    fillCountrySelect($("register-country"));
 
-    // 1. Sign In (Username & PIN)
+    $("tab-auth-signin").addEventListener("click", () => switchAuthView("signin"));
+    $("tab-auth-register").addEventListener("click", () => switchAuthView("register"));
+    $("auth-switch-to-register").addEventListener("click", () => switchAuthView("register"));
+    $("auth-switch-to-signin").addEventListener("click", () => switchAuthView("signin"));
+
+    // An edited field drops its own error straight away.
+    for (const id of AUTH_FIELDS) $(id).addEventListener("input", () => fieldError(id, ""));
+
+    const idInput = $("signin-identifier");
+    const sCountry = $("signin-country");
+    const sPin = $("signin-pin");
     const signinBtn = $("auth-signin-btn");
-    const signinUser = $("signin-username");
-    const signinPin = $("signin-pin");
+    idInput.addEventListener("input", () => {
+      const d = phoneDigits(idInput.value);
+      setCountryVisible(sCountry, d !== null && !d.startsWith("00")); // 00… already names its country
+    });
 
-    const handleSignin = async () => {
-      clearPhoneAuthErrors();
-      const identifier = (signinUser ? signinUser.value : "").trim();
-      const pin = (signinPin ? signinPin.value : "").trim();
-
+    async function handleSignin() {
+      clearAuthErrors();
+      let identifier = idInput.value.trim();
+      const pin = sPin.value.trim();
       if (!identifier) {
-        showPhoneAuthError("Please enter your username or mobile number.");
-        if (signinUser) signinUser.focus();
+        fieldError("signin-identifier", "Enter your username or mobile number.");
+        idInput.focus();
         return;
       }
       if (!/^\d{4,8}$/.test(pin)) {
-        showPhoneAuthError("Please enter your 4 to 6 digit secret PIN.");
-        if (signinPin) signinPin.focus();
+        fieldError("signin-pin", "Enter your PIN (4 to 8 digits).");
+        sPin.focus();
         return;
       }
+      const digits = phoneDigits(identifier);
+      if (digits) identifier = digits.startsWith("00") ? "+" + digits.slice(2) : toE164(sCountry.value, digits);
 
-      if (signinBtn) {
-        signinBtn.classList.add("loading");
-        signinBtn.disabled = true;
-      }
-
+      setAuthBusy(signinBtn, true);
       try {
-        let user = null;
-        if (!app.offline) {
-          try {
-            const res = await api("POST", "/api/auth/login", { username: identifier, pin });
-            if (res && res.ok && res.user) user = res.user;
-          } catch (serverErr) {
-            if (serverErr.status === 401 || serverErr.code === "bad_credentials") throw serverErr;
-            CricketleLog.warn("AUTH", "Server endpoint not responding, validating against Supabase Cloud direct");
-          }
-        }
-        if (!user) {
-          user = await SupabaseDirect.verifyCredentials(identifier, pin);
-        }
-        await becomeUser(user);
-        try { localStorage.setItem("cricketle:v2:session", JSON.stringify(user)); } catch (_) {}
-        toast(`Welcome back, @${user.username}!`, "success");
+        if (app.offline) throw new ApiError("offline", MESSAGES.offline, 0);
+        const res = await api("POST", "/api/auth/login", { identifier, pin });
+        await becomeUser(res.user);
+        toast(`Welcome back, @${res.user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
-        let msg = "Incorrect username or PIN. Please verify and try again.";
-        if (err.code === "bad_credentials" || err.message === "Incorrect username or PIN.") {
-          msg = "Incorrect username or PIN. This combination does not match any registered account.";
-        } else if (err.code === "missing_fields") {
-          msg = "Please enter both username and PIN.";
-        } else if (err.code === "network") {
-          msg = "Cannot reach authentication server or Supabase cloud. Check internet connection.";
-        } else if (err.message) {
-          msg = err.message;
-        }
-        showPhoneAuthError(msg);
-        if (signinPin) {
-          signinPin.value = "";
-          signinPin.focus();
-        }
+        const msg = err.code === "bad_credentials"
+          ? "Incorrect username or PIN."
+          : (err.code === "network" ? MESSAGES.network : (err.message || "Could not sign in. Try again."));
+        showAuthSummary(msg);
+        sPin.value = "";
+        sPin.focus();
       } finally {
-        if (signinBtn) {
-          signinBtn.classList.remove("loading");
-          signinBtn.disabled = false;
-        }
+        setAuthBusy(signinBtn, false);
       }
-    };
-
-    if (signinBtn) signinBtn.addEventListener("click", handleSignin);
-    if (signinUser) {
-      signinUser.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          if (signinPin) signinPin.focus();
-        }
-      });
-    }
-    if (signinPin) {
-      signinPin.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          handleSignin();
-        }
-      });
     }
 
-    // 2. Account Registration (Unique Username + Mobile + PIN)
-    const registerBtn = $("auth-register-btn");
     const regUsername = $("register-username");
+    const regCountry = $("register-country");
     const regPhone = $("register-phone");
-    const regCountry = $("register-country-code");
     const regPin = $("register-pin");
     const regConfirm = $("register-pin-confirm");
+    const registerBtn = $("auth-register-btn");
 
-    const handleRegister = async () => {
-      clearPhoneAuthErrors();
-      const username = (regUsername ? regUsername.value : "").trim();
-      const countryCode = (regCountry && regCountry.value) || "+91";
-      const rawPhone = (regPhone ? regPhone.value : "").trim().replace(/[\s\-()]/g, "");
-      const pin = (regPin ? regPin.value : "").trim();
-      const confirmPin = (regConfirm ? regConfirm.value : "").trim();
+    async function handleRegister() {
+      clearAuthErrors();
+      const username = regUsername.value.trim();
+      const digits = phoneDigits(regPhone.value);
+      const pin = regPin.value.trim();
+      const confirmPin = regConfirm.value.trim();
 
-      if (!username) {
-        showPhoneAuthError("Please choose a username for the leaderboard.");
-        if (regUsername) regUsername.focus();
-        return;
-      }
-      if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) {
-        showPhoneAuthError("Usernames must be 3-20 letters, numbers, or underscores.");
-        if (regUsername) regUsername.focus();
-        return;
-      }
-      if (!rawPhone) {
-        showPhoneAuthError("Please enter your mobile phone number for PIN recovery.");
-        if (regPhone) regPhone.focus();
-        return;
-      }
-      const fullPhone = rawPhone.startsWith("+") ? rawPhone : countryCode + rawPhone.replace(/^0+/, "");
-      if (!/^\+[1-9]\d{9,14}$/.test(fullPhone)) {
-        showPhoneAuthError("Please enter a valid mobile number (e.g. 98765 43210).");
-        if (regPhone) regPhone.focus();
-        return;
-      }
-      if (!/^\d{4,8}$/.test(pin)) {
-        showPhoneAuthError("Please choose a 6-digit secret PIN.");
-        if (regPin) regPin.focus();
-        return;
-      }
-      if (pin !== confirmPin) {
-        showPhoneAuthError("PINs do not match. Please re-enter.");
-        if (regConfirm) regConfirm.focus();
-        return;
-      }
+      // Report every field at once so one tap shows everything to fix.
+      let firstBad = null;
+      const bad = (id, text) => { fieldError(id, text); firstBad = firstBad || $(id); };
+      if (!username) bad("register-username", "Choose a username.");
+      else if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) bad("register-username", "3-20 letters, numbers or underscores.");
+      else if (/^\d+$/.test(username)) bad("register-username", "Add a letter: all-digit names read as phone numbers.");
+      const phone = digits ? (digits.startsWith("00") ? "+" + digits.slice(2) : toE164(regCountry.value, digits)) : null;
+      if (!digits) bad("register-phone", "Enter your mobile number.");
+      else if (!/^\+[1-9]\d{7,14}$/.test(phone)) bad("register-phone", "That doesn't look like a valid mobile number.");
+      if (!/^\d{6}$/.test(pin)) bad("register-pin", "PIN must be exactly 6 digits.");
+      else if (pin !== confirmPin) bad("register-pin-confirm", "PINs don't match.");
+      if (firstBad) { firstBad.focus(); return; }
 
-      if (registerBtn) {
-        registerBtn.classList.add("loading");
-        registerBtn.disabled = true;
-      }
-
+      setAuthBusy(registerBtn, true);
       try {
-        let user = null;
-        if (!app.offline) {
-          try {
-            const res = await api("POST", "/api/auth/phone/register", {
-              phone: fullPhone,
-              username,
-              pin,
-            });
-            if (res && res.ok && res.user) user = res.user;
-          } catch (serverErr) {
-            if (serverErr.status === 409 || serverErr.code === "username_taken" || serverErr.code === "phone_exists") throw serverErr;
-            CricketleLog.warn("AUTH", "Server endpoint not responding, creating user in Supabase Cloud direct");
-          }
-        }
-        if (!user) {
-          user = await SupabaseDirect.registerUser({ phone: fullPhone, username, pin });
-        }
-        await becomeUser(user);
-        try { localStorage.setItem("cricketle:v2:session", JSON.stringify(user)); } catch (_) {}
-        toast(`Welcome to Cricketle, @${user.username}!`, "success");
+        if (app.offline) throw new ApiError("offline", MESSAGES.offline, 0);
+        const res = await api("POST", "/api/auth/phone/register", { phone, username, pin });
+        await becomeUser(res.user);
+        toast(`Welcome to Cricketle, @${res.user.username}!`, "success");
         location.hash = "#play";
         showView();
       } catch (err) {
-        let msg = "Failed to create account. Try again.";
         if (err.code === "username_taken") {
-          msg = `Username "@${username}" is already taken! Please choose another unique username.`;
-          if (regUsername) {
-            regUsername.focus();
-            regUsername.select();
-          }
+          fieldError("register-username", "That username is taken. Try another.");
+          regUsername.focus();
+          regUsername.select();
         } else if (err.code === "phone_exists") {
-          msg = `Mobile number ${fullPhone} is already registered! Please switch to Sign In or reset your PIN.`;
-        } else if (err.code === "network") {
-          msg = "Cannot reach authentication server. Please ensure the Cricketle server is running.";
-        } else if (err.message) {
-          msg = err.message;
+          fieldError("register-phone", "This number already has an account. Sign in instead.");
+          regPhone.focus();
+        } else if (err.code === "invalid_pin") {
+          fieldError("register-pin", err.message || "PIN must be exactly 6 digits.");
+          regPin.focus();
+        } else {
+          showAuthSummary(err.code === "network" ? MESSAGES.network : (err.message || "Could not create the account. Try again."));
         }
-        showPhoneAuthError(msg);
       } finally {
-        if (registerBtn) {
-          registerBtn.classList.remove("loading");
-          registerBtn.disabled = false;
-        }
+        setAuthBusy(registerBtn, false);
       }
-    };
-
-    if (registerBtn) registerBtn.addEventListener("click", handleRegister);
-    if (regConfirm) {
-      regConfirm.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          handleRegister();
-        }
-      });
     }
 
-    // 3. Reset PIN
-    const resetBtn = $("auth-reset-btn");
-    const resetPhone = $("reset-phone");
-    const resetCountry = $("reset-country-code");
-    const resetNewPin = $("reset-new-pin");
-    const resetConfirm = $("reset-pin-confirm");
-
-    const handleReset = async () => {
-      clearPhoneAuthErrors();
-      const countryCode = (resetCountry && resetCountry.value) || "+91";
-      const rawPhone = (resetPhone ? resetPhone.value : "").trim().replace(/[\s\-()]/g, "");
-      const newPin = (resetNewPin ? resetNewPin.value : "").trim();
-      const confirmPin = (resetConfirm ? resetConfirm.value : "").trim();
-
-      if (!rawPhone) {
-        showPhoneAuthError("Please enter your registered mobile phone number.");
-        if (resetPhone) resetPhone.focus();
-        return;
-      }
-      const fullPhone = rawPhone.startsWith("+") ? rawPhone : countryCode + rawPhone.replace(/^0+/, "");
-      if (!/^\+[1-9]\d{9,14}$/.test(fullPhone)) {
-        showPhoneAuthError("Please enter a valid mobile number.");
-        if (resetPhone) resetPhone.focus();
-        return;
-      }
-      if (!/^\d{4,8}$/.test(newPin)) {
-        showPhoneAuthError("Please enter a 4 to 6 digit new PIN.");
-        if (resetNewPin) resetNewPin.focus();
-        return;
-      }
-      if (newPin !== confirmPin) {
-        showPhoneAuthError("New PINs do not match. Please re-enter.");
-        if (resetConfirm) resetConfirm.focus();
-        return;
-      }
-
-      if (resetBtn) {
-        resetBtn.classList.add("loading");
-        resetBtn.disabled = true;
-      }
-
-      try {
-        let user = null;
-        if (!app.offline) {
-          try {
-            const res = await api("POST", "/api/auth/phone/reset", { phone: fullPhone, newPin });
-            if (res && res.ok && res.user) user = res.user;
-          } catch (serverErr) {
-            if (serverErr.status === 404 || serverErr.code === "not_found") throw serverErr;
-            CricketleLog.warn("AUTH", "Server endpoint not responding, resetting PIN in Supabase Cloud direct");
-          }
-        }
-        if (!user) {
-          user = await SupabaseDirect.resetUserPin(fullPhone, newPin);
-        }
-        await becomeUser(user);
-        try { localStorage.setItem("cricketle:v2:session", JSON.stringify(user)); } catch (_) {}
-        toast(`Secret PIN updated! Welcome back, @${user.username}!`, "success");
-        location.hash = "#play";
-        showView();
-      } catch (err) {
-        let msg = "Failed to reset PIN. Try again.";
-        if (err.code === "not_found") {
-          msg = "No account found with this registered mobile number.";
-          if (resetPhone) resetPhone.focus();
-        } else if (err.code === "network") {
-          msg = "Cannot reach authentication server. Please ensure the Cricketle server is running.";
-        } else if (err.message) {
-          msg = err.message;
-        }
-        showPhoneAuthError(msg);
-      } finally {
-        if (resetBtn) {
-          resetBtn.classList.remove("loading");
-          resetBtn.disabled = false;
-        }
-      }
-    };
-
-    if (resetBtn) resetBtn.addEventListener("click", handleReset);
-    if (resetConfirm) {
-      resetConfirm.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          handleReset();
-        }
-      });
-    }
-
-    const authForm = $("auth-form") || $("otp-form");
-    if (authForm) {
-      authForm.addEventListener("submit", (e) => e.preventDefault());
-    }
+    // Enter anywhere in the form submits the visible view.
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if ($("auth-view-signin").hidden) handleRegister();
+      else handleSignin();
+    });
   }
 
   async function signOut() {
     if (!app.offline) {
       try { await api("POST", "/api/auth/logout", {}); } catch (_) { /* ignore */ }
     }
-    try { localStorage.removeItem("cricketle:v2:session"); } catch (_) {}
     becomeGuest();
     toast("Signed out. Playing as a guest on this device.");
     location.hash = "#play";
@@ -2318,32 +1913,10 @@
 
   async function becomeUser(user) {
     app.user = user;
-    app.store = app.offline ? new LocalStore() : new RemoteStore();
+    app.store = new RemoteStore();
     app.board.data = {};
     CricketleLog.auth("SIGN_IN", `Authenticated as @${user.username} (${user.displayName || user.username})`);
-    if (!app.offline) {
-      await refreshStats();
-    } else {
-      if (app.store && app.store.getStats) app.stats = app.store.getStats();
-      if (app.user && app.user.id && app.store && app.store.getHistory) {
-        const today = core.todayKey();
-        const h = app.store.getHistory().filter((p) => p.day === today);
-        for (const item of h) {
-          SupabaseDirect.request("POST", "/puzzles", {
-            user_id: app.user.id,
-            day: item.day,
-            mode: item.mode,
-            idx: item.idx,
-            status: item.status,
-            guesses: item.guesses,
-            hints: item.hints,
-            started_at: item.started_at,
-            finished_at: item.finished_at,
-            points: item.points || 0,
-          }, { Prefer: "resolution=merge-duplicates" }).catch(() => {});
-        }
-      }
-    }
+    await refreshStats();
     await reload();
     renderNav();
     renderProfile();
@@ -2353,7 +1926,6 @@
     app.user = null;
     app.stats = null;
     app.store = new LocalStore();
-    try { localStorage.removeItem("cricketle:v2:session"); } catch (_) {}
     CricketleLog.auth("GUEST", "Session cleared · Operating in guest mode");
     if (app.store && app.store.saveProfile) {
       const p = app.store.getProfile();
@@ -2398,6 +1970,43 @@
 
   // ---------- Help dialog copy ----------
 
+  // ---------- Onboarding sheet ----------
+  //
+  // First visit: shown over the live game; "Play" closes it and starts the
+  // current puzzle. Later: the help button reopens it and "Play" only closes.
+
+  let onboardFirstVisit = false;
+
+  function openOnboard(opts) {
+    const dlg = $("onboard");
+    if (!dlg || dlg.open) return;
+    onboardFirstVisit = Boolean(opts && opts.firstVisit);
+    dlg.showModal();
+  }
+
+  function closeOnboard() {
+    const dlg = $("onboard");
+    safeSet(SEEN_HELP_KEY, "1");
+    if (dlg && dlg.open) dlg.close();
+  }
+
+  function initOnboard() {
+    const play = $("onboard-play");
+    const signin = $("onboard-signin");
+    if (play) {
+      play.addEventListener("click", () => {
+        const first = onboardFirstVisit;
+        onboardFirstVisit = false;
+        closeOnboard();
+        if (first && app.state && puzzle().status === "ready") startPuzzle();
+        else input.focus();
+      });
+    }
+    if (signin) signin.addEventListener("click", () => { onboardFirstVisit = false; closeOnboard(); });
+    const dlg = $("onboard");
+    if (dlg) dlg.addEventListener("close", () => { onboardFirstVisit = false; safeSet(SEEN_HELP_KEY, "1"); });
+  }
+
   function fillHelp() {
     const easy = core.tiers(core.poolFor("easy").length);
     const hard = core.tiers(core.poolFor("hard").length);
@@ -2412,7 +2021,12 @@
 
   // ---------- Events ----------
 
-  input.addEventListener("input", () => showSuggestions(input.value));
+  // Blur hides the list after a short delay so a tap on a suggestion still
+  // lands. Typing or refocusing within that delay cancels the hide, otherwise
+  // tapping a hint and typing straight away lost the dropdown.
+  let blurTimer = 0;
+  input.addEventListener("input", () => { clearTimeout(blurTimer); showSuggestions(input.value); });
+  input.addEventListener("focus", () => clearTimeout(blurTimer));
   input.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown") { e.preventDefault(); moveHighlight(1); }
     else if (e.key === "ArrowUp") { e.preventDefault(); moveHighlight(-1); }
@@ -2426,7 +2040,10 @@
     const li = e.target.closest("li");
     if (li) { e.preventDefault(); submitGuess(li.dataset.name); }
   });
-  input.addEventListener("blur", () => setTimeout(hideSuggestions, 120));
+  input.addEventListener("blur", () => {
+    clearTimeout(blurTimer);
+    blurTimer = setTimeout(() => { if (document.activeElement !== input) hideSuggestions(); }, 120);
+  });
 
   starters.addEventListener("click", (e) => {
     const btn = e.target.closest(".starter");
@@ -2444,26 +2061,12 @@
   giveUpBtn.addEventListener("click", doGiveUp);
   $("mode-easy").addEventListener("click", () => setMode("easy"));
   $("mode-hard").addEventListener("click", () => setMode("hard"));
-  $("help-btn").addEventListener("click", () => $("help").showModal());
+  $("help-btn").addEventListener("click", () => openOnboard({ firstVisit: false }));
   document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
 
   $("tab-today").addEventListener("click", () => setBoardTab("today"));
   $("tab-alltime").addEventListener("click", () => setBoardTab("alltime"));
   $("board-refresh").addEventListener("click", () => loadBoard(true));
-
-  if ($("tab-signin")) $("tab-signin").addEventListener("click", () => { app.authTab = "signin"; renderAuthTab(); });
-  if ($("tab-signup")) $("tab-signup").addEventListener("click", () => { app.authTab = "signup"; renderAuthTab(); });
-  if ($("auth-form")) $("auth-form").addEventListener("submit", submitAuth);
-  for (const id of ["auth-username", "auth-password", "auth-confirm"]) {
-    const el = $(id);
-    if (el) {
-      el.addEventListener("blur", () => { if (el.value) validateAuth(id); });
-      el.addEventListener("input", () => {
-        const f = el.closest(".field");
-        if (f && f.classList.contains("invalid")) validateAuth(id);
-      });
-    }
-  }
 
   window.addEventListener("hashchange", showView);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) tick(); });
@@ -2473,18 +2076,15 @@
 
   async function bootstrap() {
     fillHelp();
+    initOnboard();
     initPhoneAuth();
+    // A static host (GitHub Pages, file://) has no API: play as a guest only.
+    // Accounts, leaderboards and ranks live on the server, which is the only
+    // place that can verify them.
     const isStaticHost = Boolean(location.hostname.endsWith("github.io") || location.protocol === "file:");
     if (isStaticHost) {
       app.offline = true;
       app.store = new LocalStore();
-      try {
-        const saved = JSON.parse(localStorage.getItem("cricketle:v2:session"));
-        if (saved && saved.username) {
-          app.user = saved;
-          app.stats = app.store.getStats();
-        }
-      } catch (_) {}
     } else {
       try {
         const me = await api("GET", "/api/me");
@@ -2498,22 +2098,12 @@
           app.store = new LocalStore();
         }
       } catch (err) {
-        // Running on a static host without local Node server
         app.offline = true;
         app.store = new LocalStore();
-
-        // Restore verified Supabase cloud session if present
-        try {
-          const saved = JSON.parse(localStorage.getItem("cricketle:v2:session"));
-          if (saved && saved.username) {
-            app.user = saved;
-            app.stats = app.store.getStats();
-          }
-        } catch (_) {}
-
         if (!(err instanceof ApiError && (err.status === 0 || err.status === 404 || err.status === 405))) console.warn("Cricketle: server unavailable", err);
       }
     }
+    safeRemove("cricketle:v2:session");
 
     // Clear any legacy mock credentials from earlier builds
     try {
@@ -2532,6 +2122,7 @@
       if (app.store && app.store.kind === "remote") { app.offline = false; await becomeGuest(); } else throw err;
     }
     showView();
+    if (safeGet(SEEN_HELP_KEY) !== "1") openOnboard({ firstVisit: true });
     CricketleLog.info("READY", `Cricketle ready · Day: ${core.todayKey()} · Mode: ${app.mode} · Storage: ${app.store.kind}`);
     tick();
     setInterval(tick, 250);

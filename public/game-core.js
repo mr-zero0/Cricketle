@@ -23,6 +23,9 @@
   // ---------- Constants ----------
 
   const PUZZLES_PER_DAY = 3;
+  // Guests (no account) may play this many puzzles per mode per day; the rest
+  // ask them to sign in. Signed-in play is never gated.
+  const GUEST_PUZZLES_PER_MODE = 1;
   const HINTS_PER_PUZZLE = 3;
   const HINT_COST = 10;
   const MODES = ["easy", "hard"];
@@ -214,6 +217,17 @@
     return nextMidnight - t;
   }
 
+  // Hour of day in IST (0-23) for a UTC instant.
+  function istHour(now) {
+    return new Date((now === undefined ? Date.now() : now) + IST_OFFSET_MS).getUTCHours();
+  }
+
+  // Stadium scene for an IST hour: daylight from 06:00 until 18:00.
+  // theme.js repeats this rule because it runs in <head>, before this file.
+  function sceneForHour(hourIST) {
+    return hourIST >= 6 && hourIST < 18 ? "day" : "night";
+  }
+
   // ---------- Seeded daily answers ----------
 
   function hashString(str) {
@@ -401,9 +415,15 @@
     if (following && following.status === "locked") following.status = "ready";
   }
 
-  function startPuzzle(state, mode, idx, now) {
+  function guestCanPlay(idx) {
+    return Number.isInteger(idx) && idx >= 0 && idx < GUEST_PUZZLES_PER_MODE;
+  }
+
+  // opts.guest = true applies the guest allowance; the server never sets it.
+  function startPuzzle(state, mode, idx, now, opts) {
     const loc = locate(state, mode, idx);
     if (loc.error) return fail(state, loc.error);
+    if (opts && opts.guest && !guestCanPlay(idx)) return fail(state, "sign_in_required");
     if (loc.puzzle.status === "locked") return fail(state, "locked");
     if (loc.puzzle.status !== "ready") return fail(state, "not_ready");
     const next = clone(state);
@@ -499,17 +519,28 @@
 
   // ---------- Avatars & Achievements ----------
 
+  // Profile avatars: every one is a piece of cricket kit, drawn as an SVG
+  // symbol in index.html. `icon` is the symbol reference.
   const AVATARS = [
-    { id: "batter", name: "Master Blaster", role: "Batter", icon: "🏏", bg: "linear-gradient(135deg, #15803d, #22c55e)", color: "#22c55e" },
-    { id: "bowler", name: "Speed Merchant", role: "Pacer", icon: "🎯", bg: "linear-gradient(135deg, #b91c1c, #ef4444)", color: "#ef4444" },
-    { id: "spinner", name: "Spin Wizard", role: "Spinner", icon: "🌀", bg: "linear-gradient(135deg, #0369a1, #38bdf8)", color: "#38bdf8" },
-    { id: "keeper", name: "The Wall", role: "Wicketkeeper", icon: "🧤", bg: "linear-gradient(135deg, #b45309, #f59e0b)", color: "#f59e0b" },
-    { id: "captain", name: "The Skipper", role: "Captain", icon: "👑", bg: "linear-gradient(135deg, #7e22ce, #a855f7)", color: "#a855f7" },
-    { id: "allrounder", name: "Powerhouse", role: "All-Rounder", icon: "⚡", bg: "linear-gradient(135deg, #0f766e, #14b8a6)", color: "#14b8a6" },
-    { id: "legend", name: "Hall of Fame", role: "Legend", icon: "🏆", bg: "linear-gradient(135deg, #ca8a04, #facc15)", color: "#facc15" },
-    { id: "lion", name: "Roaring Lion", role: "Mascot", icon: "🦁", bg: "linear-gradient(135deg, #ea580c, #fb923c)", color: "#fb923c" },
-    { id: "eagle", name: "Soaring Eagle", role: "Mascot", icon: "🦅", bg: "linear-gradient(135deg, #475569, #94a3b8)", color: "#94a3b8" },
+    { id: "batter", name: "Master Blaster", role: "Batter", icon: "#i-bat", bg: "linear-gradient(135deg, #15803d, #22c55e)", color: "#22c55e" },
+    { id: "bowler", name: "Speed Merchant", role: "Pacer", icon: "#i-bolt", bg: "linear-gradient(135deg, #b91c1c, #ef4444)", color: "#ef4444" },
+    { id: "spinner", name: "Spin Wizard", role: "Spinner", icon: "#i-ball", bg: "linear-gradient(135deg, #0369a1, #38bdf8)", color: "#38bdf8" },
+    { id: "keeper", name: "Safe Hands", role: "Wicketkeeper", icon: "#i-shield", bg: "linear-gradient(135deg, #b45309, #f59e0b)", color: "#f59e0b" },
+    { id: "captain", name: "The Skipper", role: "Captain", icon: "#i-crown", bg: "linear-gradient(135deg, #7e22ce, #a855f7)", color: "#a855f7" },
+    { id: "allrounder", name: "Powerhouse", role: "All-Rounder", icon: "#i-medal", bg: "linear-gradient(135deg, #0f766e, #14b8a6)", color: "#14b8a6" },
+    { id: "legend", name: "Hall of Fame", role: "Legend", icon: "#i-trophy", bg: "linear-gradient(135deg, #ca8a04, #facc15)", color: "#facc15" },
+    { id: "stumps", name: "Timber!", role: "Stumps", icon: "#i-stumps", bg: "linear-gradient(135deg, #ea580c, #fb923c)", color: "#fb923c" },
+    { id: "pads", name: "Front Foot", role: "Pads", icon: "#i-pads", bg: "linear-gradient(135deg, #475569, #94a3b8)", color: "#94a3b8" },
   ];
+
+  // Older accounts may still store the retired mascots.
+  const AVATAR_ALIASES = { lion: "captain", eagle: "allrounder" };
+
+  function normalizeAvatarId(id) {
+    const v = typeof id === "string" ? id : "";
+    if (AVATARS.some((a) => a.id === v)) return v;
+    return AVATAR_ALIASES[v] || "batter";
+  }
 
   const ACHIEVEMENTS = [
     {
@@ -782,12 +813,13 @@
   }
 
   return {
-    PUZZLES_PER_DAY, HINTS_PER_PUZZLE, HINT_COST, MODES, IST_OFFSET_MS, DAY_MS,
-    EASY_NAMES, RANK_LADDER, HINT_LABELS, AVATARS, ACHIEVEMENTS,
+    PUZZLES_PER_DAY, GUEST_PUZZLES_PER_MODE, HINTS_PER_PUZZLE, HINT_COST, MODES, IST_OFFSET_MS, DAY_MS,
+    guestCanPlay,
+    EASY_NAMES, RANK_LADDER, HINT_LABELS, AVATARS, ACHIEVEMENTS, normalizeAvatarId,
     data: { COUNTRIES: data.COUNTRIES, IPL_TEAMS: data.IPL_TEAMS, BOWL_STYLES: data.BOWL_STYLES },
     poolFor, inPool, byName, describe,
     similarity, reasons, buildRanks, tiers, tier,
-    todayKey, msUntilReset, shiftDay, hashString, mulberry32,
+    todayKey, msUntilReset, shiftDay, istHour, sceneForHour, hashString, mulberry32,
     dailyAnswers, answerFor, ranksFor,
     hintFor, scorePuzzle, rankTitle,
     newDayState, startPuzzle, applyGuess, useHint, giveUp, revealedHints,

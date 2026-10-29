@@ -37,3 +37,8 @@ Thumbs.db
 # Tooling Cache & Logs
 .aiforce_*.json
 .claude/
+.superpowers/
+
+# Progress & Notes
+PROGRESS.md
+

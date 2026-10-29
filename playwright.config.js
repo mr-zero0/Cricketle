@@ -24,7 +24,9 @@ module.exports = defineConfig({
     // Full Chromium in new-headless mode (reuses the cached build; no headless-shell download).
     channel: "chromium",
     // Static stadium scene and no CSS motion: deterministic and far cheaper to drive.
-    reducedMotion: "reduce",
+    // `reducedMotion` is not a test option (the runner ignores it silently); it
+    // has to travel in contextOptions to reach browser.newContext.
+    contextOptions: { reducedMotion: "reduce" },
     baseURL: "http://127.0.0.1:" + PORT,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
@@ -34,7 +36,11 @@ module.exports = defineConfig({
     url: "http://127.0.0.1:" + PORT + "/api/health",
     reuseExistingServer: false,
     timeout: 30 * 1000,
-    env: { PORT: String(PORT), CRICKETLE_DB: dbPath, CRICKETLE_SECRET: "public" },
+    // CRICKETLE_SKIP_DOTENV keeps a developer's .env (and its Supabase project)
+    // out of the e2e server: it always runs on the throwaway SQLite file.
+    // CRICKETLE_RATE_LIMIT=off: the suite creates more accounts per hour from
+    // 127.0.0.1 than the sign-up throttle (5/hour) allows.
+    env: { PORT: String(PORT), CRICKETLE_DB: dbPath, CRICKETLE_SECRET: "public", CRICKETLE_SKIP_DOTENV: "1", CRICKETLE_RATE_LIMIT: "off" },
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 860 } } },

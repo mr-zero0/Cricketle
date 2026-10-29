@@ -1,0 +1,30 @@
+# Render Blueprint for Cricketle.
+# Dashboard -> New -> Blueprint -> pick this repo. Render reads this file and
+# asks for the two secret values below on first deploy.
+services:
+  - type: web
+    name: cricketle
+    runtime: node
+    plan: free
+    rootDir: Cricketle
+    buildCommand: "true"            # zero npm dependencies at runtime
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22.12.0"            # node:sqlite needs 22.5+; Supabase mode needs only fetch
+      - key: SUPABASE_URL
+        sync: false                 # paste your project URL
+      - key: SUPABASE_KEY
+        sync: false                 # service_role key ONLY. Never the anon / publishable key.
+      - key: ADMIN_KEY
+        generateValue: true         # long random admin password; read it from the dashboard
+      - key: CRICKETLE_SECRET
+        generateValue: true         # seeds the account answers; never "public" in production
+      - key: TRUST_PROXY
+        value: "1"                  # Render terminates TLS and appends the client IP to x-forwarded-for
+      - key: ADMIN_PHONE
+        sync: false                 # optional: your mobile, that account becomes admin
+      - key: LOG_FORMAT
+        value: json

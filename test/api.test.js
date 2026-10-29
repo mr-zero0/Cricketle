@@ -10,14 +10,14 @@ const IST = 5.5 * 3600 * 1000;
 const T0 = Date.UTC(2026, 9, 27) - IST + 9 * 3600 * 1000;
 
 // Boots an app on an ephemeral port with an in-memory database and a fake clock.
-async function boot() {
+async function boot(extra = {}) {
   let now = T0;
   // secret "" = the public seed, so the test can compute today's answers with the core.
-  const app = createApp({ dbPath: ":memory:", now: () => now, rateLimit: false, log: false, secret: "" });
+  const app = createApp({ dbPath: ":memory:", now: () => now, rateLimit: false, log: false, secret: "", ...extra });
   await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
   const base = "http://127.0.0.1:" + app.server.address().port;
   const close = () => new Promise((resolve) => app.close(resolve));
-  return { base, close, setNow: (t) => { now = t; }, getNow: () => now };
+  return { base, close, db: app.db, setNow: (t) => { now = t; }, getNow: () => now };
 }
 
 // Minimal cookie-jar client: one jar per "browser".
@@ -50,9 +50,14 @@ function client(base) {
   };
 }
 
-async function signUp(base, username, password) {
+// Accounts are username + phone + 6-digit PIN. Each sign-up gets a fresh phone.
+let phoneSeq = 0;
+const nextPhone = () => "+9198000" + String(++phoneSeq).padStart(5, "0");
+const PIN = "246810";
+
+async function signUp(base, username, pin) {
   const c = client(base);
-  const r = await c.post("/api/auth/register", { username, password: password || "secret123" });
+  const r = await c.post("/api/auth/phone/register", { username, phone: nextPhone(), pin: pin || PIN });
   assert.equal(r.status, 201, "register " + username + ": " + r.text);
   return c;
 }
@@ -105,7 +110,7 @@ test("register creates an account, starts a session and /api/me returns it", asy
   const app = await boot();
   try {
     const c = client(app.base);
-    const r = await c.post("/api/auth/register", { username: "aman_7", password: "secret123" });
+    const r = await c.post("/api/auth/phone/register", { username: "aman_7", phone: "+919876500001", pin: "123456" });
     assert.equal(r.status, 201, r.text);
     assert.equal(r.json.user.username, "aman_7");
     assert.ok(c.jar.has("cricketle_sid"));
@@ -117,31 +122,36 @@ test("register creates an account, starts a session and /api/me returns it", asy
   } finally { await app.close(); }
 });
 
-test("register validates input and rejects duplicate usernames case-insensitively", async () => {
+test("register validates input: username, exactly 6-digit PIN, E.164 phone, unique username", async () => {
   const app = await boot();
   try {
     const c = client(app.base);
-    assert.equal((await c.post("/api/auth/register", { username: "ab", password: "secret123" })).json.error, "invalid_username");
-    assert.equal((await c.post("/api/auth/register", { username: "bad name!", password: "secret123" })).json.error, "invalid_username");
-    assert.equal((await c.post("/api/auth/register", { username: "goodname", password: "123" })).json.error, "invalid_password");
-    assert.equal((await c.post("/api/auth/register", { username: "GoodName", password: "secret123" })).status, 201);
-    const dup = await client(app.base).post("/api/auth/register", { username: "goodname", password: "secret123" });
+    const reg = (body) => c.post("/api/auth/phone/register", Object.assign({ phone: nextPhone(), pin: "123456" }, body));
+    assert.equal((await reg({ username: "ab" })).json.error, "invalid_username");
+    assert.equal((await reg({ username: "bad name!" })).json.error, "invalid_username");
+    assert.equal((await reg({ username: "goodname", pin: "12345" })).json.error, "invalid_pin", "5 digits rejected");
+    assert.equal((await reg({ username: "goodname", pin: "1234567" })).json.error, "invalid_pin", "7 digits rejected");
+    assert.equal((await reg({ username: "goodname", pin: "12a456" })).json.error, "invalid_pin");
+    assert.equal((await reg({ username: "goodname", phone: "9876543210" })).json.error, "invalid_phone", "country code required");
+    assert.equal((await reg({ username: "GoodName" })).status, 201);
+    const dup = await client(app.base).post("/api/auth/phone/register", { username: "goodname", phone: nextPhone(), pin: "123456" });
     assert.equal(dup.status, 409);
     assert.equal(dup.json.error, "username_taken");
   } finally { await app.close(); }
 });
 
-test("login checks the password, logout ends the session", async () => {
+test("login checks the PIN, logout ends the session", async () => {
   const app = await boot();
   try {
-    await signUp(app.base, "rohit", "hitman45");
+    await signUp(app.base, "rohit", "456789");
     const c = client(app.base);
-    const bad = await c.post("/api/auth/login", { username: "rohit", password: "wrong" });
+    const bad = await c.post("/api/auth/login", { identifier: "rohit", pin: "000000" });
     assert.equal(bad.status, 401);
     assert.equal(bad.json.error, "bad_credentials");
-    const ok = await c.post("/api/auth/login", { username: "Rohit", password: "hitman45" });
+    const ok = await c.post("/api/auth/login", { identifier: "Rohit", pin: "456789" });
     assert.equal(ok.status, 200);
     assert.equal(ok.json.user.username, "rohit");
+    assert.equal(ok.json.user.pinNeedsUpdate, false);
     assert.equal((await c.get("/api/me")).json.user.username, "rohit");
     const out = await c.post("/api/auth/logout");
     assert.equal(out.status, 204);
@@ -266,10 +276,10 @@ test("giving up closes the puzzle with no points and unlocks the next", async ()
 test("progress follows the account across sessions and devices", async () => {
   const app = await boot();
   try {
-    const c = await signUp(app.base, "dhoni", "helicopter7");
+    const c = await signUp(app.base, "dhoni");
     await solve(c, "easy", 0, "2026-10-27");
     const other = client(app.base);
-    await other.post("/api/auth/login", { username: "dhoni", password: "helicopter7" });
+    await other.post("/api/auth/login", { identifier: "dhoni", pin: PIN });
     const r = await other.get("/api/state");
     assert.equal(r.json.state.modes.easy.puzzles[0].status, "solved");
   } finally { await app.close(); }
@@ -366,41 +376,6 @@ test("POST requests must be JSON from the same origin", async () => {
   } finally { await app.close(); }
 });
 
-test("google sign-in creates an account and sets up profile", async () => {
-  const app = await boot();
-  try {
-    const c = client(app.base);
-    // Sign in with Google payload
-    const r1 = await c.post("/api/auth/google", {
-      sub: "google-123456",
-      email: "aman@example.com",
-      name: "Mohd Aman",
-      picture: "https://lh3.googleusercontent.com/a/photo.jpg",
-    });
-    assert.equal(r1.status, 200, r1.text);
-    assert.equal(r1.json.user.displayName, "Mohd Aman");
-    assert.equal(r1.json.user.email, "aman@example.com");
-    assert.equal(r1.json.user.googleConnected, true);
-
-    // Verify /api/me returns user details
-    const me = await c.get("/api/me");
-    assert.equal(me.status, 200);
-    assert.equal(me.json.user.displayName, "Mohd Aman");
-    assert.equal(me.json.user.googleConnected, true);
-    assert(Array.isArray(me.json.stats.achievements));
-
-    // Logging in again with same Google sub returns the same user
-    const c2 = client(app.base);
-    const r2 = await c2.post("/api/auth/google", {
-      sub: "google-123456",
-      email: "aman@example.com",
-      name: "Mohd Aman",
-    });
-    assert.equal(r2.status, 200);
-    assert.equal(r2.json.user.id, r1.json.user.id);
-  } finally { await app.close(); }
-});
-
 test("profile updates change display name, avatar, bio and favorite team", async () => {
   const app = await boot();
   try {
@@ -436,152 +411,11 @@ test("profile updates change display name, avatar, bio and favorite team", async
   } finally { await app.close(); }
 });
 
-test("mobile OTP login sends code, verifies, and logs in player", async () => {
-  const app = await boot();
-  try {
-    const c = client(app.base);
-    // Request OTP for phone
-    const sendRes = await c.post("/api/auth/otp/send", { phone: "+919876543210" });
-    assert.equal(sendRes.status, 200, sendRes.text);
-    assert.equal(sendRes.json.ok, true);
-    assert.ok(sendRes.json.devOtp);
-    assert.equal(sendRes.json.devOtp.length, 6);
-
-    // Verify with invalid OTP fails
-    const badVerify = await c.post("/api/auth/otp/verify", {
-      phone: "+919876543210",
-      code: "000000",
-    });
-    assert.equal(badVerify.status, 400);
-
-    // Verify with correct OTP succeeds
-    const goodVerify = await c.post("/api/auth/otp/verify", {
-      phone: "+919876543210",
-      code: sendRes.json.devOtp,
-      displayName: "Dhoni Fan",
-    });
-    assert.equal(goodVerify.status, 200, goodVerify.text);
-    assert.equal(goodVerify.json.user.displayName, "Dhoni Fan");
-    assert.equal(goodVerify.json.user.phone, "+919876543210");
-    assert.equal(goodVerify.json.user.phoneConnected, true);
-
-    // Check /api/me has session
-    const me = await c.get("/api/me");
-    assert.equal(me.status, 200);
-    assert.equal(me.json.user.displayName, "Dhoni Fan");
-    assert.equal(me.json.user.phone, "+919876543210");
-  } finally { await app.close(); }
-});
-
-test("mobile OTP rejects invalid phone formats and expired codes", async () => {
-  const app = await boot();
-  try {
-    const c = client(app.base);
-    const badPhone = await c.post("/api/auth/otp/send", { phone: "123" });
-    assert.equal(badPhone.status, 400);
-
-    const sendRes = await c.post("/api/auth/otp/send", { phone: "+919999988888" });
-    assert.equal(sendRes.status, 200);
-
-    // Fast-forward past 5 minutes (301 seconds)
-    app.setNow(app.getNow() + 301 * 1000);
-
-    const expiredVerify = await c.post("/api/auth/otp/verify", {
-      phone: "+919999988888",
-      code: sendRes.json.devOtp,
-    });
-    assert.equal(expiredVerify.status, 400);
-    assert.equal(expiredVerify.json.error, "otp_expired");
-  } finally { await app.close(); }
-});
-
-test("mobile OTP uses OTP.dev configuration when otpDevKey is provided", async () => {
-  let now = T0;
-  const app = createApp({
-    dbPath: ":memory:",
-    now: () => now,
-    rateLimit: false,
-    log: false,
-    secret: "",
-    otpDevKey: "test_key_mock",
-  });
-  await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
-  const base = "http://127.0.0.1:" + app.server.address().port;
-  try {
-    const c = client(base);
-    const res = await c.post("/api/auth/otp/send", { phone: "+919876543210" });
-    assert.equal(res.status, 200);
-    assert.equal(res.json.ok, true);
-    assert.equal(res.json.channel, "sms");
-  } finally {
-    await new Promise((resolve) => app.close(resolve));
-  }
-});
-
-test("GET /api/config/firebase returns enabled status and public configuration", async () => {
-  const app = createApp({
-    dbPath: ":memory:",
-    rateLimit: false,
-    log: false,
-    firebaseApiKey: "AIzaSyFakeKey123",
-    firebaseProjectId: "cricketle-app",
-    firebaseAuthDomain: "cricketle-app.firebaseapp.com",
-    firebaseAppId: "1:123:web:abc",
-  });
-  await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
-  const base = "http://127.0.0.1:" + app.server.address().port;
-  try {
-    const c = client(base);
-    const res = await c.get("/api/config/firebase");
-    assert.equal(res.status, 200);
-    assert.equal(res.json.enabled, true);
-    assert.equal(res.json.config.apiKey, "AIzaSyFakeKey123");
-    assert.equal(res.json.config.projectId, "cricketle-app");
-    assert.equal(res.json.config.authDomain, "cricketle-app.firebaseapp.com");
-  } finally {
-    await new Promise((resolve) => app.close(resolve));
-  }
-});
-
-test("POST /api/auth/firebase-phone logs in or creates player and establishes session cookie", async () => {
-  const app = await boot();
-  try {
-    const c = client(app.base);
-    const res = await c.post("/api/auth/firebase-phone", {
-      phone: "+919876543210",
-      displayName: "Virat Century",
-    });
-    assert.equal(res.status, 200, res.text);
-    assert.equal(res.json.ok, true);
-    assert.equal(res.json.user.phone, "+919876543210");
-    assert.equal(res.json.user.displayName, "Virat Century");
-    assert.equal(res.json.user.phoneConnected, true);
-
-    // Verify session was set and me endpoint recognizes player
-    const me = await c.get("/api/me");
-    assert.equal(me.status, 200);
-    assert.equal(me.json.user.phone, "+919876543210");
-    assert.equal(me.json.user.displayName, "Virat Century");
-
-    // Invalid phone rejection
-    const bad = await c.post("/api/auth/firebase-phone", { phone: "123" });
-    assert.equal(bad.status, 400);
-    assert.equal(bad.json.error, "invalid_phone");
-  } finally {
-    await app.close();
-  }
-});
-
 test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
   const app = await boot();
   try {
     const c = client(app.base);
     const testPhone = "+919876543210";
-
-    // 1. Check unregistered phone returns exists: false
-    const check1 = await c.post("/api/auth/phone/check", { phone: testPhone });
-    assert.equal(check1.status, 200, check1.text);
-    assert.equal(check1.json.exists, false);
 
     // 2. Register new player with custom username and 6-digit PIN
     const regRes = await c.post("/api/auth/phone/register", {
@@ -627,50 +461,23 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     assert.equal(dupUserCase.status, 409);
     assert.equal(dupUserCase.json.error, "username_taken");
 
-    // 6. Check now returns exists: true and custom username
-    const check2 = await c.post("/api/auth/phone/check", { phone: testPhone });
-    assert.equal(check2.status, 200);
-    assert.equal(check2.json.exists, true);
-    assert.equal(check2.json.username, "cricket_champ");
-
     // 7. Login in a separate client: bad PIN fails
     const c2 = client(app.base);
-    const badLogin = await c2.post("/api/auth/phone/login", {
-      phone: testPhone,
+    const badLogin = await c2.post("/api/auth/login", {
+      identifier: testPhone,
       pin: "000000",
     });
     assert.equal(badLogin.status, 401);
-    assert.equal(badLogin.json.error, "bad_pin");
+    assert.equal(badLogin.json.error, "bad_credentials");
 
     // 8. Login with correct PIN succeeds
-    const goodLogin = await c2.post("/api/auth/phone/login", {
-      phone: testPhone,
+    const goodLogin = await c2.post("/api/auth/login", {
+      identifier: testPhone,
       pin: "875542",
     });
     assert.equal(goodLogin.status, 200, goodLogin.text);
     assert.equal(goodLogin.json.user.phone, testPhone);
     assert.equal(goodLogin.json.user.username, "cricket_champ");
-
-    // 9. Reset PIN
-    const c3 = client(app.base);
-    const resetRes = await c3.post("/api/auth/phone/reset", {
-      phone: testPhone,
-      newPin: "112233",
-    });
-    assert.equal(resetRes.status, 200, resetRes.text);
-
-    // 10. Old PIN fails, new PIN succeeds
-    const oldPinLogin = await c.post("/api/auth/phone/login", {
-      phone: testPhone,
-      pin: "875542",
-    });
-    assert.equal(oldPinLogin.status, 401);
-
-    const newPinLogin = await c.post("/api/auth/phone/login", {
-      phone: testPhone,
-      pin: "112233",
-    });
-    assert.equal(newPinLogin.status, 200);
 
     // 11. Direct Username + PIN sign-in via POST /api/auth/login
     const c4 = client(app.base);
@@ -683,13 +490,13 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
 
     const nonExistentAuth = await c4.post("/api/auth/login", {
       username: "ghost_player",
-      pin: "112233",
+      pin: "875542",
     });
     assert.equal(nonExistentAuth.status, 401);
 
     const goodUserPinAuth = await c4.post("/api/auth/login", {
       username: "Cricket_Champ", // verifies case-insensitive match
-      pin: "112233",
+      pin: "875542",
     });
     assert.equal(goodUserPinAuth.status, 200);
     assert.equal(goodUserPinAuth.json.ok, true);
@@ -699,29 +506,28 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     assert.equal(meUserPin.status, 200);
     assert.equal(meUserPin.json.user.username, "cricket_champ");
 
-    // 11b. Mobile phone + PIN sign-in via POST /api/auth/login (10-digit and international formats)
+    // 11b. Mobile phone + PIN sign-in via POST /api/auth/login (E.164 only; bare 10 digits rejected)
     const cPhone1 = client(app.base);
     const phone10Auth = await cPhone1.post("/api/auth/login", {
       username: "9876543210",
-      pin: "112233",
+      pin: "875542",
     });
-    assert.equal(phone10Auth.status, 200, "10-digit phone login should succeed");
-    assert.equal(phone10Auth.json.user.username, "cricket_champ");
+    assert.equal(phone10Auth.status, 401, "bare 10-digit numbers are not guessed as +91 any more");
 
     const cPhone2 = client(app.base);
     const phoneFullAuth = await cPhone2.post("/api/auth/login", {
       username: "+919876543210",
-      pin: "112233",
+      pin: "875542",
     });
     assert.equal(phoneFullAuth.status, 200, "Full +91 phone login should succeed");
     assert.equal(phoneFullAuth.json.user.username, "cricket_champ");
 
     const cPhone3 = client(app.base);
     const phoneSpacedAuth = await cPhone3.post("/api/auth/login", {
-      username: "9876 543 210",
-      pin: "112233",
+      username: "+91 9876 543 210",
+      pin: "875542",
     });
-    assert.equal(phoneSpacedAuth.status, 200, "Spaced phone login should succeed");
+    assert.equal(phoneSpacedAuth.status, 200, "Spaced international phone login should succeed");
     assert.equal(phoneSpacedAuth.json.user.username, "cricket_champ");
 
     // 12. Custom username appears on leaderboard when solving
@@ -733,5 +539,378 @@ test("mobile phone and 6-digit PIN authentication (Option A)", async () => {
     assert.equal(row.username, "cricket_champ");
   } finally {
     await app.close();
+  }
+});
+
+test("unverified sign-in endpoints no longer exist", async () => {
+  const app = await boot();
+  try {
+    const c = client(app.base);
+    const gone = [
+      ["POST", "/api/auth/google", { sub: "google-1", email: "x@example.com" }],
+      ["POST", "/api/auth/otp/send", { phone: "+919876543210" }],
+      ["POST", "/api/auth/otp/verify", { phone: "+919876543210", code: "000000" }],
+      ["POST", "/api/auth/firebase-phone", { phone: "+919876543210" }],
+      ["GET", "/api/config/firebase"],
+      ["POST", "/api/auth/phone/check", { phone: "+919876543210" }],
+      ["POST", "/api/auth/phone/reset", { phone: "+919876543210", newPin: "112233" }],
+    ];
+    for (const [method, path, body] of gone) {
+      const r = method === "GET" ? await c.get(path) : await c.post(path, body);
+      assert.equal(r.status, 404, method + " " + path + " should be gone");
+      assert.equal(r.json.error, "not_found");
+    }
+    // Nobody got a session out of it.
+    const me = await c.get("/api/me");
+    assert.equal(me.json.user, null);
+  } finally { await app.close(); }
+});
+
+test("login flags accounts whose stored PIN is not 6 digits", async () => {
+  const app = await boot();
+  try {
+    const auth = require("../lib/auth.js");
+    app.db.createUser("legacy4", auth.hashPassword("1234"), app.getNow(), { phone: "+919876500003" });
+    const c = client(app.base);
+    const r = await c.post("/api/auth/login", { identifier: "legacy4", pin: "1234" });
+    assert.equal(r.status, 200, r.text);
+    assert.equal(r.json.user.pinNeedsUpdate, true);
+    const me = await c.get("/api/me");
+    assert.equal(me.json.user.pinNeedsUpdate, true);
+  } finally { await app.close(); }
+});
+
+test("ten wrong PINs lock the identifier for fifteen minutes", async () => {
+  const app = await boot();
+  try {
+    await signUp(app.base, "locked_out", "135790");
+    const c = client(app.base);
+    for (let i = 0; i < 10; i++) {
+      const r = await c.post("/api/auth/login", { identifier: "locked_out", pin: "000000" });
+      assert.equal(r.status, 401, "attempt " + (i + 1));
+    }
+    const locked = await c.post("/api/auth/login", { identifier: "locked_out", pin: "135790" });
+    assert.equal(locked.status, 429, "11th attempt is locked even with the right PIN");
+    assert.equal(locked.json.error, "pin_locked");
+    app.setNow(app.getNow() + 15 * 60 * 1000 + 1);
+    const ok = await c.post("/api/auth/login", { identifier: "locked_out", pin: "135790" });
+    assert.equal(ok.status, 200, ok.text);
+  } finally { await app.close(); }
+});
+
+test("sign-up is limited to five per IP per hour", async () => {
+  let now = T0;
+  const app = createApp({ dbPath: ":memory:", now: () => now, log: false, secret: "" });
+  await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
+  const base = "http://127.0.0.1:" + app.server.address().port;
+  try {
+    const c = client(base);
+    for (let i = 0; i < 5; i++) {
+      const r = await c.post("/api/auth/phone/register", { username: "burst_" + i, phone: nextPhone(), pin: "123456" });
+      assert.equal(r.status, 201, r.text);
+    }
+    const sixth = await c.post("/api/auth/phone/register", { username: "burst_5", phone: nextPhone(), pin: "123456" });
+    assert.equal(sixth.status, 429);
+  } finally { await new Promise((resolve) => app.close(resolve)); }
+});
+
+test("the username-only register route and the phone-login route are gone", async () => {
+  const app = await boot();
+  try {
+    const c = client(app.base);
+    assert.equal((await c.post("/api/auth/register", { username: "x_y_z", password: "secret123" })).status, 404);
+    assert.equal((await c.post("/api/auth/phone/login", { phone: "+919876500001", pin: "123456" })).status, 404);
+  } finally { await app.close(); }
+});
+
+// A logger that records every call, for asserting what the server logs.
+function recordingLogger() {
+  const calls = [];
+  const rec = (level) => (tag, message, meta) => calls.push({ level, tag, message, meta });
+  return {
+    calls,
+    info: rec("info"), warn: rec("warn"), error: rec("error"), debug: rec("debug"),
+    db: (op, message, meta) => calls.push({ level: "info", tag: "DB", action: op, message, meta }),
+    dbWarn: (op, message, meta) => calls.push({ level: "warn", tag: "DB", action: op, message, meta }),
+    auth: (action, message, meta) => calls.push({ level: "info", tag: "AUTH", action, message, meta }),
+    authWarn: (action, message, meta) => calls.push({ level: "warn", tag: "AUTH", action, message, meta }),
+    game: (action, message, meta) => calls.push({ level: "info", tag: "GAME", action, message, meta }),
+    http: (method, path, status, latencyMs, meta) => calls.push({ level: "info", tag: "HTTP", message: method + " " + path + " " + status, meta }),
+    child() { return this; },
+  };
+}
+
+test("every response carries a request id that also appears in error bodies and logs", async () => {
+  let now = T0;
+  const logger = recordingLogger();
+  const app = createApp({ dbPath: ":memory:", now: () => now, rateLimit: false, logger, secret: "" });
+  await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
+  const base = "http://127.0.0.1:" + app.server.address().port;
+  try {
+    const c = client(base);
+    const ok = await c.get("/api/health");
+    const id = ok.headers.get("x-request-id");
+    assert.match(id, /^[0-9a-f]{16}$/);
+
+    const missing = await c.get("/api/nothing");
+    const id2 = missing.headers.get("x-request-id");
+    assert.match(id2, /^[0-9a-f]{16}$/);
+    assert.notEqual(id2, id);
+    assert.equal(missing.json.requestId, id2);
+
+    const httpLogs = logger.calls.filter((x) => x.tag === "HTTP");
+    assert.ok(httpLogs.length >= 2);
+    assert.ok(httpLogs.every((x) => x.meta && /^[0-9a-f]{16}$/.test(x.meta.requestId)), "HTTP logs carry requestId");
+    assert.ok(httpLogs.some((x) => x.meta.requestId === id2));
+  } finally { await new Promise((resolve) => app.close(resolve)); }
+});
+
+test("HSTS is sent only when the request arrived over https", async () => {
+  const app = await boot({ trustProxy: true });
+  try {
+    const c = client(app.base);
+    const plain = await c.get("/api/health");
+    assert.equal(plain.headers.get("strict-transport-security"), null);
+    const secure = await c.get("/api/health", { "x-forwarded-proto": "https" });
+    assert.equal(secure.headers.get("strict-transport-security"), "max-age=31536000; includeSubDomains");
+    const page = await c.get("/", { "x-forwarded-proto": "https" });
+    assert.equal(page.headers.get("strict-transport-security"), "max-age=31536000; includeSubDomains", "static files too");
+  } finally { await app.close(); }
+});
+
+test("guess text is logged at debug level only", async () => {
+  let now = T0;
+  const logger = recordingLogger();
+  const app = createApp({ dbPath: ":memory:", now: () => now, rateLimit: false, logger, secret: "" });
+  await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
+  const base = "http://127.0.0.1:" + app.server.address().port;
+  try {
+    const c = await signUp(base, "quiet_logs");
+    await c.post("/api/puzzle/start", { mode: "easy", idx: 0 });
+    const wrong = core.poolFor("easy").find((p) => p.name !== core.answerFor("2026-10-27", "easy", 0).name).name;
+    const r = await c.post("/api/puzzle/guess", { mode: "easy", idx: 0, name: wrong });
+    assert.equal(r.status, 200, r.text);
+    const leaks = logger.calls.filter((x) => x.level !== "debug" && JSON.stringify([x.message, x.meta]).includes(wrong));
+    assert.deepEqual(leaks, [], "no info/warn log contains the guessed name");
+    assert.ok(logger.calls.some((x) => x.level === "debug" && JSON.stringify([x.message, x.meta]).includes(wrong)), "debug log has it");
+  } finally { await new Promise((resolve) => app.close(resolve)); }
+});
+
+test("the SQLite database has no OTP table or OTP methods any more", async () => {
+  const { Db } = require("../lib/db.js");
+  const db = new Db(":memory:");
+  try {
+    const tables = db.db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((r) => r.name);
+    assert.ok(!tables.includes("otp_codes"), "otp_codes table gone");
+    for (const m of ["setOtp", "getOtp", "deleteOtp", "incrementOtpAttempts"]) assert.equal(typeof db[m], "undefined", m);
+  } finally { db.close(); }
+});
+
+test("a stored legacy avatar id is presented as its cricket replacement everywhere", async () => {
+  const app = await boot();
+  try {
+    const day = "2026-10-27";
+    const c = await signUp(app.base, "simba");
+    const me0 = await c.get("/api/me");
+    assert.equal(me0.status, 200);
+    app.db.updateProfile(me0.json.user.id, { avatar: "lion" });
+
+    app.setNow(T0);
+    await solve(c, "easy", 0, day);
+
+    const me = await c.get("/api/me");
+    assert.equal(me.json.user.avatar, "captain");
+    const today = await c.get("/api/leaderboard/today");
+    assert.equal(today.json.rows.find((r) => r.username === "simba").avatar, "captain");
+    assert.equal(today.json.me.avatar, "captain");
+    const alltime = await c.get("/api/leaderboard/alltime");
+    assert.equal(alltime.json.rows.find((r) => r.username === "simba").avatar, "captain");
+  } finally {
+    await app.close();
+  }
+});
+
+test("HTML responses carry a CSP with script-src 'self' and no 'unsafe-inline' for scripts", async () => {
+  const app = await boot();
+  try {
+    for (const path of ["/", "/admin"]) {
+      const r = await client(app.base).get(path);
+      assert.equal(r.status, 200, path);
+      const csp = r.headers.get("content-security-policy") || "";
+      const script = csp.split(";").map((d) => d.trim()).find((d) => d.startsWith("script-src"));
+      assert.equal(script, "script-src 'self'", path + ": " + csp);
+      assert.match(csp, /frame-ancestors 'none'/);
+    }
+  } finally {
+    await app.close();
+  }
+});
+
+test("static text assets are gzipped on request and versioned ones cache immutably", async () => {
+  const app = await boot();
+  try {
+    // Node's fetch asks for gzip by default; identity gets the raw file.
+    const plain = await client(app.base).get("/app.js", { "accept-encoding": "identity" });
+    assert.equal(plain.status, 200);
+    assert.equal(plain.headers.get("content-encoding"), null);
+    assert.ok(Number(plain.headers.get("content-length")) > 1024);
+    assert.equal(plain.headers.get("cache-control"), "no-cache");
+
+    const gz = await fetch(app.base + "/app.js?v=test", { headers: { "accept-encoding": "gzip" } });
+    assert.equal(gz.status, 200);
+    assert.equal(gz.headers.get("content-encoding"), "gzip");
+    assert.equal(gz.headers.get("vary"), "accept-encoding");
+    assert.equal(gz.headers.get("cache-control"), "public, max-age=31536000, immutable");
+    const body = await gz.text(); // fetch decodes gzip transparently
+    assert.match(body, /CricketleLog|use strict/);
+
+    const png = await fetch(app.base + "/favicon-32.png", { headers: { "accept-encoding": "gzip" } });
+    assert.equal(png.headers.get("content-encoding"), null, "binary assets are not re-compressed");
+  } finally {
+    await app.close();
+  }
+});
+
+// ---------- Security review fixes ----------
+
+async function bootLimited(extra = {}) {
+  let now = T0;
+  const app = createApp({ dbPath: ":memory:", now: () => now, log: false, secret: "", ...extra });
+  await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
+  const base = "http://127.0.0.1:" + app.server.address().port;
+  return { base, close: () => new Promise((resolve) => app.close(resolve)), setNow: (t) => { now = t; } };
+}
+
+test("X-Forwarded-For cannot defeat the sign-up throttle unless the proxy is trusted", async () => {
+  const app = await bootLimited();
+  try {
+    for (let i = 1; i <= 5; i++) {
+      const r = await client(app.base).post("/api/auth/phone/register", { username: "xff" + i, phone: nextPhone(), pin: PIN }, { "x-forwarded-for": "198.51.100." + i });
+      assert.equal(r.status, 201, r.text);
+    }
+    const sixth = await client(app.base).post("/api/auth/phone/register", { username: "xff6", phone: nextPhone(), pin: PIN }, { "x-forwarded-for": "198.51.100.99" });
+    assert.equal(sixth.status, 429, "a spoofed header is not a new client");
+  } finally {
+    await app.close();
+  }
+
+  // Behind a trusted proxy the client is the address the proxy appended (last hop).
+  const proxied = await bootLimited({ trustProxy: true });
+  try {
+    for (let i = 1; i <= 5; i++) {
+      const r = await client(proxied.base).post("/api/auth/phone/register", { username: "pxy" + i, phone: nextPhone(), pin: PIN }, { "x-forwarded-for": "198.51.100." + i + ", 203.0.113.9" });
+      assert.equal(r.status, 201, r.text);
+    }
+    const same = await client(proxied.base).post("/api/auth/phone/register", { username: "pxy6", phone: nextPhone(), pin: PIN }, { "x-forwarded-for": "198.51.100.77, 203.0.113.9" });
+    assert.equal(same.status, 429, "rotating the attacker-controlled first entry changes nothing");
+    const other = await client(proxied.base).post("/api/auth/phone/register", { username: "pxy7", phone: nextPhone(), pin: PIN }, { "x-forwarded-for": "203.0.113.10" });
+    assert.equal(other.status, 201, "a different real client is not throttled");
+  } finally {
+    await proxied.close();
+  }
+});
+
+test("the PIN lock keys on the account and survives a flood of unknown identifiers", async () => {
+  // Small cap so the prune path runs without thousands of scrypt calls.
+  const app = await boot({ maxTrackedKeys: 20 });
+  try {
+    const phone = nextPhone();
+    const reg = await client(app.base).post("/api/auth/phone/register", { username: "locked_one", phone, pin: PIN });
+    assert.equal(reg.status, 201);
+    const c = client(app.base);
+    for (let i = 0; i < 10; i++) {
+      assert.equal((await c.post("/api/auth/login", { identifier: "locked_one", pin: "000000" })).status, 401);
+    }
+    assert.equal((await c.post("/api/auth/login", { identifier: "locked_one", pin: PIN })).json.error, "pin_locked");
+    // The phone is the same account: no second budget.
+    assert.equal((await c.post("/api/auth/login", { identifier: phone, pin: PIN })).json.error, "pin_locked");
+
+    // More misses on unknown identifiers than the map tracks must not reset anyone's lock.
+    const ids = Array.from({ length: 30 }, (_, i) => "ghost_" + i);
+    for (let i = 0; i < ids.length; i += 5) {
+      const rs = await Promise.all(ids.slice(i, i + 5).map((id) => client(app.base).post("/api/auth/login", { identifier: id, pin: "123456" })));
+      for (const r of rs) assert.equal(r.status, 401);
+    }
+    assert.equal((await c.post("/api/auth/login", { identifier: "locked_one", pin: PIN })).json.error, "pin_locked", "lock survived the flood");
+  } finally {
+    await app.close();
+  }
+});
+
+test("leaderboard limits are clamped and never crash", async () => {
+  const app = await boot();
+  try {
+    const c = await signUp(app.base, "clamp");
+    app.setNow(T0);
+    await solve(c, "easy", 0, "2026-10-27");
+    for (const q of ["-1", "0.5", "abc", "999", "0"]) {
+      const today = await c.get("/api/leaderboard/today?limit=" + q);
+      assert.equal(today.status, 200, "today limit=" + q + ": " + today.text);
+      assert.ok(today.json.rows.length >= 1 && today.json.rows.length <= 50);
+      const all = await c.get("/api/leaderboard/alltime?limit=" + q);
+      assert.equal(all.status, 200, "alltime limit=" + q + ": " + all.text);
+    }
+  } finally {
+    await app.close();
+  }
+});
+
+test("sign-in accepts a formatted phone: spaces, dashes, leading 0, 0091 and +91 all match the stored row", async () => {
+  const app = await boot();
+  try {
+    const phone = "+919876501234";
+    const reg = await client(app.base).post("/api/auth/phone/register", { username: "fmt_user", phone, pin: PIN });
+    assert.equal(reg.status, 201, reg.text);
+    for (const id of ["+91 98765-01234", "0091 98765 01234", "+91 (98765) 01234", "+919876501234"]) {
+      const r = await client(app.base).post("/api/auth/login", { identifier: id, pin: PIN });
+      assert.equal(r.status, 200, id + ": " + r.text);
+      assert.equal(r.json.user.username, "fmt_user");
+    }
+  } finally {
+    await app.close();
+  }
+});
+
+test("all-digit usernames are rejected at sign-up because digits mean a phone at sign-in", async () => {
+  const app = await boot();
+  try {
+    const r = await client(app.base).post("/api/auth/phone/register", { username: "2007", phone: nextPhone(), pin: PIN });
+    assert.equal(r.status, 400, r.text);
+    assert.equal(r.json.error, "invalid_username");
+    const ok = await client(app.base).post("/api/auth/phone/register", { username: "y2007", phone: nextPhone(), pin: PIN });
+    assert.equal(ok.status, 201, ok.text);
+  } finally {
+    await app.close();
+  }
+});
+
+test("the sign-up throttle counts created accounts, not failed attempts", async () => {
+  const app = await bootLimited();
+  try {
+    assert.equal((await client(app.base).post("/api/auth/phone/register", { username: "taken_one", phone: nextPhone(), pin: PIN })).status, 201);
+    for (let i = 0; i < 5; i++) {
+      const r = await client(app.base).post("/api/auth/phone/register", { username: "taken_one", phone: nextPhone(), pin: PIN });
+      assert.equal(r.status, 409, r.text);
+    }
+    const fresh = await client(app.base).post("/api/auth/phone/register", { username: "finally_free", phone: nextPhone(), pin: PIN });
+    assert.equal(fresh.status, 201, "five rejected attempts did not spend the budget: " + fresh.text);
+  } finally {
+    await app.close();
+  }
+});
+
+test("the HTTP log records the socket address unless the proxy is trusted", async () => {
+  let now = T0;
+  const logger = recordingLogger();
+  const app = createApp({ dbPath: ":memory:", now: () => now, rateLimit: false, logger, secret: "" });
+  await new Promise((resolve) => app.server.listen(0, "127.0.0.1", resolve));
+  const base = "http://127.0.0.1:" + app.server.address().port;
+  try {
+    await client(base).get("/api/health", { "x-forwarded-for": "203.0.113.77" });
+    const line = logger.calls.find((e) => e.tag === "HTTP" && e.message.includes("/api/health"));
+    assert.ok(line, JSON.stringify(logger.calls.slice(-3)));
+    assert.equal(line.meta.ip, "127.0.0.1");
+  } finally {
+    await new Promise((resolve) => app.close(resolve));
   }
 });

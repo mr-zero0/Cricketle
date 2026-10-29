@@ -145,3 +145,59 @@ test("SupabaseDb: leaderboard RPC parsing", async () => {
     global.fetch = originalFetch;
   }
 });
+
+test("SupabaseDb: no OTP methods any more", () => {
+  for (const m of ["setOtp", "getOtp", "deleteOtp", "incrementOtpAttempts"]) assert.equal(typeof SupabaseDb.prototype[m], "undefined", m);
+});
+
+// ---------- Security review fixes ----------
+
+function recordingFetch(calls) {
+  return async (url, opts) => {
+    calls.push({ url, opts });
+    return { ok: true, status: 200, text: async () => "[]" };
+  };
+}
+
+test("SupabaseDb: userByName escapes LIKE wildcards so al_ce cannot match alice", async () => {
+  const originalFetch = global.fetch;
+  const calls = [];
+  global.fetch = recordingFetch(calls);
+  try {
+    const db = new SupabaseDb("https://mock.supabase.co", "test-key");
+    await db.userByName("al_ce");
+    const url = decodeURIComponent(calls[0].url);
+    assert.ok(url.includes("username=ilike.al\\_ce"), url);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("SupabaseDb: admin search quotes the pattern so filter syntax cannot be injected", async () => {
+  const originalFetch = global.fetch;
+  const calls = [];
+  global.fetch = recordingFetch(calls);
+  try {
+    const db = new SupabaseDb("https://mock.supabase.co", "test-key");
+    await db.listUsers(10, 0, 'a,b)');
+    const url = decodeURIComponent(calls[0].url);
+    assert.ok(url.includes('username.ilike."*a,b)*"'), url);
+    assert.ok(!url.includes("ilike.*a,b)*,"), "unquoted pattern would split the or() tree");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("SupabaseDb: adminResetPin also deletes the player's sessions", async () => {
+  const originalFetch = global.fetch;
+  const calls = [];
+  global.fetch = recordingFetch(calls);
+  try {
+    const db = new SupabaseDb("https://mock.supabase.co", "test-key");
+    await db.adminResetPin(7, "newhash");
+    const del = calls.find((c) => c.opts.method === "DELETE" && c.url.includes("/sessions?user_id=eq.7"));
+    assert.ok(del, calls.map((c) => c.opts.method + " " + c.url).join(" | "));
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
