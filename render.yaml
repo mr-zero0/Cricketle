@@ -6,7 +6,6 @@ services:
     name: cricketle
     runtime: node
     plan: free
-    rootDir: Cricketle
     buildCommand: "true"            # zero npm dependencies at runtime
     startCommand: node server.js
     healthCheckPath: /api/health
