@@ -7,12 +7,12 @@ services:
     runtime: node
     plan: free
     buildCommand: "true"            # zero npm dependencies at runtime
-    startCommand: node server.js
+    startCommand: node --experimental-sqlite server.js
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
       - key: NODE_VERSION
-        value: "22.12.0"            # node:sqlite needs 22.5+; Supabase mode needs only fetch
+        value: "22.13.0"            # node:sqlite needs 22.5+; unflagged in 22.13+
       - key: SUPABASE_URL
         sync: false                 # paste your project URL
       - key: SUPABASE_KEY
