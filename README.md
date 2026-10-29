@@ -3,7 +3,7 @@
 Guess the secret cricketer. Every guess returns a **rank**: 1 is the answer, and the lower the number, the closer you are. Three puzzles a day in **Easy** (171 well-known players, with clue tags) and **Hard** (all 425 players, rank only), three hints per puzzle, a live timer, points, accounts, today's and all-time leaderboards, and a rank ladder from Net Bowler to Legend.
 
 ![Cricketle](https://img.shields.io/badge/Cricketle-v3.0-blue?style=for-the-badge)
-[![Play Live](https://img.shields.io/badge/▶_Play_Live-cricketle.onrender.com-2ea44f?style=for-the-badge&logo=googlechrome&logoColor=white)](https://cricketle.onrender.com/)
+[![Play Live](https://img.shields.io/badge/▶_Play_Live-cricketle-sy03.onrender.com-2ea44f?style=for-the-badge&logo=googlechrome&logoColor=white)](https://cricketle-sy03.onrender.com/)
 ![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
@@ -13,7 +13,7 @@ Guess the secret cricketer. Every guess returns a **rank**: 1 is the answer, and
 
 Jump straight into today's puzzles (no download needed, sign in for the leaderboard):
 
-👉 **[https://cricketle.onrender.com/](https://cricketle.onrender.com/)**
+👉 **[https://cricketle-sy03.onrender.com/](https://cricketle-sy03.onrender.com/)**
 
 The GitHub Pages address redirects there. Any static copy of `public/` still works as a **guest-only** game (progress in your browser, no accounts, no leaderboard): accounts and scores exist only where the server can verify them.
 
