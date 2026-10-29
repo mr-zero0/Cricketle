@@ -3,7 +3,7 @@
 # asks for the two secret values below on first deploy.
 services:
   - type: web
-    name: cricketle
+    name: playcricketle
     runtime: node
     plan: free
     buildCommand: "true"            # zero npm dependencies at runtime
