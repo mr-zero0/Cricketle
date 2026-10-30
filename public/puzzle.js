@@ -716,3 +716,4 @@
   setupAutocomplete();
   loadPuzzle();
 })();
+

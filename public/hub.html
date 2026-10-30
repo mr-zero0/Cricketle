@@ -136,6 +136,13 @@
       --tile-accent: #f59e0b;
     }
 
+    .tile-journey {
+      --tile-glow: rgba(2, 132, 199, 0.3);
+      --tile-border-hover: rgba(2, 132, 199, 0.7);
+      --tile-shadow: rgba(2, 132, 199, 0.35);
+      --tile-accent: #0284c7;
+    }
+
     .tile-locked {
       --tile-glow: transparent;
       --tile-border-hover: var(--border);
@@ -295,6 +302,7 @@
       <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-4.2-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M4 11V6a2 2 0 0 1 2-2h5a2 2 0 1 1 4 0h3a2 2 0 0 1 2 2v5a2 2 0 1 1 0 4v3a2 2 0 0 1-2 2h-3a2 2 0 1 1-4 0H6a2 2 0 0 1-2-2v-3a2 2 0 1 1 0-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-journey" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="18" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
     </defs>
   </svg>
 
@@ -313,6 +321,7 @@
       <a href="pixel.html" class="nav-link"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Pixel</span></a>
       <a href="scorecard.html" class="nav-link"><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Scorecard</span></a>
       <a href="puzzle.html" class="nav-link"><svg aria-hidden="true"><use href="#i-puzzle"/></svg><span>Puzzle</span></a>
+      <a href="journey.html" class="nav-link"><svg aria-hidden="true"><use href="#i-journey"/></svg><span>Journey</span></a>
       <a href="index.html#profile" class="nav-link" id="nav-profile-link"><svg aria-hidden="true"><use href="#i-user"/></svg><span id="nav-profile-label">Sign in</span></a>
     </nav>
     <div class="topbar-actions">
@@ -327,7 +336,7 @@
   <main id="main" class="hub-container">
     <div class="hub-hero">
       <h2>CHOOSE YOUR CHALLENGE</h2>
-      <p>Test your cricket knowledge with 3 different daily puzzles. New challenges drop every midnight.</p>
+      <p>Test your cricket knowledge with 5 different daily puzzles. New challenges drop every midnight.</p>
     </div>
 
     <!-- Active Games -->
@@ -393,6 +402,23 @@
           <div class="tile-icon">🧩</div>
           <h3 class="tile-title">Puzzle Cricketer</h3>
           <p class="tile-desc">A cricketer's portrait is broken into scrambled puzzle tiles! Guess who it is as pieces snap into place.</p>
+        </div>
+        <div class="tile-footer">
+          <span class="tile-streak"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-flame"/></svg> Daily</span>
+          <span class="tile-play-btn">Play Now →</span>
+        </div>
+      </a>
+
+      <!-- 5. IPL Journey -->
+      <a href="journey.html" class="game-tile tile-journey" id="tile-journey">
+        <div class="tile-header">
+          <span class="tile-badge">IPL Challenge</span>
+          <span class="tile-status" id="status-journey">1 Daily Player</span>
+        </div>
+        <div class="tile-body">
+          <div class="tile-icon">🗺️</div>
+          <h3 class="tile-title">IPL Journey</h3>
+          <p class="tile-desc">Trace a cricketer's IPL path across teams and seasons. Guess who it is as letters are revealed!</p>
         </div>
         <div class="tile-footer">
           <span class="tile-streak"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-flame"/></svg> Daily</span>

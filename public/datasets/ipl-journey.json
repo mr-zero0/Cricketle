@@ -1,0 +1,1587 @@
+[
+  {
+    "id": "dinesh-karthik",
+    "name": "Dinesh Karthik",
+    "country": "India",
+    "role": "Wicketkeeper-Batter",
+    "iplMatches": 257,
+    "stats": "4,842 runs · 135.36 SR · 145 dismissals",
+    "funFact": "Represented 6 different franchises and played in every IPL season from 2008 to 2024.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2008–2010"
+      },
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2011"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2012–2013"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2014"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2015"
+      },
+      {
+        "team": "GL",
+        "teamName": "Gujarat Lions",
+        "years": "2016–2017"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2018–2021"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bengaluru",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "robin-uthappa",
+    "name": "Robin Uthappa",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 205,
+    "stats": "4,952 runs · 130.35 SR · Orange Cap (2014)",
+    "funFact": "Won the Orange Cap in 2014 scoring 660 runs to guide KKR to their second title.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2008"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2009–2010"
+      },
+      {
+        "team": "PWI",
+        "teamName": "Pune Warriors India",
+        "years": "2011–2013"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2014–2019"
+      },
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2020"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2021–2022"
+      }
+    ]
+  },
+  {
+    "id": "yuvraj-singh",
+    "name": "Yuvraj Singh",
+    "country": "India",
+    "role": "All-rounder",
+    "iplMatches": 132,
+    "stats": "2,750 runs · 36 wickets · 2 Hat-tricks",
+    "funFact": "The only bowler in IPL history to take two hat-tricks in a single season (2009).",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2008–2010"
+      },
+      {
+        "team": "PWI",
+        "teamName": "Pune Warriors India",
+        "years": "2011–2013"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2014"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2015"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2016–2017"
+      },
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2018"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2019"
+      }
+    ]
+  },
+  {
+    "id": "shikhar-dhawan",
+    "name": "Shikhar Dhawan",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 222,
+    "stats": "6,769 runs · 2nd highest run-scorer · 768 fours",
+    "funFact": "First batter in IPL history to score consecutive centuries (IPL 2020).",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2008"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2009–2010"
+      },
+      {
+        "team": "DCH",
+        "teamName": "Deccan Chargers",
+        "years": "2011–2012"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2013–2018"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2019–2021"
+      },
+      {
+        "team": "PBKS",
+        "teamName": "Punjab Kings",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "ravichandran-ashwin",
+    "name": "Ravichandran Ashwin",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 212,
+    "stats": "180 wickets · 7.12 Economy Rate",
+    "funFact": "Key member of CSK's back-to-back title victories in 2010 and 2011.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2008–2015"
+      },
+      {
+        "team": "RPS",
+        "teamName": "Rising Pune Supergiant",
+        "years": "2016"
+      },
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2018–2019"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2020–2021"
+      },
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "kl-rahul",
+    "name": "KL Rahul",
+    "country": "India",
+    "role": "Wicketkeeper-Batter",
+    "iplMatches": 132,
+    "stats": "4,683 runs · 45.47 Average · 134.61 SR",
+    "funFact": "Scored the fastest 50 in IPL history (14 balls) in 2018.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2013"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2014–2015"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2016"
+      },
+      {
+        "team": "PBKS",
+        "teamName": "Punjab Kings",
+        "years": "2018–2021"
+      },
+      {
+        "team": "LSG",
+        "teamName": "Lucknow Super Giants",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "suresh-raina",
+    "name": "Suresh Raina",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 205,
+    "stats": "5,528 runs · 32.51 Average · 136.73 SR",
+    "funFact": "Known as 'Mr. IPL' for scoring 400+ runs in 7 consecutive seasons.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2008–2015"
+      },
+      {
+        "team": "GL",
+        "teamName": "Gujarat Lions",
+        "years": "2016–2017"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2018–2021"
+      }
+    ]
+  },
+  {
+    "id": "gautam-gambhir",
+    "name": "Gautam Gambhir",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 154,
+    "stats": "4,217 runs · 36 Fifties · 2x IPL Champion Captain",
+    "funFact": "Led Kolkata Knight Riders to two IPL titles in 2012 and 2014.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2008–2010"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2011–2017"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2018"
+      }
+    ]
+  },
+  {
+    "id": "rohit-sharma",
+    "name": "Rohit Sharma",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 257,
+    "stats": "6,628 runs · 5x Champion Captain · 1x Hat-trick",
+    "funFact": "Took an IPL hat-trick for Deccan Chargers against Mumbai Indians in 2009!",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DCH",
+        "teamName": "Deccan Chargers",
+        "years": "2008–2010"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2011–2024"
+      }
+    ]
+  },
+  {
+    "id": "hardik-pandya",
+    "name": "Hardik Pandya",
+    "country": "India",
+    "role": "All-rounder",
+    "iplMatches": 137,
+    "stats": "2,525 runs · 64 wickets · 5x IPL Champion",
+    "funFact": "Captained Gujarat Titans to the IPL title in their debut season (2022).",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2015–2021"
+      },
+      {
+        "team": "GT",
+        "teamName": "Gujarat Titans",
+        "years": "2022–2023"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2024"
+      }
+    ]
+  },
+  {
+    "id": "brendon-mccullum",
+    "name": "Brendon McCullum",
+    "country": "New Zealand",
+    "role": "Batter",
+    "iplMatches": 109,
+    "stats": "2,880 runs · 158* highest score · 131.75 SR",
+    "funFact": "Set the tournament ablaze with 158* off 73 balls in the very first IPL match in 2008.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2008–2010"
+      },
+      {
+        "team": "KTK",
+        "teamName": "Kochi Tuskers Kerala",
+        "years": "2011"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2012–2013"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2014–2015"
+      },
+      {
+        "team": "GL",
+        "teamName": "Gujarat Lions",
+        "years": "2016–2017"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2018"
+      }
+    ]
+  },
+  {
+    "id": "chris-gayle",
+    "name": "Chris Gayle",
+    "country": "West Indies",
+    "role": "Batter",
+    "iplMatches": 142,
+    "stats": "4,965 runs · 175* record score · 357 sixes",
+    "funFact": "Holds the record for the highest individual score in IPL history (175* off 66 balls).",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2009–2010"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2011–2017"
+      },
+      {
+        "team": "PBKS",
+        "teamName": "Punjab Kings",
+        "years": "2018–2021"
+      }
+    ]
+  },
+  {
+    "id": "ab-de-villiers",
+    "name": "AB de Villiers",
+    "country": "South Africa",
+    "role": "Batter",
+    "iplMatches": 184,
+    "stats": "5,162 runs · 151.68 SR · 3 Centuries",
+    "funFact": "Earned the title 'Mr. 360' for his extraordinary innovation and partnership with Virat Kohli.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2008–2010"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2011–2021"
+      }
+    ]
+  },
+  {
+    "id": "david-warner",
+    "name": "David Warner",
+    "country": "Australia",
+    "role": "Batter",
+    "iplMatches": 184,
+    "stats": "6,565 runs · 3x Orange Cap winner · 2016 Champion Captain",
+    "funFact": "Only player in IPL history to win the prestigious Orange Cap three times.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2009–2013"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2014–2021"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "ravindra-jadeja",
+    "name": "Ravindra Jadeja",
+    "country": "India",
+    "role": "All-rounder",
+    "iplMatches": 240,
+    "stats": "2,959 runs · 160 wickets · 101 catches",
+    "funFact": "Hit 6 and 4 off the final 2 balls in 2023 to win CSK their 5th title.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2008–2009"
+      },
+      {
+        "team": "KTK",
+        "teamName": "Kochi Tuskers Kerala",
+        "years": "2011"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2012–2015"
+      },
+      {
+        "team": "GL",
+        "teamName": "Gujarat Lions",
+        "years": "2016–2017"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2018–2024"
+      }
+    ]
+  },
+  {
+    "id": "shane-watson",
+    "name": "Shane Watson",
+    "country": "Australia",
+    "role": "All-rounder",
+    "iplMatches": 145,
+    "stats": "3,874 runs · 92 wickets · 2x Player of the Tournament",
+    "funFact": "Scored an iconic 117* in the 2018 IPL final to win the trophy for CSK.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2008–2015"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2016–2017"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2018–2020"
+      }
+    ]
+  },
+  {
+    "id": "harbhajan-singh",
+    "name": "Harbhajan Singh",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 163,
+    "stats": "150 wickets · 7.08 Economy · 4x IPL Champion",
+    "funFact": "Captained Mumbai Indians to their Champions League T20 title in 2011.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2008–2017"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2018–2020"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2021"
+      }
+    ]
+  },
+  {
+    "id": "ambati-rayudu",
+    "name": "Ambati Rayudu",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 204,
+    "stats": "4,348 runs · 6x IPL Champion (Joint record)",
+    "funFact": "Holds the joint-record for the most IPL titles won by a player (6 trophies: 3 with MI, 3 with CSK).",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2010–2017"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2018–2023"
+      }
+    ]
+  },
+  {
+    "id": "ajinkya-rahane",
+    "name": "Ajinkya Rahane",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 185,
+    "stats": "4,642 runs · 30 Fifties · 2 Centuries",
+    "funFact": "Transformed his T20 game in 2023 with a strike rate of 172+ for CSK.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2008–2009"
+      },
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2011–2015"
+      },
+      {
+        "team": "RPS",
+        "teamName": "Rising Pune Supergiant",
+        "years": "2016–2017"
+      },
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2018–2019"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2020–2021"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2022"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2023–2024"
+      }
+    ]
+  },
+  {
+    "id": "manish-pandey",
+    "name": "Manish Pandey",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 171,
+    "stats": "3,850 runs · First Indian IPL centurion",
+    "funFact": "First Indian cricketer to score a century in IPL history (114* for RCB in 2009).",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2008"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2009–2010"
+      },
+      {
+        "team": "PWI",
+        "teamName": "Pune Warriors India",
+        "years": "2011–2013"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2014–2017"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2018–2021"
+      },
+      {
+        "team": "LSG",
+        "teamName": "Lucknow Super Giants",
+        "years": "2022"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2023"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2024"
+      }
+    ]
+  },
+  {
+    "id": "piyush-chawla",
+    "name": "Piyush Chawla",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 192,
+    "stats": "192 wickets · 2nd highest wicket-taker",
+    "funFact": "Hit the winning boundary in the 2014 IPL Final for Kolkata Knight Riders.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2008–2013"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2014–2019"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2020"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2021–2024"
+      }
+    ]
+  },
+  {
+    "id": "amit-mishra",
+    "name": "Amit Mishra",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 162,
+    "stats": "174 wickets · 3 Hat-tricks (IPL Record)",
+    "funFact": "Holds the all-time IPL record with 3 separate hat-tricks for three different teams (DD, DCH, SRH).",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2008–2010"
+      },
+      {
+        "team": "DCH",
+        "teamName": "Deccan Chargers",
+        "years": "2011–2012"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2013–2014"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2015–2021"
+      },
+      {
+        "team": "LSG",
+        "teamName": "Lucknow Super Giants",
+        "years": "2023–2024"
+      }
+    ]
+  },
+  {
+    "id": "ishant-sharma",
+    "name": "Ishant Sharma",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 110,
+    "stats": "93 wickets · 5/12 best figures",
+    "funFact": "Took 5 wickets in 12 balls for Deccan Chargers against Kochi Tuskers in 2011.",
+    "difficulty": "hard",
+    "journey": [
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2008–2010"
+      },
+      {
+        "team": "DCH",
+        "teamName": "Deccan Chargers",
+        "years": "2011–2012"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2013–2015"
+      },
+      {
+        "team": "RPS",
+        "teamName": "Rising Pune Supergiants",
+        "years": "2016"
+      },
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2017"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2019–2024"
+      }
+    ]
+  },
+  {
+    "id": "faf-du-plessis",
+    "name": "Faf du Plessis",
+    "country": "South Africa",
+    "role": "Batter",
+    "iplMatches": 145,
+    "stats": "4,571 runs · 35 Fifties · 136.37 SR",
+    "funFact": "Scored 86 runs in the 2021 final to power CSK to their 4th IPL championship.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2011–2015"
+      },
+      {
+        "team": "RPS",
+        "teamName": "Rising Pune Supergiant",
+        "years": "2016–2017"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2018–2021"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bengaluru",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "glenn-maxwell",
+    "name": "Glenn Maxwell",
+    "country": "Australia",
+    "role": "All-rounder",
+    "iplMatches": 134,
+    "stats": "2,771 runs · 156.73 SR · 37 wickets",
+    "funFact": "Known as the 'Big Show', scored 552 runs at a strike rate of 187+ for KXIP in 2014.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2012"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2013"
+      },
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2014–2017"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2018"
+      },
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2020"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bengaluru",
+        "years": "2021–2024"
+      }
+    ]
+  },
+  {
+    "id": "sanju-samson",
+    "name": "Sanju Samson",
+    "country": "India",
+    "role": "Wicketkeeper-Batter",
+    "iplMatches": 167,
+    "stats": "4,419 runs · 3 Centuries · 138.96 SR",
+    "funFact": "Youngest batter to score an IPL 50 when he debuted in 2013.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2012"
+      },
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2013–2015"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2016–2017"
+      },
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2018–2024"
+      }
+    ]
+  },
+  {
+    "id": "shreyas-iyer",
+    "name": "Shreyas Iyer",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 115,
+    "stats": "3,127 runs · 21 Fifties · 2024 Champion Captain",
+    "funFact": "Captained two different franchises (DC in 2020, KKR in 2024) to IPL finals, winning with KKR in 2024.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DC",
+        "teamName": "Delhi Daredevils / Capitals",
+        "years": "2015–2021"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "virat-kohli",
+    "name": "Virat Kohli",
+    "country": "India",
+    "role": "Batter",
+    "iplMatches": 252,
+    "stats": "8,004 runs · All-time highest run-scorer · 8 Centuries",
+    "funFact": "The only player in IPL history to play for the same franchise in every season since 2008.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bengaluru",
+        "years": "2008–2024"
+      }
+    ]
+  },
+  {
+    "id": "ms-dhoni",
+    "name": "MS Dhoni",
+    "country": "India",
+    "role": "Wicketkeeper-Batter",
+    "iplMatches": 264,
+    "stats": "5,243 runs · 5x Champion Captain · Most matches in IPL history",
+    "funFact": "Led CSK to a record 10 finals and 5 IPL championships.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2008–2015"
+      },
+      {
+        "team": "RPS",
+        "teamName": "Rising Pune Supergiant",
+        "years": "2016–2017"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2018–2024"
+      }
+    ]
+  },
+  {
+    "id": "jasprit-bumrah",
+    "name": "Jasprit Bumrah",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 133,
+    "stats": "165 wickets · 7.30 Economy · 5x IPL Champion",
+    "funFact": "Debuted in 2013 dismissing Virat Kohli, and has played solely for Mumbai Indians ever since.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2013–2024"
+      }
+    ]
+  },
+  {
+    "id": "lasith-malinga",
+    "name": "Lasith Malinga",
+    "country": "Sri Lanka",
+    "role": "Bowler",
+    "iplMatches": 122,
+    "stats": "170 wickets · 19.80 Average · 4x IPL Champion",
+    "funFact": "Defended 9 runs off the last over of the 2019 Final, taking a wicket off the final ball to win the trophy.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2009–2019"
+      }
+    ]
+  },
+  {
+    "id": "sunil-narine",
+    "name": "Sunil Narine",
+    "country": "West Indies",
+    "role": "All-rounder",
+    "iplMatches": 177,
+    "stats": "180 wickets · 6.73 Economy · 3x MVP Award winner",
+    "funFact": "3-time IPL Most Valuable Player (2012, 2018, 2024), guiding KKR to three titles.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2012–2024"
+      }
+    ]
+  },
+  {
+    "id": "andre-russell",
+    "name": "Andre Russell",
+    "country": "West Indies",
+    "role": "All-rounder",
+    "iplMatches": 127,
+    "stats": "2,484 runs · 174.93 SR · 115 wickets",
+    "funFact": "Highest career strike rate in IPL history with 2,000+ runs.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2012–2013"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2014–2024"
+      }
+    ]
+  },
+  {
+    "id": "kieron-pollard",
+    "name": "Kieron Pollard",
+    "country": "West Indies",
+    "role": "All-rounder",
+    "iplMatches": 189,
+    "stats": "3,412 runs · 147.32 SR · 5x IPL Champion",
+    "funFact": "Played all 189 IPL matches for Mumbai Indians, winning 5 titles and 2 Champions League trophies.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2010–2022"
+      }
+    ]
+  },
+  {
+    "id": "dwayne-bravo",
+    "name": "Dwayne Bravo",
+    "country": "West Indies",
+    "role": "All-rounder",
+    "iplMatches": 161,
+    "stats": "183 wickets · 2x Purple Cap Winner · 1,560 runs",
+    "funFact": "First bowler to win two IPL Purple Caps (2013, 2015), taking a record 32 wickets in 2013.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2008–2010"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2011–2015"
+      },
+      {
+        "team": "GL",
+        "teamName": "Gujarat Lions",
+        "years": "2016–2017"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2018–2022"
+      }
+    ]
+  },
+  {
+    "id": "yusuf-pathan",
+    "name": "Yusuf Pathan",
+    "country": "India",
+    "role": "All-rounder",
+    "iplMatches": 174,
+    "stats": "3,204 runs · 142.97 SR · 3x IPL Champion",
+    "funFact": "Scored a 37-ball century in 2010 and was Player of the Match in the inaugural 2008 Final.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2008–2010"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2011–2017"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2018–2019"
+      }
+    ]
+  },
+  {
+    "id": "irfan-pathan",
+    "name": "Irfan Pathan",
+    "country": "India",
+    "role": "All-rounder",
+    "iplMatches": 103,
+    "stats": "80 wickets · 1,139 runs · 120.44 SR",
+    "funFact": "Was a key pace spearhead for Kings XI Punjab in the inaugural 2008 semifinals run.",
+    "difficulty": "hard",
+    "journey": [
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2008–2010"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2011–2013"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2014"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2015"
+      },
+      {
+        "team": "RPS",
+        "teamName": "Rising Pune Supergiants",
+        "years": "2016"
+      },
+      {
+        "team": "GL",
+        "teamName": "Gujarat Lions",
+        "years": "2017"
+      }
+    ]
+  },
+  {
+    "id": "zaheer-khan",
+    "name": "Zaheer Khan",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 100,
+    "stats": "102 wickets · 7.58 Economy",
+    "funFact": "Captained Delhi Daredevils to famous upsets in his final IPL seasons.",
+    "difficulty": "hard",
+    "journey": [
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2008"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2009–2010"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2011–2013"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2014"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2015–2017"
+      }
+    ]
+  },
+  {
+    "id": "ashish-nehra",
+    "name": "Ashish Nehra",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 88,
+    "stats": "106 wickets · 23.53 Average",
+    "funFact": "Key pace bowler in Sunrisers Hyderabad's maiden title triumph in 2016.",
+    "difficulty": "hard",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2008"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2009–2010"
+      },
+      {
+        "team": "PWI",
+        "teamName": "Pune Warriors India",
+        "years": "2011–2012"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2013"
+      },
+      {
+        "team": "CSK",
+        "teamName": "Chennai Super Kings",
+        "years": "2014–2015"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2016–2017"
+      }
+    ]
+  },
+  {
+    "id": "adam-gilchrist",
+    "name": "Adam Gilchrist",
+    "country": "Australia",
+    "role": "Wicketkeeper-Batter",
+    "iplMatches": 80,
+    "stats": "2,069 runs · 2 Centuries · 2009 Champion Captain",
+    "funFact": "Led Deccan Chargers from bottom place in 2008 to the championship title in 2009.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DCH",
+        "teamName": "Deccan Chargers",
+        "years": "2008–2010"
+      },
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2011–2013"
+      }
+    ]
+  },
+  {
+    "id": "dale-steyn",
+    "name": "Dale Steyn",
+    "country": "South Africa",
+    "role": "Bowler",
+    "iplMatches": 95,
+    "stats": "97 wickets · 6.91 Economy",
+    "funFact": "Defended 7 runs off the final over against Pune Warriors in 2012 with thunderous yorkers.",
+    "difficulty": "hard",
+    "journey": [
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2008–2010"
+      },
+      {
+        "team": "DCH",
+        "teamName": "Deccan Chargers",
+        "years": "2011–2012"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2013–2015"
+      },
+      {
+        "team": "GL",
+        "teamName": "Gujarat Lions",
+        "years": "2016"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2019–2020"
+      }
+    ]
+  },
+  {
+    "id": "rashid-khan",
+    "name": "Rashid Khan",
+    "country": "Afghanistan",
+    "role": "Bowler",
+    "iplMatches": 121,
+    "stats": "149 wickets · 6.82 Economy · 1 Hat-trick",
+    "funFact": "Widely regarded as the most economical world-class spinner in modern IPL history.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2017–2021"
+      },
+      {
+        "team": "GT",
+        "teamName": "Gujarat Titans",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "mohammed-shami",
+    "name": "Mohammed Shami",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 110,
+    "stats": "127 wickets · Purple Cap Winner (2023)",
+    "funFact": "Won the Purple Cap in 2023 taking 28 wickets to propel Gujarat Titans to the final.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2011–2013"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2014–2018"
+      },
+      {
+        "team": "PBKS",
+        "teamName": "Punjab Kings",
+        "years": "2019–2021"
+      },
+      {
+        "team": "GT",
+        "teamName": "Gujarat Titans",
+        "years": "2022–2023"
+      }
+    ]
+  },
+  {
+    "id": "umesh-yadav",
+    "name": "Umesh Yadav",
+    "country": "India",
+    "role": "Bowler",
+    "iplMatches": 148,
+    "stats": "144 wickets · 4/23 best figures",
+    "funFact": "Premier strike bowler for KKR during their 2014 title winning season.",
+    "difficulty": "hard",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2010–2013"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2014–2017"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2018–2020"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2021"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2022–2023"
+      },
+      {
+        "team": "GT",
+        "teamName": "Gujarat Titans",
+        "years": "2024"
+      }
+    ]
+  },
+  {
+    "id": "axar-patel",
+    "name": "Axar Patel",
+    "country": "India",
+    "role": "All-rounder",
+    "iplMatches": 150,
+    "stats": "1,653 runs · 123 wickets · 7.24 Economy",
+    "funFact": "Emerging Player of the Tournament in 2014, taking KXIP to their first-ever IPL final.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2013"
+      },
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2014–2018"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2019–2024"
+      }
+    ]
+  },
+  {
+    "id": "trent-boult",
+    "name": "Trent Boult",
+    "country": "New Zealand",
+    "role": "Bowler",
+    "iplMatches": 104,
+    "stats": "121 wickets · Most 1st-over wickets in IPL history",
+    "funFact": "Deadly first-over bowler, took 25 wickets in Mumbai Indians' dominant 2020 title campaign.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2015–2016"
+      },
+      {
+        "team": "KKR",
+        "teamName": "Kolkata Knight Riders",
+        "years": "2017"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2018–2019"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2020–2021"
+      },
+      {
+        "team": "RR",
+        "teamName": "Rajasthan Royals",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "quinton-de-kock",
+    "name": "Quinton de Kock",
+    "country": "South Africa",
+    "role": "Wicketkeeper-Batter",
+    "iplMatches": 107,
+    "stats": "3,157 runs · 140* highest score · 2x IPL Champion",
+    "funFact": "Smashed 140* off 70 balls without losing his wicket for LSG against KKR in 2022.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2013"
+      },
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2014–2017"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2018"
+      },
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2019–2021"
+      },
+      {
+        "team": "LSG",
+        "teamName": "Lucknow Super Giants",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "marcus-stoinis",
+    "name": "Marcus Stoinis",
+    "country": "Australia",
+    "role": "All-rounder",
+    "iplMatches": 96,
+    "stats": "1,866 runs · 124* highest score · 43 wickets",
+    "funFact": "Smashed an incredible 124* off 63 balls to pull off the highest successful run chase at Chepauk.",
+    "difficulty": "hard",
+    "journey": [
+      {
+        "team": "DD",
+        "teamName": "Delhi Daredevils",
+        "years": "2015"
+      },
+      {
+        "team": "KXIP",
+        "teamName": "Kings XI Punjab",
+        "years": "2016–2018"
+      },
+      {
+        "team": "RCB",
+        "teamName": "Royal Challengers Bangalore",
+        "years": "2019"
+      },
+      {
+        "team": "DC",
+        "teamName": "Delhi Capitals",
+        "years": "2020–2021"
+      },
+      {
+        "team": "LSG",
+        "teamName": "Lucknow Super Giants",
+        "years": "2022–2024"
+      }
+    ]
+  },
+  {
+    "id": "nicholas-pooran",
+    "name": "Nicholas Pooran",
+    "country": "West Indies",
+    "role": "Wicketkeeper-Batter",
+    "iplMatches": 76,
+    "stats": "1,769 runs · 162.29 SR · 113 sixes",
+    "funFact": "Hit the fastest 50 of the 2023 season in just 15 balls against RCB.",
+    "difficulty": "hard",
+    "journey": [
+      {
+        "team": "MI",
+        "teamName": "Mumbai Indians",
+        "years": "2017"
+      },
+      {
+        "team": "PBKS",
+        "teamName": "Punjab Kings",
+        "years": "2019–2021"
+      },
+      {
+        "team": "SRH",
+        "teamName": "Sunrisers Hyderabad",
+        "years": "2022"
+      },
+      {
+        "team": "LSG",
+        "teamName": "Lucknow Super Giants",
+        "years": "2023–2024"
+      }
+    ]
+  },
+  {
+    "id": "rishabh-pant",
+    "name": "Rishabh Pant",
+    "country": "India",
+    "role": "Wicketkeeper-Batter",
+    "iplMatches": 111,
+    "stats": "3,284 runs · 148.93 SR · 128* highest score",
+    "funFact": "Scored 128* off 63 balls against Sunrisers Hyderabad in 2018, featuring 15 fours and 7 sixes.",
+    "difficulty": "easy",
+    "journey": [
+      {
+        "team": "DC",
+        "teamName": "Delhi Daredevils / Capitals",
+        "years": "2016–2024"
+      }
+    ]
+  }
+]
