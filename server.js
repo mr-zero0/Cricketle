@@ -845,8 +845,8 @@ function createApp(opts = {}) {
         "script-src 'self'",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data:",
-        "connect-src 'self'",
+        "img-src 'self' data: https://upload.wikimedia.org",
+        "connect-src 'self' https://upload.wikimedia.org",
         "frame-ancestors 'none'",
         "base-uri 'self'",
       ].join("; ");
@@ -905,6 +905,10 @@ function createApp(opts = {}) {
     });
 
     if (pathname.startsWith("/api/")) done(api(req, res, pathname, url.searchParams));
+    else if (pathname === "/" || pathname === "/hub" || pathname === "/hub/") serveStatic(req, res, "/hub.html");
+    else if (pathname === "/play" || pathname === "/cricketle" || pathname === "/game") serveStatic(req, res, "/index.html");
+    else if (pathname === "/pixel" || pathname === "/pixel/") serveStatic(req, res, "/pixel.html");
+    else if (pathname === "/scorecard" || pathname === "/scorecard/") serveStatic(req, res, "/scorecard.html");
     else if (pathname === "/admin" || pathname === "/admin/") serveStatic(req, res, "/admin.html");
     else serveStatic(req, res, pathname);
   });

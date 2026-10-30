@@ -1,0 +1,214 @@
+[
+  {
+    "id": 1,
+    "title": "2011 ICC Cricket World Cup Final",
+    "date": "2 April 2011",
+    "venue": "Wankhede Stadium, Mumbai",
+    "teams": "India vs Sri Lanka",
+    "result": "India won by 6 wickets",
+    "targetPlayer": "MS Dhoni",
+    "targetRole": "Wicketkeeper / Captain",
+    "targetTeam": "India",
+    "hint": "Promoted himself ahead of in-form Yuvraj Singh and finished with an iconic six over long-on.",
+    "innings": {
+      "team": "India",
+      "targetScore": "277/4 (48.2 overs)",
+      "batting": [
+        { "player": "Virender Sehwag", "dismissal": "lbw b Malinga", "runs": 0, "balls": 2, "fours": 0, "sixes": 0, "sr": 0.0 },
+        { "player": "Sachin Tendulkar", "dismissal": "c Sangakkara b Malinga", "runs": 18, "balls": 14, "fours": 2, "sixes": 0, "sr": 128.5 },
+        { "player": "Gautam Gambhir", "dismissal": "b Perera", "runs": 97, "balls": 122, "fours": 9, "sixes": 0, "sr": 79.5 },
+        { "player": "Virat Kohli", "dismissal": "c & b Dilshan", "runs": 35, "balls": 49, "fours": 4, "sixes": 0, "sr": 71.4 },
+        { "player": "██████████", "dismissal": "not out", "runs": 91, "balls": 79, "fours": 8, "sixes": 2, "sr": 115.1, "isTarget": true },
+        { "player": "Yuvraj Singh", "dismissal": "not out", "runs": 21, "balls": 24, "fours": 2, "sixes": 0, "sr": 87.5 }
+      ],
+      "extras": "15 (b 1, lb 6, w 8)",
+      "total": "277/4 (48.2 overs)"
+    }
+  },
+  {
+    "id": 2,
+    "title": "2019 ICC Cricket World Cup Final",
+    "date": "14 July 2019",
+    "venue": "Lord's, London",
+    "teams": "England vs New Zealand",
+    "result": "Match tied (England won boundary countback in Super Over)",
+    "targetPlayer": "Ben Stokes",
+    "targetRole": "All-rounder",
+    "targetTeam": "England",
+    "hint": "Carried the entire chase on his shoulders with an unbeaten 84, including the famous deflection boundary.",
+    "innings": {
+      "team": "England",
+      "targetScore": "241 all out (50 overs)",
+      "batting": [
+        { "player": "Jason Roy", "dismissal": "c Latham b Henry", "runs": 17, "balls": 20, "fours": 3, "sixes": 0, "sr": 85.0 },
+        { "player": "Jonny Bairstow", "dismissal": "b Ferguson", "runs": 36, "balls": 55, "fours": 7, "sixes": 0, "sr": 65.4 },
+        { "player": "Joe Root", "dismissal": "c Latham b de Grandhomme", "runs": 7, "balls": 30, "fours": 0, "sixes": 0, "sr": 23.3 },
+        { "player": "Eoin Morgan", "dismissal": "c Ferguson b Neesham", "runs": 9, "balls": 22, "fours": 0, "sixes": 0, "sr": 40.9 },
+        { "player": "██████████", "dismissal": "not out", "runs": 84, "balls": 98, "fours": 5, "sixes": 2, "sr": 85.7, "isTarget": true },
+        { "player": "Jos Buttler", "dismissal": "c Southee b Ferguson", "runs": 59, "balls": 60, "fours": 6, "sixes": 0, "sr": 98.3 },
+        { "player": "Chris Woakes", "dismissal": "c Latham b Ferguson", "runs": 2, "balls": 4, "fours": 0, "sixes": 0, "sr": 50.0 },
+        { "player": "Liam Plunkett", "dismissal": "c Boult b Neesham", "runs": 10, "balls": 10, "fours": 1, "sixes": 0, "sr": 100.0 }
+      ],
+      "extras": "17 (b 2, lb 3, w 12)",
+      "total": "241 all out (50 overs)"
+    }
+  },
+  {
+    "id": 3,
+    "title": "2023 ICC Cricket World Cup Group Match",
+    "date": "7 November 2023",
+    "venue": "Wankhede Stadium, Mumbai",
+    "teams": "Australia vs Afghanistan",
+    "result": "Australia won by 3 wickets",
+    "targetPlayer": "Glenn Maxwell",
+    "targetRole": "All-rounder",
+    "targetTeam": "Australia",
+    "hint": "Battling severe cramps and unable to run, launched 21 fours and 10 sixes on one leg.",
+    "innings": {
+      "team": "Australia",
+      "targetScore": "293/7 (46.5 overs)",
+      "batting": [
+        { "player": "Travis Head", "dismissal": "c Alikhil b Naveen", "runs": 0, "balls": 2, "fours": 0, "sixes": 0, "sr": 0.0 },
+        { "player": "David Warner", "dismissal": "b Omarzai", "runs": 18, "balls": 29, "fours": 3, "sixes": 0, "sr": 62.0 },
+        { "player": "Mitchell Marsh", "dismissal": "lbw b Naveen", "runs": 24, "balls": 21, "fours": 2, "sixes": 2, "sr": 114.2 },
+        { "player": "Marnus Labuschagne", "dismissal": "run out (Noor)", "runs": 14, "balls": 28, "fours": 2, "sixes": 0, "sr": 50.0 },
+        { "player": "Josh Inglis", "dismissal": "c Ibrahim b Omarzai", "runs": 0, "balls": 1, "fours": 0, "sixes": 0, "sr": 0.0 },
+        { "player": "██████████", "dismissal": "not out", "runs": 201, "balls": 128, "fours": 21, "sixes": 10, "sr": 157.0, "isTarget": true },
+        { "player": "Marcus Stoinis", "dismissal": "lbw b Rashid", "runs": 6, "balls": 7, "fours": 1, "sixes": 0, "sr": 85.7 },
+        { "player": "Mitchell Starc", "dismissal": "c Alikhil b Rashid", "runs": 3, "balls": 7, "fours": 0, "sixes": 0, "sr": 42.8 },
+        { "player": "Pat Cummins", "dismissal": "not out", "runs": 12, "balls": 68, "fours": 1, "sixes": 0, "sr": 17.6 }
+      ],
+      "extras": "15 (b 0, lb 3, w 12)",
+      "total": "293/7 (46.5 overs)"
+    }
+  },
+  {
+    "id": 4,
+    "title": "2023 ICC Cricket World Cup Final",
+    "date": "19 November 2023",
+    "venue": "Narendra Modi Stadium, Ahmedabad",
+    "teams": "Australia vs India",
+    "result": "Australia won by 6 wickets",
+    "targetPlayer": "Travis Head",
+    "targetRole": "Opening Batter",
+    "targetTeam": "Australia",
+    "hint": "Silenced 130,000 fans with a breathtaking 137 off 120 balls after taking a diving catch to remove Rohit.",
+    "innings": {
+      "team": "Australia",
+      "targetScore": "241/4 (43.0 overs)",
+      "batting": [
+        { "player": "David Warner", "dismissal": "c Kohli b Shami", "runs": 7, "balls": 3, "fours": 1, "sixes": 0, "sr": 233.3 },
+        { "player": "██████████", "dismissal": "c Gill b Siraj", "runs": 137, "balls": 120, "fours": 15, "sixes": 4, "sr": 114.1, "isTarget": true },
+        { "player": "Mitchell Marsh", "dismissal": "c Rahul b Bumrah", "runs": 15, "balls": 15, "fours": 1, "sixes": 1, "sr": 100.0 },
+        { "player": "Steve Smith", "dismissal": "lbw b Bumrah", "runs": 4, "balls": 9, "fours": 1, "sixes": 0, "sr": 44.4 },
+        { "player": "Marnus Labuschagne", "dismissal": "not out", "runs": 58, "balls": 110, "fours": 4, "sixes": 0, "sr": 52.7 },
+        { "player": "Glenn Maxwell", "dismissal": "not out", "runs": 2, "balls": 1, "fours": 0, "sixes": 0, "sr": 200.0 }
+      ],
+      "extras": "18 (b 0, lb 2, w 16)",
+      "total": "241/4 (43.0 overs)"
+    }
+  },
+  {
+    "id": 5,
+    "title": "Record Individual ODI Score",
+    "date": "13 November 2014",
+    "venue": "Eden Gardens, Kolkata",
+    "teams": "India vs Sri Lanka",
+    "result": "India won by 153 runs",
+    "targetPlayer": "Rohit Sharma",
+    "targetRole": "Opening Batter",
+    "targetTeam": "India",
+    "hint": "Smashed 33 fours and 9 sixes in the highest individual score in One Day International history.",
+    "innings": {
+      "team": "India",
+      "targetScore": "404/5 (50 overs)",
+      "batting": [
+        { "player": "Ajinkya Rahane", "dismissal": "lbw b Mathews", "runs": 28, "balls": 31, "fours": 4, "sixes": 0, "sr": 90.3 },
+        { "player": "██████████", "dismissal": "c Jayawardene b Kulasekara", "runs": 264, "balls": 173, "fours": 33, "sixes": 9, "sr": 152.6, "isTarget": true },
+        { "player": "Ambati Rayudu", "dismissal": "b Eranga", "runs": 8, "balls": 19, "fours": 0, "sixes": 0, "sr": 42.1 },
+        { "player": "Virat Kohli", "dismissal": "run out (Seekkuge Prasanna)", "runs": 66, "balls": 64, "fours": 6, "sixes": 0, "sr": 103.1 },
+        { "player": "Suresh Raina", "dismissal": "c Jayawardene b Mathews", "runs": 11, "balls": 14, "fours": 0, "sixes": 0, "sr": 78.5 },
+        { "player": "Robin Uthappa", "dismissal": "not out", "runs": 16, "balls": 16, "fours": 0, "sixes": 0, "sr": 100.0 }
+      ],
+      "extras": "11 (lb 2, w 8, nb 1)",
+      "total": "404/5 (50 overs)"
+    }
+  },
+  {
+    "id": 6,
+    "title": "2003 ICC Cricket World Cup Final",
+    "date": "23 March 2003",
+    "venue": "Wanderers Stadium, Johannesburg",
+    "teams": "Australia vs India",
+    "result": "Australia won by 125 runs",
+    "targetPlayer": "Ricky Ponting",
+    "targetRole": "Batter / Captain",
+    "targetTeam": "Australia",
+    "hint": "Aussie skipper hammered 8 mammoth sixes against Zaheer and Harbhajan to post 359.",
+    "innings": {
+      "team": "Australia",
+      "targetScore": "359/2 (50 overs)",
+      "batting": [
+        { "player": "Adam Gilchrist", "dismissal": "c Sehwag b Harbhajan", "runs": 57, "balls": 48, "fours": 8, "sixes": 1, "sr": 118.7 },
+        { "player": "Matthew Hayden", "dismissal": "c Dravid b Harbhajan", "runs": 37, "balls": 54, "fours": 5, "sixes": 0, "sr": 68.5 },
+        { "player": "██████████", "dismissal": "not out", "runs": 140, "balls": 121, "fours": 4, "sixes": 8, "sr": 115.7, "isTarget": true },
+        { "player": "Damien Martyn", "dismissal": "not out", "runs": 88, "balls": 84, "fours": 7, "sixes": 1, "sr": 104.7 }
+      ],
+      "extras": "37 (b 2, lb 12, w 16, nb 7)",
+      "total": "359/2 (50 overs)"
+    }
+  },
+  {
+    "id": 7,
+    "title": "1998 Coca-Cola Cup 'Desert Storm'",
+    "date": "22 April 1998",
+    "venue": "Sharjah Cricket Stadium, Sharjah",
+    "teams": "India vs Australia",
+    "result": "Australia won by 26 runs (India qualified for final)",
+    "targetPlayer": "Sachin Tendulkar",
+    "targetRole": "Batter",
+    "targetTeam": "India",
+    "hint": "After a sandstorm paused play, dismantled Shane Warne and Michael Kasprowicz to seal final spot.",
+    "innings": {
+      "team": "India",
+      "targetScore": "250/5 (46 overs)",
+      "batting": [
+        { "player": "Sourav Ganguly", "dismissal": "c Blewett b Fleming", "runs": 17, "balls": 31, "fours": 2, "sixes": 0, "sr": 54.8 },
+        { "player": "██████████", "dismissal": "c Gilchrist b Fleming", "runs": 143, "balls": 131, "fours": 9, "sixes": 5, "sr": 109.1, "isTarget": true },
+        { "player": "Nayan Mongia", "dismissal": "c Gilchrist b Moody", "runs": 35, "balls": 46, "fours": 1, "sixes": 1, "sr": 76.0 },
+        { "player": "Mohammad Azharuddin", "dismissal": "lbw b Kasprowicz", "runs": 14, "balls": 21, "fours": 1, "sixes": 0, "sr": 66.6 },
+        { "player": "Ajay Jadeja", "dismissal": "c Mark Waugh b Fleming", "runs": 1, "balls": 5, "fours": 0, "sixes": 0, "sr": 20.0 },
+        { "player": "VVS Laxman", "dismissal": "not out", "runs": 23, "balls": 34, "fours": 1, "sixes": 0, "sr": 67.6 },
+        { "player": "Hrishikesh Kanitkar", "dismissal": "not out", "runs": 5, "balls": 9, "fours": 0, "sixes": 0, "sr": 55.5 }
+      ],
+      "extras": "12 (b 0, lb 3, w 7, nb 2)",
+      "total": "250/5 (46 overs)"
+    }
+  },
+  {
+    "id": 8,
+    "title": "2007 ICC World Twenty20 Group Match",
+    "date": "19 September 2007",
+    "venue": "Kingsmead, Durban",
+    "teams": "India vs England",
+    "result": "India won by 18 runs",
+    "targetPlayer": "Yuvraj Singh",
+    "targetRole": "All-rounder",
+    "targetTeam": "India",
+    "hint": "After an altercation with Andrew Flintoff, smashed Stuart Broad for 6 sixes in one over and a 12-ball fifty.",
+    "innings": {
+      "team": "India",
+      "targetScore": "218/4 (20 overs)",
+      "batting": [
+        { "player": "Gautam Gambhir", "dismissal": "c Collingwood b Tremlett", "runs": 58, "balls": 41, "fours": 7, "sixes": 1, "sr": 141.4 },
+        { "player": "Virender Sehwag", "dismissal": "b Tremlett", "runs": 68, "balls": 52, "fours": 4, "sixes": 3, "sr": 130.7 },
+        { "player": "Robin Uthappa", "dismissal": "c Pietersen b Anderson", "runs": 6, "balls": 6, "fours": 1, "sixes": 0, "sr": 100.0 },
+        { "player": "MS Dhoni", "dismissal": "not out", "runs": 10, "balls": 8, "fours": 0, "sixes": 0, "sr": 125.0 },
+        { "player": "██████████", "dismissal": "c Collingwood b Flintoff", "runs": 58, "balls": 16, "fours": 3, "sixes": 7, "sr": 362.5, "isTarget": true },
+        { "player": "Rohit Sharma", "dismissal": "not out", "runs": 0, "balls": 0, "fours": 0, "sixes": 0, "sr": 0.0 }
+      ],
+      "extras": "18 (lb 4, w 13, nb 1)",
+      "total": "218/4 (20 overs)"
+    }
+  }
+]

@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="Scorecard Mystery — Guess the secret player blacked out from a historic cricket match scorecard." />
+  <title>Scorecard Mystery — Cricketle</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="styles.css?v=2.4.0" />
+  <script src="theme.js?v=2.4.0"></script>
+  <style>
+    .scorecard-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px 16px 64px;
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .game-header h2 {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: clamp(32px, 7vw, 48px);
+      letter-spacing: 1.5px;
+      color: var(--text-primary, #fff);
+      margin: 0 0 4px;
+    }
+
+    .game-header p {
+      font-size: 14px;
+      color: var(--text-muted, #94a3b8);
+      margin: 0 0 16px;
+    }
+
+    /* Mode selector pill */
+    .mode-toggle {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 30px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted, #94a3b8);
+      padding: 6px 18px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn.active {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    /* Match Info Header (Easy mode shows, Hard mode hides) */
+    .match-meta-card {
+      background: var(--card-bg, rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .match-meta-title {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 20px;
+      letter-spacing: 1px;
+      color: #60a5fa;
+      margin: 0;
+    }
+
+    .match-meta-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-muted, #94a3b8);
+    }
+
+    .match-meta-details span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Scorecard Table Card */
+    .scorecard-card {
+      background: var(--card-bg, rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.2);
+    }
+
+    .scorecard-table-wrap {
+      overflow-x: auto;
+    }
+
+    .scorecard-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+
+    .scorecard-table th {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted, #94a3b8);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 10px 14px;
+      font-weight: 700;
+    }
+
+    .scorecard-table td {
+      padding: 12px 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+    }
+
+    .scorecard-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Mystery Target Row Highlight */
+    .mystery-row {
+      background: rgba(59, 130, 246, 0.12) !important;
+      font-weight: 600;
+    }
+
+    .mystery-badge {
+      display: inline-block;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      animation: mysteryPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes mysteryPulse {
+      0%, 100% { opacity: 0.85; }
+      50% { opacity: 1; filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.6)); }
+    }
+
+    .scorecard-footer {
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: var(--text-muted, #94a3b8);
+    }
+
+    /* Attempts Track */
+    .attempts-track {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .attempt-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .attempt-dot.used-wrong {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .attempt-dot.used-correct {
+      background: #22c55e;
+      border-color: #22c55e;
+    }
+
+    .attempt-dot.current {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      transform: scale(1.2);
+    }
+
+    /* Guess Controls */
+    .guess-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .guess-input-wrap {
+      display: flex;
+      gap: 8px;
+    }
+
+    .guess-input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .guess-input:focus {
+      border-color: #3b82f6;
+    }
+
+    .btn-guess {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-guess:hover {
+      opacity: 0.9;
+    }
+
+    /* Autocomplete */
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #0f172a;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      border-radius: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 50;
+      margin-top: 4px;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .autocomplete-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #cbd5e1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .autocomplete-item:hover {
+      background: rgba(59, 130, 246, 0.2);
+      color: #fff;
+    }
+
+    /* History & Hints */
+    .hint-banner {
+      background: rgba(234, 179, 8, 0.12);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      color: #fde047;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .guess-history {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .guess-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border-left: 3px solid #ef4444;
+      font-size: 14px;
+    }
+
+    .guess-item.correct {
+      border-left-color: #22c55e;
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    /* Result Card */
+    .result-card {
+      background: var(--card-bg, rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      display: none;
+      margin-top: 16px;
+    }
+
+    .result-card.won { border-color: rgba(34, 197, 94, 0.6); }
+    .result-card.lost { border-color: rgba(239, 68, 68, 0.6); }
+
+    .result-title {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 32px;
+      letter-spacing: 1px;
+      margin: 0 0 6px;
+    }
+
+    .back-hub-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted, #94a3b8);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .back-hub-btn:hover { color: #fff; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to game</a>
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <div class="brand">
+      <a href="hub.html" class="brand-mark" aria-label="Back to Hub" style="text-decoration:none;"><span style="font-size:20px;">📋</span></a>
+      <div class="brand-text">
+        <h1>Scorecard Mystery</h1>
+        <p class="tagline">Who played the mystery innings in this famous match?</p>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      <a href="hub.html" class="nav-link"><span>← All Games</span></a>
+    </nav>
+  </header>
+
+  <main id="main" class="scorecard-container">
+    <a href="hub.html" class="back-hub-btn">← Back to Game Hub</a>
+
+    <div class="game-header">
+      <h2>SCORECARD MYSTERY</h2>
+      <p>One player's name is blacked out. Use the match context and scorecard to guess who it is!</p>
+      <div class="mode-toggle">
+        <button id="mode-easy" class="mode-btn active" data-mode="easy">Easy (Match Details Visible)</button>
+        <button id="mode-hard" class="mode-btn" data-mode="hard">Hard (Scorecard Only)</button>
+      </div>
+    </div>
+
+    <!-- Match Metadata Card (Easy mode shows, Hard hides) -->
+    <div class="match-meta-card" id="match-meta">
+      <h3 class="match-meta-title" id="meta-title">2011 ICC Cricket World Cup Final</h3>
+      <div class="match-meta-details">
+        <span id="meta-teams">📍 India vs Sri Lanka</span>
+        <span id="meta-venue">🏟️ Wankhede Stadium, Mumbai</span>
+        <span id="meta-date">📅 2 April 2011</span>
+        <span id="meta-result">🏆 India won by 6 wickets</span>
+      </div>
+    </div>
+
+    <!-- Scorecard Table -->
+    <div class="scorecard-card">
+      <div class="scorecard-table-wrap">
+        <table class="scorecard-table">
+          <thead>
+            <tr>
+              <th>Batter</th>
+              <th>Dismissal</th>
+              <th style="text-align:right;">R</th>
+              <th style="text-align:right;">B</th>
+              <th style="text-align:right;">4s</th>
+              <th style="text-align:right;">6s</th>
+              <th style="text-align:right;">SR</th>
+            </tr>
+          </thead>
+          <tbody id="scorecard-body">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+      <div class="scorecard-footer">
+        <span id="scorecard-extras">Extras: 15</span>
+        <strong id="scorecard-total">Total: 277/4</strong>
+      </div>
+    </div>
+
+    <!-- Attempts Indicator -->
+    <div class="attempts-track" id="attempts-track">
+      <span class="attempt-dot current"></span>
+      <span class="attempt-dot"></span>
+      <span class="attempt-dot"></span>
+      <span class="attempt-dot"></span>
+      <span class="attempt-dot"></span>
+      <span class="attempt-dot"></span>
+    </div>
+
+    <!-- Hint banner (unlocked after 3 wrong guesses) -->
+    <div class="hint-banner" id="hint-banner">
+      💡 <strong>Hint:</strong> <span id="hint-text"></span>
+    </div>
+
+    <!-- Guess Controls -->
+    <div class="guess-box" id="guess-controls">
+      <div class="guess-input-wrap">
+        <input type="text" id="guess-input" class="guess-input" placeholder="Type player name..." autocomplete="off" />
+        <button id="btn-guess" class="btn-guess">Guess</button>
+      </div>
+      <div id="autocomplete-list" class="autocomplete-list"></div>
+    </div>
+
+    <!-- History -->
+    <div class="guess-history" id="guess-history"></div>
+
+    <!-- Result Card -->
+    <div class="result-card" id="result-card">
+      <h3 class="result-title" id="result-status">OUT!</h3>
+      <p style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;" id="result-name"></p>
+      <p style="font-size:14px;color:var(--text-muted, #94a3b8);margin:0 0 16px;" id="result-desc"></p>
+      <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;">Play Other Games →</a>
+    </div>
+  </main>
+
+  <script src="bg.js"></script>
+  <script src="players.js"></script>
+  <script src="scorecard.js"></script>
+</body>
+</html>
