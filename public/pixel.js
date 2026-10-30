@@ -123,8 +123,8 @@
       sx = (loadedImage.width - sw) / 2;
     } else {
       sh = loadedImage.width / canvasRatio;
-      // Focus on upper portion (head and shoulders)
-      sy = Math.max(0, (loadedImage.height - sh) * 0.15);
+      // Preserve the top of head/hair completely
+      sy = 0;
     }
 
     if (pixelSize <= 1) {
