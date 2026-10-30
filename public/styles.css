@@ -310,12 +310,12 @@ button:disabled { cursor: not-allowed; }
 }
 .icon-btn:hover { color: var(--fg); border-color: var(--border-strong); background: var(--card-2); transform: translateY(-1px); }
 .icon-btn:active { transform: scale(0.96); }
-.icon-btn svg { width: 22px; height: 22px; }
+.icon-btn svg { width: 22px; height: 22px; max-width: 22px; max-height: 22px; }
 .topbar-actions { display: flex; gap: var(--space-2); flex: none; }
-.theme-btn .i-moon { display: none; }
-:root[data-theme="day"] .theme-btn .i-moon { display: block; }
+.theme-btn .i-moon { display: none; width: 22px; height: 22px; }
+:root[data-theme="day"] .theme-btn .i-moon { display: block; width: 22px; height: 22px; }
 :root[data-theme="day"] .theme-btn .i-sun { display: none; }
-.theme-btn svg { transition: transform var(--dur-slow) var(--ease-back); }
+.theme-btn svg { width: 22px; height: 22px; max-width: 22px; max-height: 22px; transition: transform var(--dur-slow) var(--ease-back); }
 .theme-btn:hover svg { transform: rotate(30deg); }
 
 .btn {

@@ -12,6 +12,7 @@
   let currentMode = "easy";
   let loadedImage = null;
   let isGameOver = false;
+  let currentPhotoUrl = "";
 
   const canvas = document.getElementById("pixel-canvas");
   const ctx = canvas ? canvas.getContext("2d") : null;
@@ -45,6 +46,65 @@
       hash |= 0;
     }
     return Math.abs(hash);
+  }
+
+  // Mulberry32 deterministic 32-bit PRNG
+  function mulberry32(seed) {
+    return function () {
+      let t = (seed += 0x6d2b79f5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // Generate a non-repeating cycle permutation of length N for cycle number `cycle`
+  // Guaranteed: Every player appears exactly once per cycle; buffer prevents repeats at boundary.
+  const cycleCache = new Map();
+  function getPermutation(N, cycle, salt) {
+    const key = `${N}:${cycle}:${salt}`;
+    if (cycleCache.has(key)) return cycleCache.get(key);
+
+    const arr = Array.from({ length: N }, (_, i) => i);
+    const rng = mulberry32(hashString(salt + "_cycle_" + cycle));
+    for (let i = N - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+
+    if (cycle > 0) {
+      const prev = getPermutation(N, cycle - 1, salt);
+      const buffer = Math.min(8, Math.floor(N / 3));
+      const recent = new Set(prev.slice(N - buffer));
+      let swapIdx = N - 1;
+      for (let i = 0; i < buffer; i++) {
+        if (recent.has(arr[i])) {
+          while (swapIdx >= buffer && recent.has(arr[swapIdx])) {
+            swapIdx--;
+          }
+          if (swapIdx >= buffer) {
+            [arr[i], arr[swapIdx]] = [arr[swapIdx], arr[i]];
+            swapIdx--;
+          }
+        }
+      }
+    }
+
+    if (cycleCache.size > 128) cycleCache.clear();
+    cycleCache.set(key, arr);
+    return arr;
+  }
+
+  function getSpacedDailyIndex(todayKey, poolLength, modeSalt) {
+    if (poolLength <= 1) return 0;
+    const [y, m, d] = todayKey.split("-").map(Number);
+    const epoch2026 = Date.UTC(2026, 0, 1);
+    const diffDays = Math.floor((Date.UTC(y, m - 1, d) - epoch2026) / 86400000);
+    const dayNumber = Math.max(0, diffDays);
+    const cycle = Math.floor(dayNumber / poolLength);
+    const pos = dayNumber % poolLength;
+    const perm = getPermutation(poolLength, cycle, modeSalt);
+    return perm[pos];
   }
 
   // Draw pixelated image on canvas with headshot-focused center crop
@@ -120,9 +180,15 @@
       const activePool = pool.length ? pool : list;
 
       const today = getTodayKey();
-      const seed = hashString(today + "_pixel_" + currentMode);
-      const targetIndex = seed % activePool.length;
+      const targetIndex = getSpacedDailyIndex(today, activePool.length, "pixel_" + currentMode);
       currentTarget = activePool[targetIndex];
+
+      // Select variant deterministically so different encounters show different photos
+      const variants = Array.isArray(currentTarget.images) && currentTarget.images.length > 0
+        ? currentTarget.images
+        : [currentTarget.imageUrl];
+      const variantSeed = hashString(today + "_" + currentTarget.id + "_variant");
+      currentPhotoUrl = variants[variantSeed % variants.length];
 
       // Restore saved progress for today if any
       const saved = localStorage.getItem(`cricketle_pixel_${today}_${currentMode}`);
@@ -130,13 +196,14 @@
         const data = JSON.parse(saved);
         currentAttempts = data.attempts || [];
         isGameOver = data.isGameOver || false;
+        if (data.photoUrl) currentPhotoUrl = data.photoUrl;
       } else {
         currentAttempts = [];
         isGameOver = false;
       }
 
       // Load image
-      loadImage(currentTarget.imageUrl);
+      loadImage(currentPhotoUrl);
       renderHistory();
       updateTrack();
 
@@ -300,7 +367,7 @@
 
     localStorage.setItem(
       `cricketle_pixel_${today}_${currentMode}`,
-      JSON.stringify({ attempts: currentAttempts, isGameOver })
+      JSON.stringify({ attempts: currentAttempts, isGameOver, photoUrl: currentPhotoUrl })
     );
 
     renderHistory();

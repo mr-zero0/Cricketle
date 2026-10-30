@@ -7,7 +7,13 @@
     "active": true,
     "difficulty": "easy",
     "hint": "King of chases with 50 ODI hundreds and 80 international centuries.",
-    "imageUrl": "photos/player_1.jpg"
+    "imageUrl": "photos/player_1.jpg",
+    "images": [
+      "photos/player_1.jpg",
+      "photos/player_1_2.jpg",
+      "photos/player_1_3.jpg",
+      "photos/player_1_4.jpg"
+    ]
   },
   {
     "id": 2,
@@ -17,7 +23,13 @@
     "active": true,
     "difficulty": "easy",
     "hint": "'Hitman' who scored three ODI double centuries including record 264.",
-    "imageUrl": "photos/player_2.jpg"
+    "imageUrl": "photos/player_2.jpg",
+    "images": [
+      "photos/player_2.jpg",
+      "photos/player_2_2.jpg",
+      "photos/player_2_3.jpg",
+      "photos/player_2_4.jpg"
+    ]
   },
   {
     "id": 3,
@@ -27,226 +39,832 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Unorthodox hyper-extension action, premier death-overs yorker specialist.",
-    "imageUrl": "photos/player_3.jpg"
+    "imageUrl": "photos/player_3.jpg",
+    "images": [
+      "photos/player_3.jpg",
+      "photos/player_3_2.jpg",
+      "photos/player_3_3.jpg",
+      "photos/player_3_4.jpg"
+    ]
   },
   {
     "id": 4,
-    "name": "MS Dhoni",
-    "country": "India",
-    "role": "Wicketkeeper",
-    "active": false,
-    "difficulty": "hard",
-    "hint": "Captain Cool who led India to 2007 T20 WC, 2011 ODI WC, and 2013 Champions Trophy.",
-    "imageUrl": "photos/player_4.jpg"
-  },
-  {
-    "id": 5,
-    "name": "Sachin Tendulkar",
-    "country": "India",
-    "role": "Batter",
-    "active": false,
-    "difficulty": "hard",
-    "hint": "The 'Master Blaster' with 100 international centuries and 34,357 career runs.",
-    "imageUrl": "photos/player_5.jpg"
-  },
-  {
-    "id": 6,
     "name": "Pat Cummins",
     "country": "Australia",
     "role": "Bowler",
     "active": true,
     "difficulty": "easy",
     "hint": "Aussie pace captain who won 2023 WTC Final, 2023 ODI World Cup, and retained the Ashes.",
-    "imageUrl": "photos/player_6.jpg"
+    "imageUrl": "photos/player_4.jpg",
+    "images": [
+      "photos/player_4.jpg",
+      "photos/player_4_2.jpg",
+      "photos/player_4_3.jpg",
+      "photos/player_4_4.jpg"
+    ]
   },
   {
-    "id": 7,
+    "id": 5,
     "name": "Travis Head",
     "country": "Australia",
     "role": "Batter",
     "active": true,
     "difficulty": "easy",
     "hint": "Aggressive southpaw who scored match-winning hundreds in both 2023 WTC and ODI WC finals.",
-    "imageUrl": "photos/player_7.jpg"
+    "imageUrl": "photos/player_5.jpg",
+    "images": [
+      "photos/player_5.jpg",
+      "photos/player_5_2.jpg",
+      "photos/player_5_3.jpg",
+      "photos/player_5_4.jpg"
+    ]
   },
   {
-    "id": 8,
+    "id": 6,
     "name": "Mitchell Starc",
     "country": "Australia",
     "role": "Bowler",
     "active": true,
     "difficulty": "easy",
     "hint": "Left-arm lethal spearhead with most wickets across 2015 and 2019 World Cups.",
-    "imageUrl": "photos/player_8.jpg"
+    "imageUrl": "photos/player_6.jpg",
+    "images": [
+      "photos/player_6.jpg",
+      "photos/player_6_2.jpg",
+      "photos/player_6_3.jpg",
+      "photos/player_6_4.jpg"
+    ]
   },
   {
-    "id": 9,
+    "id": 7,
     "name": "Steve Smith",
     "country": "Australia",
     "role": "Batter",
     "active": true,
     "difficulty": "easy",
     "hint": "Unorthodox stance, modern Test batting phenomenon with 32 Test centuries.",
-    "imageUrl": "photos/player_9.jpg"
+    "imageUrl": "photos/player_7.jpg",
+    "images": [
+      "photos/player_7.jpg",
+      "photos/player_7_2.jpg",
+      "photos/player_7_3.jpg",
+      "photos/player_7_4.jpg"
+    ]
   },
   {
-    "id": 10,
+    "id": 8,
     "name": "Ben Stokes",
     "country": "England",
     "role": "All-rounder",
     "active": true,
     "difficulty": "easy",
     "hint": "Hero of 2019 World Cup Final and Headingley miracle, Bazball Test captain.",
-    "imageUrl": "photos/player_10.jpg"
+    "imageUrl": "photos/player_8.jpg",
+    "images": [
+      "photos/player_8.jpg",
+      "photos/player_8_2.jpg",
+      "photos/player_8_3.jpg",
+      "photos/player_8_4.jpg"
+    ]
   },
   {
-    "id": 11,
+    "id": 9,
     "name": "Joe Root",
     "country": "England",
     "role": "Batter",
     "active": true,
     "difficulty": "easy",
     "hint": "Fab Four maestro, highest Test run-scorer and century-maker for England.",
-    "imageUrl": "photos/player_11.jpg"
+    "imageUrl": "photos/player_9.jpg",
+    "images": [
+      "photos/player_9.jpg",
+      "photos/player_9_2.jpg",
+      "photos/player_9_3.jpg",
+      "photos/player_9_4.jpg"
+    ]
   },
   {
-    "id": 12,
+    "id": 10,
     "name": "Babar Azam",
     "country": "Pakistan",
     "role": "Batter",
     "active": true,
     "difficulty": "easy",
     "hint": "Cover drive virtuoso and former all-format Pakistan captain.",
-    "imageUrl": "photos/player_12.jpg"
+    "imageUrl": "photos/player_10.jpg",
+    "images": [
+      "photos/player_10.jpg",
+      "photos/player_10_2.jpg",
+      "photos/player_10_3.jpg",
+      "photos/player_10_4.jpg"
+    ]
   },
   {
-    "id": 13,
+    "id": 11,
     "name": "Shaheen Afridi",
     "country": "Pakistan",
     "role": "Bowler",
     "active": true,
     "difficulty": "easy",
     "hint": "Towering left-arm fast bowler known for devastating first-over breakthroughs.",
-    "imageUrl": "photos/player_13.jpg"
+    "imageUrl": "photos/player_11.jpg",
+    "images": [
+      "photos/player_11.jpg",
+      "photos/player_11_2.jpg",
+      "photos/player_11_3.jpg"
+    ]
   },
   {
-    "id": 14,
+    "id": 12,
     "name": "Kane Williamson",
     "country": "New Zealand",
     "role": "Batter",
     "active": true,
     "difficulty": "easy",
     "hint": "Gentleman cricketer, led Black Caps to 2019 WC Final and inaugural 2021 WTC title.",
-    "imageUrl": "photos/player_14.jpg"
+    "imageUrl": "photos/player_12.jpg",
+    "images": [
+      "photos/player_12.jpg",
+      "photos/player_12_2.jpg",
+      "photos/player_12_3.jpg",
+      "photos/player_12_4.jpg"
+    ]
   },
   {
-    "id": 15,
+    "id": 13,
     "name": "Rashid Khan",
     "country": "Afghanistan",
     "role": "Bowler",
     "active": true,
     "difficulty": "easy",
     "hint": "Quick-arm leg-spinner and T20 sensation with over 550 franchise wickets.",
-    "imageUrl": "photos/player_15.jpg"
+    "imageUrl": "photos/player_13.jpg",
+    "images": [
+      "photos/player_13.jpg",
+      "photos/player_13_2.jpg",
+      "photos/player_13_3.jpg",
+      "photos/player_13_4.jpg"
+    ]
   },
   {
-    "id": 16,
+    "id": 14,
     "name": "Kagiso Rabada",
     "country": "South Africa",
     "role": "Bowler",
     "active": true,
     "difficulty": "easy",
     "hint": "Proteas fast-bowling spearhead with blistering 145+ km/h pace and over 300 Test wickets.",
-    "imageUrl": "photos/player_16.jpg"
+    "imageUrl": "photos/player_14.jpg",
+    "images": [
+      "photos/player_14.jpg",
+      "photos/player_14_2.jpg",
+      "photos/player_14_3.jpg",
+      "photos/player_14_4.jpg"
+    ]
   },
   {
-    "id": 17,
-    "name": "Shane Warne",
-    "country": "Australia",
-    "role": "Bowler",
-    "active": false,
-    "difficulty": "hard",
-    "hint": "King of Spin who bowled the 'Ball of the Century' and took 708 Test wickets.",
-    "imageUrl": "photos/player_17.jpg"
-  },
-  {
-    "id": 18,
-    "name": "Brian Lara",
-    "country": "West Indies",
-    "role": "Batter",
-    "active": false,
-    "difficulty": "hard",
-    "hint": "Holds the record for highest Test score (400*) and first-class score (501*).",
-    "imageUrl": "photos/player_18.jpg"
-  },
-  {
-    "id": 19,
-    "name": "Ricky Ponting",
-    "country": "Australia",
-    "role": "Batter",
-    "active": false,
-    "difficulty": "hard",
-    "hint": "'Punter', master of the pull shot, captained Australia to back-to-back undefeated World Cups (2003, 2007).",
-    "imageUrl": "photos/player_19.jpg"
-  },
-  {
-    "id": 20,
-    "name": "Rahul Dravid",
-    "country": "India",
-    "role": "Batter",
-    "active": false,
-    "difficulty": "hard",
-    "hint": "'The Wall' of Indian cricket, faced over 31,000 balls in Test cricket.",
-    "imageUrl": "photos/player_20.jpg"
-  },
-  {
-    "id": 21,
-    "name": "AB de Villiers",
-    "country": "South Africa",
-    "role": "Batter",
-    "active": false,
-    "difficulty": "hard",
-    "hint": "'Mr. 360' who holds the record for fastest ODI 50, 100 (31 balls) and 150.",
-    "imageUrl": "photos/player_21.jpg"
-  },
-  {
-    "id": 22,
-    "name": "Muttiah Muralitharan",
-    "country": "Sri Lanka",
-    "role": "Bowler",
-    "active": false,
-    "difficulty": "hard",
-    "hint": "All-time highest wicket-taker in international cricket with 800 Test and 534 ODI wickets.",
-    "imageUrl": "photos/player_22.jpg"
-  },
-  {
-    "id": 23,
+    "id": 15,
     "name": "Hardik Pandya",
     "country": "India",
     "role": "All-rounder",
     "active": true,
     "difficulty": "easy",
     "hint": "Clutch seam-bowling all-rounder, defended 16 runs in the 2024 T20 World Cup final.",
-    "imageUrl": "photos/player_23.jpg"
+    "imageUrl": "photos/player_15.jpg",
+    "images": [
+      "photos/player_15.jpg",
+      "photos/player_15_2.jpg",
+      "photos/player_15_3.jpg"
+    ]
   },
   {
-    "id": 24,
+    "id": 16,
     "name": "Glenn Maxwell",
     "country": "Australia",
     "role": "All-rounder",
     "active": true,
     "difficulty": "easy",
     "hint": "'The Big Show', smashed 201* on one leg against Afghanistan in 2023 World Cup.",
-    "imageUrl": "photos/player_24.jpg"
+    "imageUrl": "photos/player_16.jpg",
+    "images": [
+      "photos/player_16.jpg",
+      "photos/player_16_2.jpg",
+      "photos/player_16_3.jpg",
+      "photos/player_16_4.jpg"
+    ]
+  },
+  {
+    "id": 17,
+    "name": "Ravindra Jadeja",
+    "country": "India",
+    "role": "All-rounder",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "'Sir Jadeja', rockstar left-arm spin all-rounder with bullet throws and 3000+ runs / 300+ Test wickets.",
+    "imageUrl": "photos/player_17.jpg",
+    "images": [
+      "photos/player_17.jpg",
+      "photos/player_17_2.jpg",
+      "photos/player_17_3.jpg"
+    ]
+  },
+  {
+    "id": 18,
+    "name": "Shubman Gill",
+    "country": "India",
+    "role": "Batter",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "'Prince of Indian Cricket', youngest batsman to hit an ODI double century.",
+    "imageUrl": "photos/player_18.jpg",
+    "images": [
+      "photos/player_18.jpg",
+      "photos/player_18_2.jpg",
+      "photos/player_18_3.jpg"
+    ]
+  },
+  {
+    "id": 19,
+    "name": "KL Rahul",
+    "country": "India",
+    "role": "Wicketkeeper",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Elegant classical batter, middle-order rock and keeper across Test and ODI formats.",
+    "imageUrl": "photos/player_19.jpg",
+    "images": [
+      "photos/player_19.jpg",
+      "photos/player_19_2.jpg",
+      "photos/player_19_3.jpg",
+      "photos/player_19_4.jpg"
+    ]
+  },
+  {
+    "id": 20,
+    "name": "Rishabh Pant",
+    "country": "India",
+    "role": "Wicketkeeper",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Fearless southpaw hero of the Gabba 2021 fortress breach, holds multiple centuries in SENA.",
+    "imageUrl": "photos/player_20.jpg",
+    "images": [
+      "photos/player_20.jpg",
+      "photos/player_20_2.jpg",
+      "photos/player_20_3.jpg"
+    ]
+  },
+  {
+    "id": 21,
+    "name": "Suryakumar Yadav",
+    "country": "India",
+    "role": "Batter",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "'SKY', ICC Men's T20I Player of the Year, renowned for 360-degree scoop shots.",
+    "imageUrl": "photos/player_21.jpg",
+    "images": [
+      "photos/player_21.jpg",
+      "photos/player_21_2.jpg",
+      "photos/player_21_3.jpg",
+      "photos/player_21_4.jpg"
+    ]
+  },
+  {
+    "id": 22,
+    "name": "Mohammed Shami",
+    "country": "India",
+    "role": "Bowler",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Seam-position maestro with 24 wickets at 10.70 in the 2023 World Cup.",
+    "imageUrl": "photos/player_22.jpg",
+    "images": [
+      "photos/player_22.jpg",
+      "photos/player_22_2.jpg",
+      "photos/player_22_3.jpg",
+      "photos/player_22_4.jpg"
+    ]
+  },
+  {
+    "id": 23,
+    "name": "Trent Boult",
+    "country": "New Zealand",
+    "role": "Bowler",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Deadly swing bowler with over 300 Test wickets and deadly in-swingers with the white ball.",
+    "imageUrl": "photos/player_23.jpg",
+    "images": [
+      "photos/player_23.jpg",
+      "photos/player_23_2.jpg",
+      "photos/player_23_3.jpg"
+    ]
+  },
+  {
+    "id": 24,
+    "name": "David Warner",
+    "country": "Australia",
+    "role": "Batter",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Explosive opener with 335* Test score and player of the tournament in 2021 T20 World Cup.",
+    "imageUrl": "photos/player_24.jpg",
+    "images": [
+      "photos/player_24.jpg",
+      "photos/player_24_2.jpg",
+      "photos/player_24_3.jpg"
+    ]
   },
   {
     "id": 25,
+    "name": "Quinton de Kock",
+    "country": "South Africa",
+    "role": "Wicketkeeper",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Destructive wicketkeeper-batter who smashed four centuries in the 2023 World Cup.",
+    "imageUrl": "photos/player_25.jpg",
+    "images": [
+      "photos/player_25.jpg",
+      "photos/player_25_2.jpg",
+      "photos/player_25_3.jpg"
+    ]
+  },
+  {
+    "id": 26,
+    "name": "Jos Buttler",
+    "country": "England",
+    "role": "Wicketkeeper",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Captain of England's 2022 T20 World Cup triumph and holder of fastest ODI tons for England.",
+    "imageUrl": "photos/player_26.jpg",
+    "images": [
+      "photos/player_26.jpg",
+      "photos/player_26_2.jpg",
+      "photos/player_26_3.jpg",
+      "photos/player_26_4.jpg"
+    ]
+  },
+  {
+    "id": 27,
+    "name": "Jofra Archer",
+    "country": "England",
+    "role": "Bowler",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Effortless fast bowler who bowled the legendary 2019 World Cup Super Over.",
+    "imageUrl": "photos/player_27.jpg",
+    "images": [
+      "photos/player_27.jpg",
+      "photos/player_27_2.jpg",
+      "photos/player_27_3.jpg"
+    ]
+  },
+  {
+    "id": 28,
+    "name": "Shakib Al Hasan",
+    "country": "Bangladesh",
+    "role": "All-rounder",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Premier all-rounder who scored 600+ runs and took 11 wickets in the 2019 World Cup.",
+    "imageUrl": "photos/player_28.jpg",
+    "images": [
+      "photos/player_28.jpg",
+      "photos/player_28_2.jpg",
+      "photos/player_28_3.jpg",
+      "photos/player_28_4.jpg"
+    ]
+  },
+  {
+    "id": 29,
+    "name": "Wanindu Hasaranga",
+    "country": "Sri Lanka",
+    "role": "All-rounder",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Mystery leg-spinner and hard-hitting lower order batter, top wicket-taker in multiple T20 WCs.",
+    "imageUrl": "photos/player_29.jpg",
+    "images": [
+      "photos/player_29.jpg",
+      "photos/player_29_2.jpg",
+      "photos/player_29_3.jpg"
+    ]
+  },
+  {
+    "id": 30,
+    "name": "Shreyas Iyer",
+    "country": "India",
+    "role": "Batter",
+    "active": true,
+    "difficulty": "easy",
+    "hint": "Middle-order powerhouse who scored 530 runs in 2023 World Cup and captained KKR to 2024 IPL title.",
+    "imageUrl": "photos/player_30.jpg",
+    "images": [
+      "photos/player_30.jpg",
+      "photos/player_30_2.jpg",
+      "photos/player_30_3.jpg"
+    ]
+  },
+  {
+    "id": 31,
+    "name": "MS Dhoni",
+    "country": "India",
+    "role": "Wicketkeeper",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Captain Cool who won 2007 T20 WC, 2011 ODI WC, and 2013 Champions Trophy.",
+    "imageUrl": "photos/player_31.jpg",
+    "images": [
+      "photos/player_31.jpg",
+      "photos/player_31_2.jpg",
+      "photos/player_31_3.jpg",
+      "photos/player_31_4.jpg"
+    ]
+  },
+  {
+    "id": 32,
+    "name": "Sachin Tendulkar",
+    "country": "India",
+    "role": "Batter",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "The 'Master Blaster' with 100 international centuries and 34,357 career runs.",
+    "imageUrl": "photos/player_32.jpg",
+    "images": [
+      "photos/player_32.jpg",
+      "photos/player_32_2.jpg",
+      "photos/player_32_3.jpg",
+      "photos/player_32_4.jpg"
+    ]
+  },
+  {
+    "id": 33,
+    "name": "Shane Warne",
+    "country": "Australia",
+    "role": "Bowler",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "King of Spin who bowled the 'Ball of the Century' and took 708 Test wickets.",
+    "imageUrl": "photos/player_33.jpg",
+    "images": [
+      "photos/player_33.jpg",
+      "photos/player_33_2.jpg",
+      "photos/player_33_3.jpg",
+      "photos/player_33_4.jpg"
+    ]
+  },
+  {
+    "id": 34,
+    "name": "Brian Lara",
+    "country": "West Indies",
+    "role": "Batter",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Holds the record for highest Test score (400*) and first-class score (501*).",
+    "imageUrl": "photos/player_34.jpg",
+    "images": [
+      "photos/player_34.jpg",
+      "photos/player_34_2.jpg",
+      "photos/player_34_3.jpg",
+      "photos/player_34_4.jpg"
+    ]
+  },
+  {
+    "id": 35,
+    "name": "Ricky Ponting",
+    "country": "Australia",
+    "role": "Batter",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Punter' captained Australia to back-to-back undefeated World Cups in 2003 and 2007.",
+    "imageUrl": "photos/player_35.jpg",
+    "images": [
+      "photos/player_35.jpg",
+      "photos/player_35_2.jpg",
+      "photos/player_35_3.jpg",
+      "photos/player_35_4.jpg"
+    ]
+  },
+  {
+    "id": 36,
+    "name": "Rahul Dravid",
+    "country": "India",
+    "role": "Batter",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'The Wall' of Indian cricket, faced over 31,000 balls in Test cricket.",
+    "imageUrl": "photos/player_36.jpg",
+    "images": [
+      "photos/player_36.jpg",
+      "photos/player_36_2.jpg",
+      "photos/player_36_3.jpg",
+      "photos/player_36_4.jpg"
+    ]
+  },
+  {
+    "id": 37,
+    "name": "AB de Villiers",
+    "country": "South Africa",
+    "role": "Batter",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Mr. 360' who holds the record for fastest ODI hundred (31 balls) and 150.",
+    "imageUrl": "photos/player_37.jpg",
+    "images": [
+      "photos/player_37.jpg",
+      "photos/player_37_2.jpg",
+      "photos/player_37_3.jpg"
+    ]
+  },
+  {
+    "id": 38,
+    "name": "Muttiah Muralitharan",
+    "country": "Sri Lanka",
+    "role": "Bowler",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "All-time highest wicket-taker in international cricket with 800 Test and 534 ODI wickets.",
+    "imageUrl": "photos/player_38.jpg",
+    "images": [
+      "photos/player_38.jpg",
+      "photos/player_38_2.jpg",
+      "photos/player_38_3.jpg",
+      "photos/player_38_4.jpg"
+    ]
+  },
+  {
+    "id": 39,
     "name": "Chris Gayle",
     "country": "West Indies",
     "role": "Batter",
     "active": false,
     "difficulty": "hard",
-    "hint": "'Universe Boss', hit 175* off 66 balls in IPL and over 500 international sixes.",
-    "imageUrl": "photos/player_25.jpg"
+    "hint": "'Universe Boss', smashed 175* off 66 balls in IPL and over 500 international sixes.",
+    "imageUrl": "photos/player_39.jpg",
+    "images": [
+      "photos/player_39.jpg",
+      "photos/player_39_2.jpg",
+      "photos/player_39_3.jpg",
+      "photos/player_39_4.jpg"
+    ]
+  },
+  {
+    "id": 40,
+    "name": "Vivian Richards",
+    "country": "West Indies",
+    "role": "Batter",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Master Blaster of 1970s and 80s who batted without a helmet and struck 189* in ODI.",
+    "imageUrl": "photos/player_40.jpg",
+    "images": [
+      "photos/player_40.jpg",
+      "photos/player_40_2.jpg",
+      "photos/player_40_3.jpg",
+      "photos/player_40_4.jpg"
+    ]
+  },
+  {
+    "id": 41,
+    "name": "Kapil Dev",
+    "country": "India",
+    "role": "All-rounder",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Haryana Hurricane', led India to 1983 World Cup title and took 434 Test wickets.",
+    "imageUrl": "photos/player_41.jpg",
+    "images": [
+      "photos/player_41.jpg",
+      "photos/player_41_2.jpg",
+      "photos/player_41_3.jpg",
+      "photos/player_41_4.jpg"
+    ]
+  },
+  {
+    "id": 42,
+    "name": "Wasim Akram",
+    "country": "Pakistan",
+    "role": "Bowler",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Sultan of Swing', 502 ODI wickets and hero of Pakistan's 1992 World Cup victory.",
+    "imageUrl": "photos/player_42.jpg",
+    "images": [
+      "photos/player_42.jpg",
+      "photos/player_42_2.jpg",
+      "photos/player_42_3.jpg",
+      "photos/player_42_4.jpg"
+    ]
+  },
+  {
+    "id": 43,
+    "name": "Jacques Kallis",
+    "country": "South Africa",
+    "role": "All-rounder",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Greatest modern all-rounder with over 13,000 Test runs, 45 centuries, and 292 wickets.",
+    "imageUrl": "photos/player_43.jpg",
+    "images": [
+      "photos/player_43.jpg",
+      "photos/player_43_2.jpg",
+      "photos/player_43_3.jpg",
+      "photos/player_43_4.jpg"
+    ]
+  },
+  {
+    "id": 44,
+    "name": "Glenn McGrath",
+    "country": "Australia",
+    "role": "Bowler",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Pigeon', metronomic accuracy with 563 Test wickets and 3 World Cup victories.",
+    "imageUrl": "photos/player_44.jpg",
+    "images": [
+      "photos/player_44.jpg",
+      "photos/player_44_2.jpg",
+      "photos/player_44_3.jpg",
+      "photos/player_44_4.jpg"
+    ]
+  },
+  {
+    "id": 45,
+    "name": "Sourav Ganguly",
+    "country": "India",
+    "role": "Batter",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Dada' and 'God of the Offside', transformed Indian cricket with aggressive leadership.",
+    "imageUrl": "photos/player_45.jpg",
+    "images": [
+      "photos/player_45.jpg",
+      "photos/player_45_2.jpg",
+      "photos/player_45_3.jpg",
+      "photos/player_45_4.jpg"
+    ]
+  },
+  {
+    "id": 46,
+    "name": "Virender Sehwag",
+    "country": "India",
+    "role": "Batter",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Najafgarh ka Nawab', revolutionized opening with two Test triple centuries (309, 319).",
+    "imageUrl": "photos/player_46.jpg",
+    "images": [
+      "photos/player_46.jpg",
+      "photos/player_46_2.jpg",
+      "photos/player_46_3.jpg",
+      "photos/player_46_4.jpg"
+    ]
+  },
+  {
+    "id": 47,
+    "name": "Yuvraj Singh",
+    "country": "India",
+    "role": "All-rounder",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Six sixes in one over in 2007 and Player of the Tournament in 2011 World Cup.",
+    "imageUrl": "photos/player_47.jpg",
+    "images": [
+      "photos/player_47.jpg",
+      "photos/player_47_2.jpg",
+      "photos/player_47_3.jpg",
+      "photos/player_47_4.jpg"
+    ]
+  },
+  {
+    "id": 48,
+    "name": "Anil Kumble",
+    "country": "India",
+    "role": "Bowler",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Jumbo', 619 Test wickets and historic 10 wickets in an innings against Pakistan.",
+    "imageUrl": "photos/player_48.jpg",
+    "images": [
+      "photos/player_48.jpg",
+      "photos/player_48_2.jpg",
+      "photos/player_48_3.jpg",
+      "photos/player_48_4.jpg"
+    ]
+  },
+  {
+    "id": 49,
+    "name": "Brett Lee",
+    "country": "Australia",
+    "role": "Bowler",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Fast bowling thunderbolt clocked at 161.1 km/h with 310 Test and 380 ODI wickets.",
+    "imageUrl": "photos/player_49.jpg",
+    "images": [
+      "photos/player_49.jpg",
+      "photos/player_49_2.jpg",
+      "photos/player_49_3.jpg",
+      "photos/player_49_4.jpg"
+    ]
+  },
+  {
+    "id": 50,
+    "name": "Adam Gilchrist",
+    "country": "Australia",
+    "role": "Wicketkeeper",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Revolutionized wicketkeeping with 149 in 2007 World Cup Final and 17 Test tons.",
+    "imageUrl": "photos/player_50.jpg",
+    "images": [
+      "photos/player_50.jpg",
+      "photos/player_50_2.jpg",
+      "photos/player_50_3.jpg",
+      "photos/player_50_4.jpg"
+    ]
+  },
+  {
+    "id": 51,
+    "name": "Dale Steyn",
+    "country": "South Africa",
+    "role": "Bowler",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Steyn Gun', number-one Test bowler for 2,343 days with 439 Test wickets at strike rate 42.3.",
+    "imageUrl": "photos/player_51.jpg",
+    "images": [
+      "photos/player_51.jpg",
+      "photos/player_51_2.jpg",
+      "photos/player_51_3.jpg",
+      "photos/player_51_4.jpg"
+    ]
+  },
+  {
+    "id": 52,
+    "name": "Kumar Sangakkara",
+    "country": "Sri Lanka",
+    "role": "Wicketkeeper",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Elegant left-hander with 12,400 Test runs, 38 Test centuries, and four consecutive ODI WC tons.",
+    "imageUrl": "photos/player_52.jpg",
+    "images": [
+      "photos/player_52.jpg",
+      "photos/player_52_2.jpg",
+      "photos/player_52_3.jpg",
+      "photos/player_52_4.jpg"
+    ]
+  },
+  {
+    "id": 53,
+    "name": "Mahela Jayawardene",
+    "country": "Sri Lanka",
+    "role": "Batter",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Tactical genius and master of touch with 11,814 Test runs including 374 against SA.",
+    "imageUrl": "photos/player_53.jpg",
+    "images": [
+      "photos/player_53.jpg",
+      "photos/player_53_2.jpg",
+      "photos/player_53_3.jpg",
+      "photos/player_53_4.jpg"
+    ]
+  },
+  {
+    "id": 54,
+    "name": "Lasith Malinga",
+    "country": "Sri Lanka",
+    "role": "Bowler",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "'Slinga Malinga', round-arm yorker King with four wickets in four balls twice in international cricket.",
+    "imageUrl": "photos/player_54.jpg",
+    "images": [
+      "photos/player_54.jpg",
+      "photos/player_54_2.jpg",
+      "photos/player_54_3.jpg",
+      "photos/player_54_4.jpg"
+    ]
+  },
+  {
+    "id": 55,
+    "name": "Imran Khan",
+    "country": "Pakistan",
+    "role": "All-rounder",
+    "active": false,
+    "difficulty": "hard",
+    "hint": "Charismatic captain who led Pakistan to 1992 World Cup glory and took 362 Test wickets.",
+    "imageUrl": "photos/player_55.jpg",
+    "images": [
+      "photos/player_55.jpg",
+      "photos/player_55_2.jpg",
+      "photos/player_55_3.jpg",
+      "photos/player_55_4.jpg"
+    ]
   }
 ]
