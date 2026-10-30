@@ -667,6 +667,108 @@
     .gate-btn-ghost:hover {
       color: var(--fg);
     }
+
+    /* Mobile Timeline Slide / Swipe Support */
+    .timeline-trail-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .mobile-swipe-hint {
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      .journey-card {
+        padding: var(--space-4) var(--space-3);
+      }
+
+      .timeline-title {
+        margin-bottom: var(--space-3);
+        padding-bottom: var(--space-2);
+      }
+
+      .timeline-title h3 {
+        font-size: 18px;
+      }
+
+      .timeline-trail-container {
+        margin: 0 -12px;
+        width: calc(100% + 24px);
+        overflow: hidden;
+      }
+
+      .timeline-trail {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        justify-content: flex-start;
+        align-items: stretch;
+        gap: 10px;
+        padding: 6px 14px 12px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(2, 132, 199, 0.4) transparent;
+      }
+
+      .timeline-trail::-webkit-scrollbar {
+        height: 4px;
+      }
+
+      .timeline-trail::-webkit-scrollbar-thumb {
+        background: rgba(2, 132, 199, 0.4);
+        border-radius: 4px;
+      }
+
+      .trail-step {
+        flex: 0 0 auto;
+        min-width: 110px;
+        max-width: 125px;
+        scroll-snap-align: center;
+        padding: 10px 8px;
+      }
+
+      .trail-step .team-badge-icon {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 6px;
+      }
+
+      .trail-step .team-abbrev {
+        font-size: 16px;
+      }
+
+      .trail-step .team-fullname {
+        font-size: 11px;
+      }
+
+      .trail-step .team-years {
+        font-size: 11px;
+        padding: 2px 6px;
+      }
+
+      .trail-arrow {
+        flex: 0 0 auto;
+        font-size: 15px;
+        opacity: 0.6;
+        padding: 0 1px;
+      }
+
+      .mobile-swipe-hint {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 11.5px;
+        color: var(--muted);
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+        font-weight: 600;
+        opacity: 0.85;
+      }
+    }
   </style>
 </head>
 <body>
@@ -748,7 +850,12 @@
         <h3><span>🏏</span> IPL Franchise History</h3>
         <span class="timeline-seasons" id="timeline-span">2008 – 2024</span>
       </div>
-      <div class="timeline-trail" id="timeline-trail"></div>
+      <div class="timeline-trail-container">
+        <div class="timeline-trail" id="timeline-trail"></div>
+      </div>
+      <div class="mobile-swipe-hint" id="mobile-swipe-hint" aria-hidden="true">
+        <span>← Swipe to explore journey →</span>
+      </div>
     </div>
 
     <!-- Mystery Letters & Clues Board -->
