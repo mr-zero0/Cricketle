@@ -42,17 +42,30 @@
     return Math.abs(hash);
   }
 
-  // Draw pixelated image on canvas
+  // Draw pixelated image on canvas with center crop
   function renderPixelated(pixelSize) {
     if (!ctx || !loadedImage) return;
 
     const w = canvas.width;
     const h = canvas.height;
 
+    // Calculate center-crop coordinates
+    const imgRatio = loadedImage.width / loadedImage.height;
+    const canvasRatio = w / h;
+    let sx = 0, sy = 0, sw = loadedImage.width, sh = loadedImage.height;
+    if (imgRatio > canvasRatio) {
+      sw = loadedImage.height * canvasRatio;
+      sx = (loadedImage.width - sw) / 2;
+    } else {
+      sh = loadedImage.width / canvasRatio;
+      sy = (loadedImage.height - sh) / 2;
+    }
+
     if (pixelSize <= 1) {
       // Draw pristine image directly
       ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(loadedImage, 0, 0, w, h);
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(loadedImage, sx, sy, sw, sh, 0, 0, w, h);
       return;
     }
 
@@ -65,11 +78,12 @@
     offscreen.height = offH;
     const offCtx = offscreen.getContext("2d");
 
-    // Draw downscaled
-    offCtx.drawImage(loadedImage, 0, 0, offW, offH);
+    // Draw downscaled with center crop
+    offCtx.drawImage(loadedImage, sx, sy, sw, sh, 0, 0, offW, offH);
 
     // Draw back upscaled with pixelated smoothing disabled
     ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, w, h);
     ctx.drawImage(offscreen, 0, 0, offW, offH, 0, 0, w, h);
   }
 
@@ -132,15 +146,14 @@
 
   function loadImage(url) {
     const img = new Image();
-    img.crossOrigin = "anonymous";
     img.onload = () => {
       loadedImage = img;
       const sizeIndex = Math.min(currentAttempts.length, PIXEL_SIZES.length - 1);
       const pixelSize = isGameOver ? 1 : PIXEL_SIZES[sizeIndex];
       renderPixelated(pixelSize);
     };
-    img.onerror = () => {
-      // Fallback: draw placeholder on canvas if image blocked
+    img.onerror = (err) => {
+      console.error("Failed to load image at:", url, err);
       if (!ctx) return;
       ctx.fillStyle = "#1e293b";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -206,7 +219,7 @@
       resultCard.className = `result-card ${won ? "won" : "lost"}`;
       if (resultStatus) {
         resultStatus.textContent = won ? "VICTORY! 🎉" : "OUT! 💔";
-        resultStatus.style.color = won ? "#22c55e" : "#ef4444";
+        resultStatus.style.color = won ? "#16a34a" : "var(--danger)";
       }
       if (resultName) {
         resultName.textContent = currentTarget.name + ` (${currentTarget.country})`;
@@ -221,7 +234,6 @@
   function setupAutocomplete() {
     if (!input || !autocomplete) return;
 
-    // Build unique player names
     const names = Array.isArray(window.PLAYERS)
       ? window.PLAYERS.map((p) => ({ name: p.name, country: p.country }))
       : [];

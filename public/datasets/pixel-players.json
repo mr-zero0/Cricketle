@@ -7,7 +7,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "King of chases with 50 ODI hundreds and 80 international centuries.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Virat_Kohli_during_the_India_vs_Aus_4th-Test_match_at_Narendra_Modi_Stadium_on_09_March_2023.jpg/480px-Virat_Kohli_during_the_India_vs_Aus_4th-Test_match_at_Narendra_Modi_Stadium_on_09_March_2023.jpg"
+    "imageUrl": "photos/player_1.jpg"
   },
   {
     "id": 2,
@@ -17,7 +17,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "'Hitman' who scored three ODI double centuries including record 264.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Rohit_Sharma_during_the_India_vs_Australia_4th_Test_match.jpg/480px-Rohit_Sharma_during_the_India_vs_Australia_4th_Test_match.jpg"
+    "imageUrl": "photos/player_2.jpg"
   },
   {
     "id": 3,
@@ -27,7 +27,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Unorthodox hyper-extension action, premier death-overs yorker specialist.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Jasprit_Bumrah_in_2023.jpg/480px-Jasprit_Bumrah_in_2023.jpg"
+    "imageUrl": "photos/player_3.jpg"
   },
   {
     "id": 4,
@@ -37,7 +37,7 @@
     "active": false,
     "difficulty": "hard",
     "hint": "Captain Cool who led India to 2007 T20 WC, 2011 ODI WC, and 2013 Champions Trophy.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Mahendra_Singh_Dhoni_January_2016_%28cropped%29.jpg/480px-Mahendra_Singh_Dhoni_January_2016_%28cropped%29.jpg"
+    "imageUrl": "photos/player_4.jpg"
   },
   {
     "id": 5,
@@ -47,7 +47,7 @@
     "active": false,
     "difficulty": "hard",
     "hint": "The 'Master Blaster' with 100 international centuries and 34,357 career runs.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Sachin_Tendulkar_at_MRF_Promotion_Event.jpg/480px-Sachin_Tendulkar_at_MRF_Promotion_Event.jpg"
+    "imageUrl": "photos/player_5.jpg"
   },
   {
     "id": 6,
@@ -57,7 +57,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Aussie pace captain who won 2023 WTC Final, 2023 ODI World Cup, and retained the Ashes.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Pat_Cummins_2023.jpg/480px-Pat_Cummins_2023.jpg"
+    "imageUrl": "photos/player_6.jpg"
   },
   {
     "id": 7,
@@ -67,7 +67,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Aggressive southpaw who scored match-winning hundreds in both 2023 WTC and ODI WC finals.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Travis_Head_2023.jpg/480px-Travis_Head_2023.jpg"
+    "imageUrl": "photos/player_7.jpg"
   },
   {
     "id": 8,
@@ -77,7 +77,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Left-arm lethal spearhead with most wickets across 2015 and 2019 World Cups.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Mitchell_Starc_2023.jpg/480px-Mitchell_Starc_2023.jpg"
+    "imageUrl": "photos/player_8.jpg"
   },
   {
     "id": 9,
@@ -87,7 +87,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Unorthodox stance, modern Test batting phenomenon with 32 Test centuries.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Steve_Smith_2023.jpg/480px-Steve_Smith_2023.jpg"
+    "imageUrl": "photos/player_9.jpg"
   },
   {
     "id": 10,
@@ -97,7 +97,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Hero of 2019 World Cup Final and Headingley miracle, Bazball Test captain.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Ben_Stokes_2023.jpg/480px-Ben_Stokes_2023.jpg"
+    "imageUrl": "photos/player_10.jpg"
   },
   {
     "id": 11,
@@ -107,7 +107,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Fab Four maestro, highest Test run-scorer and century-maker for England.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Joe_Root_2023.jpg/480px-Joe_Root_2023.jpg"
+    "imageUrl": "photos/player_11.jpg"
   },
   {
     "id": 12,
@@ -117,7 +117,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Cover drive virtuoso and former all-format Pakistan captain.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Babar_Azam_2023.jpg/480px-Babar_Azam_2023.jpg"
+    "imageUrl": "photos/player_12.jpg"
   },
   {
     "id": 13,
@@ -127,7 +127,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Towering left-arm fast bowler known for devastating first-over breakthroughs.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Shaheen_Afridi_2023.jpg/480px-Shaheen_Afridi_2023.jpg"
+    "imageUrl": "photos/player_13.jpg"
   },
   {
     "id": 14,
@@ -137,7 +137,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Gentleman cricketer, led Black Caps to 2019 WC Final and inaugural 2021 WTC title.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Kane_Williamson_2023.jpg/480px-Kane_Williamson_2023.jpg"
+    "imageUrl": "photos/player_14.jpg"
   },
   {
     "id": 15,
@@ -147,7 +147,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Quick-arm leg-spinner and T20 sensation with over 550 franchise wickets.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Rashid_Khan_2023.jpg/480px-Rashid_Khan_2023.jpg"
+    "imageUrl": "photos/player_15.jpg"
   },
   {
     "id": 16,
@@ -157,7 +157,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Proteas fast-bowling spearhead with blistering 145+ km/h pace and over 300 Test wickets.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Kagiso_Rabada_2023.jpg/480px-Kagiso_Rabada_2023.jpg"
+    "imageUrl": "photos/player_16.jpg"
   },
   {
     "id": 17,
@@ -167,7 +167,7 @@
     "active": false,
     "difficulty": "hard",
     "hint": "King of Spin who bowled the 'Ball of the Century' and took 708 Test wickets.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Shane_Warne_2015.jpg/480px-Shane_Warne_2015.jpg"
+    "imageUrl": "photos/player_17.jpg"
   },
   {
     "id": 18,
@@ -177,7 +177,7 @@
     "active": false,
     "difficulty": "hard",
     "hint": "Holds the record for highest Test score (400*) and first-class score (501*).",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Brian_Lara_2014.jpg/480px-Brian_Lara_2014.jpg"
+    "imageUrl": "photos/player_18.jpg"
   },
   {
     "id": 19,
@@ -187,7 +187,7 @@
     "active": false,
     "difficulty": "hard",
     "hint": "'Punter', master of the pull shot, captained Australia to back-to-back undefeated World Cups (2003, 2007).",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Ricky_Ponting_2012.jpg/480px-Ricky_Ponting_2012.jpg"
+    "imageUrl": "photos/player_19.jpg"
   },
   {
     "id": 20,
@@ -197,7 +197,7 @@
     "active": false,
     "difficulty": "hard",
     "hint": "'The Wall' of Indian cricket, faced over 31,000 balls in Test cricket.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Rahul_Dravid_2011.jpg/480px-Rahul_Dravid_2011.jpg"
+    "imageUrl": "photos/player_20.jpg"
   },
   {
     "id": 21,
@@ -207,7 +207,7 @@
     "active": false,
     "difficulty": "hard",
     "hint": "'Mr. 360' who holds the record for fastest ODI 50, 100 (31 balls) and 150.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/AB_de_Villiers_2015.jpg/480px-AB_de_Villiers_2015.jpg"
+    "imageUrl": "photos/player_21.jpg"
   },
   {
     "id": 22,
@@ -217,7 +217,7 @@
     "active": false,
     "difficulty": "hard",
     "hint": "All-time highest wicket-taker in international cricket with 800 Test and 534 ODI wickets.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Muttiah_Muralitharan_2011.jpg/480px-Muttiah_Muralitharan_2011.jpg"
+    "imageUrl": "photos/player_22.jpg"
   },
   {
     "id": 23,
@@ -227,7 +227,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Clutch seam-bowling all-rounder, defended 16 runs in the 2024 T20 World Cup final.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Hardik_Pandya_2023.jpg/480px-Hardik_Pandya_2023.jpg"
+    "imageUrl": "photos/player_23.jpg"
   },
   {
     "id": 24,
@@ -237,7 +237,7 @@
     "active": true,
     "difficulty": "easy",
     "hint": "'The Big Show', smashed 201* on one leg against Afghanistan in 2023 World Cup.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Glenn_Maxwell_2023.jpg/480px-Glenn_Maxwell_2023.jpg"
+    "imageUrl": "photos/player_24.jpg"
   },
   {
     "id": 25,
@@ -247,6 +247,6 @@
     "active": false,
     "difficulty": "hard",
     "hint": "'Universe Boss', hit 175* off 66 balls in IPL and over 500 international sixes.",
-    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Chris_Gayle_2015.jpg/480px-Chris_Gayle_2015.jpg"
+    "imageUrl": "photos/player_25.jpg"
   }
 ]
