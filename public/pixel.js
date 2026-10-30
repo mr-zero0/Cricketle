@@ -490,8 +490,9 @@
   }
 
   function selectCurrent() {
-    if (highlighted >= 0 && currentMatches[highlighted]) {
-      const chosen = currentMatches[highlighted].name;
+    if (currentMatches.length > 0) {
+      const idx = highlighted >= 0 && highlighted < currentMatches.length ? highlighted : 0;
+      const chosen = currentMatches[idx].name;
       hideSuggestions();
       makeGuess(chosen);
     } else if (input && input.value.trim()) {
@@ -548,8 +549,7 @@
 
   // Event listeners
   guessBtn?.addEventListener("click", () => {
-    const val = input ? input.value.trim() : "";
-    if (val) makeGuess(val);
+    selectCurrent();
   });
 
   skipBtn?.addEventListener("click", () => {
