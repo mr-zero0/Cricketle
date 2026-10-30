@@ -52,10 +52,13 @@
       const res = await fetch("datasets/scorecards.json");
       allCards = await res.json();
 
+      const pool = allCards.filter((c) => c.difficulty === currentMode);
+      const activePool = pool.length ? pool : allCards;
+
       const today = getTodayKey();
-      const seed = hashString(today + "_scorecard");
-      const idx = seed % allCards.length;
-      currentCard = allCards[idx];
+      const seed = hashString(today + "_scorecard_" + currentMode);
+      const idx = seed % activePool.length;
+      currentCard = activePool[idx];
 
       // Restore saved progress
       const saved = localStorage.getItem(`cricketle_scorecard_${today}_${currentMode}`);
@@ -201,7 +204,19 @@
     { name: "Glenn McGrath", country: "Australia", role: "Bowler" },
     { name: "Allan Border", country: "Australia", role: "Batter" },
     { name: "Sunil Gavaskar", country: "India", role: "Batter" },
-    { name: "Ian Botham", country: "England", role: "All-rounder" }
+    { name: "Ian Botham", country: "England", role: "All-rounder" },
+    { name: "Mohammad Kaif", country: "India", role: "Batter" },
+    { name: "Lance Klusener", country: "South Africa", role: "All-rounder" },
+    { name: "Mohinder Amarnath", country: "India", role: "All-rounder" },
+    { name: "Kris Srikkanth", country: "India", role: "Batter" },
+    { name: "Madan Lal", country: "India", role: "Bowler" },
+    { name: "Syed Kirmani", country: "India", role: "Wicketkeeper" },
+    { name: "Balwinder Sandhu", country: "India", role: "Bowler" },
+    { name: "Gary Kirsten", country: "South Africa", role: "Batter" },
+    { name: "Herschelle Gibbs", country: "South Africa", role: "Batter" },
+    { name: "Jonty Rhodes", country: "South Africa", role: "Batter" },
+    { name: "Shaun Pollock", country: "South Africa", role: "All-rounder" },
+    { name: "Allan Donald", country: "South Africa", role: "Bowler" }
   ];
 
   function getSearchPool() {

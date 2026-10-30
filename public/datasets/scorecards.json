@@ -2,6 +2,7 @@
   {
     "id": 1,
     "title": "2011 ICC Cricket World Cup Final",
+    "difficulty": "easy",
     "date": "2 April 2011",
     "venue": "Wankhede Stadium, Mumbai",
     "teams": "India vs Sri Lanka",
@@ -28,6 +29,7 @@
   {
     "id": 2,
     "title": "2019 ICC Cricket World Cup Final",
+    "difficulty": "easy",
     "date": "14 July 2019",
     "venue": "Lord's, London",
     "teams": "England vs New Zealand",
@@ -56,6 +58,7 @@
   {
     "id": 3,
     "title": "2023 ICC Cricket World Cup Group Match",
+    "difficulty": "easy",
     "date": "7 November 2023",
     "venue": "Wankhede Stadium, Mumbai",
     "teams": "Australia vs Afghanistan",
@@ -85,6 +88,7 @@
   {
     "id": 4,
     "title": "2023 ICC Cricket World Cup Final",
+    "difficulty": "easy",
     "date": "19 November 2023",
     "venue": "Narendra Modi Stadium, Ahmedabad",
     "teams": "Australia vs India",
@@ -111,6 +115,7 @@
   {
     "id": 5,
     "title": "Record Individual ODI Score",
+    "difficulty": "easy",
     "date": "13 November 2014",
     "venue": "Eden Gardens, Kolkata",
     "teams": "India vs Sri Lanka",
@@ -136,7 +141,37 @@
   },
   {
     "id": 6,
+    "title": "2022 ICC Men's T20 World Cup Super 12",
+    "difficulty": "easy",
+    "date": "23 October 2022",
+    "venue": "Melbourne Cricket Ground, Melbourne",
+    "teams": "India vs Pakistan",
+    "result": "India won by 4 wickets",
+    "targetPlayer": "Virat Kohli",
+    "targetRole": "Batter",
+    "targetTeam": "India",
+    "hint": "Rescued India from 31/4 with an unforgettable 82*, punctuated by two legendary sixes off Haris Rauf in the 19th over.",
+    "innings": {
+      "team": "India",
+      "targetScore": "160/6 (20 overs)",
+      "batting": [
+        { "player": "KL Rahul", "dismissal": "b Naseem Shah", "runs": 4, "balls": 8, "fours": 0, "sixes": 0, "sr": 50.0 },
+        { "player": "Rohit Sharma", "dismissal": "c Iftikhar b Haris Rauf", "runs": 4, "balls": 7, "fours": 0, "sixes": 0, "sr": 57.1 },
+        { "player": "Suryakumar Yadav", "dismissal": "c Rizwan b Haris Rauf", "runs": 15, "balls": 10, "fours": 2, "sixes": 0, "sr": 150.0 },
+        { "player": "Axar Patel", "dismissal": "run out (Babar/Rizwan)", "runs": 2, "balls": 3, "fours": 0, "sixes": 0, "sr": 66.7 },
+        { "player": "██████████", "dismissal": "not out", "runs": 82, "balls": 53, "fours": 6, "sixes": 4, "sr": 154.7, "isTarget": true },
+        { "player": "Hardik Pandya", "dismissal": "c Babar b Mohammad Nawaz", "runs": 40, "balls": 37, "fours": 1, "sixes": 2, "sr": 108.1 },
+        { "player": "Dinesh Karthik", "dismissal": "st Rizwan b Mohammad Nawaz", "runs": 1, "balls": 2, "fours": 0, "sixes": 0, "sr": 50.0 },
+        { "player": "Ravichandran Ashwin", "dismissal": "not out", "runs": 1, "balls": 1, "fours": 0, "sixes": 0, "sr": 100.0 }
+      ],
+      "extras": "11 (lb 2, w 6, nb 3)",
+      "total": "160/6 (20 overs)"
+    }
+  },
+  {
+    "id": 7,
     "title": "2003 ICC Cricket World Cup Final",
+    "difficulty": "hard",
     "date": "23 March 2003",
     "venue": "Wanderers Stadium, Johannesburg",
     "teams": "Australia vs India",
@@ -159,8 +194,9 @@
     }
   },
   {
-    "id": 7,
+    "id": 8,
     "title": "1998 Coca-Cola Cup 'Desert Storm'",
+    "difficulty": "hard",
     "date": "22 April 1998",
     "venue": "Sharjah Cricket Stadium, Sharjah",
     "teams": "India vs Australia",
@@ -186,8 +222,9 @@
     }
   },
   {
-    "id": 8,
+    "id": 9,
     "title": "2007 ICC World Twenty20 Group Match",
+    "difficulty": "hard",
     "date": "19 September 2007",
     "venue": "Kingsmead, Durban",
     "teams": "India vs England",
@@ -209,6 +246,100 @@
       ],
       "extras": "18 (lb 4, w 13, nb 1)",
       "total": "218/4 (20 overs)"
+    }
+  },
+  {
+    "id": 10,
+    "title": "2002 NatWest Series Final",
+    "difficulty": "hard",
+    "date": "13 July 2002",
+    "venue": "Lord's, London",
+    "teams": "India vs England",
+    "result": "India won by 2 wickets",
+    "targetPlayer": "Mohammad Kaif",
+    "targetRole": "Batter",
+    "targetTeam": "India",
+    "hint": "Youngster came in at 146/5 chasing 326 and played a fairytale knock of 87* alongside Yuvraj.",
+    "innings": {
+      "team": "India",
+      "targetScore": "326/8 (49.3 overs)",
+      "batting": [
+        { "player": "Sourav Ganguly", "dismissal": "b Giles", "runs": 60, "balls": 43, "fours": 10, "sixes": 1, "sr": 139.5 },
+        { "player": "Virender Sehwag", "dismissal": "b Giles", "runs": 45, "balls": 49, "fours": 7, "sixes": 0, "sr": 91.8 },
+        { "player": "Dinesh Mongia", "dismissal": "c Irani b Giles", "runs": 9, "balls": 17, "fours": 1, "sixes": 0, "sr": 52.9 },
+        { "player": "Sachin Tendulkar", "dismissal": "b Giles", "runs": 14, "balls": 19, "fours": 2, "sixes": 0, "sr": 73.6 },
+        { "player": "Rahul Dravid", "dismissal": "c Irani b Collingwood", "runs": 5, "balls": 13, "fours": 0, "sixes": 0, "sr": 38.4 },
+        { "player": "Yuvraj Singh", "dismissal": "c Tudor b Collingwood", "runs": 69, "balls": 63, "fours": 9, "sixes": 1, "sr": 109.5 },
+        { "player": "██████████", "dismissal": "not out", "runs": 87, "balls": 75, "fours": 6, "sixes": 2, "sr": 116.0, "isTarget": true },
+        { "player": "Harbhajan Singh", "dismissal": "b Flintoff", "runs": 15, "balls": 13, "fours": 2, "sixes": 0, "sr": 115.3 },
+        { "player": "Anil Kumble", "dismissal": "c Stewart b Flintoff", "runs": 0, "balls": 2, "fours": 0, "sixes": 0, "sr": 0.0 },
+        { "player": "Zaheer Khan", "dismissal": "not out", "runs": 8, "balls": 11, "fours": 0, "sixes": 0, "sr": 72.7 }
+      ],
+      "extras": "14 (b 1, lb 5, w 6, nb 2)",
+      "total": "326/8 (49.3 overs)"
+    }
+  },
+  {
+    "id": 11,
+    "title": "1999 ICC Cricket World Cup Semi-Final",
+    "difficulty": "hard",
+    "date": "17 June 1999",
+    "venue": "Edgbaston, Birmingham",
+    "teams": "Australia vs South Africa",
+    "result": "Match tied (Australia advanced on countback)",
+    "targetPlayer": "Lance Klusener",
+    "targetRole": "All-rounder",
+    "targetTeam": "South Africa",
+    "hint": "'Zulu' hit blistering boundaries in the final over before the infamous mix-up with Allan Donald tied the greatest ODI ever.",
+    "innings": {
+      "team": "South Africa",
+      "targetScore": "213 all out (49.2 overs)",
+      "batting": [
+        { "player": "Gary Kirsten", "dismissal": "b Warne", "runs": 18, "balls": 32, "fours": 3, "sixes": 0, "sr": 56.2 },
+        { "player": "Herschelle Gibbs", "dismissal": "b Warne", "runs": 30, "balls": 54, "fours": 4, "sixes": 0, "sr": 55.5 },
+        { "player": "Daryll Cullinan", "dismissal": "run out (Blewett)", "runs": 6, "balls": 20, "fours": 1, "sixes": 0, "sr": 30.0 },
+        { "player": "Jacques Kallis", "dismissal": "c Steve Waugh b Warne", "runs": 53, "balls": 92, "fours": 3, "sixes": 1, "sr": 57.6 },
+        { "player": "Hansie Cronje", "dismissal": "c Mark Waugh b Warne", "runs": 0, "balls": 2, "fours": 0, "sixes": 0, "sr": 0.0 },
+        { "player": "Jonty Rhodes", "dismissal": "c Bevan b Miller", "runs": 43, "balls": 55, "fours": 4, "sixes": 0, "sr": 78.1 },
+        { "player": "Shaun Pollock", "dismissal": "b Fleming", "runs": 20, "balls": 14, "fours": 2, "sixes": 0, "sr": 142.8 },
+        { "player": "██████████", "dismissal": "not out", "runs": 31, "balls": 16, "fours": 4, "sixes": 1, "sr": 193.7, "isTarget": true },
+        { "player": "Steve Elworthy", "dismissal": "run out (Fleming)", "runs": 1, "balls": 4, "fours": 0, "sixes": 0, "sr": 25.0 },
+        { "player": "Allan Donald", "dismissal": "run out (Mark Waugh/Gilchrist)", "runs": 0, "balls": 1, "fours": 0, "sixes": 0, "sr": 0.0 }
+      ],
+      "extras": "11 (b 0, lb 4, w 6, nb 1)",
+      "total": "213 all out (49.2 overs)"
+    }
+  },
+  {
+    "id": 12,
+    "title": "1983 Prudential World Cup Final",
+    "difficulty": "hard",
+    "date": "25 June 1983",
+    "venue": "Lord's, London",
+    "teams": "India vs West Indies",
+    "result": "India won by 43 runs",
+    "targetPlayer": "Mohinder Amarnath",
+    "targetRole": "All-rounder",
+    "targetTeam": "India",
+    "hint": "Player of the Match who showed immense grit with 26 runs against the Windies pace quartet, then took 3/12.",
+    "innings": {
+      "team": "India",
+      "targetScore": "183 all out (54.4 overs)",
+      "batting": [
+        { "player": "Sunil Gavaskar", "dismissal": "c Dujon b Roberts", "runs": 2, "balls": 12, "fours": 0, "sixes": 0, "sr": 16.6 },
+        { "player": "Kris Srikkanth", "dismissal": "lbw b Marshall", "runs": 38, "balls": 57, "fours": 7, "sixes": 1, "sr": 66.6 },
+        { "player": "██████████", "dismissal": "b Holding", "runs": 26, "balls": 80, "fours": 3, "sixes": 0, "sr": 32.5, "isTarget": true },
+        { "player": "Yashpal Sharma", "dismissal": "c Logie b Gomes", "runs": 11, "balls": 32, "fours": 1, "sixes": 0, "sr": 34.3 },
+        { "player": "Sandeep Patil", "dismissal": "c Gomes b Garner", "runs": 27, "balls": 29, "fours": 5, "sixes": 0, "sr": 93.1 },
+        { "player": "Kapil Dev", "dismissal": "c Holding b Gomes", "runs": 15, "balls": 8, "fours": 3, "sixes": 0, "sr": 187.5 },
+        { "player": "Kirti Azad", "dismissal": "c Garner b Roberts", "runs": 0, "balls": 3, "fours": 0, "sixes": 0, "sr": 0.0 },
+        { "player": "Roger Binny", "dismissal": "c Garner b Roberts", "runs": 2, "balls": 8, "fours": 0, "sixes": 0, "sr": 25.0 },
+        { "player": "Madan Lal", "dismissal": "b Garner", "runs": 17, "balls": 27, "fours": 2, "sixes": 0, "sr": 62.9 },
+        { "player": "Syed Kirmani", "dismissal": "b Holding", "runs": 14, "balls": 43, "fours": 0, "sixes": 0, "sr": 32.5 },
+        { "player": "Balwinder Sandhu", "dismissal": "not out", "runs": 11, "balls": 30, "fours": 1, "sixes": 0, "sr": 36.6 }
+      ],
+      "extras": "20 (b 0, lb 8, w 8, nb 4)",
+      "total": "183 all out (54.4 overs)"
     }
   }
 ]

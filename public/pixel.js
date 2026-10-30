@@ -116,15 +116,13 @@
       const list = await res.json();
       allPlayers = list;
 
-      const pool = list.filter((p) => {
-        if (currentMode === "easy") return p.difficulty === "easy";
-        return true; // hard mode includes all (active + legends)
-      });
+      const pool = list.filter((p) => p.difficulty === currentMode);
+      const activePool = pool.length ? pool : list;
 
       const today = getTodayKey();
-      const seed = hashString(today + "_" + currentMode);
-      const targetIndex = seed % pool.length;
-      currentTarget = pool[targetIndex];
+      const seed = hashString(today + "_pixel_" + currentMode);
+      const targetIndex = seed % activePool.length;
+      currentTarget = activePool[targetIndex];
 
       // Restore saved progress for today if any
       const saved = localStorage.getItem(`cricketle_pixel_${today}_${currentMode}`);
@@ -208,7 +206,19 @@
     { name: "Glenn McGrath", country: "Australia", role: "Bowler" },
     { name: "Allan Border", country: "Australia", role: "Batter" },
     { name: "Sunil Gavaskar", country: "India", role: "Batter" },
-    { name: "Ian Botham", country: "England", role: "All-rounder" }
+    { name: "Ian Botham", country: "England", role: "All-rounder" },
+    { name: "Mohammad Kaif", country: "India", role: "Batter" },
+    { name: "Lance Klusener", country: "South Africa", role: "All-rounder" },
+    { name: "Mohinder Amarnath", country: "India", role: "All-rounder" },
+    { name: "Kris Srikkanth", country: "India", role: "Batter" },
+    { name: "Madan Lal", country: "India", role: "Bowler" },
+    { name: "Syed Kirmani", country: "India", role: "Wicketkeeper" },
+    { name: "Balwinder Sandhu", country: "India", role: "Bowler" },
+    { name: "Gary Kirsten", country: "South Africa", role: "Batter" },
+    { name: "Herschelle Gibbs", country: "South Africa", role: "Batter" },
+    { name: "Jonty Rhodes", country: "South Africa", role: "Batter" },
+    { name: "Shaun Pollock", country: "South Africa", role: "All-rounder" },
+    { name: "Allan Donald", country: "South Africa", role: "Bowler" }
   ];
 
   // Combined Search Pool ensuring legends like Brian Lara and Shane Warne are always present
@@ -432,8 +442,6 @@
       showSuggestions(input.value);
     });
 
-    input.addEventListener("focus", () => clearTimeout(blurTimer));
-
     input.addEventListener("keydown", (e) => {
       if (suggestions.hidden) {
         if (e.key === "Enter") {
@@ -473,17 +481,8 @@
 
   // Event listeners
   guessBtn?.addEventListener("click", () => {
-    if (!suggestions.hidden && highlighted >= 0 && currentMatches[highlighted]) {
-      const chosen = currentMatches[highlighted].name;
-      hideSuggestions();
-      makeGuess(chosen);
-    } else {
-      const val = input ? input.value.trim() : "";
-      if (val) {
-        hideSuggestions();
-        makeGuess(val);
-      }
-    }
+    const val = input ? input.value.trim() : "";
+    if (val) makeGuess(val);
   });
 
   skipBtn?.addEventListener("click", () => {
