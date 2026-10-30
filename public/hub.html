@@ -129,6 +129,13 @@
       --tile-accent: #2563eb;
     }
 
+    .tile-puzzle {
+      --tile-glow: rgba(245, 158, 11, 0.3);
+      --tile-border-hover: rgba(245, 158, 11, 0.7);
+      --tile-shadow: rgba(245, 158, 11, 0.35);
+      --tile-accent: #f59e0b;
+    }
+
     .tile-locked {
       --tile-glow: transparent;
       --tile-border-hover: var(--border);
@@ -287,6 +294,7 @@
       <symbol id="i-stumps" viewBox="0 0 24 24"><path d="M7 21V7M12 21V7M17 21V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 6h5M13 6h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-4.2-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M4 11V6a2 2 0 0 1 2-2h5a2 2 0 1 1 4 0h3a2 2 0 0 1 2 2v5a2 2 0 1 1 0 4v3a2 2 0 0 1-2 2h-3a2 2 0 1 1-4 0H6a2 2 0 0 1-2-2v-3a2 2 0 1 1 0-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
 
@@ -304,6 +312,7 @@
       <a href="index.html" class="nav-link"><svg aria-hidden="true"><use href="#i-stumps"/></svg><span>Cricketle</span></a>
       <a href="pixel.html" class="nav-link"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Pixel</span></a>
       <a href="scorecard.html" class="nav-link"><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Scorecard</span></a>
+      <a href="puzzle.html" class="nav-link"><svg aria-hidden="true"><use href="#i-puzzle"/></svg><span>Puzzle</span></a>
       <a href="index.html#profile" class="nav-link" id="nav-profile-link"><svg aria-hidden="true"><use href="#i-user"/></svg><span id="nav-profile-label">Sign in</span></a>
     </nav>
     <div class="topbar-actions">
@@ -367,6 +376,23 @@
           <div class="tile-icon">📋</div>
           <h3 class="tile-title">Scorecard Mystery</h3>
           <p class="tile-desc">One player's name is blacked out from a historic ODI match scorecard. Can you identify the match-winner?</p>
+        </div>
+        <div class="tile-footer">
+          <span class="tile-streak"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-flame"/></svg> Daily</span>
+          <span class="tile-play-btn">Play Now →</span>
+        </div>
+      </a>
+
+      <!-- 4. Puzzle Cricketer -->
+      <a href="puzzle.html" class="game-tile tile-puzzle" id="tile-puzzle">
+        <div class="tile-header">
+          <span class="tile-badge">Jigsaw Challenge</span>
+          <span class="tile-status" id="status-puzzle">1 Daily Puzzle</span>
+        </div>
+        <div class="tile-body">
+          <div class="tile-icon">🧩</div>
+          <h3 class="tile-title">Puzzle Cricketer</h3>
+          <p class="tile-desc">A cricketer's portrait is broken into scrambled puzzle tiles! Guess who it is as pieces snap into place.</p>
         </div>
         <div class="tile-footer">
           <span class="tile-streak"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-flame"/></svg> Daily</span>
