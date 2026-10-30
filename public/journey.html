@@ -143,22 +143,27 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
     }
 
-    /* Team Crest SVG Badge */
+    /* Team Real Logo Badge */
     .team-badge-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
+      width: 64px;
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      padding: 4px;
     }
 
-    .team-badge-icon svg {
-      width: 32px;
-      height: 32px;
+    .team-badge-icon img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+      transition: transform 0.2s ease;
+    }
+
+    .trail-step:hover .team-badge-icon img {
+      transform: scale(1.08);
     }
 
     .team-abbrev {
@@ -293,6 +298,46 @@
     .clue-hint-text {
       font-size: 13px;
       color: var(--muted);
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    /* Locked Hint 1 Banner */
+    .hint-locked-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: rgba(2, 132, 199, 0.08);
+      border: 1px dashed rgba(2, 132, 199, 0.4);
+      border-radius: var(--radius-sm);
+      padding: 16px 22px;
+      margin: var(--space-3) auto var(--space-2);
+      max-width: 480px;
+    }
+
+    .hint-lock-icon {
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .hint-lock-content {
+      text-align: left;
+    }
+
+    .hint-lock-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      letter-spacing: 0.8px;
+      color: var(--fg);
+      margin-bottom: 2px;
+    }
+
+    .hint-lock-desc {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
       margin-top: 6px;
       font-weight: 500;
     }
@@ -566,9 +611,18 @@
         <span class="meta-pill" id="meta-matches">🏆 205 IPL Matches</span>
       </div>
 
-      <!-- Letter reveal tiles -->
-      <div class="name-letters-wrap" id="name-letters-wrap"></div>
-      <p class="clue-hint-text" id="clue-hint-text">Each attempt reveals 1–2 letters of the cricketer's name!</p>
+      <!-- Locked Hint 1 Banner (Attempts 0, 1, 2) -->
+      <div class="hint-locked-banner" id="hint-locked-banner">
+        <div class="hint-lock-icon">🔒</div>
+        <div class="hint-lock-content">
+          <div class="hint-lock-title">Hint 1: Name Letter Clues</div>
+          <div class="hint-lock-desc" id="hint-lock-desc">Unlocks after 3 failed attempts (3 tries remaining)</div>
+        </div>
+      </div>
+
+      <!-- Letter reveal tiles (Unlocked after 3 failed attempts) -->
+      <div class="name-letters-wrap" id="name-letters-wrap" style="display:none;"></div>
+      <p class="clue-hint-text" id="clue-hint-text">Guess from the franchise history above or skip to unlock letter hints!</p>
 
       <div class="attempts-track" id="attempts-track">
         <span class="attempt-dot current"></span>

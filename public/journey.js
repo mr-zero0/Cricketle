@@ -137,6 +137,8 @@
   const metaMatches = document.getElementById("meta-matches");
   const nameLettersWrap = document.getElementById("name-letters-wrap");
   const clueHintText = document.getElementById("clue-hint-text");
+  const hintLockedBanner = document.getElementById("hint-locked-banner");
+  const hintLockDesc = document.getElementById("hint-lock-desc");
   const input = document.getElementById("guess-input");
   const guessBtn = document.getElementById("btn-guess");
   const skipBtn = document.getElementById("btn-skip");
@@ -224,8 +226,8 @@
     return perm[pos];
   }
 
-  // Calculate which letter indices to reveal based on attempt count (0 to 6)
-  function getRevealedLetters(name, step, seed) {
+  // Calculate which letter indices to reveal (Hint 1 unlocks after 3 failed attempts)
+  function getRevealedLetters(name, hintStep, seed) {
     const letterIndices = [];
     const wordStartIndices = [];
     let isWordStart = true;
@@ -244,17 +246,20 @@
     }
 
     const total = letterIndices.length;
-    if (step === 0) {
+    if (hintStep <= 0) {
       return new Set();
     }
-    if (step >= MAX_ATTEMPTS || isGameOver) {
+    if (hintStep >= 4 || isGameOver) {
       return new Set(letterIndices);
     }
 
-    const fractions = [0, 0.25, 0.45, 0.65, 0.80, 0.90];
-    const targetCount = Math.min(total - 1, Math.max(step, Math.round(total * fractions[step])));
+    // hintStep 1: Initials (e.g. A, D, V in AB de Villiers)
+    // hintStep 2: 45% of letters
+    // hintStep 3: 80% of letters (almost all)
+    const fractions = [0, 0.25, 0.50, 0.80];
+    const targetCount = Math.min(total - 1, Math.max(wordStartIndices.length, Math.round(total * fractions[hintStep])));
 
-    // Priority 1: Word start letters (initials)
+    // Priority 1: Initials
     const priority = [...wordStartIndices];
 
     // Priority 2: Other letters deterministically shuffled
@@ -269,16 +274,40 @@
     return new Set(revealOrder.slice(0, targetCount));
   }
 
-  // Render the interactive letter tiles
+  // Render the interactive letter tiles (Only visible as Hint 1 after 3 failed attempts)
   function renderLetters() {
     if (!nameLettersWrap || !currentTarget) return;
+
+    const attemptsCount = currentAttempts.length;
+    const isHintUnlocked = attemptsCount >= 3 || isGameOver;
+
+    if (!isHintUnlocked) {
+      if (hintLockedBanner) {
+        hintLockedBanner.style.display = "flex";
+        const remaining = 3 - attemptsCount;
+        if (hintLockDesc) {
+          hintLockDesc.textContent = `Unlocks after 3 failed attempts (${remaining} ${remaining === 1 ? 'try' : 'tries'} remaining)`;
+        }
+      }
+      nameLettersWrap.style.display = "none";
+      if (clueHintText) {
+        clueHintText.textContent = "Guess the player from their IPL teams & years above or skip to unlock letter hints!";
+      }
+      return;
+    }
+
+    if (hintLockedBanner) {
+      hintLockedBanner.style.display = "none";
+    }
+    nameLettersWrap.style.display = "flex";
 
     nameLettersWrap.innerHTML = "";
     const name = currentTarget.name;
     const today = getTodayKey();
     const seed = hashString(today + "_" + currentTarget.id + "_letters");
-    const step = isGameOver ? MAX_ATTEMPTS : currentAttempts.length;
-    const revealedSet = getRevealedLetters(name, step, seed);
+    // hintStep: 1 at attempt 3, 2 at attempt 4, 3 at attempt 5, 4 on win
+    const hintStep = isGameOver ? 4 : (attemptsCount - 2);
+    const revealedSet = getRevealedLetters(name, hintStep, seed);
 
     const words = name.split(" ");
     let charOffset = 0;
@@ -311,21 +340,19 @@
       }
 
       nameLettersWrap.appendChild(wordContainer);
-      charOffset += word.length + 1; // +1 for the space
+      charOffset += word.length + 1;
     });
 
     if (clueHintText) {
       if (isGameOver) {
         clueHintText.textContent = "Full name revealed!";
-      } else if (revealedSet.size === 0) {
-        clueHintText.textContent = "Each attempt reveals 1–2 letters of the cricketer's name!";
       } else {
-        clueHintText.textContent = `💡 ${revealedSet.size} letters revealed so far!`;
+        clueHintText.textContent = `💡 Hint 1 Unlocked: ${revealedSet.size} letters revealed!`;
       }
     }
   }
 
-  // Render the franchise journey timeline with IPL team logo badges
+  // Render the franchise journey timeline with real official IPL team logos
   function renderTimeline() {
     if (!timelineTrail || !currentTarget) return;
 
@@ -339,22 +366,21 @@
     }
 
     journey.forEach((item, index) => {
-      const conf = TEAM_CONFIG[item.team] || {
+      const code = item.team.toLowerCase();
+      const logoSrc = `logos/ipl/${code}.png`;
+      const fallbackConf = TEAM_CONFIG[item.team] || {
         name: item.teamName || item.team,
-        bg: "linear-gradient(135deg, #1e293b, #0f172a)",
-        border: "#64748b",
-        textColor: "#ffffff",
-        icon: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#64748b"/></svg>`
+        border: "#0284c7"
       };
 
       const stepCard = document.createElement("div");
       stepCard.className = "trail-step";
       stepCard.innerHTML = `
-        <div class="team-badge-icon" style="background:${conf.bg}; border-color:${conf.border};">
-          ${conf.icon}
+        <div class="team-badge-icon">
+          <img src="${logoSrc}" alt="${escapeHtml(item.teamName || item.team)} logo" loading="lazy" />
         </div>
-        <div class="team-abbrev" style="color:${conf.border};">${escapeHtml(item.team)}</div>
-        <div class="team-fullname" title="${escapeHtml(item.teamName || conf.name)}">${escapeHtml(item.teamName || conf.name)}</div>
+        <div class="team-abbrev" style="color:${fallbackConf.border};">${escapeHtml(item.team)}</div>
+        <div class="team-fullname" title="${escapeHtml(item.teamName || fallbackConf.name)}">${escapeHtml(item.teamName || fallbackConf.name)}</div>
         <div class="team-years">${escapeHtml(item.years)}</div>
       `;
       timelineTrail.appendChild(stepCard);
@@ -757,3 +783,4 @@
   setupAutocomplete();
   loadPuzzle();
 })();
+
