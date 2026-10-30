@@ -42,7 +42,8 @@
     "imageUrl": "photos/player_3.jpg",
     "images": [
       "photos/player_3.jpg",
-      "photos/player_3_2.jpg"
+      "photos/player_3_2.jpg",
+      "photos/p_9fd00ee09e24.jpg"
     ]
   },
   {
@@ -209,7 +210,8 @@
     "imageUrl": "photos/player_14.jpg",
     "images": [
       "photos/player_14.jpg",
-      "photos/player_14_3.jpg"
+      "photos/player_14_3.jpg",
+      "photos/p_02e5f0c156a4.jpg"
     ]
   },
   {
@@ -238,7 +240,8 @@
     "imageUrl": "photos/player_16.jpg",
     "images": [
       "photos/player_16.jpg",
-      "photos/player_16_2.jpg"
+      "photos/player_16_2.jpg",
+      "photos/p_afeb26247653.jpg"
     ]
   },
   {
@@ -267,7 +270,8 @@
     "imageUrl": "photos/player_18.jpg",
     "images": [
       "photos/player_18.jpg",
-      "photos/player_18_3.jpg"
+      "photos/player_18_3.jpg",
+      "photos/p_a61d624390f9.jpg"
     ]
   },
   {
@@ -295,7 +299,9 @@
     "hint": "Fearless southpaw hero of the Gabba 2021 fortress breach, holds multiple centuries in SENA.",
     "imageUrl": "photos/player_20.jpg",
     "images": [
-      "photos/player_20.jpg"
+      "photos/player_20.jpg",
+      "photos/p_efe5c87d29d8.jpg",
+      "photos/p_69a2aee43e41.jpg"
     ]
   },
   {
@@ -309,7 +315,8 @@
     "imageUrl": "photos/player_21.jpg",
     "images": [
       "photos/player_21.jpg",
-      "photos/player_21_2.jpg"
+      "photos/player_21_2.jpg",
+      "photos/p_1a7b5c3342be.jpg"
     ]
   },
   {
@@ -322,7 +329,9 @@
     "hint": "Seam-position maestro with 24 wickets at 10.70 in the 2023 World Cup.",
     "imageUrl": "photos/player_22.jpg",
     "images": [
-      "photos/player_22.jpg"
+      "photos/player_22.jpg",
+      "photos/p_b828290df4c6.jpg",
+      "photos/p_6fd9e7c3ba8c.jpg"
     ]
   },
   {
@@ -336,7 +345,8 @@
     "imageUrl": "photos/player_23.jpg",
     "images": [
       "photos/player_23.jpg",
-      "photos/player_23_2.jpg"
+      "photos/player_23_2.jpg",
+      "photos/p_1512d22806a7.jpg"
     ]
   },
   {
@@ -365,7 +375,8 @@
     "imageUrl": "photos/player_25.jpg",
     "images": [
       "photos/player_25.jpg",
-      "photos/player_25_2.jpg"
+      "photos/player_25_2.jpg",
+      "photos/p_0f2e91d17209.jpg"
     ]
   },
   {
@@ -393,7 +404,9 @@
     "hint": "Effortless fast bowler who bowled the legendary 2019 World Cup Super Over.",
     "imageUrl": "photos/player_27.jpg",
     "images": [
-      "photos/player_27.jpg"
+      "photos/player_27.jpg",
+      "photos/p_40362f8939a8.jpg",
+      "photos/p_9246e644d374.jpg"
     ]
   },
   {
@@ -421,7 +434,8 @@
     "hint": "Mystery leg-spinner and hard-hitting lower order batter, top wicket-taker in multiple T20 WCs.",
     "imageUrl": "photos/player_29.jpg",
     "images": [
-      "photos/player_29.jpg"
+      "photos/player_29.jpg",
+      "photos/p_ff85ed1e0da4.jpg"
     ]
   },
   {
@@ -434,7 +448,9 @@
     "hint": "Middle-order powerhouse who scored 530 runs in 2023 World Cup and captained KKR to 2024 IPL title.",
     "imageUrl": "photos/player_30.jpg",
     "images": [
-      "photos/player_30.jpg"
+      "photos/player_30.jpg",
+      "photos/p_555a3a710496.jpg",
+      "photos/p_fde7c8ea8023.jpg"
     ]
   },
   {
@@ -445,8 +461,12 @@
     "active": false,
     "difficulty": "hard",
     "hint": "Captain Cool who won 2007 T20 WC, 2011 ODI WC, and 2013 Champions Trophy.",
-    "imageUrl": "",
-    "images": []
+    "imageUrl": "photos/p_52befb664d5e.jpg",
+    "images": [
+      "photos/p_52befb664d5e.jpg",
+      "photos/p_8eba04cf5326.jpg",
+      "photos/p_a64afa81109e.jpg"
+    ]
   },
   {
     "id": 32,
@@ -456,8 +476,12 @@
     "active": false,
     "difficulty": "hard",
     "hint": "The 'Master Blaster' with 100 international centuries and 34,357 career runs.",
-    "imageUrl": "",
-    "images": []
+    "imageUrl": "photos/p_1f17d1d15cb3.jpg",
+    "images": [
+      "photos/p_1f17d1d15cb3.jpg",
+      "photos/p_fefcbfa44d73.jpg",
+      "photos/p_aa9bcc23f392.jpg"
+    ]
   },
   {
     "id": 33,
@@ -467,8 +491,12 @@
     "active": false,
     "difficulty": "hard",
     "hint": "King of Spin who bowled the 'Ball of the Century' and took 708 Test wickets.",
-    "imageUrl": "",
-    "images": []
+    "imageUrl": "photos/p_8f9c116ea094.jpg",
+    "images": [
+      "photos/p_8f9c116ea094.jpg",
+      "photos/p_ea8d501b3311.jpg",
+      "photos/p_70837b8ffd18.jpg"
+    ]
   },
   {
     "id": 34,
@@ -480,7 +508,9 @@
     "hint": "Holds the record for highest Test score (400*) and first-class score (501*).",
     "imageUrl": "photos/player_34_4.jpg",
     "images": [
-      "photos/player_34_4.jpg"
+      "photos/player_34_4.jpg",
+      "photos/p_52a7f5ff9268.jpg",
+      "photos/p_0819f8bfc5ae.jpg"
     ]
   },
   {
@@ -491,8 +521,12 @@
     "active": false,
     "difficulty": "hard",
     "hint": "'Punter' captained Australia to back-to-back undefeated World Cups in 2003 and 2007.",
-    "imageUrl": "",
-    "images": []
+    "imageUrl": "photos/p_ebf906d05e2b.jpg",
+    "images": [
+      "photos/p_ebf906d05e2b.jpg",
+      "photos/p_a8d506eaf4e4.jpg",
+      "photos/p_ca043a77d7ee.jpg"
+    ]
   },
   {
     "id": 36,
@@ -504,7 +538,9 @@
     "hint": "'The Wall' of Indian cricket, faced over 31,000 balls in Test cricket.",
     "imageUrl": "photos/player_36_4.jpg",
     "images": [
-      "photos/player_36_4.jpg"
+      "photos/player_36_4.jpg",
+      "photos/p_b04e4b9018b9.jpg",
+      "photos/p_af504b658e88.jpg"
     ]
   },
   {
@@ -515,8 +551,12 @@
     "active": false,
     "difficulty": "hard",
     "hint": "'Mr. 360' who holds the record for fastest ODI hundred (31 balls) and 150.",
-    "imageUrl": "",
-    "images": []
+    "imageUrl": "photos/p_9ec66f84911a.jpg",
+    "images": [
+      "photos/p_9ec66f84911a.jpg",
+      "photos/p_9d2722aa272d.jpg",
+      "photos/p_931babf5094d.jpg"
+    ]
   },
   {
     "id": 38,
@@ -526,8 +566,12 @@
     "active": false,
     "difficulty": "hard",
     "hint": "All-time highest wicket-taker in international cricket with 800 Test and 534 ODI wickets.",
-    "imageUrl": "",
-    "images": []
+    "imageUrl": "photos/p_14640a7688ba.jpg",
+    "images": [
+      "photos/p_14640a7688ba.jpg",
+      "photos/p_b56c4df2b35e.jpg",
+      "photos/p_e7708570d50e.jpg"
+    ]
   },
   {
     "id": 39,
@@ -539,7 +583,9 @@
     "hint": "'Universe Boss', smashed 175* off 66 balls in IPL and over 500 international sixes.",
     "imageUrl": "photos/player_39_4.jpg",
     "images": [
-      "photos/player_39_4.jpg"
+      "photos/player_39_4.jpg",
+      "photos/p_2eb957ce5ade.jpg",
+      "photos/p_3c2e1deb5d0a.jpg"
     ]
   },
   {
@@ -553,7 +599,8 @@
     "imageUrl": "photos/player_40.jpg",
     "images": [
       "photos/player_40.jpg",
-      "photos/player_40_2.jpg"
+      "photos/player_40_2.jpg",
+      "photos/p_a78f0ccee067.jpg"
     ]
   },
   {
@@ -582,7 +629,8 @@
     "imageUrl": "photos/player_42.jpg",
     "images": [
       "photos/player_42.jpg",
-      "photos/player_42_4.jpg"
+      "photos/player_42_4.jpg",
+      "photos/p_7243cb682b8e.jpg"
     ]
   },
   {
@@ -596,7 +644,8 @@
     "imageUrl": "photos/player_43.jpg",
     "images": [
       "photos/player_43.jpg",
-      "photos/player_43_3.jpg"
+      "photos/player_43_3.jpg",
+      "photos/p_1f3f32d91699.jpg"
     ]
   },
   {
@@ -610,7 +659,8 @@
     "imageUrl": "photos/player_44.jpg",
     "images": [
       "photos/player_44.jpg",
-      "photos/player_44_3.jpg"
+      "photos/player_44_3.jpg",
+      "photos/p_155496dd4701.jpg"
     ]
   },
   {
@@ -624,7 +674,8 @@
     "imageUrl": "photos/player_45.jpg",
     "images": [
       "photos/player_45.jpg",
-      "photos/player_45_4.jpg"
+      "photos/player_45_4.jpg",
+      "photos/p_802369fa30b5.jpg"
     ]
   },
   {
@@ -638,7 +689,8 @@
     "imageUrl": "photos/player_46.jpg",
     "images": [
       "photos/player_46.jpg",
-      "photos/player_46_4.jpg"
+      "photos/player_46_4.jpg",
+      "photos/p_6588e826a20c.jpg"
     ]
   },
   {
@@ -667,7 +719,8 @@
     "imageUrl": "photos/player_48.jpg",
     "images": [
       "photos/player_48.jpg",
-      "photos/player_48_3.jpg"
+      "photos/player_48_3.jpg",
+      "photos/p_f3397a4a95bb.jpg"
     ]
   },
   {
@@ -696,7 +749,8 @@
     "imageUrl": "photos/player_50.jpg",
     "images": [
       "photos/player_50.jpg",
-      "photos/player_50_3.jpg"
+      "photos/player_50_3.jpg",
+      "photos/p_05f94003fd48.jpg"
     ]
   },
   {
@@ -725,7 +779,8 @@
     "imageUrl": "photos/player_52.jpg",
     "images": [
       "photos/player_52.jpg",
-      "photos/player_52_3.jpg"
+      "photos/player_52_3.jpg",
+      "photos/p_28aaf8450b6b.jpg"
     ]
   },
   {
@@ -754,7 +809,8 @@
     "imageUrl": "photos/player_54.jpg",
     "images": [
       "photos/player_54.jpg",
-      "photos/player_54_4.jpg"
+      "photos/player_54_4.jpg",
+      "photos/p_813ae2fdbb96.jpg"
     ]
   },
   {
@@ -768,7 +824,8 @@
     "imageUrl": "photos/player_55.jpg",
     "images": [
       "photos/player_55.jpg",
-      "photos/player_55_3.jpg"
+      "photos/player_55_3.jpg",
+      "photos/p_2b6fe354e738.jpg"
     ]
   }
 ]
