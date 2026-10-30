@@ -7,6 +7,8 @@
   let currentAttempts = [];
   let currentMode = "easy";
   let isGameOver = false;
+  let currentUser = null;
+  const gateModal = document.getElementById("member-gate-modal");
 
   const bodyEl = document.getElementById("scorecard-body");
   const metaCard = document.getElementById("match-meta");
@@ -259,6 +261,10 @@
   }
 
   function makeGuess(name) {
+    if (!currentUser) {
+      if (gateModal) gateModal.hidden = false;
+      return;
+    }
     if (isGameOver || !currentCard) return;
 
     let clean = name.trim();
@@ -514,6 +520,35 @@
     loadScorecard();
   });
 
+  async function checkAuth() {
+    try {
+      const res = await fetch("/api/me");
+      const d = await res.json();
+      if (d && d.user) {
+        currentUser = d.user;
+        const navProfile = document.getElementById("nav-profile-label");
+        if (navProfile) navProfile.textContent = "@" + d.user.username;
+        if (gateModal) gateModal.hidden = true;
+        if (input) {
+          input.disabled = false;
+          input.placeholder = "Type player name (e.g. MS Dhoni)...";
+        }
+        if (guessBtn) guessBtn.disabled = false;
+        return true;
+      }
+    } catch (e) {}
+
+    currentUser = null;
+    if (gateModal) gateModal.hidden = false;
+    if (input) {
+      input.disabled = true;
+      input.placeholder = "Member access only — Log in to play...";
+    }
+    if (guessBtn) guessBtn.disabled = true;
+    return false;
+  }
+
   setupAutocomplete();
+  checkAuth();
   loadScorecard();
 })();

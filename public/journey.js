@@ -130,6 +130,8 @@
   let currentAttempts = [];
   let currentMode = "easy";
   let isGameOver = false;
+  let currentUser = null;
+  const gateModal = document.getElementById("member-gate-modal");
 
   const timelineTrail = document.getElementById("timeline-trail");
   const timelineSpan = document.getElementById("timeline-span");
@@ -532,6 +534,10 @@
   }
 
   function makeGuess(name, skipped = false) {
+    if (!currentUser) {
+      if (gateModal) gateModal.hidden = false;
+      return;
+    }
     if (isGameOver || !currentTarget) return;
 
     let clean = name.trim();
@@ -780,7 +786,38 @@
     loadPuzzle();
   });
 
+  async function checkAuth() {
+    try {
+      const res = await fetch("/api/me");
+      const d = await res.json();
+      if (d && d.user) {
+        currentUser = d.user;
+        const navProfile = document.getElementById("nav-profile-label");
+        if (navProfile) navProfile.textContent = "@" + d.user.username;
+        if (gateModal) gateModal.hidden = true;
+        if (input) {
+          input.disabled = false;
+          input.placeholder = "Type player name (e.g. Virat Kohli)...";
+        }
+        if (guessBtn) guessBtn.disabled = false;
+        if (skipBtn) skipBtn.disabled = false;
+        return true;
+      }
+    } catch (e) {}
+
+    currentUser = null;
+    if (gateModal) gateModal.hidden = false;
+    if (input) {
+      input.disabled = true;
+      input.placeholder = "Member access only — Log in to play...";
+    }
+    if (guessBtn) guessBtn.disabled = true;
+    if (skipBtn) skipBtn.disabled = true;
+    return false;
+  }
+
   setupAutocomplete();
+  checkAuth();
   loadPuzzle();
 })();
 

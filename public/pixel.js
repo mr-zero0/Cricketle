@@ -577,6 +577,14 @@
     loadPuzzle();
   });
 
+  // Locked coming soon mode: disable input controls
+  if (input) {
+    input.disabled = true;
+    input.placeholder = "Pixel Cricketer is locked & coming soon...";
+  }
+  if (guessBtn) guessBtn.disabled = true;
+  if (skipBtn) skipBtn.disabled = true;
+
   // Initialize
   setupAutocomplete();
   loadPuzzle();

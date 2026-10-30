@@ -295,6 +295,100 @@
     .back-hub-btn:hover {
       color: var(--fg);
     }
+
+    /* Locked Coming Soon Overlay */
+    .locked-overlay-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 18, 32, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      z-index: 1000;
+    }
+
+    .locked-overlay-card {
+      background: var(--card-solid);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6) var(--space-5);
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    .locked-icon-badge {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: var(--space-3);
+    }
+
+    .locked-overlay-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      letter-spacing: 1.5px;
+      color: var(--fg);
+      margin: 0 0 var(--space-2);
+      line-height: 1.1;
+    }
+
+    .locked-overlay-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0 0 var(--space-5);
+    }
+
+    .locked-overlay-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-gate-primary {
+      display: block;
+      background: #9333ea;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      transition: opacity 0.2s;
+    }
+
+    .btn-gate-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-gate-ghost {
+      display: block;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 11px 20px;
+      border-radius: var(--radius-sm);
+      transition: background 0.2s;
+    }
+
+    .btn-gate-ghost:hover {
+      background: var(--card-2);
+    }
   </style>
 </head>
 <body>
@@ -339,6 +433,19 @@
   </header>
 
   <main id="main" class="pixel-container">
+    <!-- Locked Coming Soon Overlay -->
+    <div class="locked-overlay-backdrop" id="coming-soon-modal" role="dialog" aria-modal="true" aria-labelledby="cs-title">
+      <div class="locked-overlay-card">
+        <div class="locked-icon-badge">⏳</div>
+        <h3 id="cs-title" class="locked-overlay-title">COMING SOON</h3>
+        <p class="locked-overlay-desc">Pixel Cricketer is currently locked while we tune up the player portraits and visuals. In the meantime, explore all our other live daily game modes!</p>
+        <div class="locked-overlay-actions">
+          <a href="hub.html" class="btn-gate-primary">Explore All Games (Hub) →</a>
+          <a href="index.html" class="btn-gate-ghost">Play Cricketle (1/3 Free Daily)</a>
+        </div>
+      </div>
+    </div>
+
     <a href="hub.html" class="back-hub-btn">← Back to Game Hub</a>
 
     <div class="game-header">
