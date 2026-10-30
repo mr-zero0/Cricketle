@@ -185,10 +185,15 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         target = Path(sys.argv[1])
     else:
-        # Check if there is a zip in current folder
-        zips = list(Path('.').glob('*.zip')) + list(Path('..').glob('*.zip'))
-        for z in zips:
-            if 'cricket' in z.name.lower() or 'archive' in z.name.lower() or 'kaggle' in z.name.lower() or 'player' in z.name.lower():
+        # Check current folder, parent, and Downloads folder automatically
+        candidates = list(Path('.').glob('*.zip')) + list(Path('..').glob('*.zip'))
+        dl_dir = Path.home() / 'Downloads'
+        if dl_dir.exists():
+            candidates.extend(dl_dir.glob('*.zip'))
+            
+        for z in sorted(candidates, key=lambda f: f.stat().st_mtime, reverse=True):
+            zn = z.name.lower()
+            if any(k in zn for k in ['cricket', 'archive', 'kaggle', 'player', 'legend', 'face']):
                 target = z
                 break
         if not target and Path('kaggle_dataset').exists():
@@ -200,3 +205,4 @@ if __name__ == '__main__':
     else:
         print("Usage: python import_from_kaggle.py <path_to_zip_or_folder>")
         print("Or drop your Kaggle 'archive.zip' directly in the Cricketle directory and rerun!")
+
