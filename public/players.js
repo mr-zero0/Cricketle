@@ -486,6 +486,10 @@ const PLAYERS = [
 ];
 
 // Node (server + tests) loads this file with require(); browsers read the globals above.
+if (typeof window === "object") {
+  window.PLAYERS = PLAYERS;
+  window.COUNTRIES = COUNTRIES;
+}
 if (typeof module === "object" && module.exports) {
   module.exports = { PLAYERS, COUNTRIES, IPL_TEAMS, BOWL_STYLES, PACE, SPIN };
 }

@@ -178,11 +178,99 @@
     });
   }
 
+  const EXTRA_LEGENDS = [
+    { name: "Brian Lara", country: "West Indies", role: "Batter" },
+    { name: "Shane Warne", country: "Australia", role: "Bowler" },
+    { name: "Sourav Ganguly", country: "India", role: "Batter" },
+    { name: "VVS Laxman", country: "India", role: "Batter" },
+    { name: "Robin Uthappa", country: "India", role: "Batter" },
+    { name: "Jason Roy", country: "England", role: "Batter" },
+    { name: "Liam Plunkett", country: "England", role: "Bowler" },
+    { name: "Ambati Rayudu", country: "India", role: "Batter" },
+    { name: "Mohammad Azharuddin", country: "India", role: "Batter" },
+    { name: "Ajay Jadeja", country: "India", role: "Batter" },
+    { name: "Hrishikesh Kanitkar", country: "India", role: "All-rounder" },
+    { name: "Vivian Richards", country: "West Indies", role: "Batter" },
+    { name: "Kapil Dev", country: "India", role: "All-rounder" },
+    { name: "Imran Khan", country: "Pakistan", role: "All-rounder" },
+    { name: "Wasim Akram", country: "Pakistan", role: "Bowler" },
+    { name: "Waqar Younis", country: "Pakistan", role: "Bowler" },
+    { name: "Curtly Ambrose", country: "West Indies", role: "Bowler" },
+    { name: "Courtney Walsh", country: "West Indies", role: "Bowler" },
+    { name: "Jacques Kallis", country: "South Africa", role: "All-rounder" },
+    { name: "Glenn McGrath", country: "Australia", role: "Bowler" },
+    { name: "Allan Border", country: "Australia", role: "Batter" },
+    { name: "Sunil Gavaskar", country: "India", role: "Batter" },
+    { name: "Ian Botham", country: "England", role: "All-rounder" }
+  ];
+
+  function getSearchPool() {
+    const map = new Map();
+
+    // 1. Target and batting players from scorecards
+    if (Array.isArray(allCards)) {
+      allCards.forEach((c) => {
+        if (c.targetPlayer) {
+          map.set(c.targetPlayer.toLowerCase(), { name: c.targetPlayer, country: c.targetTeam, role: c.targetRole });
+        }
+        if (c.innings && Array.isArray(c.innings.batting)) {
+          c.innings.batting.forEach((b) => {
+            if (b.player && !b.isTarget) {
+              map.set(b.player.toLowerCase(), { name: b.player, country: c.innings.team, role: "Batter" });
+            }
+          });
+        }
+      });
+    }
+
+    // 2. Extra legends
+    EXTRA_LEGENDS.forEach((p) => {
+      map.set(p.name.toLowerCase(), p);
+    });
+
+    // 3. Full 425-player list from players.js
+    const list = (typeof window !== "undefined" && window.PLAYERS) || (typeof PLAYERS !== "undefined" ? PLAYERS : []);
+    if (Array.isArray(list)) {
+      list.forEach((p) => {
+        const key = p.name.toLowerCase();
+        if (!map.has(key)) {
+          const cName = (window.COUNTRIES && window.COUNTRIES[p.country]) || p.country;
+          map.set(key, { name: p.name, country: cName, role: p.role });
+        }
+      });
+    }
+
+    return Array.from(map.values());
+  }
+
   function makeGuess(name) {
     if (isGameOver || !currentCard) return;
 
-    const clean = name.trim();
+    let clean = name.trim();
     if (!clean) return;
+
+    const guessLower = clean.toLowerCase();
+    const targetLower = currentCard.targetPlayer.toLowerCase();
+
+    // Smart resolution: e.g. "dhoni" -> "MS Dhoni", "maxwell" -> "Glenn Maxwell"
+    if (targetLower === guessLower) {
+      clean = currentCard.targetPlayer;
+    } else if (
+      targetLower.endsWith(" " + guessLower) ||
+      targetLower.startsWith(guessLower + " ") ||
+      targetLower.split(/\s+/).includes(guessLower)
+    ) {
+      clean = currentCard.targetPlayer;
+    } else {
+      const pool = getSearchPool();
+      const found = pool.find(
+        (p) =>
+          p.name.toLowerCase() === guessLower ||
+          p.name.toLowerCase().endsWith(" " + guessLower) ||
+          p.name.toLowerCase().split(/\s+/).includes(guessLower)
+      );
+      if (found) clean = found.name;
+    }
 
     const isCorrect = clean.toLowerCase() === currentCard.targetPlayer.toLowerCase();
     currentAttempts.push({ name: clean, isCorrect });
@@ -230,69 +318,164 @@
     }
   }
 
-  // Autocomplete
-  function setupAutocomplete() {
-    if (!input || !autocomplete) return;
-
-    const names = Array.isArray(window.PLAYERS)
-      ? window.PLAYERS.map((p) => ({ name: p.name, country: p.country }))
-      : [];
-
-    input.addEventListener("input", () => {
-      const q = input.value.trim().toLowerCase();
-      if (q.length < 2) {
-        hideSuggestions();
-        return;
-      }
-
-      const matches = names
-        .filter((p) => p.name.toLowerCase().includes(q))
-        .slice(0, 6);
-
-      if (matches.length === 0) {
-        hideSuggestions();
-        return;
-      }
-
-      autocomplete.innerHTML = "";
-      matches.forEach((p) => {
-        const item = document.createElement("div");
-        item.className = "autocomplete-item";
-        item.innerHTML = `<span>${p.name}</span><span style="color:#94a3b8;font-size:12px;">${p.country}</span>`;
-        item.addEventListener("click", () => {
-          input.value = p.name;
-          hideSuggestions();
-          makeGuess(p.name);
-        });
-        autocomplete.appendChild(item);
-      });
-      autocomplete.style.display = "block";
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!input.contains(e.target) && !autocomplete.contains(e.target)) {
-        hideSuggestions();
-      }
-    });
+  // Autocomplete matching Classic Cricketle
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
-  function closeAutocomplete() {
-    if (autocomplete) {
-      autocomplete.innerHTML = "";
-      autocomplete.style.display = "none";
+  function highlightMatch(name, q) {
+    const i = name.toLowerCase().indexOf(q);
+    if (i < 0) return escapeHtml(name);
+    return (
+      escapeHtml(name.slice(0, i)) +
+      "<mark>" +
+      escapeHtml(name.slice(i, i + q.length)) +
+      "</mark>" +
+      escapeHtml(name.slice(i + q.length))
+    );
+  }
+
+  function hideSuggestions() {
+    if (!suggestions) return;
+    suggestions.hidden = true;
+    suggestions.innerHTML = "";
+    if (input) {
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+    }
+    highlighted = -1;
+    currentMatches = [];
+  }
+
+  function showSuggestions(query) {
+    const q = query.trim().toLowerCase();
+    if (!q || !suggestions || !input) {
+      hideSuggestions();
+      return;
+    }
+
+    const pool = getSearchPool();
+    const starts = (pl) => pl.name.toLowerCase().startsWith(q);
+    const hasWord = (pl) => pl.name.toLowerCase().split(/\s+/).some((w) => w.startsWith(q));
+
+    currentMatches = pool
+      .filter((pl) => pl.name.toLowerCase().includes(q))
+      .sort((a, b) => {
+        const aStarts = starts(a), bStarts = starts(b);
+        if (aStarts !== bStarts) return aStarts ? -1 : 1;
+        const aWord = hasWord(a), bWord = hasWord(b);
+        if (aWord !== bWord) return aWord ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      })
+      .slice(0, 8);
+
+    if (!currentMatches.length) {
+      hideSuggestions();
+      return;
+    }
+
+    highlighted = 0;
+    suggestions.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+
+    suggestions.innerHTML = currentMatches
+      .map((pl, i) => {
+        return `
+          <li role="option" id="opt-${i}" class="${i === 0 ? "highlight" : ""}" data-name="${escapeHtml(pl.name)}">
+            <span>${highlightMatch(pl.name, q)}</span>
+            <span class="sub">${escapeHtml(pl.country)} · ${escapeHtml(pl.role)}</span>
+          </li>
+        `;
+      })
+      .join("");
+
+    input.setAttribute("aria-activedescendant", "opt-0");
+  }
+
+  function moveHighlight(delta) {
+    if (!currentMatches.length || !suggestions) return;
+    highlighted = (highlighted + delta + currentMatches.length) % currentMatches.length;
+    [...suggestions.children].forEach((li, i) => {
+      li.classList.toggle("highlight", i === highlighted);
+    });
+    input.setAttribute("aria-activedescendant", `opt-${highlighted}`);
+    suggestions.children[highlighted]?.scrollIntoView({ block: "nearest" });
+  }
+
+  function selectCurrent() {
+    if (highlighted >= 0 && currentMatches[highlighted]) {
+      const chosen = currentMatches[highlighted].name;
+      hideSuggestions();
+      makeGuess(chosen);
+    } else if (input && input.value.trim()) {
+      const text = input.value.trim();
+      hideSuggestions();
+      makeGuess(text);
     }
   }
 
-  guessBtn?.addEventListener("click", () => {
-    const val = input ? input.value.trim() : "";
-    if (val) makeGuess(val);
-  });
+  function setupAutocomplete() {
+    if (!input || !suggestions) return;
 
-  input?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      const first = autocomplete?.querySelector(".autocomplete-item span");
-      const val = first ? first.textContent : input.value.trim();
-      if (val) makeGuess(val);
+    input.addEventListener("input", () => {
+      clearTimeout(blurTimer);
+      showSuggestions(input.value);
+    });
+
+    input.addEventListener("focus", () => clearTimeout(blurTimer));
+
+    input.addEventListener("keydown", (e) => {
+      if (suggestions.hidden) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (input.value.trim()) makeGuess(input.value.trim());
+        }
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        moveHighlight(1);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        moveHighlight(-1);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        selectCurrent();
+      } else if (e.key === "Escape") {
+        hideSuggestions();
+      }
+    });
+
+    suggestions.addEventListener("mousedown", (e) => {
+      const li = e.target.closest("li[data-name]");
+      if (li) {
+        e.preventDefault();
+        const name = li.getAttribute("data-name");
+        hideSuggestions();
+        makeGuess(name);
+      }
+    });
+
+    input.addEventListener("blur", () => {
+      blurTimer = setTimeout(hideSuggestions, 150);
+    });
+  }
+
+  guessBtn?.addEventListener("click", () => {
+    if (!suggestions.hidden && highlighted >= 0 && currentMatches[highlighted]) {
+      const chosen = currentMatches[highlighted].name;
+      hideSuggestions();
+      makeGuess(chosen);
+    } else {
+      const val = input ? input.value.trim() : "";
+      if (val) {
+        hideSuggestions();
+        makeGuess(val);
+      }
     }
   });
 

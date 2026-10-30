@@ -185,11 +185,92 @@
     });
   }
 
+  const EXTRA_LEGENDS = [
+    { name: "Brian Lara", country: "West Indies", role: "Batter" },
+    { name: "Shane Warne", country: "Australia", role: "Bowler" },
+    { name: "Sourav Ganguly", country: "India", role: "Batter" },
+    { name: "VVS Laxman", country: "India", role: "Batter" },
+    { name: "Robin Uthappa", country: "India", role: "Batter" },
+    { name: "Jason Roy", country: "England", role: "Batter" },
+    { name: "Liam Plunkett", country: "England", role: "Bowler" },
+    { name: "Ambati Rayudu", country: "India", role: "Batter" },
+    { name: "Mohammad Azharuddin", country: "India", role: "Batter" },
+    { name: "Ajay Jadeja", country: "India", role: "Batter" },
+    { name: "Hrishikesh Kanitkar", country: "India", role: "All-rounder" },
+    { name: "Vivian Richards", country: "West Indies", role: "Batter" },
+    { name: "Kapil Dev", country: "India", role: "All-rounder" },
+    { name: "Imran Khan", country: "Pakistan", role: "All-rounder" },
+    { name: "Wasim Akram", country: "Pakistan", role: "Bowler" },
+    { name: "Waqar Younis", country: "Pakistan", role: "Bowler" },
+    { name: "Curtly Ambrose", country: "West Indies", role: "Bowler" },
+    { name: "Courtney Walsh", country: "West Indies", role: "Bowler" },
+    { name: "Jacques Kallis", country: "South Africa", role: "All-rounder" },
+    { name: "Glenn McGrath", country: "Australia", role: "Bowler" },
+    { name: "Allan Border", country: "Australia", role: "Batter" },
+    { name: "Sunil Gavaskar", country: "India", role: "Batter" },
+    { name: "Ian Botham", country: "England", role: "All-rounder" }
+  ];
+
+  // Combined Search Pool ensuring legends like Brian Lara and Shane Warne are always present
+  function getSearchPool() {
+    const map = new Map();
+
+    // 1. Extra legends fallback (synchronous, instant availability)
+    EXTRA_LEGENDS.forEach((p) => {
+      map.set(p.name.toLowerCase(), p);
+    });
+
+    // 2. Add all players from datasets/pixel-players.json (includes all pixel targets)
+    if (Array.isArray(allPlayers)) {
+      allPlayers.forEach((p) => {
+        map.set(p.name.toLowerCase(), { name: p.name, country: p.country, role: p.role });
+      });
+    }
+
+    // 3. Add full 425-player list from players.js
+    const list = (typeof window !== "undefined" && window.PLAYERS) || (typeof PLAYERS !== "undefined" ? PLAYERS : []);
+    if (Array.isArray(list)) {
+      list.forEach((p) => {
+        const key = p.name.toLowerCase();
+        if (!map.has(key)) {
+          const cName = (window.COUNTRIES && window.COUNTRIES[p.country]) || p.country;
+          map.set(key, { name: p.name, country: cName, role: p.role });
+        }
+      });
+    }
+
+    return Array.from(map.values());
+  }
+
   function makeGuess(name, skipped = false) {
     if (isGameOver || !currentTarget) return;
 
-    const clean = name.trim();
+    let clean = name.trim();
     if (!clean && !skipped) return;
+
+    if (!skipped) {
+      const guessLower = clean.toLowerCase();
+      // Smart resolution: if player typed "lara" or "dhoni" or "kohli", resolve to full name
+      if (currentTarget.name.toLowerCase() === guessLower) {
+        clean = currentTarget.name;
+      } else if (
+        currentTarget.name.toLowerCase().endsWith(" " + guessLower) ||
+        currentTarget.name.toLowerCase().startsWith(guessLower + " ") ||
+        currentTarget.name.toLowerCase().split(/\s+/).includes(guessLower)
+      ) {
+        clean = currentTarget.name; // Smart match for target!
+      } else {
+        // Resolve from general player pool
+        const pool = getSearchPool();
+        const found = pool.find(
+          (p) =>
+            p.name.toLowerCase() === guessLower ||
+            p.name.toLowerCase().endsWith(" " + guessLower) ||
+            p.name.toLowerCase().split(/\s+/).includes(guessLower)
+        );
+        if (found) clean = found.name;
+      }
+    }
 
     const isCorrect = !skipped && clean.toLowerCase() === currentTarget.name.toLowerCase();
     currentAttempts.push({ name: clean || "Skip", skipped, isCorrect });
@@ -280,12 +361,22 @@
       return;
     }
 
-    const all = Array.isArray(window.PLAYERS) ? window.PLAYERS : [];
+    const pool = getSearchPool();
     const starts = (pl) => pl.name.toLowerCase().startsWith(q);
+    const hasWord = (pl) => pl.name.toLowerCase().split(/\s+/).some((w) => w.startsWith(q));
 
-    currentMatches = all
+    currentMatches = pool
       .filter((pl) => pl.name.toLowerCase().includes(q))
-      .sort((a, b) => (starts(a) === starts(b) ? a.name.localeCompare(b.name) : starts(a) ? -1 : 1))
+      .sort((a, b) => {
+        // Priority 1: Full name starts with q (e.g. "vir" -> "Virat Kohli")
+        const aStarts = starts(a), bStarts = starts(b);
+        if (aStarts !== bStarts) return aStarts ? -1 : 1;
+        // Priority 2: Any word starts with q (e.g. "lara" -> "Brian Lara")
+        const aWord = hasWord(a), bWord = hasWord(b);
+        if (aWord !== bWord) return aWord ? -1 : 1;
+        // Priority 3: Alphabetical
+        return a.name.localeCompare(b.name);
+      })
       .slice(0, 8);
 
     if (!currentMatches.length) {
@@ -299,11 +390,10 @@
 
     suggestions.innerHTML = currentMatches
       .map((pl, i) => {
-        const country = (window.COUNTRIES && window.COUNTRIES[pl.country]) || pl.country;
         return `
           <li role="option" id="opt-${i}" class="${i === 0 ? "highlight" : ""}" data-name="${escapeHtml(pl.name)}">
             <span>${highlightMatch(pl.name, q)}</span>
-            <span class="sub">${escapeHtml(country)} · ${escapeHtml(pl.role)}</span>
+            <span class="sub">${escapeHtml(pl.country)} · ${escapeHtml(pl.role)}</span>
           </li>
         `;
       })
@@ -341,6 +431,8 @@
       clearTimeout(blurTimer);
       showSuggestions(input.value);
     });
+
+    input.addEventListener("focus", () => clearTimeout(blurTimer));
 
     input.addEventListener("keydown", (e) => {
       if (suggestions.hidden) {
@@ -381,8 +473,17 @@
 
   // Event listeners
   guessBtn?.addEventListener("click", () => {
-    const val = input ? input.value.trim() : "";
-    if (val) makeGuess(val);
+    if (!suggestions.hidden && highlighted >= 0 && currentMatches[highlighted]) {
+      const chosen = currentMatches[highlighted].name;
+      hideSuggestions();
+      makeGuess(chosen);
+    } else {
+      const val = input ? input.value.trim() : "";
+      if (val) {
+        hideSuggestions();
+        makeGuess(val);
+      }
+    }
   });
 
   skipBtn?.addEventListener("click", () => {
