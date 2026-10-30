@@ -258,36 +258,16 @@
       opacity: 0.9;
     }
 
-    /* Autocomplete */
-    .autocomplete-list {
-      position: absolute;
+    /* Autocomplete matching Classic Cricketle */
+    .guess-box .suggestions {
       top: 100%;
-      left: 0;
-      right: 0;
-      background: var(--card-solid);
-      border: 1px solid #2563eb;
-      border-radius: var(--radius-sm);
-      max-height: 220px;
-      overflow-y: auto;
-      z-index: 50;
-      margin-top: 4px;
-      display: none;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      margin-top: 6px;
+      width: 100%;
     }
 
-    .autocomplete-item {
-      padding: 10px 16px;
-      cursor: pointer;
-      font-size: 14px;
-      color: var(--fg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .autocomplete-item:hover {
-      background: rgba(37, 99, 235, 0.15);
-      color: var(--fg);
+    .guess-box .suggestions li mark {
+      color: #2563eb;
+      font-weight: 700;
     }
 
     /* History & Hints */
@@ -472,10 +452,10 @@
     <!-- Guess Controls -->
     <div class="guess-box" id="guess-controls">
       <div class="guess-input-wrap">
-        <input type="text" id="guess-input" class="guess-input" placeholder="Type player name..." autocomplete="off" />
+        <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. MS Dhoni)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
         <button id="btn-guess" class="btn-guess">Guess</button>
       </div>
-      <div id="autocomplete-list" class="autocomplete-list"></div>
+      <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
     </div>
 
     <!-- History -->

@@ -19,7 +19,10 @@
   const totalEl = document.getElementById("scorecard-total");
   const input = document.getElementById("guess-input");
   const guessBtn = document.getElementById("btn-guess");
-  const autocomplete = document.getElementById("autocomplete-list");
+  const suggestions = document.getElementById("suggestions");
+  let highlighted = -1;
+  let currentMatches = [];
+  let blurTimer = null;
   const historyList = document.getElementById("guess-history");
   const track = document.getElementById("attempts-track");
   const hintBanner = document.getElementById("hint-banner");
@@ -201,7 +204,7 @@
     renderHistory();
     updateTrack();
     if (input) input.value = "";
-    closeAutocomplete();
+    hideSuggestions();
   }
 
   function finishGame(won) {
@@ -238,7 +241,7 @@
     input.addEventListener("input", () => {
       const q = input.value.trim().toLowerCase();
       if (q.length < 2) {
-        closeAutocomplete();
+        hideSuggestions();
         return;
       }
 
@@ -247,7 +250,7 @@
         .slice(0, 6);
 
       if (matches.length === 0) {
-        closeAutocomplete();
+        hideSuggestions();
         return;
       }
 
@@ -258,7 +261,7 @@
         item.innerHTML = `<span>${p.name}</span><span style="color:#94a3b8;font-size:12px;">${p.country}</span>`;
         item.addEventListener("click", () => {
           input.value = p.name;
-          closeAutocomplete();
+          hideSuggestions();
           makeGuess(p.name);
         });
         autocomplete.appendChild(item);
@@ -268,7 +271,7 @@
 
     document.addEventListener("click", (e) => {
       if (!input.contains(e.target) && !autocomplete.contains(e.target)) {
-        closeAutocomplete();
+        hideSuggestions();
       }
     });
   }

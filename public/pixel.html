@@ -16,14 +16,15 @@
   <script src="theme.js?v=2.4.0"></script>
   <style>
     .pixel-container {
-      width: min(100%, 720px);
+      width: min(100%, 640px);
       margin: 0 auto;
       padding: var(--space-4) var(--space-4) var(--space-8);
+      --mode-text: #9333ea;
     }
 
     .game-header {
       text-align: center;
-      margin-bottom: var(--space-5);
+      margin-bottom: var(--space-4);
     }
 
     .game-header h2 {
@@ -75,7 +76,7 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: var(--space-5);
+      padding: var(--space-4);
       text-align: center;
       margin-bottom: var(--space-4);
       box-shadow: var(--shadow);
@@ -100,7 +101,6 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: filter 0.3s ease;
     }
 
     /* Attempt indicators */
@@ -108,7 +108,7 @@
       display: flex;
       justify-content: center;
       gap: 8px;
-      margin: var(--space-4) 0 0;
+      margin: var(--space-3) 0 0;
     }
 
     .attempt-dot {
@@ -196,41 +196,16 @@
       color: var(--fg);
     }
 
-    /* Autocomplete dropdown */
-    .autocomplete-list {
-      position: absolute;
+    /* Autocomplete dropdown styled like classic Cricketle */
+    .guess-box .suggestions {
       top: 100%;
-      left: 0;
-      right: 0;
-      background: var(--card-solid);
-      border: 1px solid #9333ea;
-      border-radius: var(--radius-sm);
-      max-height: 220px;
-      overflow-y: auto;
-      z-index: 50;
-      margin-top: 4px;
-      display: none;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      margin-top: 6px;
+      width: 100%;
     }
 
-    .autocomplete-item {
-      padding: 10px 16px;
-      cursor: pointer;
-      font-size: 14px;
-      color: var(--fg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .autocomplete-item:hover, .autocomplete-item.active {
-      background: rgba(147, 51, 234, 0.15);
-      color: var(--fg);
-    }
-
-    .autocomplete-country {
-      color: var(--muted);
-      font-size: 12px;
+    .guess-box .suggestions li mark {
+      color: #9333ea;
+      font-weight: 700;
     }
 
     /* Guess history log */
@@ -386,14 +361,14 @@
       </div>
     </div>
 
-    <!-- Guess Input -->
+    <!-- Guess Input with Classic Dropdown -->
     <div class="guess-box" id="guess-controls">
       <div class="guess-input-wrap">
-        <input type="text" id="guess-input" class="guess-input" placeholder="Type player name..." autocomplete="off" />
+        <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. Virat Kohli)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
         <button id="btn-skip" class="btn-skip" title="Skip to unblur more">Skip</button>
         <button id="btn-guess" class="btn-guess">Guess</button>
       </div>
-      <div id="autocomplete-list" class="autocomplete-list"></div>
+      <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
     </div>
 
     <!-- Guess History -->

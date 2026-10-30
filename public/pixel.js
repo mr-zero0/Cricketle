@@ -2,7 +2,8 @@
   "use strict";
 
   // Pixelation block sizes per attempt (attempt 0 to 5, then revealed)
-  const PIXEL_SIZES = [36, 26, 18, 12, 7, 4];
+  // Tuned to be fair and fun: face structure, hair, eyes & beard are recognizable!
+  const PIXEL_SIZES = [10, 7, 5, 3, 2, 1];
   const MAX_ATTEMPTS = 6;
 
   let allPlayers = [];
@@ -17,7 +18,7 @@
   const input = document.getElementById("guess-input");
   const guessBtn = document.getElementById("btn-guess");
   const skipBtn = document.getElementById("btn-skip");
-  const autocomplete = document.getElementById("autocomplete-list");
+  const suggestions = document.getElementById("suggestions");
   const historyList = document.getElementById("guess-history");
   const track = document.getElementById("attempts-track");
   const resultCard = document.getElementById("result-card");
@@ -25,6 +26,10 @@
   const resultName = document.getElementById("result-name");
   const resultHint = document.getElementById("result-hint");
   const guessControls = document.getElementById("guess-controls");
+
+  let highlighted = -1;
+  let currentMatches = [];
+  let blurTimer = null;
 
   // Format today's date key: YYYY-MM-DD
   function getTodayKey() {
@@ -42,14 +47,14 @@
     return Math.abs(hash);
   }
 
-  // Draw pixelated image on canvas with center crop
+  // Draw pixelated image on canvas with headshot-focused center crop
   function renderPixelated(pixelSize) {
     if (!ctx || !loadedImage) return;
 
     const w = canvas.width;
     const h = canvas.height;
 
-    // Calculate center-crop coordinates
+    // Headshot-focused crop (keeps eyes/face centered)
     const imgRatio = loadedImage.width / loadedImage.height;
     const canvasRatio = w / h;
     let sx = 0, sy = 0, sw = loadedImage.width, sh = loadedImage.height;
@@ -58,7 +63,8 @@
       sx = (loadedImage.width - sw) / 2;
     } else {
       sh = loadedImage.width / canvasRatio;
-      sy = (loadedImage.height - sh) / 2;
+      // Focus on upper portion (head and shoulders)
+      sy = Math.max(0, (loadedImage.height - sh) * 0.15);
     }
 
     if (pixelSize <= 1) {
@@ -69,7 +75,7 @@
       return;
     }
 
-    // Downscale and upscale on an offscreen canvas to create true pixel blocks
+    // Downscale and upscale on an offscreen canvas to create crisp mosaic blocks
     const offW = Math.max(1, Math.floor(w / pixelSize));
     const offH = Math.max(1, Math.floor(h / pixelSize));
 
@@ -78,7 +84,7 @@
     offscreen.height = offH;
     const offCtx = offscreen.getContext("2d");
 
-    // Draw downscaled with center crop
+    // Draw downscaled with headshot crop
     offCtx.drawImage(loadedImage, sx, sy, sw, sh, 0, 0, offW, offH);
 
     // Draw back upscaled with pixelated smoothing disabled
@@ -172,7 +178,7 @@
       const el = document.createElement("div");
       el.className = `guess-item ${a.isCorrect ? "correct" : a.skipped ? "skipped" : ""}`;
       el.innerHTML = `
-        <span>${a.skipped ? "<em>Skipped</em>" : a.name}</span>
+        <span>${a.skipped ? "<em>Skipped</em>" : escapeHtml(a.name)}</span>
         <span style="font-weight:700;">${a.isCorrect ? "✅ Correct" : a.skipped ? "⏭️ Skipped" : "❌ Incorrect"}</span>
       `;
       historyList.appendChild(el);
@@ -182,8 +188,11 @@
   function makeGuess(name, skipped = false) {
     if (isGameOver || !currentTarget) return;
 
-    const isCorrect = !skipped && name.trim().toLowerCase() === currentTarget.name.toLowerCase();
-    currentAttempts.push({ name: name.trim(), skipped, isCorrect });
+    const clean = name.trim();
+    if (!clean && !skipped) return;
+
+    const isCorrect = !skipped && clean.toLowerCase() === currentTarget.name.toLowerCase();
+    currentAttempts.push({ name: clean || "Skip", skipped, isCorrect });
 
     // Save state
     const today = getTodayKey();
@@ -206,7 +215,7 @@
     renderHistory();
     updateTrack();
     if (input) input.value = "";
-    closeAutocomplete();
+    hideSuggestions();
   }
 
   function finishGame(won) {
@@ -230,57 +239,144 @@
     }
   }
 
-  // Autocomplete logic using PLAYERS from players.js
-  function setupAutocomplete() {
-    if (!input || !autocomplete) return;
+  // ---------- Autocomplete (Matches Classic Cricketle) ----------
 
-    const names = Array.isArray(window.PLAYERS)
-      ? window.PLAYERS.map((p) => ({ name: p.name, country: p.country }))
-      : [];
-
-    input.addEventListener("input", () => {
-      const q = input.value.trim().toLowerCase();
-      if (q.length < 2) {
-        closeAutocomplete();
-        return;
-      }
-
-      const matches = names
-        .filter((p) => p.name.toLowerCase().includes(q))
-        .slice(0, 6);
-
-      if (matches.length === 0) {
-        closeAutocomplete();
-        return;
-      }
-
-      autocomplete.innerHTML = "";
-      matches.forEach((p) => {
-        const item = document.createElement("div");
-        item.className = "autocomplete-item";
-        item.innerHTML = `<span>${p.name}</span><span class="autocomplete-country">${p.country}</span>`;
-        item.addEventListener("click", () => {
-          input.value = p.name;
-          closeAutocomplete();
-          makeGuess(p.name);
-        });
-        autocomplete.appendChild(item);
-      });
-      autocomplete.style.display = "block";
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!input.contains(e.target) && !autocomplete.contains(e.target)) {
-        closeAutocomplete();
-      }
-    });
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
-  function closeAutocomplete() {
-    if (autocomplete) {
-      autocomplete.innerHTML = "";
-      autocomplete.style.display = "none";
+  function highlightMatch(name, q) {
+    const i = name.toLowerCase().indexOf(q);
+    if (i < 0) return escapeHtml(name);
+    return (
+      escapeHtml(name.slice(0, i)) +
+      "<mark>" +
+      escapeHtml(name.slice(i, i + q.length)) +
+      "</mark>" +
+      escapeHtml(name.slice(i + q.length))
+    );
+  }
+
+  function hideSuggestions() {
+    if (!suggestions) return;
+    suggestions.hidden = true;
+    suggestions.innerHTML = "";
+    if (input) {
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
     }
+    highlighted = -1;
+    currentMatches = [];
+  }
+
+  function showSuggestions(query) {
+    const q = query.trim().toLowerCase();
+    if (!q || !suggestions || !input) {
+      hideSuggestions();
+      return;
+    }
+
+    const all = Array.isArray(window.PLAYERS) ? window.PLAYERS : [];
+    const starts = (pl) => pl.name.toLowerCase().startsWith(q);
+
+    currentMatches = all
+      .filter((pl) => pl.name.toLowerCase().includes(q))
+      .sort((a, b) => (starts(a) === starts(b) ? a.name.localeCompare(b.name) : starts(a) ? -1 : 1))
+      .slice(0, 8);
+
+    if (!currentMatches.length) {
+      hideSuggestions();
+      return;
+    }
+
+    highlighted = 0;
+    suggestions.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+
+    suggestions.innerHTML = currentMatches
+      .map((pl, i) => {
+        const country = (window.COUNTRIES && window.COUNTRIES[pl.country]) || pl.country;
+        return `
+          <li role="option" id="opt-${i}" class="${i === 0 ? "highlight" : ""}" data-name="${escapeHtml(pl.name)}">
+            <span>${highlightMatch(pl.name, q)}</span>
+            <span class="sub">${escapeHtml(country)} · ${escapeHtml(pl.role)}</span>
+          </li>
+        `;
+      })
+      .join("");
+
+    input.setAttribute("aria-activedescendant", "opt-0");
+  }
+
+  function moveHighlight(delta) {
+    if (!currentMatches.length || !suggestions) return;
+    highlighted = (highlighted + delta + currentMatches.length) % currentMatches.length;
+    [...suggestions.children].forEach((li, i) => {
+      li.classList.toggle("highlight", i === highlighted);
+    });
+    input.setAttribute("aria-activedescendant", `opt-${highlighted}`);
+    suggestions.children[highlighted]?.scrollIntoView({ block: "nearest" });
+  }
+
+  function selectCurrent() {
+    if (highlighted >= 0 && currentMatches[highlighted]) {
+      const chosen = currentMatches[highlighted].name;
+      hideSuggestions();
+      makeGuess(chosen);
+    } else if (input && input.value.trim()) {
+      const text = input.value.trim();
+      hideSuggestions();
+      makeGuess(text);
+    }
+  }
+
+  function setupAutocomplete() {
+    if (!input || !suggestions) return;
+
+    input.addEventListener("input", () => {
+      clearTimeout(blurTimer);
+      showSuggestions(input.value);
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (suggestions.hidden) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (input.value.trim()) makeGuess(input.value.trim());
+        }
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        moveHighlight(1);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        moveHighlight(-1);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        selectCurrent();
+      } else if (e.key === "Escape") {
+        hideSuggestions();
+      }
+    });
+
+    suggestions.addEventListener("mousedown", (e) => {
+      const li = e.target.closest("li[data-name]");
+      if (li) {
+        e.preventDefault();
+        const name = li.getAttribute("data-name");
+        hideSuggestions();
+        makeGuess(name);
+      }
+    });
+
+    input.addEventListener("blur", () => {
+      blurTimer = setTimeout(hideSuggestions, 150);
+    });
   }
 
   // Event listeners
@@ -291,14 +387,6 @@
 
   skipBtn?.addEventListener("click", () => {
     makeGuess("Skip", true);
-  });
-
-  input?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      const first = autocomplete?.querySelector(".autocomplete-item span");
-      const val = first ? first.textContent : input.value.trim();
-      if (val) makeGuess(val);
-    }
   });
 
   // Mode toggles
