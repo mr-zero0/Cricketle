@@ -7,7 +7,7 @@
   <meta name="description" content="Cricketle Hub — Choose your daily cricket challenge: Mystery Player, Pixel Cricketer, or Scorecard Mystery." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://playcricketle.onrender.com/" />
-  <meta property="og:title" content="Cricketle — Daily Cricket Puzzles" />
+  <meta property="og:title" content="Cricketle — Game Hub" />
   <meta property="og:description" content="Multiple daily cricket guessing games! Clues, scrambled photos, and match scorecards." />
   <meta property="og:image" content="https://playcricketle.onrender.com/og-image.jpg" />
   <title>Cricketle — Game Hub</title>
@@ -21,129 +21,133 @@
   <script src="theme.js?v=2.4.0"></script>
   <style>
     /* =====================================================================
-       GAME HUB SPECIFIC STYLES
+       GAME HUB SPECIFIC STYLES (Strictly synced with Cricketle Design System)
        ===================================================================== */
     .hub-container {
-      max-width: 960px;
+      width: min(100%, 1100px);
       margin: 0 auto;
-      padding: 24px 16px 64px;
+      padding: var(--space-4) var(--space-4) var(--space-8);
     }
 
     .hub-hero {
       text-align: center;
-      margin-bottom: 36px;
-      animation: hubFadeIn 0.6s ease-out;
+      margin: var(--space-3) auto var(--space-6);
+      max-width: 680px;
     }
 
     .hub-hero h2 {
-      font-family: 'Bebas Neue', Impact, sans-serif;
-      font-size: clamp(28px, 6vw, 44px);
-      letter-spacing: 1.5px;
-      color: var(--text-primary, #fff);
-      margin: 0 0 8px;
+      font-family: var(--font-display);
+      font-size: clamp(36px, 7vw, 56px);
+      letter-spacing: 2px;
+      color: var(--fg);
+      margin: 0 0 var(--space-2);
+      line-height: 1;
     }
 
     .hub-hero p {
-      font-size: 15px;
-      color: var(--text-muted, #94a3b8);
-      max-width: 480px;
-      margin: 0 auto;
+      font-size: 16px;
+      color: var(--muted);
+      margin: 0;
+      font-weight: 500;
+      line-height: 1.5;
     }
 
     /* Grid of game tiles */
     .hub-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      margin-bottom: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
     }
 
     /* Individual Game Tile */
     .game-tile {
       position: relative;
-      background: var(--card-bg, rgba(15, 23, 42, 0.7));
-      border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
-      border-radius: 16px;
-      padding: 28px 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--space-5);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 260px;
+      min-height: 280px;
       text-decoration: none;
-      color: inherit;
+      color: var(--fg);
       overflow: hidden;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform var(--dur-base) var(--ease-out),
+                  border-color var(--dur-base) var(--ease-out),
+                  box-shadow var(--dur-base) var(--ease-out);
       cursor: pointer;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
     }
 
-    /* Glow backdrop per tile type */
+    .game-tile:hover {
+      transform: translateY(-4px);
+      border-color: var(--tile-border-hover, var(--border-strong));
+      box-shadow: 0 16px 36px -10px var(--tile-shadow, rgba(0, 0, 0, 0.35));
+    }
+
+    /* Subtle atmospheric glow behind each tile */
     .game-tile::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 140px;
+      height: 120px;
       background: radial-gradient(circle at 50% 0%, var(--tile-glow, rgba(34, 197, 94, 0.15)), transparent 70%);
       pointer-events: none;
-      transition: opacity 0.3s ease;
       opacity: 0.6;
-    }
-
-    .game-tile:hover {
-      transform: translateY(-4px);
-      border-color: var(--tile-border-hover, rgba(34, 197, 94, 0.5));
-      box-shadow: 0 12px 32px -8px var(--tile-shadow, rgba(34, 197, 94, 0.2));
+      transition: opacity var(--dur-base) ease;
     }
 
     .game-tile:hover::before {
       opacity: 1;
     }
 
-    /* Tile themes */
+    /* Tile Themes */
     .tile-cricketle {
-      --tile-glow: rgba(34, 197, 94, 0.2);
-      --tile-border-hover: rgba(34, 197, 94, 0.6);
-      --tile-shadow: rgba(34, 197, 94, 0.25);
-      --tile-accent: #22c55e;
+      --tile-glow: rgba(34, 197, 94, 0.3);
+      --tile-border-hover: rgba(34, 197, 94, 0.7);
+      --tile-shadow: rgba(34, 197, 94, 0.35);
+      --tile-accent: #16a34a;
     }
 
     .tile-pixel {
-      --tile-glow: rgba(168, 85, 247, 0.2);
-      --tile-border-hover: rgba(168, 85, 247, 0.6);
-      --tile-shadow: rgba(168, 85, 247, 0.25);
-      --tile-accent: #a855f7;
+      --tile-glow: rgba(168, 85, 247, 0.3);
+      --tile-border-hover: rgba(168, 85, 247, 0.7);
+      --tile-shadow: rgba(168, 85, 247, 0.35);
+      --tile-accent: #9333ea;
     }
 
     .tile-scorecard {
-      --tile-glow: rgba(59, 130, 246, 0.2);
-      --tile-border-hover: rgba(59, 130, 246, 0.6);
-      --tile-shadow: rgba(59, 130, 246, 0.25);
-      --tile-accent: #3b82f6;
+      --tile-glow: rgba(37, 99, 235, 0.3);
+      --tile-border-hover: rgba(37, 99, 235, 0.7);
+      --tile-shadow: rgba(37, 99, 235, 0.35);
+      --tile-accent: #2563eb;
     }
 
     .tile-locked {
-      --tile-glow: rgba(100, 116, 139, 0.1);
-      --tile-border-hover: rgba(100, 116, 139, 0.3);
-      --tile-shadow: rgba(0, 0, 0, 0.1);
-      --tile-accent: #64748b;
+      --tile-glow: transparent;
+      --tile-border-hover: var(--border);
+      --tile-shadow: none;
+      --tile-accent: var(--muted);
       opacity: 0.65;
       cursor: not-allowed;
     }
 
     .tile-locked:hover {
       transform: none;
-      box-shadow: none;
+      box-shadow: var(--shadow);
     }
 
-    /* Tile header: badge + daily status */
     .tile-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: var(--space-4);
       z-index: 1;
     }
 
@@ -152,38 +156,33 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      padding: 4px 10px;
+      padding: 3px 10px;
       border-radius: 20px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--tile-accent, #22c55e);
-      border: 1px solid var(--tile-accent, #22c55e);
+      background: rgba(125, 125, 125, 0.12);
+      color: var(--tile-accent);
+      border: 1px solid var(--tile-accent);
     }
 
     .tile-status {
       font-size: 12px;
-      color: var(--text-muted, #94a3b8);
+      color: var(--muted);
       display: flex;
       align-items: center;
-      gap: 5px;
-    }
-
-    .tile-status.completed {
-      color: #22c55e;
+      gap: 4px;
       font-weight: 600;
     }
 
-    /* Tile body: icon + title + description */
     .tile-body {
       z-index: 1;
-      margin-bottom: 24px;
+      margin-bottom: var(--space-4);
     }
 
     .tile-icon {
-      font-size: 36px;
+      font-size: 38px;
       line-height: 1;
-      margin-bottom: 12px;
+      margin-bottom: var(--space-3);
       display: inline-block;
-      transition: transform 0.25s ease;
+      transition: transform var(--dur-base) var(--ease-back);
     }
 
     .game-tile:hover .tile-icon {
@@ -191,31 +190,29 @@
     }
 
     .tile-title {
-      font-family: 'Bebas Neue', Impact, sans-serif;
-      font-size: 26px;
+      font-family: var(--font-display);
+      font-size: 30px;
       letter-spacing: 1px;
-      color: var(--text-primary, #fff);
+      color: var(--fg);
       margin: 0 0 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-weight: 400;
+      line-height: 1.1;
     }
 
     .tile-desc {
-      font-size: 13.5px;
+      font-size: 14px;
       line-height: 1.5;
-      color: var(--text-muted, #94a3b8);
+      color: var(--muted);
       margin: 0;
     }
 
-    /* Tile footer: action button */
     .tile-footer {
       z-index: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--border);
     }
 
     .tile-play-btn {
@@ -223,44 +220,44 @@
       align-items: center;
       gap: 6px;
       padding: 8px 18px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.5px;
-      background: var(--tile-accent, #22c55e);
-      color: #0b1220;
+      background: var(--tile-accent);
+      color: #ffffff;
       border: none;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
+      transition: opacity var(--dur-fast), transform var(--dur-fast);
     }
 
-    .tile-play-btn:hover {
-      opacity: 0.9;
-      transform: scale(1.02);
+    .game-tile:hover .tile-play-btn {
+      opacity: 0.95;
+      transform: scale(1.03);
     }
 
     .tile-locked .tile-play-btn {
-      background: rgba(255, 255, 255, 0.08);
-      color: #64748b;
+      background: var(--border);
+      color: var(--muted);
       cursor: not-allowed;
     }
 
     .tile-streak {
       font-size: 12px;
-      color: var(--text-muted, #94a3b8);
+      color: var(--muted);
       display: flex;
       align-items: center;
       gap: 4px;
+      font-weight: 600;
     }
 
-    /* Section divider */
     .hub-section-title {
-      font-family: 'Bebas Neue', Impact, sans-serif;
-      font-size: 18px;
-      letter-spacing: 1px;
-      color: var(--text-muted, #64748b);
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 1.2px;
+      color: var(--muted);
       text-transform: uppercase;
-      margin: 32px 0 16px;
+      margin: var(--space-6) 0 var(--space-4);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -270,40 +267,30 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--border);
     }
-
-    /* Entrance animations with staggered delays */
-    @keyframes hubFadeIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .game-tile:nth-child(1) { animation: hubFadeIn 0.5s ease-out 0.05s both; }
-    .game-tile:nth-child(2) { animation: hubFadeIn 0.5s ease-out 0.12s both; }
-    .game-tile:nth-child(3) { animation: hubFadeIn 0.5s ease-out 0.19s both; }
-    .game-tile:nth-child(4) { animation: hubFadeIn 0.5s ease-out 0.26s both; }
-    .game-tile:nth-child(5) { animation: hubFadeIn 0.5s ease-out 0.33s both; }
   </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <canvas id="bg" aria-hidden="true"></canvas>
 
-  <!-- SVG Sprite (same as index.html) -->
+  <!-- SVG Sprite (Shared standard symbols) -->
   <svg class="sprite" aria-hidden="true" focusable="false">
     <defs>
       <symbol id="i-ball" viewBox="0 0 24 24"><radialGradient id="g-leather" cx="0.36" cy="0.32" r="0.75"><stop offset="0" stop-color="#ff8a78"/><stop offset="0.4" stop-color="#d92b28"/><stop offset="1" stop-color="#5e0d0d"/></radialGradient><circle cx="12" cy="12" r="10.6" fill="url(#g-leather)"/><path d="M9.2 1.9C5.3 7 5.3 17 9.2 22.1" fill="none" stroke="#6a1010" stroke-width="2.6" stroke-linecap="round"/><path d="M8.1 2.3C4.4 7.2 4.4 16.8 8.1 21.7M10.3 1.8C6.6 7 6.6 17 10.3 22.2" fill="none" stroke="#fff3df" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="1 1.1"/><ellipse cx="8.6" cy="7.4" rx="2.2" ry="3.2" transform="rotate(-25 8.6 7.4)" fill="#ffffff" opacity="0.28"/><circle cx="12" cy="12" r="10.6" fill="none" stroke="#000000" stroke-opacity="0.3" stroke-width="0.8"/></symbol>
-      <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c-.5 2.5-3 5-4.5 7.5C6 12 5.5 14.5 7 17.5c1.2 2.4 3.3 3.5 5 3.5s3.8-1.1 5-3.5c1.5-3 1-5.5-.5-8C15 7 12.5 4.5 12 2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 12c-.5 1-1.5 2-1.5 3.2 0 1.5 1 2.3 1.5 2.3s1.5-.8 1.5-2.3c0-1.2-1-2.2-1.5-3.2Z" fill="currentColor"/></symbol>
-      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor"/></symbol>
-      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 20a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.6A8.5 8.5 0 0 1 9.4 4a8.5 8.5 0 1 0 10.6 10.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c-.5 2.5-3 5-4.5 7.5C6 12 5.5 14.5 7 17.5c1.2 2.4 3.3 3.5 5 3.5s3.8-1.1 5-3.5c1.5-3 1-5.5-.5-8C15 7 12.5 4.5 12 2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 12c-.5 1-1.5 2-1.5 3.2 0 1.5 1 2.3 1.5 2.3s1.5-.8 1.5-2.3c0-1.2-1-2.2-1.5-3.2Z" fill="currentColor"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 20a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-stumps" viewBox="0 0 24 24"><path d="M7 21V7M12 21V7M17 21V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 6h5M13 6h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-4.2-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     </defs>
   </svg>
 
-  <!-- Top Bar -->
+  <!-- Top Bar (Exact standard topbar structure) -->
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true"><svg><use href="#i-ball"/></svg></span>
@@ -313,14 +300,18 @@
       </div>
     </div>
     <nav class="nav" aria-label="Primary">
-      <button id="theme-toggle" class="btn-theme-toggle" aria-label="Toggle theme">
-        <svg id="theme-icon" aria-hidden="true"><use href="#i-moon"/></svg>
-      </button>
-      <div id="user-pill" class="user-pill" style="display:none;">
-        <span id="user-name">Player</span>
-      </div>
-      <a href="index.html#auth" id="btn-login" class="nav-link"><svg aria-hidden="true"><use href="#i-user"/></svg><span>Sign In</span></a>
+      <a href="hub.html" class="nav-link" aria-current="page"><svg aria-hidden="true"><use href="#i-ball"/></svg><span>All Games</span></a>
+      <a href="index.html" class="nav-link"><svg aria-hidden="true"><use href="#i-stumps"/></svg><span>Cricketle</span></a>
+      <a href="pixel.html" class="nav-link"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Pixel</span></a>
+      <a href="scorecard.html" class="nav-link"><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Scorecard</span></a>
+      <a href="index.html#profile" class="nav-link" id="nav-profile-link"><svg aria-hidden="true"><use href="#i-user"/></svg><span id="nav-profile-label">Sign in</span></a>
     </nav>
+    <div class="topbar-actions">
+      <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch to day">
+        <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+        <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+      </button>
+    </div>
   </header>
 
   <!-- Main Hub -->

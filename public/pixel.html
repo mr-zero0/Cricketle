@@ -7,74 +7,80 @@
   <meta name="description" content="Pixel Cricketer — Guess the famous cricketer from the scrambled photo. Each guess unblurs the picture." />
   <title>Pixel Cricketer — Cricketle</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
   <link rel="stylesheet" href="styles.css?v=2.4.0" />
   <script src="theme.js?v=2.4.0"></script>
   <style>
     .pixel-container {
-      max-width: 640px;
+      width: min(100%, 720px);
       margin: 0 auto;
-      padding: 20px 16px 64px;
+      padding: var(--space-4) var(--space-4) var(--space-8);
     }
 
     .game-header {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: var(--space-5);
     }
 
     .game-header h2 {
-      font-family: 'Bebas Neue', Impact, sans-serif;
-      font-size: clamp(32px, 7vw, 48px);
+      font-family: var(--font-display);
+      font-size: clamp(34px, 7vw, 52px);
       letter-spacing: 1.5px;
-      color: var(--text-primary, #fff);
-      margin: 0 0 4px;
+      color: var(--fg);
+      margin: 0 0 var(--space-2);
+      line-height: 1;
     }
 
     .game-header p {
-      font-size: 14px;
-      color: var(--text-muted, #94a3b8);
-      margin: 0 0 16px;
+      font-size: 15px;
+      color: var(--muted);
+      margin: 0 0 var(--space-4);
+      font-weight: 500;
     }
 
     /* Mode selector pill */
     .mode-toggle {
       display: inline-flex;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 30px;
-      padding: 3px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px;
       gap: 4px;
     }
 
     .mode-btn {
       background: transparent;
       border: none;
-      color: var(--text-muted, #94a3b8);
+      color: var(--muted);
       padding: 6px 18px;
-      border-radius: 24px;
+      border-radius: 999px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all var(--dur-base) ease;
     }
 
     .mode-btn.active {
-      background: #a855f7;
+      background: #9333ea;
       color: #fff;
     }
 
     /* Canvas photo container */
     .photo-card {
       position: relative;
-      background: var(--card-bg, rgba(15, 23, 42, 0.8));
-      border: 1px solid rgba(168, 85, 247, 0.3);
-      border-radius: 16px;
-      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--space-5);
       text-align: center;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.25);
+      margin-bottom: var(--space-4);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     .canvas-wrapper {
@@ -83,9 +89,9 @@
       height: 340px;
       max-width: 100%;
       margin: 0 auto;
-      border-radius: 12px;
+      border-radius: var(--radius-sm);
       overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       background: #0b1220;
     }
 
@@ -102,52 +108,52 @@
       display: flex;
       justify-content: center;
       gap: 8px;
-      margin: 16px 0 0;
+      margin: var(--space-4) 0 0;
     }
 
     .attempt-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: var(--border);
+      border: 1px solid var(--border-strong);
       transition: all 0.2s ease;
     }
 
     .attempt-dot.used-wrong {
-      background: #ef4444;
-      border-color: #ef4444;
+      background: var(--danger);
+      border-color: var(--danger);
     }
 
     .attempt-dot.used-correct {
-      background: #22c55e;
-      border-color: #22c55e;
+      background: #16a34a;
+      border-color: #16a34a;
     }
 
     .attempt-dot.current {
-      background: #a855f7;
-      border-color: #a855f7;
+      background: #9333ea;
+      border-color: #9333ea;
       transform: scale(1.2);
     }
 
     /* Input & Autocomplete */
     .guess-box {
       position: relative;
-      margin-bottom: 16px;
+      margin-bottom: var(--space-4);
     }
 
     .guess-input-wrap {
       display: flex;
-      gap: 8px;
+      gap: var(--space-2);
     }
 
     .guess-input {
       flex: 1;
       padding: 12px 16px;
-      border-radius: 10px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #fff;
+      border-radius: var(--radius-sm);
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      color: var(--fg);
       font-size: 15px;
       font-family: inherit;
       outline: none;
@@ -155,19 +161,19 @@
     }
 
     .guess-input:focus {
-      border-color: #a855f7;
+      border-color: #9333ea;
     }
 
     .btn-guess {
-      background: #a855f7;
+      background: #9333ea;
       color: #fff;
       border: none;
       padding: 12px 24px;
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
       font-weight: 700;
       font-size: 14px;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
+      transition: opacity 0.2s;
     }
 
     .btn-guess:hover {
@@ -175,19 +181,19 @@
     }
 
     .btn-skip {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-muted, #94a3b8);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--border);
       padding: 12px 18px;
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
       font-weight: 600;
       font-size: 14px;
       cursor: pointer;
     }
 
     .btn-skip:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #fff;
+      background: var(--card-2);
+      color: var(--fg);
     }
 
     /* Autocomplete dropdown */
@@ -196,34 +202,34 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: #0f172a;
-      border: 1px solid rgba(168, 85, 247, 0.4);
-      border-radius: 8px;
+      background: var(--card-solid);
+      border: 1px solid #9333ea;
+      border-radius: var(--radius-sm);
       max-height: 220px;
       overflow-y: auto;
       z-index: 50;
       margin-top: 4px;
       display: none;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     }
 
     .autocomplete-item {
       padding: 10px 16px;
       cursor: pointer;
       font-size: 14px;
-      color: #cbd5e1;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
     }
 
     .autocomplete-item:hover, .autocomplete-item.active {
-      background: rgba(168, 85, 247, 0.2);
-      color: #fff;
+      background: rgba(147, 51, 234, 0.15);
+      color: var(--fg);
     }
 
     .autocomplete-country {
-      color: #94a3b8;
+      color: var(--muted);
       font-size: 12px;
     }
 
@@ -232,7 +238,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-bottom: 24px;
+      margin-bottom: var(--space-4);
     }
 
     .guess-item {
@@ -240,77 +246,79 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 16px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border-left: 3px solid #ef4444;
+      border-radius: var(--radius-sm);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--danger);
       font-size: 14px;
+      color: var(--fg);
     }
 
     .guess-item.correct {
-      border-left-color: #22c55e;
+      border-left-color: #16a34a;
       background: rgba(34, 197, 94, 0.1);
     }
 
     .guess-item.skipped {
-      border-left-color: #64748b;
-      color: #94a3b8;
+      border-left-color: var(--muted);
+      color: var(--muted);
     }
 
     /* Result modal card */
     .result-card {
-      background: var(--card-bg, rgba(15, 23, 42, 0.95));
-      border: 1px solid rgba(34, 197, 94, 0.4);
-      border-radius: 16px;
-      padding: 24px;
+      background: var(--card);
+      border: 2px solid #16a34a;
+      border-radius: var(--radius);
+      padding: var(--space-5);
       text-align: center;
       display: none;
-      animation: hubFadeIn 0.4s ease-out;
-      margin-top: 16px;
+      margin-top: var(--space-4);
+      box-shadow: var(--shadow);
     }
 
     .result-card.won {
-      border-color: rgba(34, 197, 94, 0.6);
+      border-color: #16a34a;
     }
 
     .result-card.lost {
-      border-color: rgba(239, 68, 68, 0.6);
+      border-color: var(--danger);
     }
 
     .result-title {
-      font-family: 'Bebas Neue', Impact, sans-serif;
-      font-size: 32px;
+      font-family: var(--font-display);
+      font-size: 36px;
       letter-spacing: 1px;
       margin: 0 0 6px;
     }
 
     .result-name {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
-      color: #fff;
-      margin: 0 0 4px;
+      color: var(--fg);
+      margin: 0 0 6px;
     }
 
     .result-hint {
-      font-size: 13.5px;
-      color: var(--text-muted, #94a3b8);
-      margin: 0 0 16px;
-      line-height: 1.4;
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0 0 var(--space-4);
+      line-height: 1.5;
     }
 
     .back-hub-btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      color: var(--text-muted, #94a3b8);
+      color: var(--muted);
       text-decoration: none;
       font-size: 13px;
       font-weight: 600;
-      margin-bottom: 16px;
+      margin-bottom: var(--space-3);
       transition: color 0.2s;
     }
 
     .back-hub-btn:hover {
-      color: #fff;
+      color: var(--fg);
     }
   </style>
 </head>
@@ -318,17 +326,37 @@
   <a class="skip-link" href="#main">Skip to game</a>
   <canvas id="bg" aria-hidden="true"></canvas>
 
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-ball" viewBox="0 0 24 24"><radialGradient id="g-leather" cx="0.36" cy="0.32" r="0.75"><stop offset="0" stop-color="#ff8a78"/><stop offset="0.4" stop-color="#d92b28"/><stop offset="1" stop-color="#5e0d0d"/></radialGradient><circle cx="12" cy="12" r="10.6" fill="url(#g-leather)"/><path d="M9.2 1.9C5.3 7 5.3 17 9.2 22.1" fill="none" stroke="#6a1010" stroke-width="2.6" stroke-linecap="round"/><path d="M8.1 2.3C4.4 7.2 4.4 16.8 8.1 21.7M10.3 1.8C6.6 7 6.6 17 10.3 22.2" fill="none" stroke="#fff3df" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="1 1.1"/><ellipse cx="8.6" cy="7.4" rx="2.2" ry="3.2" transform="rotate(-25 8.6 7.4)" fill="#ffffff" opacity="0.28"/><circle cx="12" cy="12" r="10.6" fill="none" stroke="#000000" stroke-opacity="0.3" stroke-width="0.8"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.6A8.5 8.5 0 0 1 9.4 4a8.5 8.5 0 1 0 10.6 10.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-stumps" viewBox="0 0 24 24"><path d="M7 21V7M12 21V7M17 21V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 6h5M13 6h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-4.2-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    </defs>
+  </svg>
+
   <header class="topbar">
     <div class="brand">
-      <a href="hub.html" class="brand-mark" aria-label="Back to Hub" style="text-decoration:none;"><span style="font-size:20px;">📸</span></a>
+      <a href="hub.html" class="brand-mark" aria-label="Back to Hub" style="text-decoration:none;"><span style="font-size:24px;">📸</span></a>
       <div class="brand-text">
         <h1>Pixel Cricketer</h1>
         <p class="tagline">Guess the cricketer from the scrambled photo</p>
       </div>
     </div>
     <nav class="nav" aria-label="Primary">
-      <a href="hub.html" class="nav-link"><span>← All Games</span></a>
+      <a href="hub.html" class="nav-link"><svg aria-hidden="true"><use href="#i-ball"/></svg><span>All Games</span></a>
+      <a href="index.html" class="nav-link"><svg aria-hidden="true"><use href="#i-stumps"/></svg><span>Cricketle</span></a>
+      <a href="pixel.html" class="nav-link" aria-current="page"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Pixel</span></a>
+      <a href="scorecard.html" class="nav-link"><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Scorecard</span></a>
     </nav>
+    <div class="topbar-actions">
+      <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch to day">
+        <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+        <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+      </button>
+    </div>
   </header>
 
   <main id="main" class="pixel-container">
@@ -376,7 +404,7 @@
       <h3 class="result-title" id="result-status">OUT!</h3>
       <p class="result-name" id="result-name"></p>
       <p class="result-hint" id="result-hint"></p>
-      <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;">Play Other Games →</a>
+      <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#9333ea;color:#fff;font-weight:700;">Play Other Games →</a>
     </div>
   </main>
 
