@@ -1,0 +1,422 @@
+[
+  {
+    "id": "wankhede",
+    "name": "Wankhede Stadium",
+    "city": "Mumbai",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "33,108",
+    "established": 1974,
+    "ends": [
+      "Tata End",
+      "Pavilion End"
+    ],
+    "pitchType": "Red soil with true bounce, carry & pace; evening sea breeze assists swing",
+    "boundaries": {
+      "straight": 75,
+      "square": 66,
+      "fineLeg": 62
+    },
+    "historicMoment": "Hosted 2011 ICC Cricket World Cup Final; MS Dhoni struck the match-winning six.",
+    "homeTeam": "Mumbai Indians (IPL) & Mumbai Ranji Team"
+  },
+  {
+    "id": "lords",
+    "name": "Lord's Cricket Ground",
+    "city": "London",
+    "country": "England",
+    "continent": "Europe",
+    "capacity": "31,100",
+    "established": 1814,
+    "ends": [
+      "Pavilion End",
+      "Nursery End"
+    ],
+    "pitchType": "Famous 8-foot (2.5m) natural slope running south-to-north; true bounce & swing",
+    "boundaries": {
+      "straight": 77,
+      "square": 68,
+      "fineLeg": 64
+    },
+    "historicMoment": "Known as the 'Home of Cricket'; hosted 2019 World Cup Final with the Super Over finish.",
+    "homeTeam": "Middlesex & Marylebone Cricket Club (MCC)"
+  },
+  {
+    "id": "mcg",
+    "name": "Melbourne Cricket Ground (MCG)",
+    "city": "Melbourne",
+    "country": "Australia",
+    "continent": "Oceania",
+    "capacity": "100,024",
+    "established": 1853,
+    "ends": [
+      "Members End",
+      "Great Southern Stand End"
+    ],
+    "pitchType": "Drop-in pitch offering even bounce and pace; colossal boundary dimensions",
+    "boundaries": {
+      "straight": 84,
+      "square": 76,
+      "fineLeg": 70
+    },
+    "historicMoment": "Hosted the first-ever Test match in 1877; 1992 and 2015 ICC World Cup Finals.",
+    "homeTeam": "Melbourne Stars (BBL) & Victoria"
+  },
+  {
+    "id": "eden_gardens",
+    "name": "Eden Gardens",
+    "city": "Kolkata",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "68,000",
+    "established": 1864,
+    "ends": [
+      "High Court End",
+      "Club House End"
+    ],
+    "pitchType": "Good batting track with reliable bounce; aids orthodox spinners as match progresses",
+    "boundaries": {
+      "straight": 76,
+      "square": 67,
+      "fineLeg": 63
+    },
+    "historicMoment": "VVS Laxman's 281 in 2001 vs Australia; Rohit Sharma's world record 264 in 2014.",
+    "homeTeam": "Kolkata Knight Riders (IPL) & Bengal"
+  },
+  {
+    "id": "the_oval",
+    "name": "The Oval (Kia Oval)",
+    "city": "London",
+    "country": "England",
+    "continent": "Europe",
+    "capacity": "27,500",
+    "established": 1845,
+    "ends": [
+      "Pavilion End",
+      "Vauxhall End"
+    ],
+    "pitchType": "Traditionally one of the fastest, bounciest pitches in England with exceptional carry",
+    "boundaries": {
+      "straight": 74,
+      "square": 69,
+      "fineLeg": 65
+    },
+    "historicMoment": "Birthplace of The Ashes in 1882; traditionally hosts the final Test of the English summer.",
+    "homeTeam": "Surrey CCC & Oval Invincibles"
+  },
+  {
+    "id": "scg",
+    "name": "Sydney Cricket Ground (SCG)",
+    "city": "Sydney",
+    "country": "Australia",
+    "continent": "Oceania",
+    "capacity": "48,000",
+    "established": 1848,
+    "ends": [
+      "Paddington End",
+      "Randwick End"
+    ],
+    "pitchType": "Historic bulli soil providing classic turn for spinners from Day 3 onwards",
+    "boundaries": {
+      "straight": 79,
+      "square": 71,
+      "fineLeg": 68
+    },
+    "historicMoment": "Traditional New Year's Pink Test; famous heritage Members Pavilion and clock tower.",
+    "homeTeam": "Sydney Sixers (BBL) & New South Wales"
+  },
+  {
+    "id": "narendra_modi",
+    "name": "Narendra Modi Stadium",
+    "city": "Ahmedabad",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "132,000",
+    "established": 1982,
+    "ends": [
+      "Adani Pavilion End",
+      "Reliance End"
+    ],
+    "pitchType": "Features both red-soil and black-soil wickets; expansive 63-acre complex",
+    "boundaries": {
+      "straight": 78,
+      "square": 69,
+      "fineLeg": 65
+    },
+    "historicMoment": "Largest cricket stadium in the world; hosted the 2023 ICC World Cup Final.",
+    "homeTeam": "Gujarat Titans (IPL) & Gujarat"
+  },
+  {
+    "id": "hpca_dharamshala",
+    "name": "HPCA Stadium",
+    "city": "Dharamshala",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "23,000",
+    "established": 2003,
+    "ends": [
+      "River End",
+      "College End"
+    ],
+    "pitchType": "High altitude (1,457m) Ryegrass outfield; brisk chill aids extra pace and lateral swing",
+    "boundaries": {
+      "straight": 72,
+      "square": 64,
+      "fineLeg": 60
+    },
+    "historicMoment": "Set against the dramatic snow-capped Dhauladhar mountain range in Himachal Pradesh.",
+    "homeTeam": "Punjab Kings (IPL Alternate) & Himachal Pradesh"
+  },
+  {
+    "id": "newlands",
+    "name": "Newlands Cricket Ground",
+    "city": "Cape Town",
+    "country": "South Africa",
+    "continent": "Africa",
+    "capacity": "25,000",
+    "established": 1888,
+    "ends": [
+      "Wynberg End",
+      "Kelvin Grove End"
+    ],
+    "pitchType": "Seamer-friendly conditions on opening days; takes spin later under Mediterranean sun",
+    "boundaries": {
+      "straight": 73,
+      "square": 66,
+      "fineLeg": 63
+    },
+    "historicMoment": "Overlooked by the majestic Table Mountain and Devil's Peak; iconic Test venue.",
+    "homeTeam": "Western Province & MI Cape Town (SA20)"
+  },
+  {
+    "id": "kensington_oval",
+    "name": "Kensington Oval",
+    "city": "Bridgetown",
+    "country": "Barbados",
+    "continent": "Americas",
+    "capacity": "28,000",
+    "established": 1882,
+    "ends": [
+      "Malcolm Marshall End",
+      "Joel Garner End"
+    ],
+    "pitchType": "Hard, true bounce and fast outfield; Mecca of West Indian cricket heritage",
+    "boundaries": {
+      "straight": 74,
+      "square": 65,
+      "fineLeg": 62
+    },
+    "historicMoment": "Hosted the 2007 ICC World Cup Final and the 2024 ICC T20 World Cup Final.",
+    "homeTeam": "Barbados Royals (CPL) & West Indies"
+  },
+  {
+    "id": "chinnaswamy",
+    "name": "M. Chinnaswamy Stadium",
+    "city": "Bengaluru",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "35,000",
+    "established": 1969,
+    "ends": [
+      "Pavilion End",
+      "Brijesh Patel End"
+    ],
+    "pitchType": "Flat batting paradise with short boundaries (60m square) and high-altitude thin air",
+    "boundaries": {
+      "straight": 70,
+      "square": 61,
+      "fineLeg": 58
+    },
+    "historicMoment": "Chris Gayle's record 175* off 66 balls in IPL 2013; first stadium in world to use solar power.",
+    "homeTeam": "Royal Challengers Bengaluru (RCB) & Karnataka"
+  },
+  {
+    "id": "chepauk",
+    "name": "M. A. Chidambaram Stadium (Chepauk)",
+    "city": "Chennai",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "38,000",
+    "established": 1916,
+    "ends": [
+      "Anna Pavilion End",
+      "V Pattabhiraman Gate End"
+    ],
+    "pitchType": "Dry clay surface offering intense spin and low bounce; humid coastal air",
+    "boundaries": {
+      "straight": 73,
+      "square": 66,
+      "fineLeg": 62
+    },
+    "historicMoment": "Historic Tied Test between India and Australia in 1986; yellow fortress of CSK.",
+    "homeTeam": "Chennai Super Kings (CSK) & Tamil Nadu"
+  },
+  {
+    "id": "trent_bridge",
+    "name": "Trent Bridge",
+    "city": "Nottingham",
+    "country": "England",
+    "continent": "Europe",
+    "capacity": "17,500",
+    "established": 1841,
+    "ends": [
+      "Pavilion End",
+      "Radcliffe Road End"
+    ],
+    "pitchType": "Pungent heavy atmosphere encourages heavy swing; ultra-fast outfield and high scoring",
+    "boundaries": {
+      "straight": 75,
+      "square": 65,
+      "fineLeg": 62
+    },
+    "historicMoment": "Venue of England's world record 481/6 vs Australia; Stuart Broad 8/15 in 2015 Ashes.",
+    "homeTeam": "Nottinghamshire CCC & Trent Rockets"
+  },
+  {
+    "id": "adelaide_oval",
+    "name": "Adelaide Oval",
+    "city": "Adelaide",
+    "country": "Australia",
+    "continent": "Oceania",
+    "capacity": "53,500",
+    "established": 1871,
+    "ends": [
+      "City End",
+      "Cathedral End"
+    ],
+    "pitchType": "Famous drop-in pitch with very short square boundaries and lengthy straight boundaries",
+    "boundaries": {
+      "straight": 82,
+      "square": 63,
+      "fineLeg": 60
+    },
+    "historicMoment": "Hosted the first-ever Day/Night pink-ball Test match in cricket history (2015).",
+    "homeTeam": "Adelaide Strikers (BBL) & South Australia"
+  },
+  {
+    "id": "gaddafi",
+    "name": "Gaddafi Stadium",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "continent": "Asia",
+    "capacity": "27,000",
+    "established": 1959,
+    "ends": [
+      "Pavilion End",
+      "College End"
+    ],
+    "pitchType": "Classic subcontinent surface; flat early with reverse swing emerging later",
+    "boundaries": {
+      "straight": 74,
+      "square": 66,
+      "fineLeg": 63
+    },
+    "historicMoment": "Hosted the 1996 Cricket World Cup Final where Sri Lanka lifted their maiden title.",
+    "homeTeam": "Lahore Qalandars (PSL) & Pakistan"
+  },
+  {
+    "id": "galle",
+    "name": "Galle International Stadium",
+    "city": "Galle",
+    "country": "Sri Lanka",
+    "continent": "Asia",
+    "capacity": "35,000",
+    "established": 1876,
+    "ends": [
+      "Fort End",
+      "City End"
+    ],
+    "pitchType": "Coastal breezes off Indian Ocean aid seam early, turning into an explosive spin minefield",
+    "boundaries": {
+      "straight": 72,
+      "square": 64,
+      "fineLeg": 60
+    },
+    "historicMoment": "Bordered on two sides by the Indian Ocean and the 17th-century UNESCO Dutch Fort.",
+    "homeTeam": "Galle Cricket Club & Sri Lanka"
+  },
+  {
+    "id": "dubai_stadium",
+    "name": "Dubai International Stadium",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "continent": "Asia",
+    "capacity": "25,000",
+    "established": 2009,
+    "ends": [
+      "Emirates Road End",
+      "Dubai Sports City End"
+    ],
+    "pitchType": "Fair contest between bat and ball; renowned for evening dew factor",
+    "boundaries": {
+      "straight": 75,
+      "square": 67,
+      "fineLeg": 63
+    },
+    "historicMoment": "Distinguished by its circular 'Ring of Fire' roof lighting system of 350 floodlights.",
+    "homeTeam": "Dubai Capitals (ILT20) & UAE"
+  },
+  {
+    "id": "old_trafford",
+    "name": "Old Trafford",
+    "city": "Manchester",
+    "country": "England",
+    "continent": "Europe",
+    "capacity": "26,000",
+    "established": 1857,
+    "ends": [
+      "James Anderson End",
+      "Brian Statham End"
+    ],
+    "pitchType": "Quickest and bounciest pitch in England; retains reverse swing and spin late in Tests",
+    "boundaries": {
+      "straight": 76,
+      "square": 68,
+      "fineLeg": 64
+    },
+    "historicMoment": "Shane Warne bowled the 'Ball of the Century' to Mike Gatting here in the 1993 Ashes.",
+    "homeTeam": "Lancashire CCC & Manchester Originals"
+  },
+  {
+    "id": "supersport_park",
+    "name": "SuperSport Park",
+    "city": "Centurion",
+    "country": "South Africa",
+    "continent": "Africa",
+    "capacity": "22,000",
+    "established": 1986,
+    "ends": [
+      "Pavilion End",
+      "Hennops River End"
+    ],
+    "pitchType": "High-altitude fast track with sharp steepling bounce and rapid outfield",
+    "boundaries": {
+      "straight": 74,
+      "square": 66,
+      "fineLeg": 62
+    },
+    "historicMoment": "Fortress for South African fast bowling with picturesque open grass banks.",
+    "homeTeam": "Titans & Pretoria Capitals (SA20)"
+  },
+  {
+    "id": "edgbaston",
+    "name": "Edgbaston Cricket Ground",
+    "city": "Birmingham",
+    "country": "England",
+    "continent": "Europe",
+    "capacity": "25,000",
+    "established": 1882,
+    "ends": [
+      "Birmingham End",
+      "Pavilion End"
+    ],
+    "pitchType": "Lively pace and reliable bounce; famous for vibrant, vocal Eric Hollies Stand atmosphere",
+    "boundaries": {
+      "straight": 75,
+      "square": 67,
+      "fineLeg": 63
+    },
+    "historicMoment": "Site of the dramatic 2005 Ashes Test thriller where England won by just 2 runs.",
+    "homeTeam": "Warwickshire CCC & Birmingham Phoenix"
+  }
+]

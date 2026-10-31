@@ -4,13 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1220" />
-  <meta name="description" content="Cricketle Hub — Choose your daily cricket challenge: Mystery Player, Pixel Cricketer, or Scorecard Mystery." />
-  <meta property="og:type" content="website" />
+  <meta name="description" content="Cricketle Game Hub — Choose from daily cricket challenges including Cricketle, Cricket Connections, IPL Journey, Scorecard Mystery, Puzzle Cricketer, and Stadium Mystery." />
+  <meta property="og:title" content="Cricketle Game Hub — Daily Cricket Guessing Games" />
+  <meta property="og:description" content="Test your cricket knowledge with daily word, match, jigsaw, franchise and connection challenges." />
   <meta property="og:url" content="https://playcricketle.onrender.com/" />
-  <meta property="og:title" content="Cricketle — Game Hub" />
-  <meta property="og:description" content="Multiple daily cricket guessing games! Clues, scrambled photos, and match scorecards." />
   <meta property="og:image" content="https://playcricketle.onrender.com/og-image.jpg" />
-  <title>Cricketle — Game Hub</title>
+  <title>Cricketle Game Hub — Daily Cricket Games</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,24 +19,20 @@
   <link rel="stylesheet" href="styles.css?v=2.4.0" />
   <script src="theme.js?v=2.4.0"></script>
   <style>
-    /* =====================================================================
-       GAME HUB SPECIFIC STYLES (Strictly synced with Cricketle Design System)
-       ===================================================================== */
     .hub-container {
-      width: min(100%, 1100px);
+      width: min(100%, 1080px);
       margin: 0 auto;
       padding: var(--space-4) var(--space-4) var(--space-8);
     }
 
     .hub-hero {
       text-align: center;
-      margin: var(--space-3) auto var(--space-6);
-      max-width: 680px;
+      margin-bottom: var(--space-6);
     }
 
     .hub-hero h2 {
       font-family: var(--font-display);
-      font-size: clamp(36px, 7vw, 56px);
+      font-size: clamp(38px, 8vw, 64px);
       letter-spacing: 2px;
       color: var(--fg);
       margin: 0 0 var(--space-2);
@@ -47,7 +42,8 @@
     .hub-hero p {
       font-size: 16px;
       color: var(--muted);
-      margin: 0;
+      max-width: 52ch;
+      margin: 0 auto;
       font-weight: 500;
       line-height: 1.5;
     }
@@ -74,9 +70,9 @@
       text-decoration: none;
       color: var(--fg);
       overflow: hidden;
-      transition: transform var(--dur-base) var(--ease-out),
-                  border-color var(--dur-base) var(--ease-out),
-                  box-shadow var(--dur-base) var(--ease-out);
+      transition: transform var(--dur-base) cubic-bezier(0.34, 1.56, 0.64, 1),
+                  border-color var(--dur-base) ease,
+                  box-shadow var(--dur-base) ease;
       cursor: pointer;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -115,11 +111,18 @@
       --tile-accent: #16a34a;
     }
 
-    .tile-pixel {
-      --tile-glow: rgba(168, 85, 247, 0.3);
-      --tile-border-hover: rgba(168, 85, 247, 0.7);
-      --tile-shadow: rgba(168, 85, 247, 0.35);
-      --tile-accent: #9333ea;
+    .tile-connections {
+      --tile-glow: rgba(14, 165, 233, 0.3);
+      --tile-border-hover: rgba(14, 165, 233, 0.7);
+      --tile-shadow: rgba(14, 165, 233, 0.35);
+      --tile-accent: #0284c7;
+    }
+
+    .tile-journey {
+      --tile-glow: rgba(2, 132, 199, 0.3);
+      --tile-border-hover: rgba(2, 132, 199, 0.7);
+      --tile-shadow: rgba(2, 132, 199, 0.35);
+      --tile-accent: #0284c7;
     }
 
     .tile-scorecard {
@@ -136,11 +139,18 @@
       --tile-accent: #f59e0b;
     }
 
-    .tile-journey {
-      --tile-glow: rgba(2, 132, 199, 0.3);
-      --tile-border-hover: rgba(2, 132, 199, 0.7);
-      --tile-shadow: rgba(2, 132, 199, 0.35);
-      --tile-accent: #0284c7;
+    .tile-stadium {
+      --tile-glow: rgba(16, 185, 129, 0.3);
+      --tile-border-hover: rgba(16, 185, 129, 0.7);
+      --tile-shadow: rgba(16, 185, 129, 0.35);
+      --tile-accent: #10b981;
+    }
+
+    .tile-pixel {
+      --tile-glow: rgba(168, 85, 247, 0.3);
+      --tile-border-hover: rgba(168, 85, 247, 0.7);
+      --tile-shadow: rgba(168, 85, 247, 0.35);
+      --tile-accent: #9333ea;
     }
 
     .tile-locked {
@@ -180,73 +190,68 @@
     .tile-status {
       font-size: 12px;
       color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 4px;
       font-weight: 600;
     }
 
     .tile-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       z-index: 1;
-      margin-bottom: var(--space-4);
     }
 
     .tile-icon {
-      font-size: 38px;
+      font-size: 44px;
       line-height: 1;
       margin-bottom: var(--space-3);
-      display: inline-block;
-      transition: transform var(--dur-base) var(--ease-back);
+      transition: transform var(--dur-base) ease;
     }
 
     .game-tile:hover .tile-icon {
-      transform: scale(1.15) rotate(-3deg);
+      transform: scale(1.1) rotate(4deg);
     }
 
     .tile-title {
       font-family: var(--font-display);
-      font-size: 30px;
+      font-size: 28px;
       letter-spacing: 1px;
-      color: var(--fg);
-      margin: 0 0 6px;
-      font-weight: 400;
+      margin: 0 0 var(--space-2);
       line-height: 1.1;
+      color: var(--fg);
     }
 
     .tile-desc {
       font-size: 14px;
-      line-height: 1.5;
       color: var(--muted);
+      line-height: 1.45;
       margin: 0;
+      flex: 1;
     }
 
     .tile-footer {
-      z-index: 1;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      margin-top: var(--space-4);
       padding-top: var(--space-3);
       border-top: 1px solid var(--border);
+      z-index: 1;
     }
 
     .tile-play-btn {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--tile-accent);
+      padding: 6px 14px;
+      border-radius: 20px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 18px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      background: var(--tile-accent);
-      color: #ffffff;
-      border: none;
-      cursor: pointer;
-      transition: opacity var(--dur-fast), transform var(--dur-fast);
+      transition: transform var(--dur-fast) ease, opacity var(--dur-fast) ease;
     }
 
     .game-tile:hover .tile-play-btn {
-      opacity: 0.95;
       transform: scale(1.03);
     }
 
@@ -361,10 +366,12 @@
       <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M4 11V6a2 2 0 0 1 2-2h5a2 2 0 1 1 4 0h3a2 2 0 0 1 2 2v5a2 2 0 1 1 0 4v3a2 2 0 0 1-2 2h-3a2 2 0 1 1-4 0H6a2 2 0 0 1-2-2v-3a2 2 0 1 1 0-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-journey" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="18" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-stadium" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6 2 11c0 3.2 1.8 6 4.5 7.6L6 22l4-2c.6.1 1.3.1 2 .1 5.5 0 10-4 10-9s-4.5-9-10-9z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
     </defs>
   </svg>
 
-  <!-- Top Bar (Exact standard topbar structure) -->
+  <!-- Top Bar -->
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true"><svg><use href="#i-ball"/></svg></span>
@@ -376,17 +383,20 @@
     <nav class="nav" aria-label="Primary">
       <a href="hub.html" class="nav-link" aria-current="page"><svg aria-hidden="true"><use href="#i-ball"/></svg><span>All Games</span></a>
       <a href="index.html" class="nav-link"><svg aria-hidden="true"><use href="#i-stumps"/></svg><span>Cricketle</span></a>
-      <a href="pixel.html" class="nav-link"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Pixel</span></a>
+      <a href="connections.html" class="nav-link"><svg aria-hidden="true"><use href="#i-link"/></svg><span>Connections</span></a>
+      <a href="journey.html" class="nav-link"><svg aria-hidden="true"><use href="#i-journey"/></svg><span>Journey</span></a>
       <a href="scorecard.html" class="nav-link"><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Scorecard</span></a>
       <a href="puzzle.html" class="nav-link"><svg aria-hidden="true"><use href="#i-puzzle"/></svg><span>Puzzle</span></a>
-      <a href="journey.html" class="nav-link"><svg aria-hidden="true"><use href="#i-journey"/></svg><span>Journey</span></a>
-      <a href="index.html#profile" class="nav-link" id="nav-profile-link"><svg aria-hidden="true"><use href="#i-user"/></svg><span id="nav-profile-label">Sign in</span></a>
+      <a href="stadium.html" class="nav-link"><svg aria-hidden="true"><use href="#i-stadium"/></svg><span>Stadium</span></a>
     </nav>
     <div class="topbar-actions">
       <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch to day">
         <svg class="i-sun" width="22" height="22" aria-hidden="true"><use href="#i-sun"/></svg>
         <svg class="i-moon" width="22" height="22" aria-hidden="true"><use href="#i-moon"/></svg>
       </button>
+      <a href="index.html#profile" class="icon-btn topbar-auth-btn" id="topbar-auth-btn" aria-label="Sign In or Account" title="Sign In / Profile">
+        <svg class="i-user" width="20" height="20" aria-hidden="true"><use href="#i-user"/></svg>
+      </a>
     </div>
   </header>
 
@@ -394,10 +404,10 @@
   <main id="main" class="hub-container">
     <div class="hub-hero">
       <h2>CHOOSE YOUR CHALLENGE</h2>
-      <p>Test your cricket knowledge with 5 different daily puzzles. New challenges drop every midnight.</p>
+      <p>Test your cricket knowledge with 6 daily challenges. New puzzles drop every midnight.</p>
     </div>
 
-    <!-- Active Games -->
+    <!-- Active Games (6 Live Modes) -->
     <div class="hub-grid">
       <!-- 1. Cricketle (Original) -->
       <a href="index.html" class="game-tile tile-cricketle" id="tile-cricketle">
@@ -416,24 +426,41 @@
         </div>
       </a>
 
-      <!-- 2. Pixel Cricketer (Locked - Coming Soon) -->
-      <div class="game-tile tile-locked" id="tile-pixel" tabindex="0" role="button" aria-disabled="true">
+      <!-- 2. Cricket Connections (Live) -->
+      <a href="connections.html" class="game-tile tile-connections" id="tile-connections">
         <div class="tile-header">
-          <span class="tile-badge">Photo Puzzle</span>
-          <span class="tile-status" id="status-pixel"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-lock"/></svg> Locked</span>
+          <span class="tile-badge">Grid Trivia</span>
+          <span class="tile-status" id="status-connections"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-lock"/></svg> Members Only</span>
         </div>
         <div class="tile-body">
-          <div class="tile-icon">📸</div>
-          <h3 class="tile-title">Pixel Cricketer</h3>
-          <p class="tile-desc">A famous cricketer's face is scrambled! Guess who it is — each wrong attempt unblurs the photo slightly.</p>
+          <div class="tile-icon">🔗</div>
+          <h3 class="tile-title">Cricket Connections</h3>
+          <p class="tile-desc">Group 16 cricketers into 4 secret categories of four. Spot the hidden links before 4 mistakes!</p>
         </div>
         <div class="tile-footer">
-          <span class="tile-streak">Coming Soon</span>
-          <span class="tile-play-btn">Locked</span>
+          <span class="tile-streak"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-flame"/></svg> Daily</span>
+          <span class="tile-play-btn">Play Now →</span>
         </div>
-      </div>
+      </a>
 
-      <!-- 3. Scorecard Mystery (Members Only) -->
+      <!-- 3. IPL Journey (Live) -->
+      <a href="journey.html" class="game-tile tile-journey" id="tile-journey">
+        <div class="tile-header">
+          <span class="tile-badge">IPL Challenge</span>
+          <span class="tile-status" id="status-journey"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-lock"/></svg> Members Only</span>
+        </div>
+        <div class="tile-body">
+          <div class="tile-icon">🗺️</div>
+          <h3 class="tile-title">IPL Journey</h3>
+          <p class="tile-desc">Trace a cricketer's IPL path across teams and seasons. Guess who it is as letters are revealed!</p>
+        </div>
+        <div class="tile-footer">
+          <span class="tile-streak"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-flame"/></svg> Daily</span>
+          <span class="tile-play-btn">Play Now →</span>
+        </div>
+      </a>
+
+      <!-- 4. Scorecard Mystery (Live) -->
       <a href="scorecard.html" class="game-tile tile-scorecard" id="tile-scorecard">
         <div class="tile-header">
           <span class="tile-badge">Match Quiz</span>
@@ -450,7 +477,7 @@
         </div>
       </a>
 
-      <!-- 4. Puzzle Cricketer (Members Only) -->
+      <!-- 5. Puzzle Cricketer (Live) -->
       <a href="puzzle.html" class="game-tile tile-puzzle" id="tile-puzzle">
         <div class="tile-header">
           <span class="tile-badge">Jigsaw Challenge</span>
@@ -467,16 +494,16 @@
         </div>
       </a>
 
-      <!-- 5. IPL Journey (Members Only) -->
-      <a href="journey.html" class="game-tile tile-journey" id="tile-journey">
+      <!-- 6. Stadium Mystery (Live) -->
+      <a href="stadium.html" class="game-tile tile-stadium" id="tile-stadium">
         <div class="tile-header">
-          <span class="tile-badge">IPL Challenge</span>
-          <span class="tile-status" id="status-journey"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-lock"/></svg> Members Only</span>
+          <span class="tile-badge">Venue Quiz</span>
+          <span class="tile-status" id="status-stadium"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-lock"/></svg> Members Only</span>
         </div>
         <div class="tile-body">
-          <div class="tile-icon">🗺️</div>
-          <h3 class="tile-title">IPL Journey</h3>
-          <p class="tile-desc">Trace a cricketer's IPL path across teams and seasons. Guess who it is as letters are revealed!</p>
+          <div class="tile-icon">🏟️</div>
+          <h3 class="tile-title">Stadium Mystery</h3>
+          <p class="tile-desc">Identify iconic cricket grounds from blueprints, boundary dimensions, pitch behavior, and history.</p>
         </div>
         <div class="tile-footer">
           <span class="tile-streak"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-flame"/></svg> Daily</span>
@@ -491,33 +518,16 @@
     <!-- Coming Soon Section -->
     <div class="hub-section-title">Coming Soon</div>
     <div class="hub-grid">
-      <!-- 4. Stadium Guess -->
-      <div class="game-tile tile-locked" tabindex="0" role="button" aria-disabled="true">
+      <!-- Pixel Cricketer (Locked per instruction) -->
+      <div class="game-tile tile-locked" id="tile-pixel" tabindex="0" role="button" aria-disabled="true">
         <div class="tile-header">
-          <span class="tile-badge">Under Development</span>
-          <span class="tile-status"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-lock"/></svg> Locked</span>
+          <span class="tile-badge">Photo Puzzle</span>
+          <span class="tile-status" id="status-pixel"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-lock"/></svg> Locked</span>
         </div>
         <div class="tile-body">
-          <div class="tile-icon">🏟️</div>
-          <h3 class="tile-title">Stadium Mystery</h3>
-          <p class="tile-desc">Identify iconic cricket grounds from aerial shots, boundary dimensions, and pitch characteristics.</p>
-        </div>
-        <div class="tile-footer">
-          <span class="tile-streak">Coming Soon</span>
-          <span class="tile-play-btn">Locked</span>
-        </div>
-      </div>
-
-      <!-- 5. Cricket Connections -->
-      <div class="game-tile tile-locked" tabindex="0" role="button" aria-disabled="true">
-        <div class="tile-header">
-          <span class="tile-badge">Under Development</span>
-          <span class="tile-status"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-lock"/></svg> Locked</span>
-        </div>
-        <div class="tile-body">
-          <div class="tile-icon">🔗</div>
-          <h3 class="tile-title">Cricket Connections</h3>
-          <p class="tile-desc">Group 16 players into 4 secret categories (e.g., 'Hat-trick in World Cup', 'Played for 5 IPL teams').</p>
+          <div class="tile-icon">📸</div>
+          <h3 class="tile-title">Pixel Cricketer</h3>
+          <p class="tile-desc">A famous cricketer's face is scrambled! Guess who it is — each wrong attempt unblurs the photo slightly.</p>
         </div>
         <div class="tile-footer">
           <span class="tile-streak">Coming Soon</span>

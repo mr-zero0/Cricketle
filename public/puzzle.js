@@ -726,6 +726,12 @@
         currentUser = d.user;
         const navProfile = document.getElementById("nav-profile-label");
         if (navProfile) navProfile.textContent = "@" + d.user.username;
+        const topbarAuth = document.getElementById("topbar-auth-btn");
+        if (topbarAuth) {
+          topbarAuth.classList.add("signed-in");
+          topbarAuth.title = `@${d.user.username} (Account)`;
+          topbarAuth.setAttribute("aria-label", `Account for @${d.user.username}`);
+        }
         if (gateModal) gateModal.hidden = true;
         if (input) {
           input.disabled = false;

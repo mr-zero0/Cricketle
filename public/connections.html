@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="Cricket Connections — Group 16 cricketers into 4 secret categories of four." />
+  <title>Cricket Connections — Cricketle</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
+  <link rel="stylesheet" href="styles.css?v=2.4.0" />
+  <script src="theme.js?v=2.4.0"></script>
+  <style>
+    .conn-container {
+      width: min(100%, 640px);
+      margin: 0 auto;
+      padding: var(--space-4) var(--space-4) var(--space-8);
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: var(--space-4);
+    }
+
+    .game-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(34px, 7vw, 50px);
+      letter-spacing: 1.5px;
+      color: var(--fg);
+      margin: 0 0 var(--space-2);
+      line-height: 1;
+    }
+
+    .game-header p {
+      font-size: 15px;
+      color: var(--muted);
+      margin: 0 0 var(--space-2);
+      font-weight: 500;
+    }
+
+    .conn-subtext {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-bottom: var(--space-4);
+      font-weight: 600;
+    }
+
+    /* Solved Groups List */
+    .solved-categories {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: var(--space-3);
+    }
+
+    .solved-card {
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      text-align: center;
+      color: #0b1220;
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .solved-card.level-0 { background: #eab308; }
+    .solved-card.level-1 { background: #22c55e; }
+    .solved-card.level-2 { background: #38bdf8; }
+    .solved-card.level-3 { background: #c084fc; }
+
+    .solved-title {
+      font-family: var(--font-display);
+      font-size: 19px;
+      letter-spacing: 1px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .solved-members {
+      font-size: 13.5px;
+      font-weight: 600;
+      opacity: 0.92;
+      line-height: 1.35;
+    }
+
+    /* 4x4 Grid */
+    .connections-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: var(--space-4);
+    }
+
+    @media (max-width: 480px) {
+      .connections-grid {
+        gap: 6px;
+      }
+    }
+
+    .conn-tile {
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      min-height: 72px;
+      padding: 8px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--fg);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      line-height: 1.25;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    @media (max-width: 480px) {
+      .conn-tile {
+        min-height: 64px;
+        font-size: 11.5px;
+        padding: 6px 4px;
+      }
+    }
+
+    .conn-tile:hover {
+      background: var(--card-2);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .conn-tile.selected {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      color: #ffffff;
+      transform: scale(0.97);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .conn-tile.shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.92); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Mistakes Tracker */
+    .mistakes-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: var(--space-4);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .mistake-dots {
+      display: inline-flex;
+      gap: 6px;
+    }
+
+    .mistake-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #0284c7;
+      transition: background 0.2s;
+    }
+
+    .mistake-dot.lost {
+      background: var(--border-strong);
+      opacity: 0.3;
+    }
+
+    /* Action Controls */
+    .conn-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    .conn-btn {
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      color: var(--fg);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .conn-btn:hover:not(:disabled) {
+      background: var(--card-2);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .conn-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .conn-btn-submit {
+      background: #0284c7;
+      border-color: #0284c7;
+      color: #fff;
+      font-weight: 700;
+      padding: 10px 24px;
+    }
+
+    .conn-btn-submit:hover:not(:disabled) {
+      background: #0369a1;
+      border-color: #0369a1;
+    }
+
+    /* Floating Toast */
+    .conn-toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      color: #f8fafc;
+      border: 1px solid var(--border-strong);
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .conn-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Result Modal Card */
+    .result-card {
+      background: var(--card);
+      border: 2px solid #22c55e;
+      border-radius: var(--radius);
+      padding: var(--space-5);
+      text-align: center;
+      display: none;
+      margin-top: var(--space-4);
+      box-shadow: var(--shadow);
+    }
+
+    .result-card.won { border-color: #22c55e; }
+    .result-card.lost { border-color: var(--danger); }
+
+    .result-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      letter-spacing: 1px;
+      margin: 0 0 6px;
+    }
+
+    .result-desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0 0 var(--space-4);
+      line-height: 1.5;
+    }
+
+    .result-grid-share {
+      font-size: 20px;
+      line-height: 1.4;
+      margin: 0 auto var(--space-4);
+      font-family: monospace;
+      letter-spacing: 3px;
+    }
+
+    .back-hub-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+      transition: color 0.2s;
+    }
+
+    .back-hub-btn:hover { color: var(--fg); }
+
+    /* Member Gate Overlay */
+    .member-gate-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 18, 32, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      z-index: 1000;
+    }
+
+    .member-gate-card {
+      background: var(--card-solid);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6) var(--space-5);
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    .gate-lock-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(2, 132, 199, 0.15);
+      border: 1px solid rgba(2, 132, 199, 0.4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin-bottom: var(--space-3);
+    }
+
+    .gate-title {
+      font-family: var(--font-display);
+      font-size: 34px;
+      letter-spacing: 1.5px;
+      color: var(--fg);
+      margin: 0 0 var(--space-2);
+      line-height: 1.1;
+    }
+
+    .gate-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0 0 var(--space-4);
+    }
+
+    .gate-perks {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 var(--space-5);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+    }
+
+    .gate-perks li {
+      font-size: 13px;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .gate-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .gate-btn-primary {
+      display: block;
+      background: #0284c7;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      transition: opacity 0.2s;
+    }
+
+    .gate-btn-primary:hover { opacity: 0.9; }
+
+    .gate-btn-secondary {
+      display: block;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 11px 20px;
+      border-radius: var(--radius-sm);
+      transition: background 0.2s;
+    }
+
+    .gate-btn-secondary:hover { background: var(--card-2); }
+
+    .gate-btn-ghost {
+      display: inline-block;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 6px;
+      transition: color 0.2s;
+    }
+
+    .gate-btn-ghost:hover { color: var(--fg); }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to game</a>
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-ball" viewBox="0 0 24 24"><radialGradient id="g-leather" cx="0.36" cy="0.32" r="0.75"><stop offset="0" stop-color="#ff8a78"/><stop offset="0.4" stop-color="#d92b28"/><stop offset="1" stop-color="#5e0d0d"/></radialGradient><circle cx="12" cy="12" r="10.6" fill="url(#g-leather)"/><path d="M9.2 1.9C5.3 7 5.3 17 9.2 22.1" fill="none" stroke="#6a1010" stroke-width="2.6" stroke-linecap="round"/><path d="M8.1 2.3C4.4 7.2 4.4 16.8 8.1 21.7M10.3 1.8C6.6 7 6.6 17 10.3 22.2" fill="none" stroke="#fff3df" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="1 1.1"/><ellipse cx="8.6" cy="7.4" rx="2.2" ry="3.2" transform="rotate(-25 8.6 7.4)" fill="#ffffff" opacity="0.28"/><circle cx="12" cy="12" r="10.6" fill="none" stroke="#000000" stroke-opacity="0.3" stroke-width="0.8"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.6A8.5 8.5 0 0 1 9.4 4a8.5 8.5 0 1 0 10.6 10.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 20a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-stumps" viewBox="0 0 24 24"><path d="M7 21V7M12 21V7M17 21V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 6h5M13 6h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-4.2-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M4 11V6a2 2 0 0 1 2-2h5a2 2 0 1 1 4 0h3a2 2 0 0 1 2 2v5a2 2 0 1 1 0 4v3a2 2 0 0 1-2 2h-3a2 2 0 1 1-4 0H6a2 2 0 0 1-2-2v-3a2 2 0 1 1 0-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-journey" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="18" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-stadium" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6 2 11c0 3.2 1.8 6 4.5 7.6L6 22l4-2c.6.1 1.3.1 2 .1 5.5 0 10-4 10-9s-4.5-9-10-9z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="topbar">
+    <div class="brand">
+      <a href="hub.html" class="brand-mark" aria-label="Back to Hub" style="text-decoration:none;"><span style="font-size:24px;">🔗</span></a>
+      <div class="brand-text">
+        <h1>Cricket Connections</h1>
+        <p class="tagline">Group 16 cricketers into 4 secret categories</p>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      <a href="hub.html" class="nav-link"><svg aria-hidden="true"><use href="#i-ball"/></svg><span>All Games</span></a>
+      <a href="index.html" class="nav-link"><svg aria-hidden="true"><use href="#i-stumps"/></svg><span>Cricketle</span></a>
+      <a href="connections.html" class="nav-link" aria-current="page"><svg aria-hidden="true"><use href="#i-link"/></svg><span>Connections</span></a>
+      <a href="journey.html" class="nav-link"><svg aria-hidden="true"><use href="#i-journey"/></svg><span>Journey</span></a>
+      <a href="scorecard.html" class="nav-link"><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Scorecard</span></a>
+      <a href="puzzle.html" class="nav-link"><svg aria-hidden="true"><use href="#i-puzzle"/></svg><span>Puzzle</span></a>
+      <a href="stadium.html" class="nav-link"><svg aria-hidden="true"><use href="#i-stadium"/></svg><span>Stadium</span></a>
+    </nav>
+    <div class="topbar-actions">
+      <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch to day">
+        <svg class="i-sun" width="22" height="22" aria-hidden="true"><use href="#i-sun"/></svg>
+        <svg class="i-moon" width="22" height="22" aria-hidden="true"><use href="#i-moon"/></svg>
+      </button>
+      <a href="index.html#profile" class="icon-btn topbar-auth-btn" id="topbar-auth-btn" aria-label="Sign In or Account" title="Sign In / Profile">
+        <svg class="i-user" width="20" height="20" aria-hidden="true"><use href="#i-user"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <main id="main" class="conn-container">
+    <!-- Member Gate Overlay (Displayed for Guests) -->
+    <div class="member-gate-backdrop" id="member-gate-modal" role="dialog" aria-modal="true" aria-labelledby="gate-title" hidden>
+      <div class="member-gate-card">
+        <div class="gate-lock-icon">🔒</div>
+        <h3 id="gate-title" class="gate-title">MEMBER ACCESS ONLY</h3>
+        <p class="gate-desc"><strong>Cricket Connections</strong> is an exclusive daily challenge for registered Cricketle members.</p>
+        <ul class="gate-perks">
+          <li><span>✨</span> <span><strong>Free Instant Account</strong> — 100% free to join in seconds</span></li>
+          <li><span>📊</span> <span><strong>Stats & Streaks</strong> — Track personal solve times and win records</span></li>
+          <li><span>🏆</span> <span><strong>Live Leaderboards</strong> — Compete with players worldwide</span></li>
+          <li><span>🏏</span> <span><strong>Full Access</strong> — Unlock all 3 daily Cricketle puzzles & bonus games</span></li>
+        </ul>
+        <div class="gate-actions">
+          <a href="index.html#profile" class="gate-btn-primary">Log In / Sign Up Free →</a>
+          <a href="index.html#play" class="gate-btn-secondary">Play Cricketle (1/3 Free Daily)</a>
+          <a href="hub.html" class="gate-btn-ghost">Back to Game Hub</a>
+        </div>
+      </div>
+    </div>
+
+    <a href="hub.html" class="back-hub-btn">← Back to Game Hub</a>
+
+    <div class="game-header">
+      <h2>CRICKET CONNECTIONS</h2>
+      <p>Find four groups of four cricketers that share a common link!</p>
+      <div class="conn-subtext" id="conn-day-label">Daily Puzzle</div>
+    </div>
+
+    <!-- Solved Categories Section -->
+    <div class="solved-categories" id="solved-categories"></div>
+
+    <!-- Active 4x4 Grid -->
+    <div class="connections-grid" id="connections-grid"></div>
+
+    <!-- Mistakes Tracker -->
+    <div class="mistakes-row">
+      <span>Mistakes remaining:</span>
+      <div class="mistake-dots" id="mistake-dots">
+        <span class="mistake-dot"></span>
+        <span class="mistake-dot"></span>
+        <span class="mistake-dot"></span>
+        <span class="mistake-dot"></span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="conn-actions">
+      <button id="btn-shuffle" class="conn-btn">Shuffle</button>
+      <button id="btn-deselect" class="conn-btn" disabled>Deselect All</button>
+      <button id="btn-submit" class="conn-btn conn-btn-submit" disabled>Submit</button>
+    </div>
+
+    <!-- Result Card -->
+    <div class="result-card" id="result-card">
+      <h3 class="result-title" id="result-status">GENIUS! 🏆</h3>
+      <p class="result-desc" id="result-desc">You solved all four cricket categories!</p>
+      <div class="result-grid-share" id="result-grid-share"></div>
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <button id="btn-share" class="conn-btn conn-btn-submit">Share Result 📋</button>
+        <a href="hub.html" class="conn-btn" style="text-decoration:none;">Play Other Games →</a>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="conn-toast" id="conn-toast"></div>
+  </main>
+
+  <script src="bg.js"></script>
+  <script src="connections.js"></script>
+</body>
+</html>

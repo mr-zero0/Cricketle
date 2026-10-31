@@ -1124,6 +1124,18 @@
     if (navAdmin) {
       navAdmin.style.display = (app.user && app.user.isAdmin) ? "inline-flex" : "none";
     }
+    const topbarAuth = $("topbar-auth-btn");
+    if (topbarAuth) {
+      if (app.user) {
+        topbarAuth.classList.add("signed-in");
+        topbarAuth.title = `@${app.user.username} (Account)`;
+        topbarAuth.setAttribute("aria-label", `Account for @${app.user.username}`);
+      } else {
+        topbarAuth.classList.remove("signed-in");
+        topbarAuth.title = "Sign in / Register";
+        topbarAuth.setAttribute("aria-label", "Sign in or register");
+      }
+    }
     document.querySelectorAll("[data-view]").forEach((el) => {
       if (el.dataset.view === app.view) el.setAttribute("aria-current", "page");
       else el.removeAttribute("aria-current");

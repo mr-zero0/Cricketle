@@ -585,6 +585,21 @@
   if (guessBtn) guessBtn.disabled = true;
   if (skipBtn) skipBtn.disabled = true;
 
+  // Session check for mobile auth button
+  fetch("/api/me")
+    .then((r) => r.json())
+    .then((d) => {
+      if (d && d.user) {
+        const topbarAuth = document.getElementById("topbar-auth-btn");
+        if (topbarAuth) {
+          topbarAuth.classList.add("signed-in");
+          topbarAuth.title = `@${d.user.username} (Account)`;
+          topbarAuth.setAttribute("aria-label", `Account for @${d.user.username}`);
+        }
+      }
+    })
+    .catch(() => {});
+
   // Initialize
   setupAutocomplete();
   loadPuzzle();

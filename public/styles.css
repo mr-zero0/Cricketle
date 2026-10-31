@@ -318,6 +318,22 @@ button:disabled { cursor: not-allowed; }
 .theme-btn svg { width: 22px; height: 22px; max-width: 22px; max-height: 22px; transition: transform var(--dur-slow) var(--ease-back); }
 .theme-btn:hover svg { transform: rotate(30deg); }
 
+.topbar-auth-btn {
+  text-decoration: none;
+  position: relative;
+  transition: all var(--dur-fast) ease;
+}
+.topbar-auth-btn:hover {
+  color: var(--fg);
+  border-color: rgba(34, 197, 94, 0.4);
+  background: var(--card-2);
+}
+.topbar-auth-btn.signed-in {
+  color: var(--primary-bright);
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.12);
+}
+
 .btn {
   min-height: 44px;
   display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
