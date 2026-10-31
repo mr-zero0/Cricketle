@@ -161,13 +161,11 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 
 /* ---------- Layout shell ---------- */
 
-.topbar, .app {
-  width: min(100%, 1180px);
+.topbar {
+  width: min(100%, 1380px);
   margin: 0 auto;
   padding-left: var(--space-4);
   padding-right: var(--space-4);
-}
-.topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -175,7 +173,13 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
   padding-top: calc(var(--space-4) + env(safe-area-inset-top));
   padding-bottom: var(--space-3);
 }
-.app { padding-top: var(--space-3); }
+.app {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+  padding-top: var(--space-3);
+}
 .app:focus { outline: none; }
 
 .brand { display: flex; align-items: center; gap: var(--space-3); min-width: 0; flex: 0 1 auto; }
@@ -214,26 +218,36 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 /* Top navigation (tablet and up) */
 .nav {
   display: none;
-  gap: var(--space-1);
-  padding: 4px;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 999px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   flex: 0 1 auto;
   min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.nav::-webkit-scrollbar {
+  display: none;
 }
 .nav-link {
-  display: inline-flex; align-items: center; gap: 8px;
-  min-height: 40px; padding: 0 16px;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 36px; padding: 0 10px;
   border-radius: 999px;
-  color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.92rem;
+  color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.84rem;
   transition: color var(--dur-fast), background var(--dur-fast);
   white-space: nowrap;
+  flex-shrink: 0;
 }
-.nav-link svg { width: 18px; height: 18px; flex: none; }
-.nav-link:hover { color: var(--fg); background: rgba(255,255,255,0.06); }
+.nav-link svg { width: 17px; height: 17px; flex: none; }
+.nav-link:hover { color: var(--fg); background: rgba(255,255,255,0.08); }
 .nav-link[aria-current="page"] { color: #fff; background: var(--mode-deep); }
 body.hard .nav-link[aria-current="page"] { color: #1a1200; background: var(--accent); }
 
@@ -268,17 +282,26 @@ body.hard .nav-link[aria-current="page"] { color: #1a1200; background: var(--acc
   body { padding-bottom: var(--space-7); }
 }
 
-/* Tablet & compact desktop (768px - 1139px): icon-only nav pills to prevent squashing .brand */
-@media (min-width: 768px) and (max-width: 1139px) {
+/* Tablet & compact laptop (768px - 1199px): icon-only nav pills to ensure 100% breathing room */
+@media (min-width: 768px) and (max-width: 1199px) {
   .nav-link span { display: none; }
-  .nav-link { padding: 0 12px; min-height: 38px; }
+  .nav-link { padding: 0 10px; min-height: 36px; }
   .topbar { gap: var(--space-2); }
-  .topbar h1 { font-size: clamp(1.6rem, 2.6vw, 2.2rem); }
+  .topbar h1 { font-size: clamp(1.4rem, 2.2vw, 1.9rem); }
 }
 
-@media (min-width: 1140px) {
+/* Standard Desktop & Laptops (1200px - 1339px): compact text pills fitting all 7 variants comfortably */
+@media (min-width: 1200px) and (max-width: 1339px) {
   .nav-link span { display: inline; }
-  .nav-link { padding: 0 16px; }
+  .nav-link { padding: 0 9px; font-size: 0.82rem; gap: 5px; min-height: 36px; }
+  .topbar { gap: var(--space-2); }
+  .topbar h1 { font-size: clamp(1.6rem, 2.4vw, 2.2rem); }
+}
+
+/* Wide Desktop (>= 1340px): spacious luxury sports UI */
+@media (min-width: 1340px) {
+  .nav-link span { display: inline; }
+  .nav-link { padding: 0 12px; font-size: 0.86rem; gap: 6px; min-height: 38px; }
 }
 
 /* ---------- Views ---------- */
@@ -932,12 +955,15 @@ body.hard .segmented:not(.tabs) .seg-thumb { background: var(--accent-deep); box
 /* ---------- Dialogs ---------- */
 
 dialog {
+  box-sizing: border-box;
   background: var(--card-solid);
   color: var(--fg);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   width: min(92vw, 520px);
   max-height: 90dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--space-5);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
 }

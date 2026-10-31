@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
   <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
-  <link rel="stylesheet" href="styles.css?v=2.5.2" />
+  <link rel="stylesheet" href="styles.css?v=2.5.3" />
   <script src="theme.js?v=2.5.1"></script>
   <style>
     .hub-container {
@@ -51,7 +51,7 @@
     /* Grid of game tiles */
     .hub-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
       gap: var(--space-4);
       margin-bottom: var(--space-6);
     }
