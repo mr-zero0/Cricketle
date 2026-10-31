@@ -91,6 +91,43 @@
     }
   });
 
+
+  // Speculative prefetching for ultra-smooth instantaneous navigation
+  const prefetched = new Set();
+  function prefetchUrl(url) {
+    if (!url || prefetched.has(url) || url.startsWith("#") || url.startsWith("javascript:")) return;
+    prefetched.add(url);
+    const link = document.createElement("link");
+    link.rel = "prefetch";
+    link.href = url;
+    link.as = "document";
+    document.head.appendChild(link);
+  }
+
+  document.addEventListener("mouseover", (e) => {
+    const a = e.target.closest("a");
+    if (a && a.href && a.origin === location.origin) {
+      prefetchUrl(a.pathname + a.search);
+    }
+  }, { passive: true });
+
+  document.addEventListener("touchstart", (e) => {
+    const a = e.target.closest("a");
+    if (a && a.href && a.origin === location.origin) {
+      prefetchUrl(a.pathname + a.search);
+    }
+  }, { passive: true });
+
+  // Smooth escape key modal dismiss
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const openDialog = document.querySelector("dialog[open]");
+      if (openDialog && typeof openDialog.close === "function") {
+        openDialog.close();
+      }
+    }
+  });
+
   root.CricketleTheme = {
     current: () => current,
     mode: () => override || "auto",

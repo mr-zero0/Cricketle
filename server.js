@@ -261,8 +261,11 @@ function createApp(opts = {}) {
   function send(res, status, body, headers) {
     const h = Object.assign({
       "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store",
+      "cache-control": "no-store, no-cache, must-revalidate",
       "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
+      "referrer-policy": "strict-origin-when-cross-origin",
     }, headers || {});
     res.writeHead(status, h);
     res.end(status === 204 ? undefined : JSON.stringify(body));
@@ -839,7 +842,11 @@ function createApp(opts = {}) {
       "cache-control": versioned ? "public, max-age=31536000, immutable" : "no-cache",
       "last-modified": stat.mtime.toUTCString(),
       "x-content-type-options": "nosniff",
-      "referrer-policy": "same-origin",
+      "x-frame-options": "DENY",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "cross-origin-opener-policy": "same-origin",
+      "cross-origin-resource-policy": "same-origin",
+      "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
       "vary": "accept-encoding",
     };
     if (ext === ".html") {
@@ -852,6 +859,7 @@ function createApp(opts = {}) {
         "connect-src 'self' https://upload.wikimedia.org",
         "frame-ancestors 'none'",
         "base-uri 'self'",
+        "form-action 'self'",
       ].join("; ");
     }
     // Text assets are gzipped on the fly (no build step, no dependencies).
