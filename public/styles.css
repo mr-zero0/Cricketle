@@ -1625,3 +1625,125 @@ dialog form { margin-top: var(--space-4); text-align: right; }
   from { background-color: color-mix(in srgb, var(--heat) 30%, var(--card-solid)); }
   to { background-color: var(--card); }
 }
+
+/* ==========================================================================
+   Mobile Quick-Switch Variants Bar
+   Sticky, horizontally swipeable games rail for phones (<768px)
+   ========================================================================== */
+.mobile-variants-bar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-variants-bar {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 95;
+    background: var(--card-solid);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 6px 0;
+    margin-bottom: var(--space-3);
+  }
+
+  .mv-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mv-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mv-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--card-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: transform var(--dur-fast) ease, background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mv-pill:active {
+    transform: scale(0.95);
+  }
+
+  .mv-pill .mv-icon {
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  /* Active pill states with distinct color coding */
+  .mv-pill.active,
+  .mv-pill[aria-current="page"] {
+    color: #ffffff !important;
+    font-weight: 700;
+  }
+
+  .mv-pill.active[data-game="hub"],
+  .mv-pill[aria-current="page"][data-game="hub"] {
+    background: #2563eb;
+    border-color: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+  }
+
+  .mv-pill.active[data-game="cricketle"],
+  .mv-pill[aria-current="page"][data-game="cricketle"] {
+    background: #15803d;
+    border-color: #22c55e;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+  }
+
+  .mv-pill.active[data-game="connections"],
+  .mv-pill[aria-current="page"][data-game="connections"] {
+    background: #b45309;
+    border-color: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  }
+
+  .mv-pill.active[data-game="journey"],
+  .mv-pill[aria-current="page"][data-game="journey"] {
+    background: #0369a1;
+    border-color: #38bdf8;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+  }
+
+  .mv-pill.active[data-game="scorecard"],
+  .mv-pill[aria-current="page"][data-game="scorecard"] {
+    background: #4338ca;
+    border-color: #818cf8;
+    box-shadow: 0 0 10px rgba(129, 140, 248, 0.4);
+  }
+
+  .mv-pill.active[data-game="puzzle"],
+  .mv-pill[aria-current="page"][data-game="puzzle"] {
+    background: #7e22ce;
+    border-color: #c084fc;
+    box-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
+  }
+
+  .mv-pill.active[data-game="stadium"],
+  .mv-pill[aria-current="page"][data-game="stadium"] {
+    background: #047857;
+    border-color: #34d399;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+  }
+}

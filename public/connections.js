@@ -380,3 +380,4 @@
   checkAuth();
   loadPuzzle();
 })();
+

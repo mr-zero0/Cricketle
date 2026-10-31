@@ -406,3 +406,4 @@
   checkAuth();
   loadStadium();
 })();
+

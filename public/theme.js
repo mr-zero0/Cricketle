@@ -81,9 +81,14 @@
   // The button is parsed after this script.
   document.addEventListener("DOMContentLoaded", () => {
     const btn = document.getElementById("theme-btn");
-    if (!btn) return;
-    labelButton();
-    btn.addEventListener("click", toggle);
+    if (btn) {
+      labelButton();
+      btn.addEventListener("click", toggle);
+    }
+    const activePill = document.querySelector(".mv-pill.active");
+    if (activePill) {
+      activePill.scrollIntoView({ inline: "center", block: "nearest", behavior: "auto" });
+    }
   });
 
   root.CricketleTheme = {
