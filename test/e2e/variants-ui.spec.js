@@ -55,6 +55,7 @@ test.describe("Full UI & Gameplay Tests (Authenticated Member)", () => {
     await expect(page.locator("#tile-puzzle")).toBeVisible();
     await expect(page.locator("#tile-stadium")).toBeVisible();
     await expect(page.locator("#tile-facts")).toBeVisible();
+    await expect(page.locator("#tile-scramble")).toBeVisible();
 
     // Locked photo game
     await expect(page.locator("#tile-pixel")).toBeVisible();
@@ -82,7 +83,7 @@ test.describe("Full UI & Gameplay Tests (Authenticated Member)", () => {
     if (isMobile) {
       await expect(bar).toBeVisible();
       const pills = bar.locator(".mv-pill");
-      await expect(pills).toHaveCount(8);
+      await expect(pills).toHaveCount(9);
       await expect(bar.locator('.mv-pill[data-game="hub"]')).toHaveClass(/active/);
     } else {
       await expect(bar).toBeHidden();

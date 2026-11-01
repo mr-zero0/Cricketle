@@ -38,6 +38,8 @@
 
         const factsStatus = document.getElementById("status-facts");
         if (factsStatus) factsStatus.textContent = "1 Daily Challenge";
+        const scrambleStatus = document.getElementById("status-scramble");
+        if (scrambleStatus) scrambleStatus.textContent = "6 Attempts Daily";
       }
     })
     .catch(() => {});
