@@ -268,7 +268,7 @@ function createApp(opts = {}) {
       "referrer-policy": "strict-origin-when-cross-origin",
     }, headers || {});
     res.writeHead(status, h);
-    res.end(status === 204 ? undefined : JSON.stringify(body));
+    res.end(status === 204 || (res.req && res.req.method === "HEAD") ? undefined : JSON.stringify(body));
   }
 
   function fail(res, status, code, message) {
@@ -408,8 +408,10 @@ function createApp(opts = {}) {
   async function api(req, res, pathname, query) {
     const key = req.method + " " + pathname;
 
-    if (key === "GET /api/health") {
-      return send(res, 200, { ok: true, day: core.todayKey(now()), now: now(), puzzlesPerDay: core.PUZZLES_PER_DAY });
+    if (pathname === "/api/health" || pathname === "/health" || pathname === "/healthz") {
+      if (req.method === "GET" || req.method === "HEAD") {
+        return send(res, 200, { ok: true, day: core.todayKey(now()), now: now(), puzzlesPerDay: core.PUZZLES_PER_DAY });
+      }
     }
 
     if (key === "POST /api/auth/login") {
@@ -915,7 +917,7 @@ function createApp(opts = {}) {
       else res.end();
     });
 
-    if (pathname.startsWith("/api/")) done(api(req, res, pathname, url.searchParams));
+    if (pathname.startsWith("/api/") || pathname === "/health" || pathname === "/healthz") done(api(req, res, pathname, url.searchParams));
     else if (pathname === "/" || pathname === "/hub" || pathname === "/hub/") serveStatic(req, res, "/hub.html");
     else if (pathname === "/play" || pathname === "/cricketle" || pathname === "/game") serveStatic(req, res, "/index.html");
     else if (pathname === "/connections" || pathname === "/connections/") serveStatic(req, res, "/connections.html");
