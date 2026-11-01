@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
   <meta name="theme-color" content="#0b1220" />
-  <meta name="description" content="Puzzle Cricketer — Guess the famous cricketer from the scrambled jigsaw puzzle photo. Each guess snaps pieces into place." />
+  <meta name="description" content="Puzzle Cricketer — Rearrange the scrambled portrait tiles to reveal the famous cricketer. You have 3 guesses — no hints!" />
   <title>Puzzle Cricketer — Cricketle</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
   <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
-  <link rel="stylesheet" href="styles.css?v=2.5.3" />
+  <link rel="stylesheet" href="styles.css?v=2.5.4" />
   <script src="theme.js?v=2.5.1"></script>
   <style>
     .puzzle-container {
@@ -96,6 +96,9 @@
       overflow: hidden;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       background: #0b1220;
+      touch-action: none;
+      user-select: none;
+      cursor: pointer;
     }
 
     #puzzle-canvas {
@@ -103,6 +106,53 @@
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    .puzzle-instructions {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-puzzle-reset {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-puzzle-reset:hover {
+      background: var(--card-2);
+      color: var(--fg);
+      border-color: var(--puzzle-accent);
+    }
+
+    .puzzle-assembled-banner {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid #16a34a;
+      color: #86efac;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      margin: 10px auto 0;
+      max-width: 280px;
+      animation: popIn 0.3s ease both;
     }
 
     /* Jigsaw Progress meter */
@@ -132,23 +182,23 @@
 
     .puzzle-progress-bar-fill {
       height: 100%;
-      width: 12.5%;
+      width: 0%;
       background: linear-gradient(90deg, #f59e0b, #fbbf24);
       border-radius: 999px;
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Attempt indicators */
+    /* Attempt indicators (3 attempts) */
     .attempts-track {
       display: flex;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       margin: var(--space-3) 0 0;
     }
 
     .attempt-dot {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       background: var(--border);
       border: 1px solid var(--border-strong);
@@ -168,7 +218,15 @@
     .attempt-dot.current {
       background: #f59e0b;
       border-color: #f59e0b;
-      transform: scale(1.2);
+      transform: scale(1.25);
+    }
+
+    .attempts-label {
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 6px;
+      font-weight: 600;
     }
 
     /* Input & Autocomplete */
@@ -203,10 +261,10 @@
       background: #f59e0b;
       color: #000;
       border: none;
-      padding: 12px 24px;
+      padding: 12px 28px;
       border-radius: var(--radius-sm);
       font-weight: 700;
-      font-size: 14px;
+      font-size: 15px;
       cursor: pointer;
       transition: opacity 0.2s;
     }
@@ -215,32 +273,54 @@
       opacity: 0.9;
     }
 
-    .btn-skip {
-      background: var(--card);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      padding: 12px 18px;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .btn-skip:hover {
-      background: var(--card-2);
-      color: var(--fg);
-    }
-
     /* Autocomplete dropdown */
     .guess-box .suggestions {
+      position: absolute;
       top: 100%;
+      left: 0;
+      right: 0;
       margin-top: 6px;
-      width: 100%;
+      list-style: none;
+      padding: 6px;
+      background: var(--card-solid, #10192d);
+      border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.18));
+      border-radius: var(--radius-sm, 10px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+      max-height: min(280px, 40dvh);
+      overflow-y: auto;
+      z-index: 100;
+      animation: popIn 0.2s ease both;
+    }
+
+    .guess-box .suggestions li {
+      min-height: 42px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--fg);
+      transition: background 0.15s ease;
+    }
+
+    .guess-box .suggestions li:hover,
+    .guess-box .suggestions li.selected {
+      background: rgba(245, 158, 11, 0.2);
     }
 
     .guess-box .suggestions li mark {
       color: #f59e0b;
       font-weight: 700;
+      background: transparent;
+    }
+
+    .sug-meta {
+      font-size: 12px;
+      color: var(--muted);
+      flex-shrink: 0;
     }
 
     /* Guess history log */
@@ -269,11 +349,6 @@
       background: rgba(34, 197, 94, 0.1);
     }
 
-    .guess-item.skipped {
-      border-left-color: var(--muted);
-      color: var(--muted);
-    }
-
     /* Result modal card */
     .result-card {
       background: var(--card);
@@ -284,6 +359,7 @@
       display: none;
       margin-top: var(--space-4);
       box-shadow: var(--shadow);
+      animation: popIn 0.3s ease both;
     }
 
     .result-card.won {
@@ -302,17 +378,24 @@
     }
 
     .result-name {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       color: var(--fg);
-      margin: 0 0 6px;
+      margin: 0 0 4px;
     }
 
-    .result-hint {
+    .result-role {
       font-size: 14px;
       color: var(--muted);
+      margin: 0 0 6px;
+      font-weight: 600;
+    }
+
+    .result-score {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--fg);
       margin: 0 0 var(--space-4);
-      line-height: 1.5;
     }
 
     .back-hub-btn {
@@ -330,141 +413,9 @@
     .back-hub-btn:hover {
       color: var(--fg);
     }
-
-    /* Member Gate Overlay */
-    .member-gate-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(11, 18, 32, 0.88);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-      z-index: 1000;
-    }
-
-    .member-gate-card {
-      background: var(--card-solid);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6) var(--space-5);
-      max-width: 480px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-      position: relative;
-    }
-
-    .gate-lock-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
-      margin-bottom: var(--space-3);
-    }
-
-    .gate-title {
-      font-family: var(--font-display);
-      font-size: 34px;
-      letter-spacing: 1.5px;
-      color: var(--fg);
-      margin: 0 0 var(--space-2);
-      line-height: 1.1;
-    }
-
-    .gate-desc {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.55;
-      margin: 0 0 var(--space-4);
-    }
-
-    .gate-perks {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 var(--space-5);
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 14px 18px;
-    }
-
-    .gate-perks li {
-      font-size: 13px;
-      color: var(--fg);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .gate-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .gate-btn-primary {
-      display: block;
-      background: #f59e0b;
-      color: #000;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 15px;
-      padding: 12px 20px;
-      border-radius: var(--radius-sm);
-      transition: opacity 0.2s;
-    }
-
-    .gate-btn-primary:hover {
-      opacity: 0.9;
-    }
-
-    .gate-btn-secondary {
-      display: block;
-      background: var(--card);
-      border: 1px solid var(--border);
-      color: var(--fg);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      padding: 11px 20px;
-      border-radius: var(--radius-sm);
-      transition: background 0.2s;
-    }
-
-    .gate-btn-secondary:hover {
-      background: var(--card-2);
-    }
-
-    .gate-btn-ghost {
-      display: inline-block;
-      color: var(--muted);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 13px;
-      padding: 6px;
-      transition: color 0.2s;
-    }
-
-    .gate-btn-ghost:hover {
-      color: var(--fg);
-    }
   </style>
   <style id="glass-nav-css">
-/* ==========================================================================
-   Smooth Glassmorphism Mobile Variants Rail
-   ========================================================================== */
+/* Smooth Glassmorphism Mobile Variants Rail */
 .mobile-variants-bar {
   display: none;
 }
@@ -551,7 +502,6 @@
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
   }
 
-  /* Active glowing states with glassmorphism gradients */
   .mv-pill.active,
   .mv-pill[aria-current="page"] {
     color: #ffffff !important;
@@ -559,81 +509,26 @@
     transform: scale(1.02);
   }
 
-  .mv-pill.active[data-game="hub"],
-  .mv-pill[aria-current="page"][data-game="hub"] {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.75), rgba(29, 78, 216, 0.9));
-    border-color: rgba(96, 165, 250, 0.8);
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  }
-
-  .mv-pill.active[data-game="cricketle"],
-  .mv-pill[aria-current="page"][data-game="cricketle"] {
-    background: linear-gradient(135deg, rgba(22, 163, 74, 0.75), rgba(21, 128, 61, 0.9));
-    border-color: rgba(74, 222, 128, 0.8);
-    box-shadow: 0 4px 16px rgba(34, 197, 94, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  }
-
-  .mv-pill.active[data-game="connections"],
-  .mv-pill[aria-current="page"][data-game="connections"] {
-    background: linear-gradient(135deg, rgba(217, 119, 6, 0.75), rgba(180, 83, 9, 0.9));
-    border-color: rgba(251, 191, 36, 0.8);
+  .mv-pill.active[data-game="puzzle"],
+  .mv-pill[aria-current="page"][data-game="puzzle"] {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.85), rgba(217, 119, 6, 0.95));
+    border-color: rgba(251, 191, 36, 0.9);
     box-shadow: 0 4px 16px rgba(245, 158, 11, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
 
-  .mv-pill.active[data-game="journey"],
-  .mv-pill[aria-current="page"][data-game="journey"] {
-    background: linear-gradient(135deg, rgba(2, 132, 199, 0.75), rgba(3, 105, 161, 0.9));
-    border-color: rgba(56, 189, 248, 0.8);
-    box-shadow: 0 4px 16px rgba(2, 132, 199, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  }
-
-  .mv-pill.active[data-game="scorecard"],
-  .mv-pill[aria-current="page"][data-game="scorecard"] {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.75), rgba(67, 56, 202, 0.9));
-    border-color: rgba(129, 140, 248, 0.8);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  }
-
-  .mv-pill.active[data-game="puzzle"],
-  .mv-pill[aria-current="page"][data-game="puzzle"] {
-    background: linear-gradient(135deg, rgba(147, 51, 234, 0.75), rgba(126, 34, 206, 0.9));
-    border-color: rgba(192, 132, 252, 0.8);
-    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  }
-
-  .mv-pill.active[data-game="stadium"],
-  .mv-pill[aria-current="page"][data-game="stadium"] {
-    background: linear-gradient(135deg, rgba(13, 148, 136, 0.75), rgba(15, 118, 110, 0.9));
-    border-color: rgba(45, 212, 191, 0.8);
-    box-shadow: 0 4px 16px rgba(20, 184, 166, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  }
-
-  /* Smooth page transition */
   main {
     animation: glassFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 }
 
 @keyframes glassBarDrop {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes glassFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
   </style>
 </head>
@@ -651,10 +546,11 @@
       <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M4 11V6a2 2 0 0 1 2-2h5a2 2 0 1 1 4 0h3a2 2 0 0 1 2 2v5a2 2 0 1 1 0 4v3a2 2 0 0 1-2 2h-3a2 2 0 1 1-4 0H6a2 2 0 0 1-2-2v-3a2 2 0 1 1 0-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-journey" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="18" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
-          <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
       <symbol id="i-stadium" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6 2 11c0 3.2 1.8 6 4.5 7.6L6 22l4-2c.6.1 1.3.1 2 .1 5.5 0 10-4 10-9s-4.5-9-10-9z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
-    <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M5 7l7-3 7 3M5 7L2 15h6L5 7zm14 0l-3 8h6l-3-8zM9 21h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M5 7l7-3 7 3M5 7L2 15h6L5 7zm14 0l-3 8h6l-3-8zM9 21h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-scramble" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20l5.5-5.5M21 3l-7 7M4 4l16 16M16 21h5v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-pixel" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
     </defs>
   </svg>
 
@@ -663,7 +559,7 @@
       <a href="hub.html" class="brand-mark" aria-label="Back to Hub" style="text-decoration:none;"><span style="font-size:24px;">🧩</span></a>
       <div class="brand-text">
         <h1>Puzzle Cricketer</h1>
-        <p class="tagline">Guess the cricketer from the scrambled jigsaw pieces</p>
+        <p class="tagline">Rearrange portrait tiles to guess the cricketer</p>
       </div>
     </div>
     <nav class="nav" aria-label="Primary">
@@ -676,6 +572,7 @@
       <a href="stadium.html" class="nav-link" title="Stadium"><svg aria-hidden="true"><use href="#i-stadium"/></svg><span>Stadium</span></a>
       <a href="facts.html" class="nav-link" title="Facts"><svg aria-hidden="true"><use href="#i-scale"/></svg><span>Facts</span></a>
       <a href="scramble.html" class="nav-link" title="Scramble"><svg aria-hidden="true"><use href="#i-scramble"/></svg><span>Scramble</span></a>
+      <a href="pixel.html" class="nav-link" title="Pixel"><svg aria-hidden="true"><use href="#i-pixel"/></svg><span>Pixel</span></a>
     </nav>
     <div class="topbar-actions">
       <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch to day">
@@ -698,38 +595,18 @@
       <a href="scorecard.html" class="mv-pill" data-game="scorecard"><span class="mv-icon">📋</span><span>Scorecard</span></a>
       <a href="puzzle.html" class="mv-pill active" data-game="puzzle" aria-current="page"><span class="mv-icon">🧩</span><span>Puzzle</span></a>
       <a href="stadium.html" class="mv-pill" data-game="stadium"><span class="mv-icon">🏟️</span><span>Stadium</span></a>
-    
       <a href="facts.html" class="mv-pill" data-game="facts"><span class="mv-icon">⚖️</span><span>Facts</span></a>
       <a href="scramble.html" class="mv-pill" data-game="scramble"><span class="mv-icon">🔀</span><span>Scramble</span></a>
+      <a href="pixel.html" class="mv-pill" data-game="pixel"><span class="mv-icon">📸</span><span>Pixel</span></a>
     </div>
   </nav>
 
   <main id="main" class="puzzle-container">
-    <!-- Member Gate Overlay (Displayed for Guests) -->
-    <div class="member-gate-backdrop" id="member-gate-modal" role="dialog" aria-modal="true" aria-labelledby="gate-title" hidden>
-      <div class="member-gate-card">
-        <div class="gate-lock-icon">🔒</div>
-        <h3 id="gate-title" class="gate-title">MEMBER ACCESS ONLY</h3>
-        <p class="gate-desc"><strong>Puzzle Cricketer</strong> is an exclusive daily challenge for registered Cricketle members.</p>
-        <ul class="gate-perks">
-          <li><span>✨</span> <span><strong>Free Instant Account</strong> — 100% free to join in seconds</span></li>
-          <li><span>📊</span> <span><strong>Stats & Streaks</strong> — Track personal solve times and win records</span></li>
-          <li><span>🏆</span> <span><strong>Live Leaderboards</strong> — Compete with players worldwide</span></li>
-          <li><span>🏏</span> <span><strong>Full Access</strong> — Unlock all 3 daily Cricketle puzzles & bonus games</span></li>
-        </ul>
-        <div class="gate-actions">
-          <a href="index.html#profile" class="gate-btn-primary">Log In / Sign Up Free →</a>
-          <a href="index.html#play" class="gate-btn-secondary">Play Cricketle (1/3 Free Daily)</a>
-          <a href="hub.html" class="gate-btn-ghost">Back to Game Hub</a>
-        </div>
-      </div>
-    </div>
-
     <a href="hub.html" class="back-hub-btn">← Back to Game Hub</a>
 
     <div class="game-header">
-      <h2>JIGSAW CRICKETER</h2>
-      <p>The portrait is sliced and scrambled! Guess who it is — each try snaps pieces into place.</p>
+      <h2>PUZZLE CRICKETER</h2>
+      <p>Tap or drag any two tiles to swap and reassemble the face. You have 3 guesses — no hints!</p>
       <div class="mode-toggle">
         <button id="mode-easy" class="mode-btn active" data-mode="easy">Current Active (Top 50)</button>
         <button id="mode-hard" class="mode-btn" data-mode="hard">All-Time Legends</button>
@@ -742,32 +619,38 @@
         <canvas id="puzzle-canvas" width="280" height="340"></canvas>
       </div>
 
+      <div class="puzzle-instructions">
+        <span>💡 Tap tile to select, tap another to swap</span>
+      </div>
+
+      <button id="btn-reset-scramble" class="btn-puzzle-reset" type="button" title="Reset pieces to start">🔄 Reset Scramble</button>
+
+      <div id="puzzle-assembled-banner" class="puzzle-assembled-banner" style="display:none;">🎉 Portrait assembled! Enter your guess below.</div>
+
       <!-- Jigsaw Progress Bar -->
       <div class="puzzle-progress-wrap">
         <div class="puzzle-progress-header">
-          <span id="puzzle-progress-text">🧩 2 of 16 pieces in place</span>
-          <span id="puzzle-progress-percent">12%</span>
+          <span id="puzzle-progress-text">🧩 0 of 9 pieces in place</span>
+          <span id="puzzle-progress-percent">0%</span>
         </div>
         <div class="puzzle-progress-bar-bg">
           <div id="puzzle-progress-bar" class="puzzle-progress-bar-fill"></div>
         </div>
       </div>
 
-      <div class="attempts-track" id="attempts-track">
-        <span class="attempt-dot current"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
+      <!-- 3-Attempt Indicators -->
+      <div class="attempts-track" id="attempts-track" aria-label="3 attempts">
+        <span class="attempt-dot current" title="Attempt 1"></span>
+        <span class="attempt-dot" title="Attempt 2"></span>
+        <span class="attempt-dot" title="Attempt 3"></span>
       </div>
+      <div class="attempts-label" id="attempts-label">3 guesses remaining</div>
     </div>
 
-    <!-- Guess Input with Classic Dropdown -->
+    <!-- Guess Input with Dropdown (No Skip button) -->
     <div class="guess-box" id="guess-controls">
       <div class="guess-input-wrap">
         <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. Virat Kohli)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
-        <button id="btn-skip" class="btn-skip" title="Skip to snap more puzzle pieces">Skip</button>
         <button id="btn-guess" class="btn-guess">Guess</button>
       </div>
       <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
@@ -778,9 +661,10 @@
 
     <!-- Result Card -->
     <div class="result-card" id="result-card">
-      <h3 class="result-title" id="result-status">OUT!</h3>
+      <h3 class="result-title" id="result-status">HOWZAT! SOLVED!</h3>
       <p class="result-name" id="result-name"></p>
-      <p class="result-hint" id="result-hint"></p>
+      <p class="result-role" id="result-role"></p>
+      <p class="result-score" id="result-score"></p>
       <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#f59e0b;color:#000;font-weight:700;">Play Other Games →</a>
     </div>
   </main>

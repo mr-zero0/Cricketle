@@ -1,20 +1,11 @@
 (function () {
   "use strict";
 
-  // Puzzle progression: number of pieces correctly placed at each step (0 to 6)
-  // 4x4 grid = 16 pieces total.
-  // Step 0 (start): 2 pieces in place (14 scrambled)
-  // Step 1: 5 pieces in place
-  // Step 2: 8 pieces in place
-  // Step 3: 10 pieces in place
-  // Step 4: 12 pieces in place
-  // Step 5: 14 pieces in place
-  // Step 6 (Victory / Finished): All 16 pieces in place!
-  const STEPS = [2, 5, 8, 10, 12, 14, 16];
-  const MAX_ATTEMPTS = 6;
-  const GRID_COLS = 4;
-  const GRID_ROWS = 4;
+  // 3x3 Grid = 9 interactive rearrangeable puzzle pieces
+  const GRID_COLS = 3;
+  const GRID_ROWS = 3;
   const TOTAL_TILES = GRID_COLS * GRID_ROWS;
+  const MAX_ATTEMPTS = 3;
 
   let allPlayers = [];
   let currentTarget = null;
@@ -23,25 +14,30 @@
   let loadedImage = null;
   let isGameOver = false;
   let currentPhotoUrl = "";
-  let currentUser = null;
-  const gateModal = document.getElementById("member-gate-modal");
+  let initialScramble = [];
+  let board = [];
+  let selectedSlot = -1;
+  let dragStartSlot = -1;
 
   const canvas = document.getElementById("puzzle-canvas");
   const ctx = canvas ? canvas.getContext("2d") : null;
   const input = document.getElementById("guess-input");
   const guessBtn = document.getElementById("btn-guess");
-  const skipBtn = document.getElementById("btn-skip");
+  const resetBtn = document.getElementById("btn-reset-scramble");
   const suggestions = document.getElementById("suggestions");
   const historyList = document.getElementById("guess-history");
   const track = document.getElementById("attempts-track");
+  const attemptsLabel = document.getElementById("attempts-label");
   const resultCard = document.getElementById("result-card");
   const resultStatus = document.getElementById("result-status");
   const resultName = document.getElementById("result-name");
-  const resultHint = document.getElementById("result-hint");
+  const resultRole = document.getElementById("result-role");
+  const resultScore = document.getElementById("result-score");
   const guessControls = document.getElementById("guess-controls");
   const progressText = document.getElementById("puzzle-progress-text");
   const progressPercent = document.getElementById("puzzle-progress-percent");
   const progressBar = document.getElementById("puzzle-progress-bar");
+  const assembledBanner = document.getElementById("puzzle-assembled-banner");
 
   let highlighted = -1;
   let currentMatches = [];
@@ -53,7 +49,6 @@
     return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
   }
 
-  // String hash for deterministic daily seed
   function hashString(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -63,7 +58,6 @@
     return Math.abs(hash);
   }
 
-  // Mulberry32 deterministic 32-bit PRNG
   function mulberry32(seed) {
     return function () {
       let t = (seed += 0x6d2b79f5);
@@ -73,150 +67,97 @@
     };
   }
 
-  // Generate a non-repeating cycle permutation of length N for cycle number `cycle`
-  const cycleCache = new Map();
-  function getPermutation(N, cycle, salt) {
-    const key = `${N}:${cycle}:${salt}`;
-    if (cycleCache.has(key)) return cycleCache.get(key);
-
-    const arr = Array.from({ length: N }, (_, i) => i);
-    const rng = mulberry32(hashString(salt + "_cycle_" + cycle));
-    for (let i = N - 1; i > 0; i--) {
-      const j = Math.floor(rng() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-
-    if (cycle > 0) {
-      const prev = getPermutation(N, cycle - 1, salt);
-      const buffer = Math.min(8, Math.floor(N / 3));
-      const recent = new Set(prev.slice(N - buffer));
-      let swapIdx = N - 1;
-      for (let i = 0; i < buffer; i++) {
-        if (recent.has(arr[i])) {
-          while (swapIdx >= buffer && recent.has(arr[swapIdx])) {
-            swapIdx--;
-          }
-          if (swapIdx >= buffer) {
-            [arr[i], arr[swapIdx]] = [arr[swapIdx], arr[i]];
-            swapIdx--;
-          }
-        }
-      }
-    }
-
-    if (cycleCache.size > 128) cycleCache.clear();
-    cycleCache.set(key, arr);
-    return arr;
-  }
-
   function getSpacedDailyIndex(todayKey, poolLength, modeSalt) {
     if (poolLength <= 1) return 0;
     const [y, m, d] = todayKey.split("-").map(Number);
-    const epoch2026 = Date.UTC(2026, 0, 1);
-    const diffDays = Math.floor((Date.UTC(y, m - 1, d) - epoch2026) / 86400000);
-    const dayNumber = Math.max(0, diffDays);
+    const dayNumber = y * 365 + m * 31 + d;
     const cycle = Math.floor(dayNumber / poolLength);
-    const pos = dayNumber % poolLength;
-    const perm = getPermutation(poolLength, cycle, modeSalt);
-    return perm[pos];
-  }
-
-  // Deterministic order of tile resolution for today's player
-  function getTileOrder(todayKey, playerId) {
-    const seed = hashString(todayKey + "_" + playerId + "_puzzle_order");
-    const rng = mulberry32(seed);
-    const order = Array.from({ length: TOTAL_TILES }, (_, i) => i);
-    for (let i = TOTAL_TILES - 1; i > 0; i--) {
+    const dayInCycle = dayNumber % poolLength;
+    const arr = Array.from({ length: poolLength }, (_, i) => i);
+    const rng = mulberry32(hashString(modeSalt + "_cycle_" + cycle));
+    for (let i = poolLength - 1; i > 0; i--) {
       const j = Math.floor(rng() * (i + 1));
-      [order[i], order[j]] = [order[j], order[i]];
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    return order;
+    return arr[dayInCycle];
   }
 
-  // Calculate board arrangement: which tiles are placed correctly and which are scrambled
-  function getBoardSlots(order, count, seed) {
-    const board = new Array(TOTAL_TILES);
-    const placed = new Set(order.slice(0, count));
+  // Generate a non-trivial scramble (at least 7 of 9 tiles displaced)
+  function generateScramble(seedStr) {
+    const rng = mulberry32(hashString(seedStr));
+    let perm = Array.from({ length: TOTAL_TILES }, (_, i) => i);
+    let attempts = 0;
+    let valid = false;
 
-    // Placed tiles are in their true slots
-    for (const t of placed) {
-      board[t] = t;
+    while (!valid && attempts < 50) {
+      attempts++;
+      for (let i = TOTAL_TILES - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [perm[i], perm[j]] = [perm[j], perm[i]];
+      }
+      let displaced = 0;
+      for (let i = 0; i < TOTAL_TILES; i++) {
+        if (perm[i] !== i) displaced++;
+      }
+      if (displaced >= 7) valid = true;
     }
-
-    // Unplaced slots
-    const unplacedSlots = order.slice(count);
-    if (unplacedSlots.length === 1) {
-      board[unplacedSlots[0]] = unplacedSlots[0];
-    } else if (unplacedSlots.length > 1) {
-      const subRng = mulberry32(seed + count * 7919);
-      let shuffled = [...unplacedSlots];
-      let attempts = 0;
-      let valid = false;
-      while (!valid && attempts < 30) {
-        attempts++;
-        for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor(subRng() * (i + 1));
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        valid = shuffled.every((tile, i) => tile !== unplacedSlots[i]);
-      }
-      if (!valid) {
-        // Deterministic cyclic shift if derangement loop exhausted
-        shuffled = [...unplacedSlots.slice(1), unplacedSlots[0]];
-      }
-      for (let i = 0; i < unplacedSlots.length; i++) {
-        board[unplacedSlots[i]] = shuffled[i];
-      }
-    }
-
-    return { board, placed };
+    return perm;
   }
 
-  // Render jigsaw puzzle canvas
-  function renderPuzzle() {
-    if (!ctx || !loadedImage || !currentTarget) return;
+  function saveProgress() {
+    if (!currentTarget) return;
+    const today = getTodayKey();
+    const data = {
+      attempts: currentAttempts,
+      isGameOver: isGameOver,
+      board: board,
+      initialScramble: initialScramble,
+      photoUrl: currentPhotoUrl
+    };
+    try {
+      localStorage.setItem(`cricketle_puzzle_${today}_${currentMode}`, JSON.stringify(data));
+    } catch (e) {
+      // LocalStorage errors ignored
+    }
+  }
+
+  function renderBoard() {
+    if (!ctx || !loadedImage) return;
 
     const w = canvas.width;
     const h = canvas.height;
-
-    // Headshot-focused center crop
-    const imgRatio = loadedImage.width / loadedImage.height;
-    const canvasRatio = w / h;
-    let sx = 0, sy = 0, sw = loadedImage.width, sh = loadedImage.height;
-
-    if (imgRatio > canvasRatio) {
-      sw = loadedImage.height * canvasRatio;
-      sx = (loadedImage.width - sw) / 2;
-    } else {
-      sh = loadedImage.width / canvasRatio;
-      sy = 0; // Preserve hair and top of head
-    }
-
     ctx.clearRect(0, 0, w, h);
 
-    const today = getTodayKey();
-    const order = getTileOrder(today, currentTarget.id);
-    const stepIndex = isGameOver ? STEPS.length - 1 : Math.min(currentAttempts.length, STEPS.length - 2);
-    const count = STEPS[stepIndex];
-    const seed = hashString(today + "_" + currentTarget.id + "_jigsaw_board");
-    const { board, placed } = getBoardSlots(order, count, seed);
+    const imgW = loadedImage.naturalWidth || loadedImage.width;
+    const imgH = loadedImage.naturalHeight || loadedImage.height;
+
+    // Center-crop to 280:340 portrait aspect ratio
+    const targetAspect = w / h;
+    const imgAspect = imgW / imgH;
+    let sx = 0, sy = 0, sw = imgW, sh = imgH;
+    if (imgAspect > targetAspect) {
+      sw = imgH * targetAspect;
+      sx = (imgW - sw) / 2;
+    } else {
+      sh = imgW / targetAspect;
+      sy = (imgH - sh) / 2;
+    }
 
     const tileW = w / GRID_COLS;
     const tileH = h / GRID_ROWS;
     const srcTileW = sw / GRID_COLS;
     const srcTileH = sh / GRID_ROWS;
 
-    // 1. Draw each tile into its slot
+    // 1. Draw each tile
     for (let slot = 0; slot < TOTAL_TILES; slot++) {
-      const tileId = board[slot];
+      // If game over, show solved order (0..8), else current board permutation
+      const tileId = isGameOver ? slot : board[slot];
 
-      // Destination coordinates on canvas
       const destCol = slot % GRID_COLS;
       const destRow = Math.floor(slot / GRID_COLS);
       const dx = destCol * tileW;
       const dy = destRow * tileH;
 
-      // Source coordinates from original headshot
       const srcCol = tileId % GRID_COLS;
       const srcRow = Math.floor(tileId / GRID_COLS);
       const tileSx = sx + srcCol * srcTileW;
@@ -235,62 +176,85 @@
       );
     }
 
-    // 2. If game is active, draw puzzle overlays and grid borders
+    // 2. Draw borders & overlays if game active
+    let correctCount = 0;
     if (!isGameOver) {
       for (let slot = 0; slot < TOTAL_TILES; slot++) {
         const tileId = board[slot];
-        const isSolved = placed.has(tileId);
+        const isSolved = (tileId === slot);
+        if (isSolved) correctCount++;
 
         const destCol = slot % GRID_COLS;
         const destRow = Math.floor(slot / GRID_COLS);
         const dx = destCol * tileW;
         const dy = destRow * tileH;
 
-        if (isSolved) {
-          // Solved tile: subtle green/gold border and clean checkmark badge
-          ctx.strokeStyle = "rgba(34, 197, 94, 0.7)";
-          ctx.lineWidth = 1.5;
-          ctx.strokeRect(dx + 0.75, dy + 0.75, tileW - 1.5, tileH - 1.5);
+        if (slot === selectedSlot) {
+          // Selected tile: Bright glowing gold border + translucent amber wash
+          ctx.strokeStyle = "#f59e0b";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(dx + 1.5, dy + 1.5, tileW - 3, tileH - 3);
 
-          // Subtle lock/check badge in corner
-          ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+          ctx.fillStyle = "rgba(245, 158, 11, 0.28)";
+          ctx.fillRect(dx + 1.5, dy + 1.5, tileW - 3, tileH - 3);
+
+          // Glowing badge
+          ctx.fillStyle = "#f59e0b";
           ctx.beginPath();
-          ctx.arc(dx + 12, dy + 12, 8, 0, Math.PI * 2);
+          ctx.arc(dx + 15, dy + 15, 10, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = "#000000";
+          ctx.font = "bold 11px sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("★", dx + 15, dy + 15);
+        } else if (isSolved) {
+          // Correctly placed: Clean subtle green border + checkmark
+          ctx.strokeStyle = "rgba(34, 197, 94, 0.85)";
+          ctx.lineWidth = 1.8;
+          ctx.strokeRect(dx + 1, dy + 1, tileW - 2, tileH - 2);
+
+          // Checkmark badge in corner
+          ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
+          ctx.beginPath();
+          ctx.arc(dx + 14, dy + 14, 9, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.fillStyle = "#22c55e";
-          ctx.font = "bold 9px 'Source Sans 3', sans-serif";
+          ctx.font = "bold 10px sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText("✓", dx + 12, dy + 12);
+          ctx.fillText("✓", dx + 14, dy + 14);
         } else {
-          // Scrambled tile: subtle dashed amber border and tile identifier
-          ctx.strokeStyle = "rgba(245, 158, 11, 0.6)";
-          ctx.lineWidth = 1.5;
-          ctx.setLineDash([4, 3]);
-          ctx.strokeRect(dx + 0.75, dy + 0.75, tileW - 1.5, tileH - 1.5);
+          // Scrambled tile: Subtle dashed border + tile number
+          ctx.strokeStyle = "rgba(245, 158, 11, 0.35)";
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]);
+          ctx.strokeRect(dx + 0.5, dy + 0.5, tileW - 1, tileH - 1);
           ctx.setLineDash([]);
 
-          // Tile badge
-          ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+          // Tile number badge
+          ctx.fillStyle = "rgba(15, 23, 42, 0.7)";
           ctx.beginPath();
-          ctx.arc(dx + 13, dy + 13, 9, 0, Math.PI * 2);
+          ctx.arc(dx + 14, dy + 14, 9, 0, Math.PI * 2);
           ctx.fill();
 
-          ctx.fillStyle = "#f59e0b";
-          ctx.font = "bold 9px 'Source Sans 3', sans-serif";
+          ctx.fillStyle = "rgba(245, 158, 11, 0.9)";
+          ctx.font = "bold 10px sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText(String(tileId + 1), dx + 13, dy + 13);
+          ctx.fillText(String(tileId + 1), dx + 14, dy + 14);
         }
       }
+    } else {
+      correctCount = TOTAL_TILES;
     }
 
     // 3. Update Progress Bar
-    const actualSolved = isGameOver ? TOTAL_TILES : count;
-    const percent = Math.round((actualSolved / TOTAL_TILES) * 100);
+    const percent = Math.round((correctCount / TOTAL_TILES) * 100);
     if (progressText) {
-      progressText.textContent = `🧩 ${actualSolved} of ${TOTAL_TILES} pieces in place`;
+      progressText.textContent = `🧩 ${correctCount} of ${TOTAL_TILES} pieces in place`;
     }
     if (progressPercent) {
       progressPercent.textContent = `${percent}%`;
@@ -298,7 +262,93 @@
     if (progressBar) {
       progressBar.style.width = `${percent}%`;
     }
+
+    // 4. Update Assembled Banner
+    if (assembledBanner) {
+      if (!isGameOver && correctCount === TOTAL_TILES) {
+        assembledBanner.style.display = "block";
+      } else {
+        assembledBanner.style.display = "none";
+      }
+    }
   }
+
+  function getSlotFromCoords(clientX, clientY) {
+    if (!canvas) return -1;
+    const rect = canvas.getBoundingClientRect();
+    const x = (clientX - rect.left) * (canvas.width / rect.width);
+    const y = (clientY - rect.top) * (canvas.height / rect.height);
+    if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return -1;
+
+    const col = Math.floor(x / (canvas.width / GRID_COLS));
+    const row = Math.floor(y / (canvas.height / GRID_ROWS));
+    if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return -1;
+    return row * GRID_COLS + col;
+  }
+
+  function handleTileTap(slot) {
+    if (isGameOver || slot < 0 || slot >= TOTAL_TILES) return;
+
+    if (selectedSlot === -1) {
+      selectedSlot = slot;
+      renderBoard();
+    } else if (selectedSlot === slot) {
+      selectedSlot = -1;
+      renderBoard();
+    } else {
+      const temp = board[selectedSlot];
+      board[selectedSlot] = board[slot];
+      board[slot] = temp;
+      selectedSlot = -1;
+      saveProgress();
+      renderBoard();
+    }
+  }
+
+  // Pointer events for drag and tap
+  if (canvas) {
+    canvas.addEventListener("pointerdown", (e) => {
+      if (isGameOver) return;
+      dragStartSlot = getSlotFromCoords(e.clientX, e.clientY);
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+
+    canvas.addEventListener("pointerup", (e) => {
+      if (isGameOver) return;
+      const endSlot = getSlotFromCoords(e.clientX, e.clientY);
+      try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+
+      if (dragStartSlot !== -1 && endSlot !== -1 && dragStartSlot !== endSlot) {
+        // Drag-swapped between two different slots!
+        const temp = board[dragStartSlot];
+        board[dragStartSlot] = board[endSlot];
+        board[endSlot] = temp;
+        selectedSlot = -1;
+        dragStartSlot = -1;
+        saveProgress();
+        renderBoard();
+      } else if (dragStartSlot !== -1 && dragStartSlot === endSlot) {
+        // Single tap on a slot
+        handleTileTap(dragStartSlot);
+        dragStartSlot = -1;
+      } else {
+        dragStartSlot = -1;
+      }
+    });
+
+    canvas.addEventListener("pointercancel", () => {
+      dragStartSlot = -1;
+    });
+  }
+
+  // Reset Scramble Button
+  resetBtn?.addEventListener("click", () => {
+    if (isGameOver || initialScramble.length !== TOTAL_TILES) return;
+    board = [...initialScramble];
+    selectedSlot = -1;
+    saveProgress();
+    renderBoard();
+  });
 
   // Update dots indicator
   function updateTrack() {
@@ -314,6 +364,17 @@
         dot.classList.add("current");
       }
     });
+
+    if (attemptsLabel) {
+      const remaining = Math.max(0, MAX_ATTEMPTS - currentAttempts.length);
+      if (isGameOver) {
+        attemptsLabel.textContent = currentAttempts.some((a) => a.isCorrect)
+          ? `Solved in ${currentAttempts.length} of ${MAX_ATTEMPTS} guesses!`
+          : "All 3 attempts used";
+      } else {
+        attemptsLabel.textContent = `${remaining} guess${remaining === 1 ? "" : "es"} remaining`;
+      }
+    }
   }
 
   // Load target for current mode and date
@@ -327,26 +388,35 @@
       const activePool = pool.length ? pool : list;
 
       const today = getTodayKey();
-      const targetIndex = getSpacedDailyIndex(today, activePool.length, "puzzle_" + currentMode);
+      const targetIndex = getSpacedDailyIndex(today, activePool.length, "portrait_puzzle_" + currentMode);
       currentTarget = activePool[targetIndex];
 
-      // Select variant deterministically
       const variants = Array.isArray(currentTarget.images) && currentTarget.images.length > 0
         ? currentTarget.images
         : [currentTarget.imageUrl];
-      const variantSeed = hashString(today + "_" + currentTarget.id + "_puzzle_var");
+      const variantSeed = hashString(today + "_" + currentTarget.id + "_jigsaw_variant");
       currentPhotoUrl = variants[variantSeed % variants.length];
 
-      // Restore saved progress for today if any
+      // Daily scramble seed
+      const scrambleSeed = today + "_" + currentTarget.id + "_puzzle_scramble";
+      initialScramble = generateScramble(scrambleSeed);
+
+      // Restore saved progress if any
       const saved = localStorage.getItem(`cricketle_puzzle_${today}_${currentMode}`);
       if (saved) {
         const data = JSON.parse(saved);
         currentAttempts = data.attempts || [];
         isGameOver = data.isGameOver || false;
+        if (Array.isArray(data.board) && data.board.length === TOTAL_TILES) {
+          board = data.board;
+        } else {
+          board = [...initialScramble];
+        }
         if (data.photoUrl) currentPhotoUrl = data.photoUrl;
       } else {
         currentAttempts = [];
         isGameOver = false;
+        board = [...initialScramble];
       }
 
       loadImage(currentPhotoUrl);
@@ -365,7 +435,7 @@
     const img = new Image();
     img.onload = () => {
       loadedImage = img;
-      renderPuzzle();
+      renderBoard();
     };
     img.onerror = (err) => {
       console.error("Failed to load image at:", url, err);
@@ -373,9 +443,9 @@
       ctx.fillStyle = "#1e293b";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "#94a3b8";
-      ctx.font = "bold 20px 'Source Sans 3', sans-serif";
+      ctx.font = "bold 20px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("Puzzle Preview", canvas.width / 2, canvas.height / 2);
+      ctx.fillText("Photo Preview", canvas.width / 2, canvas.height / 2);
     };
     img.src = url;
   }
@@ -385,69 +455,65 @@
     historyList.innerHTML = "";
     currentAttempts.forEach((a) => {
       const el = document.createElement("div");
-      el.className = `guess-item ${a.isCorrect ? "correct" : a.skipped ? "skipped" : ""}`;
+      el.className = `guess-item ${a.isCorrect ? "correct" : ""}`;
       el.innerHTML = `
-        <span>${a.skipped ? "<em>Skipped</em>" : escapeHtml(a.name)}</span>
-        <span style="font-weight:700;">${a.isCorrect ? "✅ Correct" : a.skipped ? "⏭️ Skipped" : "❌ Incorrect"}</span>
+        <span>${escapeHtml(a.name)}</span>
+        <span style="font-weight:700;">${a.isCorrect ? "✅ Correct" : "❌ Incorrect"}</span>
       `;
       historyList.appendChild(el);
     });
   }
 
-  const EXTRA_LEGENDS = [
-    { name: "Brian Lara", country: "West Indies", role: "Batter" },
-    { name: "Shane Warne", country: "Australia", role: "Bowler" },
-    { name: "Sourav Ganguly", country: "India", role: "Batter" },
-    { name: "VVS Laxman", country: "India", role: "Batter" },
-    { name: "Robin Uthappa", country: "India", role: "Batter" },
-    { name: "Jason Roy", country: "England", role: "Batter" },
-    { name: "Liam Plunkett", country: "England", role: "Bowler" },
-    { name: "Ambati Rayudu", country: "India", role: "Batter" },
-    { name: "Mohammad Azharuddin", country: "India", role: "Batter" },
-    { name: "Ajay Jadeja", country: "India", role: "Batter" },
-    { name: "Hrishikesh Kanitkar", country: "India", role: "All-rounder" },
-    { name: "Vivian Richards", country: "West Indies", role: "Batter" },
-    { name: "Kapil Dev", country: "India", role: "All-rounder" },
-    { name: "Imran Khan", country: "Pakistan", role: "All-rounder" },
-    { name: "Wasim Akram", country: "Pakistan", role: "Bowler" },
-    { name: "Waqar Younis", country: "Pakistan", role: "Bowler" },
-    { name: "Curtly Ambrose", country: "West Indies", role: "Bowler" },
-    { name: "Courtney Walsh", country: "West Indies", role: "Bowler" },
-    { name: "Jacques Kallis", country: "South Africa", role: "All-rounder" },
-    { name: "Glenn McGrath", country: "Australia", role: "Bowler" },
-    { name: "Allan Border", country: "Australia", role: "Batter" },
-    { name: "Sunil Gavaskar", country: "India", role: "Batter" },
-    { name: "Ian Botham", country: "England", role: "All-rounder" },
-    { name: "Mohammad Kaif", country: "India", role: "Batter" },
-    { name: "Lance Klusener", country: "South Africa", role: "All-rounder" },
-    { name: "Mohinder Amarnath", country: "India", role: "All-rounder" },
-    { name: "Kris Srikkanth", country: "India", role: "Batter" },
-    { name: "Madan Lal", country: "India", role: "Bowler" },
-    { name: "Syed Kirmani", country: "India", role: "Wicketkeeper" },
-    { name: "Balwinder Sandhu", country: "India", role: "Bowler" },
-    { name: "Gary Kirsten", country: "South Africa", role: "Batter" },
-    { name: "Herschelle Gibbs", country: "South Africa", role: "Batter" },
-    { name: "Jonty Rhodes", country: "South Africa", role: "Batter" },
-    { name: "Shaun Pollock", country: "South Africa", role: "All-rounder" },
-    { name: "Allan Donald", country: "South Africa", role: "Bowler" }
-  ];
+  function escapeHtml(s) {
+    const d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
 
+  function finishGame(won) {
+    isGameOver = true;
+    selectedSlot = -1;
+
+    // Reveal all pieces in solved order
+    for (let i = 0; i < TOTAL_TILES; i++) board[i] = i;
+    renderBoard();
+    updateTrack();
+
+    if (guessControls) guessControls.style.display = "none";
+    if (resetBtn) resetBtn.style.display = "none";
+
+    if (resultCard) {
+      resultCard.style.display = "block";
+      resultCard.className = `result-card ${won ? "won" : "lost"}`;
+    }
+    if (resultStatus) {
+      resultStatus.textContent = won ? "HOWZAT! SOLVED!" : "OUT!";
+    }
+    if (resultName && currentTarget) {
+      resultName.textContent = currentTarget.name;
+    }
+    if (resultRole && currentTarget) {
+      resultRole.textContent = `${currentTarget.country} • ${currentTarget.role}`;
+    }
+    if (resultScore) {
+      resultScore.textContent = won
+        ? `Solved in ${currentAttempts.length} of ${MAX_ATTEMPTS} guesses!`
+        : `The cricketer was ${currentTarget ? currentTarget.name : ""}`;
+    }
+
+    saveProgress();
+  }
+
+  // Combined Search Pool
   function getSearchPool() {
     const map = new Map();
 
-    // 1. Extra legends fallback
-    EXTRA_LEGENDS.forEach((p) => {
-      map.set(p.name.toLowerCase(), p);
-    });
-
-    // 2. Add all players from datasets/pixel-players.json
     if (Array.isArray(allPlayers)) {
       allPlayers.forEach((p) => {
         map.set(p.name.toLowerCase(), { name: p.name, country: p.country, role: p.role });
       });
     }
 
-    // 3. Add full 425-player list from players.js
     const list = (typeof window !== "undefined" && window.PLAYERS) || (typeof PLAYERS !== "undefined" ? PLAYERS : []);
     if (Array.isArray(list)) {
       list.forEach((p) => {
@@ -462,239 +528,181 @@
     return Array.from(map.values());
   }
 
-  function makeGuess(name, skipped = false) {
-    if (!currentUser) {
-      if (gateModal) gateModal.hidden = false;
-      return;
-    }
+  function makeGuess(name) {
     if (isGameOver || !currentTarget) return;
 
     let clean = name.trim();
-    if (!clean && !skipped) return;
+    if (!clean) return;
 
-    if (!skipped) {
-      const guessLower = clean.toLowerCase();
-      // Smart resolution: typing partial name like "lara" resolves to full name
-      if (currentTarget.name.toLowerCase() === guessLower) {
-        clean = currentTarget.name;
-      } else if (
-        currentTarget.name.toLowerCase().endsWith(" " + guessLower) ||
-        currentTarget.name.toLowerCase().startsWith(guessLower + " ") ||
-        currentTarget.name.toLowerCase().split(/\s+/).includes(guessLower)
-      ) {
-        clean = currentTarget.name;
-      } else {
-        const pool = getSearchPool();
-        const found = pool.find(
-          (p) =>
-            p.name.toLowerCase() === guessLower ||
-            p.name.toLowerCase().endsWith(" " + guessLower) ||
-            p.name.toLowerCase().split(/\s+/).includes(guessLower)
-        );
-        if (found) clean = found.name;
-      }
-    }
-
-    const isCorrect = !skipped && clean.toLowerCase() === currentTarget.name.toLowerCase();
-    currentAttempts.push({ name: clean || "Skip", skipped, isCorrect });
-
-    // Save state
-    const today = getTodayKey();
-    const won = isCorrect;
-    const lost = !won && currentAttempts.length >= MAX_ATTEMPTS;
-
-    if (won || lost) {
-      isGameOver = true;
-      finishGame(won);
+    const guessLower = clean.toLowerCase();
+    if (currentTarget.name.toLowerCase() === guessLower) {
+      clean = currentTarget.name;
+    } else if (
+      currentTarget.name.toLowerCase().endsWith(" " + guessLower) ||
+      currentTarget.name.toLowerCase().startsWith(guessLower + " ") ||
+      currentTarget.name.toLowerCase().split(/\s+/).includes(guessLower)
+    ) {
+      clean = currentTarget.name;
     } else {
-      renderPuzzle();
+      const pool = getSearchPool();
+      const match = pool.find((p) => p.name.toLowerCase() === guessLower);
+      if (match) clean = match.name;
     }
 
-    localStorage.setItem(
-      `cricketle_puzzle_${today}_${currentMode}`,
-      JSON.stringify({ attempts: currentAttempts, isGameOver, photoUrl: currentPhotoUrl })
-    );
+    // Check duplicate
+    if (currentAttempts.some((a) => a.name.toLowerCase() === clean.toLowerCase())) {
+      input.classList.add("shake");
+      setTimeout(() => input.classList.remove("shake"), 400);
+      return;
+    }
 
+    const isCorrect = (clean.toLowerCase() === currentTarget.name.toLowerCase());
+    currentAttempts.push({ name: clean, isCorrect: isCorrect });
+
+    if (input) input.value = "";
+    closeSuggestions();
     renderHistory();
     updateTrack();
-    if (input) input.value = "";
-    hideSuggestions();
-  }
 
-  function finishGame(won) {
-    renderPuzzle();
-
-    if (guessControls) guessControls.style.display = "none";
-    if (resultCard) {
-      resultCard.style.display = "block";
-      resultCard.className = `result-card ${won ? "won" : "lost"}`;
-      if (resultStatus) {
-        resultStatus.textContent = won ? "VICTORY! 🎉" : "OUT! 💔";
-        resultStatus.style.color = won ? "#16a34a" : "var(--danger)";
-      }
-      if (resultName) {
-        resultName.textContent = currentTarget.name + ` (${currentTarget.country})`;
-      }
-      if (resultHint) {
-        resultHint.textContent = currentTarget.hint;
-      }
+    if (isCorrect) {
+      finishGame(true);
+    } else if (currentAttempts.length >= MAX_ATTEMPTS) {
+      finishGame(false);
+    } else {
+      saveProgress();
     }
   }
 
-  // ---------- Autocomplete ----------
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
-
-  function highlightMatch(name, q) {
-    const i = name.toLowerCase().indexOf(q);
-    if (i < 0) return escapeHtml(name);
-    return (
-      escapeHtml(name.slice(0, i)) +
-      "<mark>" +
-      escapeHtml(name.slice(i, i + q.length)) +
-      "</mark>" +
-      escapeHtml(name.slice(i + q.length))
-    );
-  }
-
-  function hideSuggestions() {
-    if (!suggestions) return;
-    suggestions.hidden = true;
-    suggestions.innerHTML = "";
-    if (input) {
-      input.setAttribute("aria-expanded", "false");
-      input.removeAttribute("aria-activedescendant");
-    }
-    highlighted = -1;
-    currentMatches = [];
-  }
-
-  function showSuggestions(query) {
-    const q = query.trim().toLowerCase();
-    if (!q || !suggestions || !input) {
-      hideSuggestions();
-      return;
-    }
-
-    const pool = getSearchPool();
-    const starts = (pl) => pl.name.toLowerCase().startsWith(q);
-    const hasWord = (pl) => pl.name.toLowerCase().split(/\s+/).some((w) => w.startsWith(q));
-
-    currentMatches = pool
-      .filter((pl) => pl.name.toLowerCase().includes(q))
-      .sort((a, b) => {
-        const aStarts = starts(a), bStarts = starts(b);
-        if (aStarts !== bStarts) return aStarts ? -1 : 1;
-        const aWord = hasWord(a), bWord = hasWord(b);
-        if (aWord !== bWord) return aWord ? -1 : 1;
-        return a.name.localeCompare(b.name);
-      })
-      .slice(0, 8);
-
-    if (!currentMatches.length) {
-      hideSuggestions();
-      return;
-    }
-
-    highlighted = 0;
-    suggestions.hidden = false;
-    input.setAttribute("aria-expanded", "true");
-
-    suggestions.innerHTML = currentMatches
-      .map((pl, i) => {
-        return `
-          <li role="option" id="opt-${i}" class="${i === 0 ? "highlight" : ""}" data-name="${escapeHtml(pl.name)}">
-            <span>${highlightMatch(pl.name, q)}</span>
-            <span class="sub">${escapeHtml(pl.country)} · ${escapeHtml(pl.role)}</span>
-          </li>
-        `;
-      })
-      .join("");
-
-    input.setAttribute("aria-activedescendant", "opt-0");
-  }
-
-  function moveHighlight(delta) {
-    if (!currentMatches.length || !suggestions) return;
-    highlighted = (highlighted + delta + currentMatches.length) % currentMatches.length;
-    [...suggestions.children].forEach((li, i) => {
-      li.classList.toggle("highlight", i === highlighted);
-    });
-    input.setAttribute("aria-activedescendant", `opt-${highlighted}`);
-    suggestions.children[highlighted]?.scrollIntoView({ block: "nearest" });
-  }
-
-  function selectCurrent() {
-    if (currentMatches.length > 0) {
-      const idx = highlighted >= 0 && highlighted < currentMatches.length ? highlighted : 0;
-      const chosen = currentMatches[idx].name;
-      hideSuggestions();
-      makeGuess(chosen);
-    } else if (input && input.value.trim()) {
-      const text = input.value.trim();
-      hideSuggestions();
-      makeGuess(text);
-    }
-  }
-
+  // Autocomplete
   function setupAutocomplete() {
     if (!input || !suggestions) return;
 
     input.addEventListener("input", () => {
-      clearTimeout(blurTimer);
-      showSuggestions(input.value);
+      const q = input.value.trim().toLowerCase();
+      if (q.length < 1) {
+        closeSuggestions();
+        return;
+      }
+      const pool = getSearchPool();
+      currentMatches = pool
+        .filter((p) => p.name.toLowerCase().includes(q))
+        .slice(0, 7);
+
+      renderSuggestions(q);
     });
 
     input.addEventListener("keydown", (e) => {
-      if (suggestions.hidden) {
+      if (!suggestions || suggestions.hidden) {
         if (e.key === "Enter") {
           e.preventDefault();
-          if (input.value.trim()) makeGuess(input.value.trim());
+          selectCurrent();
         }
         return;
       }
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        moveHighlight(1);
+        highlighted = Math.min(highlighted + 1, currentMatches.length - 1);
+        updateHighlight();
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        moveHighlight(-1);
+        highlighted = Math.max(highlighted - 1, -1);
+        updateHighlight();
       } else if (e.key === "Enter") {
         e.preventDefault();
         selectCurrent();
       } else if (e.key === "Escape") {
-        hideSuggestions();
+        closeSuggestions();
       }
     });
 
-    suggestions.addEventListener("mousedown", (e) => {
-      const li = e.target.closest("li[data-name]");
-      if (li) {
-        e.preventDefault();
-        const name = li.getAttribute("data-name");
-        hideSuggestions();
-        makeGuess(name);
+    input.addEventListener("focus", () => {
+      if (input.value.trim().length >= 1) {
+        input.dispatchEvent(new Event("input"));
       }
     });
 
     input.addEventListener("blur", () => {
-      blurTimer = setTimeout(hideSuggestions, 150);
+      blurTimer = setTimeout(() => closeSuggestions(), 250);
     });
+  }
+
+  function renderSuggestions(q) {
+    if (!suggestions) return;
+    if (currentMatches.length === 0) {
+      closeSuggestions();
+      return;
+    }
+
+    suggestions.innerHTML = "";
+    highlighted = -1;
+
+    currentMatches.forEach((p, idx) => {
+      const li = document.createElement("li");
+      li.setAttribute("role", "option");
+      li.dataset.index = String(idx);
+
+      const reg = new RegExp("(" + q.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&") + ")", "gi");
+      const highlightedName = p.name.replace(reg, "<mark>$1</mark>");
+
+      li.innerHTML = `
+        <span class="sug-name">${highlightedName}</span>
+        <span class="sug-meta">${p.country} • ${p.role}</span>
+      `;
+
+      li.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        if (blurTimer) clearTimeout(blurTimer);
+        input.value = p.name;
+        closeSuggestions();
+        makeGuess(p.name);
+      });
+
+      suggestions.appendChild(li);
+    });
+
+    suggestions.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+  }
+
+  function updateHighlight() {
+    if (!suggestions) return;
+    const items = suggestions.querySelectorAll("li");
+    items.forEach((item, idx) => {
+      if (idx === highlighted) {
+        item.classList.add("selected");
+        item.scrollIntoView({ block: "nearest" });
+      } else {
+        item.classList.remove("selected");
+      }
+    });
+  }
+
+  function selectCurrent() {
+    if (!suggestions || suggestions.hidden || highlighted === -1) {
+      if (input && input.value.trim()) {
+        makeGuess(input.value.trim());
+      }
+      return;
+    }
+    if (currentMatches[highlighted]) {
+      const p = currentMatches[highlighted];
+      if (input) input.value = p.name;
+      closeSuggestions();
+      makeGuess(p.name);
+    }
+  }
+
+  function closeSuggestions() {
+    if (!suggestions) return;
+    suggestions.hidden = true;
+    suggestions.innerHTML = "";
+    highlighted = -1;
+    if (input) input.setAttribute("aria-expanded", "false");
   }
 
   // Event listeners
   guessBtn?.addEventListener("click", () => {
     selectCurrent();
-  });
-
-  skipBtn?.addEventListener("click", () => {
-    makeGuess("Skip", true);
   });
 
   // Mode toggles
@@ -704,6 +712,7 @@
     document.querySelectorAll(".mode-btn").forEach((b) => b.classList.remove("active"));
     e.target.classList.add("active");
     if (guessControls) guessControls.style.display = "block";
+    if (resetBtn) resetBtn.style.display = "inline-flex";
     if (resultCard) resultCard.style.display = "none";
     loadPuzzle();
   });
@@ -714,49 +723,27 @@
     document.querySelectorAll(".mode-btn").forEach((b) => b.classList.remove("active"));
     e.target.classList.add("active");
     if (guessControls) guessControls.style.display = "block";
+    if (resetBtn) resetBtn.style.display = "inline-flex";
     if (resultCard) resultCard.style.display = "none";
     loadPuzzle();
   });
 
-  async function checkAuth() {
-    try {
-      const res = await fetch("/api/me");
-      const d = await res.json();
+  // Auth button check
+  fetch("/api/me")
+    .then((r) => r.json())
+    .then((d) => {
       if (d && d.user) {
-        currentUser = d.user;
-        const navProfile = document.getElementById("nav-profile-label");
-        if (navProfile) navProfile.textContent = "@" + d.user.username;
         const topbarAuth = document.getElementById("topbar-auth-btn");
         if (topbarAuth) {
           topbarAuth.classList.add("signed-in");
           topbarAuth.title = `@${d.user.username} (Account)`;
           topbarAuth.setAttribute("aria-label", `Account for @${d.user.username}`);
         }
-        if (gateModal) gateModal.hidden = true;
-        if (input) {
-          input.disabled = false;
-          input.placeholder = "Type player name (e.g. Virat Kohli)...";
-        }
-        if (guessBtn) guessBtn.disabled = false;
-        if (skipBtn) skipBtn.disabled = false;
-        return true;
       }
-    } catch (e) {}
-
-    currentUser = null;
-    if (gateModal) gateModal.hidden = false;
-    if (input) {
-      input.disabled = true;
-      input.placeholder = "Member access only — Log in to play...";
-    }
-    if (guessBtn) guessBtn.disabled = true;
-    if (skipBtn) skipBtn.disabled = true;
-    return false;
-  }
+    })
+    .catch(() => {});
 
   // Initialize
   setupAutocomplete();
-  checkAuth();
   loadPuzzle();
 })();
-

@@ -41,25 +41,22 @@ test.describe("Full UI & Gameplay Tests (Authenticated Member)", () => {
     });
   });
 
-  test("Hub: renders all 7 live game cards and locked pixel cricketer", async ({ page }) => {
+  test("Hub: renders all 9 live game cards", async ({ page }) => {
     const errors = monitorConsole(page);
     await page.goto("/hub.html");
 
     await expect(page.locator(".hub-hero h2")).toContainText("CHOOSE YOUR CHALLENGE");
 
-    // 7 Live game cards
+    // 9 Live game cards
     await expect(page.locator("#tile-cricketle")).toBeVisible();
     await expect(page.locator("#tile-connections")).toBeVisible();
     await expect(page.locator("#tile-journey")).toBeVisible();
     await expect(page.locator("#tile-scorecard")).toBeVisible();
     await expect(page.locator("#tile-puzzle")).toBeVisible();
+    await expect(page.locator("#tile-pixel")).toBeVisible();
     await expect(page.locator("#tile-stadium")).toBeVisible();
     await expect(page.locator("#tile-facts")).toBeVisible();
     await expect(page.locator("#tile-scramble")).toBeVisible();
-
-    // Locked photo game
-    await expect(page.locator("#tile-pixel")).toBeVisible();
-    await expect(page.locator("#status-pixel")).toContainText("Locked");
 
     // Topbar Auth Button shows signed-in state
     const authBtn = page.locator("#topbar-auth-btn");
@@ -83,7 +80,7 @@ test.describe("Full UI & Gameplay Tests (Authenticated Member)", () => {
     if (isMobile) {
       await expect(bar).toBeVisible();
       const pills = bar.locator(".mv-pill");
-      await expect(pills).toHaveCount(9);
+      await expect(pills).toHaveCount(10);
       await expect(bar.locator('.mv-pill[data-game="hub"]')).toHaveClass(/active/);
     } else {
       await expect(bar).toBeHidden();
@@ -208,20 +205,37 @@ test.describe("Full UI & Gameplay Tests (Authenticated Member)", () => {
     expect(errors.filter((e) => !e.includes("favicon"))).toEqual([]);
   });
 
-  test("Puzzle Cricketer UI: jigsaw puzzle container", async ({ page }) => {
+  test("Puzzle Cricketer UI: interactive rearrangeable puzzle and 3 attempts", async ({ page }) => {
     const errors = monitorConsole(page);
     await page.goto("/puzzle.html");
 
     await expect(page.locator("h1")).toContainText("Puzzle Cricketer");
     await expect(page.locator("#puzzle-canvas")).toBeVisible();
+    await expect(page.locator("#btn-reset-scramble")).toBeVisible();
+    await expect(page.locator("#guess-input")).toBeEnabled();
+    await expect(page.locator("#btn-guess")).toBeVisible();
+    
+    // Exactly 3 attempts dots
+    const dots = page.locator("#attempts-track .attempt-dot");
+    await expect(dots).toHaveCount(3);
 
     expect(errors.filter((e) => !e.includes("favicon"))).toEqual([]);
   });
 
-  test("Pixel Cricketer Lock State: Coming Soon overlay and disabled input", async ({ page }) => {
+  test("Pixel Cricketer UI: photo unblur container and active controls", async ({ page }) => {
+    const errors = monitorConsole(page);
     await page.goto("/pixel.html");
-    await expect(page.locator("#coming-soon-modal")).toBeVisible();
-    await expect(page.locator("#cs-title")).toHaveText("COMING SOON");
-    await expect(page.locator("#guess-input")).toBeDisabled();
+
+    await expect(page.locator("h1")).toContainText("Pixel Cricketer");
+    await expect(page.locator("#pixel-canvas")).toBeVisible();
+    await expect(page.locator("#guess-input")).toBeEnabled();
+    await expect(page.locator("#btn-guess")).toBeVisible();
+    await expect(page.locator("#btn-skip")).toBeVisible();
+
+    // 6 attempts dots
+    const dots = page.locator("#attempts-track .attempt-dot");
+    await expect(dots).toHaveCount(6);
+
+    expect(errors.filter((e) => !e.includes("favicon"))).toEqual([]);
   });
 });

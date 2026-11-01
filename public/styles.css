@@ -241,8 +241,8 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 .nav {
   display: none;
   align-items: center;
-  gap: 3px;
-  padding: 3px 8px;
+  gap: 2px;
+  padding: 3px 6px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -252,17 +252,19 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
   flex-shrink: 0;
   min-width: 0;
   overflow: visible;
+  box-sizing: border-box;
 }
 .nav-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  min-height: 36px; padding: 0 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  min-height: 34px; padding: 0 8px;
   border-radius: 999px;
-  color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.82rem;
+  color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.8rem;
   transition: color var(--dur-fast), background var(--dur-fast);
   white-space: nowrap;
   flex-shrink: 0;
+  overflow: visible;
 }
-.nav-link svg { width: 17px; height: 17px; flex: none; }
+.nav-link svg { width: 16px; height: 16px; flex: none; }
 .nav-link:hover { color: var(--fg); background: rgba(255,255,255,0.08); }
 .nav-link[aria-current="page"] { color: #fff; background: var(--mode-deep); }
 body.hard .nav-link[aria-current="page"] { color: #1a1200; background: var(--accent); }
@@ -298,34 +300,59 @@ body.hard .nav-link[aria-current="page"] { color: #1a1200; background: var(--acc
   body { padding-bottom: var(--space-7); }
 }
 
-/* Tablet & compact laptop (768px - 1319px): icon-only nav pills with pristine spacing so .brand NEVER gets squeezed */
-@media (min-width: 768px) and (max-width: 1319px) {
+/* Tablet (768px - 1023px): compact icon pills, crisp brand */
+@media (min-width: 768px) and (max-width: 1023px) {
   .tagline { display: none; }
+  .brand-mark { width: 38px; height: 38px; border-radius: 10px; }
+  .brand-mark svg { width: 26px; height: 26px; }
+  .topbar h1 { font-size: clamp(1.15rem, 1.8vw, 1.45rem); letter-spacing: 0.02em; }
   .nav-link span { display: none; }
-  .nav-link { padding: 0 9px; min-height: 36px; }
-  .nav { padding: 3px 6px; gap: 3px; }
-  .topbar { gap: 10px; }
-  .topbar h1 { font-size: clamp(1.3rem, 1.8vw, 1.65rem); }
+  .nav-link { padding: 0 7px; min-height: 32px; }
+  .nav-link svg { width: 15px; height: 15px; }
+  .nav { padding: 2px 5px; gap: 2px; }
+  .topbar { gap: 8px; padding-left: 12px; padding-right: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 10px; }
+  .icon-btn svg { width: 18px; height: 18px; }
+  /* For index.html (4 items), keep text */
+  .topbar:has(a[data-view="play"]) .nav-link span { display: inline; }
+  .topbar:has(a[data-view="play"]) .nav-link { padding: 0 8px; }
 }
 
-/* Standard Desktop & Laptops (1320px - 1479px): compact text pills fitting all 9 variants comfortably */
-@media (min-width: 1320px) and (max-width: 1479px) {
+/* Compact Desktop (1024px - 1279px): icon pills with active variant label */
+@media (min-width: 1024px) and (max-width: 1279px) {
   .tagline { display: none; }
+  .brand-mark { width: 42px; height: 42px; }
+  .brand-mark svg { width: 30px; height: 30px; }
+  .topbar h1 { font-size: clamp(1.25rem, 1.8vw, 1.6rem); }
+  .nav-link span { display: none; }
+  .nav-link[aria-current="page"] span { display: inline; }
+  .nav-link { padding: 0 8px; min-height: 34px; }
+  .nav-link[aria-current="page"] { padding: 0 10px; }
+  .nav { padding: 3px 6px; gap: 2px; }
+  .topbar { gap: 10px; }
+  .topbar:has(a[data-view="play"]) .nav-link span { display: inline; }
+}
+
+/* Standard Desktop (1280px - 1439px): full text pills fitting all 10 variants */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .tagline { display: none; }
+  .brand-mark { width: 44px; height: 44px; }
+  .topbar h1 { font-size: clamp(1.35rem, 1.6vw, 1.75rem); }
   .nav-link span { display: inline; }
   .nav-link { padding: 0 6px; font-size: 0.76rem; gap: 3px; min-height: 34px; }
   .nav { padding: 3px 8px; gap: 3px; }
   .topbar { gap: 10px; }
-  .topbar h1 { font-size: clamp(1.35rem, 1.6vw, 1.75rem); }
 }
 
-/* Wide Desktop (>= 1480px): spacious luxury sports UI */
-@media (min-width: 1480px) {
+/* Wide Desktop (>= 1440px): spacious luxury sports UI */
+@media (min-width: 1440px) {
   .tagline { display: block; max-width: 32ch; font-size: 0.8rem; }
+  .brand-mark { width: 48px; height: 48px; }
+  .topbar h1 { font-size: clamp(1.5rem, 1.8vw, 2.1rem); }
   .nav-link span { display: inline; }
   .nav-link { padding: 0 8px; font-size: 0.82rem; gap: 5px; min-height: 36px; }
   .nav { padding: 4px 10px; gap: 4px; }
   .topbar { gap: 14px; }
-  .topbar h1 { font-size: clamp(1.5rem, 1.8vw, 2.1rem); }
 }
 
 /* ---------- Views ---------- */

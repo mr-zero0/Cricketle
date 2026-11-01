@@ -25,7 +25,10 @@
         if (scorecardStatus) scorecardStatus.textContent = "1 Daily Match";
 
         const puzzleStatus = document.getElementById("status-puzzle");
-        if (puzzleStatus) puzzleStatus.textContent = "1 Daily Puzzle";
+        if (puzzleStatus) puzzleStatus.textContent = "3 Guesses Daily";
+
+        const pixelStatus = document.getElementById("status-pixel");
+        if (pixelStatus) pixelStatus.textContent = "6 Attempts Daily";
 
         const journeyStatus = document.getElementById("status-journey");
         if (journeyStatus) journeyStatus.textContent = "1 Daily Player";
@@ -38,6 +41,7 @@
 
         const factsStatus = document.getElementById("status-facts");
         if (factsStatus) factsStatus.textContent = "1 Daily Challenge";
+
         const scrambleStatus = document.getElementById("status-scramble");
         if (scrambleStatus) scrambleStatus.textContent = "6 Attempts Daily";
       }
