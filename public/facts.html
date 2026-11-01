@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
   <meta name="theme-color" content="#0b1220" />
   <meta name="description" content="Cricketle: Fact or Fiction - Spot 3 real truths from 3 clever myths in daily cricket challenges." />
   <meta property="og:title" content="Fact or Fiction - Cricketle Daily Challenge" />
@@ -568,7 +568,7 @@
         <p class="gate-desc"><strong>Fact or Fiction</strong> is an exclusive daily challenge for registered Cricketle members.</p>
         <ul class="gate-perks">
           <li><span>✨</span> <span><strong>Free Instant Account</strong> — 100% free to join in seconds</span></li>
-          <li><span>🧠</span> <span><strong>3 Daily Rounds</strong> — Test your knowledge with 18 surprising facts</span></li>
+          <li><span>🧠</span> <span><strong>1 Daily Challenge</strong> — Test your knowledge with 6 surprising facts (3 real, 3 fake)</span></li>
           <li><span>📊</span> <span><strong>Streaks & Badges</strong> — Track trivia accuracy and share results</span></li>
         </ul>
         <div class="gate-actions">
@@ -587,9 +587,7 @@
 
       <!-- Round Indicators -->
       <div class="round-indicator-bar" id="round-indicator-bar">
-        <div class="round-step-pill active" id="step-pill-0"><span>Round 1</span></div>
-        <div class="round-step-pill" id="step-pill-1"><span>Round 2</span></div>
-        <div class="round-step-pill" id="step-pill-2"><span>Round 3</span></div>
+        <div class="round-step-pill active" id="step-pill-0"><span>Daily Challenge</span></div>
       </div>
 
       <!-- Round Score Banner (Visible after submitting a round) -->
@@ -601,7 +599,7 @@
       <!-- Meta bar: Theme & Decision Counter -->
       <div class="facts-meta-bar">
         <div class="facts-theme-label">
-          <span class="facts-theme-tag" id="facts-theme-tag">Round 1</span>
+          <span class="facts-theme-tag" id="facts-theme-tag">Daily Trivia</span>
           <span id="facts-theme-title">Legendary Feats & Curiosities</span>
         </div>
         <div class="facts-counters">
@@ -620,9 +618,7 @@
         <button type="button" class="submit-facts-btn" id="btn-submit-round" disabled>
           <span>Submit Decisions (0/6)</span>
         </button>
-        <button type="button" class="next-round-btn" id="btn-next-round" style="display:none;">
-          <span>Continue to Round 2 →</span>
-        </button>
+        
       </div>
     </div>
 
@@ -631,7 +627,7 @@
       <div style="font-size:42px; margin-bottom:8px;">🏆</div>
       <h2>DAILY CHALLENGE COMPLETE!</h2>
       <p style="color:var(--muted); font-size:15px; margin:0;">Here is your final Fact or Fiction score for today:</p>
-      <div class="summary-score-big" id="final-score-display">16 / 18</div>
+      <div class="summary-score-big" id="final-score-display">6 / 6</div>
       <p id="final-score-rating" style="font-weight:700; font-size:16px; color:#f8fafc; margin:0 0 12px;"></p>
       <div class="summary-grid-preview" id="summary-grid-preview"></div>
       <div class="summary-actions">
@@ -650,6 +646,7 @@
 
   <div class="toast" id="facts-toast" role="status" aria-live="polite"></div>
 
+  <script src="mobile-keyboard.js?v=1.0.0" defer></script>
   <script src="facts.js?v=1.0.0" defer></script>
 </body>
 </html>

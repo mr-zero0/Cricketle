@@ -37,7 +37,7 @@
         if (stadiumStatus) stadiumStatus.textContent = "1 Daily Venue";
 
         const factsStatus = document.getElementById("status-facts");
-        if (factsStatus) factsStatus.textContent = "3 Daily Rounds";
+        if (factsStatus) factsStatus.textContent = "1 Daily Challenge";
       }
     })
     .catch(() => {});

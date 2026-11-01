@@ -1,13 +1,13 @@
 (function () {
   "use strict";
 
-  const TOTAL_ROUNDS = 3;
+  const TOTAL_ROUNDS = 1;
   let allSets = [];
   let dailySets = [];
   let currentRoundIndex = 0;
   let currentRoundSet = null;
   let userChoices = {}; // factId -> 'real' | 'fake'
-  let roundResults = []; // array of results for each completed round
+  let roundResults = []; // array of results for daily challenge
   let isRoundSubmitted = false;
   let currentUser = null;
 
@@ -107,7 +107,7 @@
   function saveState() {
     const today = getTodayKey();
     const state = {
-      roundIndex: currentRoundIndex,
+      roundIndex: 0,
       roundResults: roundResults,
       userChoices: userChoices,
       isRoundSubmitted: isRoundSubmitted
@@ -130,32 +130,20 @@
 
   function selectDailySets(todayKey) {
     if (!allSets || allSets.length === 0) return [];
-    const pool = [...allSets];
-    const picked = [];
-
-    for (let r = 0; r < TOTAL_ROUNDS; r++) {
-      const seed = hashString(`${todayKey}_facts_round_${r}`);
-      const idx = seed % pool.length;
-      picked.push(pool[idx]);
-      pool.splice(idx, 1);
-    }
-
-    return picked;
+    const seed = hashString(`${todayKey}_facts_daily_single`);
+    const idx = seed % allSets.length;
+    return [allSets[idx]];
   }
 
   function updateRoundPills() {
-    for (let i = 0; i < TOTAL_ROUNDS; i++) {
-      const pill = document.getElementById(`step-pill-${i}`);
-      if (!pill) continue;
-      pill.classList.remove("active", "completed");
-      if (i < currentRoundIndex) {
-        pill.classList.add("completed");
-        pill.innerHTML = `<span>✓ Round ${i + 1}</span>`;
-      } else if (i === currentRoundIndex) {
-        pill.classList.add("active");
-        pill.innerHTML = `<span>Round ${i + 1}</span>`;
+    const pill0 = document.getElementById("step-pill-0");
+    if (pill0) {
+      pill0.classList.add("active");
+      if (isRoundSubmitted) {
+        pill0.classList.add("completed");
+        pill0.innerHTML = "<span>✓ Completed</span>";
       } else {
-        pill.innerHTML = `<span>Round ${i + 1}</span>`;
+        pill0.innerHTML = "<span>Daily Challenge</span>";
       }
     }
   }
@@ -182,29 +170,36 @@
     if (btnSubmit && !isRoundSubmitted) {
       btnSubmit.disabled = totalMarked < 6;
       const label = totalMarked === 6 ? "SUBMIT DECISIONS (Ready!)" : `Submit Decisions (${totalMarked}/6)`;
-      btnSubmit.querySelector("span").textContent = label;
+      const btnSpan = btnSubmit.querySelector("span");
+      if (btnSpan) btnSpan.textContent = label;
     }
   }
 
-  function renderRound() {
+  function renderRound(alreadySubmitted = false) {
     if (!currentRoundSet) return;
 
-    userChoices = {};
-    isRoundSubmitted = false;
-
-    updateRoundPills();
-    if (roundBanner) roundBanner.hidden = true;
-    if (btnNext) btnNext.style.display = "none";
-    if (btnSubmit) {
-      btnSubmit.style.display = "inline-flex";
-      btnSubmit.disabled = true;
+    if (!alreadySubmitted) {
+      userChoices = {};
+      isRoundSubmitted = false;
     }
 
-    if (themeTagEl) themeTagEl.textContent = `Round ${currentRoundIndex + 1}`;
+    updateRoundPills();
+    if (roundBanner && !alreadySubmitted) roundBanner.hidden = true;
+    if (btnNext) btnNext.style.display = "none";
+    if (btnSubmit) {
+      if (alreadySubmitted) {
+        btnSubmit.style.display = "none";
+      } else {
+        btnSubmit.style.display = "inline-flex";
+        btnSubmit.disabled = true;
+      }
+    }
+
+    if (themeTagEl) themeTagEl.textContent = "Daily Trivia";
     if (themeTitleEl) themeTitleEl.textContent = currentRoundSet.theme || "Cricket Trivia";
 
-    // Shuffle facts deterministically for this round
-    const seed = hashString(`${getTodayKey()}_round_${currentRoundIndex}_order`);
+    // Shuffle facts deterministically for today
+    const seed = hashString(`${getTodayKey()}_daily_order`);
     const rng = mulberry32(seed);
     const facts = [...currentRoundSet.facts];
     for (let i = facts.length - 1; i > 0; i--) {
@@ -220,19 +215,38 @@
       card.id = `card-${f.id}`;
       card.setAttribute("data-fact-id", f.id);
 
+      const existingChoice = userChoices[f.id];
+      const isCorrect = alreadySubmitted && ((existingChoice === "real" && f.isReal) || (existingChoice === "fake" && !f.isReal));
+
+      if (alreadySubmitted) {
+        card.classList.add(isCorrect ? "reveal-correct" : "reveal-wrong");
+      } else if (existingChoice === "real") {
+        card.classList.add("selected-real");
+      } else if (existingChoice === "fake") {
+        card.classList.add("selected-fake");
+      }
+
       card.innerHTML = `
         <div class="fact-card-body">
           <div class="fact-statement">${escapeHtml(f.statement)}</div>
           <div class="fact-actions">
-            <button type="button" class="choice-btn choice-real" data-fact-id="${f.id}" data-choice="real" aria-label="Mark statement ${idx + 1} as Real">
+            <button type="button" class="choice-btn choice-real${existingChoice === "real" ? " active-real" : ""}" data-fact-id="${f.id}" data-choice="real" aria-label="Mark statement ${idx + 1} as Real"${alreadySubmitted ? " disabled" : ""}>
               <span>✅ Real</span>
             </button>
-            <button type="button" class="choice-btn choice-fake" data-fact-id="${f.id}" data-choice="fake" aria-label="Mark statement ${idx + 1} as Fake">
+            <button type="button" class="choice-btn choice-fake${existingChoice === "fake" ? " active-fake" : ""}" data-fact-id="${f.id}" data-choice="fake" aria-label="Mark statement ${idx + 1} as Fake"${alreadySubmitted ? " disabled" : ""}>
               <span>❌ Fake</span>
             </button>
           </div>
         </div>
-        <div class="fact-explanation-box" id="explain-${f.id}" style="display:none;"></div>
+        <div class="fact-explanation-box" id="explain-${f.id}" style="${alreadySubmitted ? "display:block;" : "display:none;"}">
+          ${alreadySubmitted ? `
+            <div class="verdict-header">
+              <span>${f.isReal ? "🟢 REAL (VERIFIED)" : "🔴 FAKE (MYTH)"}</span>
+              <span>${isCorrect ? "✅ YOU GOT IT!" : `❌ MISSED (You guessed ${(existingChoice || "").toUpperCase()})`}</span>
+            </div>
+            <div class="verdict-text">${escapeHtml(f.explanation)}</div>
+          ` : ""}
+        </div>
       `;
 
       factsListEl.appendChild(card);
@@ -254,20 +268,20 @@
       // Toggle off
       delete userChoices[factId];
       card.classList.remove("selected-real", "selected-fake");
-      btnReal.classList.remove("active-real");
-      btnFake.classList.remove("active-fake");
+      if (btnReal) btnReal.classList.remove("active-real");
+      if (btnFake) btnFake.classList.remove("active-fake");
     } else {
       userChoices[factId] = choice;
       card.classList.remove("selected-real", "selected-fake");
-      btnReal.classList.remove("active-real");
-      btnFake.classList.remove("active-fake");
+      if (btnReal) btnReal.classList.remove("active-real");
+      if (btnFake) btnFake.classList.remove("active-fake");
 
       if (choice === "real") {
         card.classList.add("selected-real");
-        btnReal.classList.add("active-real");
+        if (btnReal) btnReal.classList.add("active-real");
       } else {
         card.classList.add("selected-fake");
-        btnFake.classList.add("active-fake");
+        if (btnFake) btnFake.classList.add("active-fake");
       }
     }
 
@@ -282,7 +296,7 @@
     }
 
     isRoundSubmitted = true;
-    btnSubmit.style.display = "none";
+    if (btnSubmit) btnSubmit.style.display = "none";
 
     let correctCount = 0;
     const roundDetails = [];
@@ -305,8 +319,8 @@
       if (card) {
         const btnReal = card.querySelector(".choice-real");
         const btnFake = card.querySelector(".choice-fake");
-        btnReal.disabled = true;
-        btnFake.disabled = true;
+        if (btnReal) btnReal.disabled = true;
+        if (btnFake) btnFake.disabled = true;
 
         card.classList.remove("selected-real", "selected-fake");
         card.classList.add(isCorrect ? "reveal-correct" : "reveal-wrong");
@@ -327,85 +341,66 @@
       }
     });
 
-    roundResults[currentRoundIndex] = {
-      roundIndex: currentRoundIndex,
+    roundResults[0] = {
+      roundIndex: 0,
       theme: currentRoundSet.theme,
       score: correctCount,
       details: roundDetails
     };
 
     saveState();
+    updateRoundPills();
 
     // Show round banner
     if (roundBanner) {
       roundBanner.hidden = false;
-      const feedback = correctCount === 6 ? "PERFECT! Flawless intuition!" :
-                       correctCount >= 5 ? "GREAT EYE! Exceptional knowledge!" :
+      const feedback = correctCount === 6 ? "PERFECT! Flawless cricket intuition!" :
+                       correctCount >= 5 ? "GREAT EYE! Exceptional cricket knowledge!" :
                        correctCount >= 4 ? "SOLID EFFORT! Tricky ones in there!" :
                        "DECEIVING! These myths fooled you!";
       roundBannerTitle.textContent = `${correctCount} / 6 CORRECT!`;
       roundBannerDesc.textContent = feedback;
     }
 
-    // Show Next or Finish button
-    if (currentRoundIndex < TOTAL_ROUNDS - 1) {
-      if (btnNext) {
-        btnNext.querySelector("span").textContent = `Continue to Round ${currentRoundIndex + 2} →`;
-        btnNext.style.display = "inline-flex";
-      }
-    } else {
-      setTimeout(() => {
-        showFinalSummary();
-      }, 1500);
-    }
-  }
-
-  function advanceToNextRound() {
-    if (currentRoundIndex < TOTAL_ROUNDS - 1) {
-      currentRoundIndex++;
-      currentRoundSet = dailySets[currentRoundIndex];
-      renderRound();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      saveState();
-    }
+    showFinalSummary();
   }
 
   function showFinalSummary() {
-    if (gameView) gameView.style.display = "none";
     if (finishedView) finishedView.style.display = "block";
+    if (btnSubmit) btnSubmit.style.display = "none";
 
-    let totalScore = 0;
-    const maxScore = TOTAL_ROUNDS * 6;
+    const result = roundResults[0] || { score: 0, details: [] };
+    const totalScore = result.score || 0;
+    const maxScore = 6;
     let gridText = "";
 
-    roundResults.forEach((r, idx) => {
-      totalScore += r.score;
+    if (result.details && result.details.length > 0) {
       let rowEmojis = "";
-      r.details.forEach((d) => {
+      result.details.forEach((d) => {
         rowEmojis += d.isCorrect ? "🟢" : "🔴";
       });
-      gridText += `R${idx + 1}: ${rowEmojis} (${r.score}/6)\n`;
-    });
+      gridText = `${rowEmojis} (${totalScore}/6)`;
+    }
 
     if (finalScoreDisplay) {
       finalScoreDisplay.textContent = `${totalScore} / ${maxScore}`;
     }
 
     if (finalScoreRating) {
-      const pct = (totalScore / maxScore) * 100;
       let title = "Cricket Fan";
-      if (pct === 100) title = "🏆 Cricket Trivia Grandmaster (Flawless 18/18!)";
-      else if (pct >= 80) title = "🧠 Trivia Mastermind";
-      else if (pct >= 60) title = "🏏 Sharp Cricket Connoisseur";
+      if (totalScore === 6) title = "🏆 Cricket Trivia Grandmaster (Flawless 6/6!)";
+      else if (totalScore === 5) title = "🧠 Trivia Mastermind (5/6)";
+      else if (totalScore === 4) title = "🏏 Sharp Cricket Connoisseur (4/6)";
+      else if (totalScore === 3) title = "⚖️ Balanced Guessing (3/6)";
       else title = "📚 Clever Myths Won Today!";
       finalScoreRating.textContent = title;
     }
 
     if (summaryGridPreview) {
-      summaryGridPreview.textContent = gridText.trim();
+      summaryGridPreview.textContent = gridText || `${totalScore}/6`;
     }
 
-    const shareText = `Cricketle · Fact or Fiction ⚖️\nDaily Challenge · ${getTodayKey()}\nScore: ${totalScore}/${maxScore}\n\n${gridText.trim()}\nPlay at: https://cricketle.onrender.com/facts.html`;
+    const shareText = `Cricketle · Fact or Fiction ⚖️\nDaily Challenge · ${getTodayKey()}\nScore: ${totalScore}/${maxScore}\n\n${gridText}\n\nCan you separate cricket truth from clever fiction?\nhttps://cricketle.onrender.com/facts.html`;
 
     if (btnShareWhatsapp) {
       btnShareWhatsapp.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
@@ -423,7 +418,6 @@
     }
 
     startMidnightCountdown();
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function startMidnightCountdown() {
@@ -441,7 +435,7 @@
       const diffMs = nextMidnightIst.getTime() - istMs;
 
       if (diffMs <= 0) {
-        if (countdownTimer) countdownTimer.textContent = "New puzzles live! Refresh.";
+        if (countdownTimer) countdownTimer.textContent = "New facts live! Refresh.";
         return;
       }
 
@@ -472,24 +466,25 @@
     dailySets = selectDailySets(today);
     if (!dailySets || dailySets.length === 0) return;
 
+    currentRoundIndex = 0;
+    currentRoundSet = dailySets[0];
+
     const saved = loadSavedState();
-    if (saved && saved.roundResults && saved.roundResults.length === TOTAL_ROUNDS) {
-      // Completed all 3 rounds today
+    if (saved && saved.isRoundSubmitted && saved.roundResults && saved.roundResults.length > 0) {
+      // Completed today
       roundResults = saved.roundResults;
+      userChoices = saved.userChoices || {};
+      isRoundSubmitted = true;
+      renderRound(true);
       showFinalSummary();
       return;
     }
 
-    if (saved && typeof saved.roundIndex === "number") {
-      currentRoundIndex = Math.min(saved.roundIndex, TOTAL_ROUNDS - 1);
-      roundResults = saved.roundResults || [];
-    } else {
-      currentRoundIndex = 0;
-      roundResults = [];
+    if (saved && saved.userChoices) {
+      userChoices = saved.userChoices;
     }
 
-    currentRoundSet = dailySets[currentRoundIndex];
-    renderRound();
+    renderRound(false);
 
     // Event Delegation for choice clicks
     if (factsListEl) {
@@ -506,10 +501,6 @@
 
     if (btnSubmit) {
       btnSubmit.addEventListener("click", submitRound);
-    }
-
-    if (btnNext) {
-      btnNext.addEventListener("click", advanceToNextRound);
     }
   }
 
