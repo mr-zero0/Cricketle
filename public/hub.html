@@ -153,6 +153,13 @@
       --tile-accent: #9333ea;
     }
 
+    .tile-facts {
+      --tile-glow: rgba(244, 63, 94, 0.3);
+      --tile-border-hover: rgba(244, 63, 94, 0.7);
+      --tile-shadow: rgba(244, 63, 94, 0.35);
+      --tile-accent: #f43f5e;
+    }
+
     .tile-locked {
       --tile-glow: transparent;
       --tile-border-hover: var(--border);
@@ -543,6 +550,7 @@
       <symbol id="i-journey" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="18" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
       <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
       <symbol id="i-stadium" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6 2 11c0 3.2 1.8 6 4.5 7.6L6 22l4-2c.6.1 1.3.1 2 .1 5.5 0 10-4 10-9s-4.5-9-10-9z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M5 7l7-3 7 3M5 7L2 15h6L5 7zm14 0l-3 8h6l-3-8zM9 21h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
 
@@ -563,6 +571,7 @@
       <a href="scorecard.html" class="nav-link"><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Scorecard</span></a>
       <a href="puzzle.html" class="nav-link"><svg aria-hidden="true"><use href="#i-puzzle"/></svg><span>Puzzle</span></a>
       <a href="stadium.html" class="nav-link"><svg aria-hidden="true"><use href="#i-stadium"/></svg><span>Stadium</span></a>
+      <a href="facts.html" class="nav-link"><svg aria-hidden="true"><use href="#i-scale"/></svg><span>Facts</span></a>
     </nav>
     <div class="topbar-actions">
       <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch to day">
@@ -585,6 +594,7 @@
       <a href="scorecard.html" class="mv-pill" data-game="scorecard"><span class="mv-icon">📋</span><span>Scorecard</span></a>
       <a href="puzzle.html" class="mv-pill" data-game="puzzle"><span class="mv-icon">🧩</span><span>Puzzle</span></a>
       <a href="stadium.html" class="mv-pill" data-game="stadium"><span class="mv-icon">🏟️</span><span>Stadium</span></a>
+      <a href="facts.html" class="mv-pill" data-game="facts"><span class="mv-icon">⚖️</span><span>Facts</span></a>
     </div>
   </nav>
 
@@ -592,7 +602,7 @@
   <main id="main" class="hub-container">
     <div class="hub-hero">
       <h2>CHOOSE YOUR CHALLENGE</h2>
-      <p>Test your cricket knowledge with 6 daily challenges. New puzzles drop every midnight.</p>
+      <p>Test your cricket knowledge with 7 daily challenges. New puzzles drop every midnight.</p>
     </div>
 
     <!-- Active Games (6 Live Modes) -->
@@ -698,6 +708,22 @@
           <span class="tile-play-btn">Play Now →</span>
         </div>
       </a>
+          <!-- 7. Fact or Fiction (Live) -->
+      <a href="facts.html" class="game-tile tile-facts" id="tile-facts">
+        <div class="tile-header">
+          <span class="tile-badge">Trivia Duel</span>
+          <span class="tile-status" id="status-facts"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-lock"/></svg> Members Only</span>
+        </div>
+        <div class="tile-body">
+          <div class="tile-icon">⚖️</div>
+          <h3 class="tile-title">Fact or Fiction</h3>
+          <p class="tile-desc">Spot 3 mind-blowing truths from 3 clever myths. 3 tricky rounds every single day!</p>
+        </div>
+        <div class="tile-footer">
+          <span class="tile-streak"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-flame"/></svg> Daily</span>
+          <span class="tile-play-btn">Play Now →</span>
+        </div>
+      </a>
     </div>
     <div class="hub-mobile-hint" aria-hidden="true">
       <span>← Swipe to explore games →</span>
@@ -722,6 +748,7 @@
           <span class="tile-play-btn">Locked</span>
         </div>
       </div>
+          
     </div>
     <div class="hub-mobile-hint" aria-hidden="true">
       <span>← Swipe to explore upcoming modes →</span>

@@ -1,0 +1,16 @@
+name: Keep Render Awake
+
+on:
+  schedule:
+    # Runs every 12 minutes to keep the Render free-tier instance active (Render spins down after 15m)
+    - cron: '*/12 * * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    name: Ping Render Instance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send keep-alive HTTP GET request
+        run: |
+          curl -s -S -f --max-time 30 https://playcricketle.onrender.com/api/health || echo "Ping attempted"

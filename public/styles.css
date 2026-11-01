@@ -182,7 +182,14 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 }
 .app:focus { outline: none; }
 
-.brand { display: flex; align-items: center; gap: var(--space-3); min-width: 0; flex: 0 1 auto; }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: max-content;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+}
 .brand-mark {
   flex: none;
   width: 48px; height: 48px;
@@ -198,14 +205,19 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 .brand-mark svg { width: 34px; height: 34px; transition: transform 900ms var(--ease-out); }
 .brand:hover .brand-mark { transform: translateY(-2px); }
 .brand:hover .brand-mark svg { transform: rotate(180deg); }
-.brand-text { min-width: 0; }
+.brand-text {
+  min-width: 0;
+  flex-shrink: 0;
+}
 .topbar h1 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
   letter-spacing: 0.04em;
-  line-height: 0.95;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
   background: linear-gradient(100deg, #f8fafc 0%, #f8fafc 40%, #86efac 50%, #f8fafc 60%, #f8fafc 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -213,7 +225,15 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
   color: transparent;
   animation: shimmer 1.8s var(--ease-out) 300ms 1 both;
 }
-.tagline { margin: 2px 0 0; color: var(--muted); font-size: 0.9rem; max-width: 40ch; }
+.tagline {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 38ch;
+}
 
 /* Top navigation (tablet and up) */
 .nav {
@@ -226,16 +246,9 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
   border-radius: 999px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  flex: 0 1 auto;
+  flex: 0 0 auto;
+  flex-shrink: 0;
   min-width: 0;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-.nav::-webkit-scrollbar {
-  display: none;
 }
 .nav-link {
   display: inline-flex; align-items: center; gap: 6px;
@@ -282,26 +295,26 @@ body.hard .nav-link[aria-current="page"] { color: #1a1200; background: var(--acc
   body { padding-bottom: var(--space-7); }
 }
 
-/* Tablet & compact laptop (768px - 1199px): icon-only nav pills to ensure 100% breathing room */
-@media (min-width: 768px) and (max-width: 1199px) {
+/* Tablet & compact laptop (768px - 1279px): icon-only nav pills with pristine spacing so .brand NEVER gets squeezed */
+@media (min-width: 768px) and (max-width: 1279px) {
   .nav-link span { display: none; }
   .nav-link { padding: 0 10px; min-height: 36px; }
   .topbar { gap: var(--space-2); }
-  .topbar h1 { font-size: clamp(1.4rem, 2.2vw, 1.9rem); }
+  .topbar h1 { font-size: clamp(1.4rem, 2.2vw, 1.85rem); }
 }
 
-/* Standard Desktop & Laptops (1200px - 1339px): compact text pills fitting all 7 variants comfortably */
-@media (min-width: 1200px) and (max-width: 1339px) {
+/* Standard Desktop & Laptops (1280px - 1399px): compact text pills fitting all 8 variants comfortably */
+@media (min-width: 1280px) and (max-width: 1399px) {
   .nav-link span { display: inline; }
-  .nav-link { padding: 0 9px; font-size: 0.82rem; gap: 5px; min-height: 36px; }
+  .nav-link { padding: 0 8px; font-size: 0.8rem; gap: 4px; min-height: 36px; }
   .topbar { gap: var(--space-2); }
-  .topbar h1 { font-size: clamp(1.6rem, 2.4vw, 2.2rem); }
+  .topbar h1 { font-size: clamp(1.5rem, 2vw, 2rem); }
 }
 
-/* Wide Desktop (>= 1340px): spacious luxury sports UI */
-@media (min-width: 1340px) {
+/* Wide Desktop (>= 1400px): spacious luxury sports UI */
+@media (min-width: 1400px) {
   .nav-link span { display: inline; }
-  .nav-link { padding: 0 12px; font-size: 0.86rem; gap: 6px; min-height: 38px; }
+  .nav-link { padding: 0 11px; font-size: 0.85rem; gap: 6px; min-height: 38px; }
 }
 
 /* ---------- Views ---------- */
@@ -1908,6 +1921,13 @@ dialog form { margin-top: var(--space-4); text-align: right; }
     background: linear-gradient(135deg, rgba(13, 148, 136, 0.75), rgba(15, 118, 110, 0.9));
     border-color: rgba(45, 212, 191, 0.8);
     box-shadow: 0 4px 16px rgba(20, 184, 166, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .mv-pill.active[data-game="facts"],
+  .mv-pill[aria-current="page"][data-game="facts"] {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.75), rgba(225, 29, 72, 0.9));
+    border-color: rgba(251, 113, 133, 0.85);
+    box-shadow: 0 4px 16px rgba(244, 63, 94, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
 
   /* Smooth page transition */

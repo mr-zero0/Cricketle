@@ -46,7 +46,7 @@ async function solveCurrent(page, mode, idx) {
 const uniqPhone = () => "9" + String(Date.now() % 1e9).padStart(9, "0");
 
 async function signUp(page, username, pin, phone) {
-  await page.goto("/#profile");
+  await page.goto("/index.html#profile");
   await page.getByRole("tab", { name: "Create Account" }).click();
   await page.locator("#register-username").fill(username);
   await page.locator("#register-phone").fill(phone || uniqPhone());
@@ -69,7 +69,7 @@ test.beforeEach(async ({ page }) => {
 test.describe("onboarding", () => {
   test("first visit: the sheet shows and Play starts puzzle 1 with the timer running", async ({ page }) => {
     await page.addInitScript((key) => { try { localStorage.removeItem(key); } catch (_) {} }, SEEN_HELP);
-    await page.goto("/");
+    await page.goto("/index.html");
     const sheet = page.locator("#onboard");
     await expect(sheet).toBeVisible();
     await expect(sheet).toContainText("Guess the secret cricketer");
@@ -85,7 +85,7 @@ test.describe("onboarding", () => {
   });
 
   test("returning visit: no sheet, the help button reopens it without starting anything", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/index.html");
     await expect(page.locator("#onboard")).toBeHidden();
     await expect(page.locator("#timer")).toHaveText("00:00");
     await page.locator("#help-btn").click();
@@ -104,7 +104,7 @@ test.describe("onboarding", () => {
     });
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.goto("/");
+    await page.goto("/index.html");
     await expect(page.locator("#onboard")).toBeVisible();
     await page.locator("#onboard-play").click();
     await expect(page.locator("#onboard")).toBeHidden();
@@ -115,7 +115,7 @@ test.describe("onboarding", () => {
 
 test.describe("guest play", () => {
   test("Easy puzzle: timer runs, hint costs points, tags explain closeness, solve unlocks the next", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/index.html");
     await expect(page.getByRole("heading", { name: "Cricketle", level: 1 })).toBeVisible();
     await expect(page.locator("#guest-banner")).toBeVisible();
     await expect(page.locator("#timer")).toHaveText("00:00");
@@ -165,7 +165,7 @@ test.describe("guest play", () => {
   });
 
   test("typing right after tapping a hint keeps the suggestions open", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/index.html");
     await startPuzzle(page);
     await page.locator("#guess-input").fill("vir");
     await expect(page.locator("#suggestions")).toBeVisible();
@@ -179,7 +179,7 @@ test.describe("guest play", () => {
   });
 
   test("Hard mode: rank only, three hints at most, give up reveals the answer and scores zero", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/index.html");
     await page.getByRole("button", { name: "Hard" }).click();
     await expect(page.locator("body")).toHaveClass(/hard/);
     await expect(page.locator("#worth")).toHaveText("150");
@@ -209,7 +209,7 @@ test.describe("guest play", () => {
   test("three puzzles a day: the mode closes after the third (signed in)", async ({ page }) => {
     // Guests get only the first puzzle (see "guest gate"); the full day needs an account.
     await signUp(page, uniq("trio"), "246810");
-    await page.goto("/");
+    await page.goto("/index.html");
     for (let i = 0; i < 3; i++) {
       await solveCurrent(page, "easy", i);
       if (i < 2) await page.getByRole("button", { name: "Next puzzle" }).click();
@@ -227,7 +227,7 @@ test.describe("guest play", () => {
 
 test.describe("guest gate", () => {
   test("guest: puzzles 2 and 3 are gated and the gate card appears after solving puzzle 1", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/index.html");
     await expect(page.locator("#dots .dot.gated")).toHaveCount(2);
     await expect(page.locator("#dots .dot.gated").first()).toBeEnabled();
     await expect(page.locator("#gate")).toBeHidden();
@@ -253,7 +253,7 @@ test.describe("guest gate", () => {
   });
 
   test("guest: after Easy 1 the win card offers Hard for free, then Hard gates too", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/index.html");
     await solveCurrent(page, "easy", 0);
     const other = page.locator("#other-mode-btn");
     await expect(other).toHaveText(/Try Hard mode, also free/);
@@ -268,7 +268,7 @@ test.describe("guest gate", () => {
 
   test("signed in: no gated dots and the next puzzle unlocks", async ({ page }) => {
     await signUp(page, uniq("gate"), "246810");
-    await page.goto("/");
+    await page.goto("/index.html");
     await expect(page.locator("#dots .dot.gated")).toHaveCount(0);
     await expect(page.locator("#gate")).toBeHidden();
     await solveCurrent(page, "easy", 0);
@@ -308,7 +308,7 @@ test.describe("accounts and leaderboards", () => {
     await expect(page.locator("#board-list .board-row.me")).toContainText("Net Bowler");
     await shot(page, "leaderboard-alltime");
 
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     await expect(page.locator("#profile-card")).toContainText(username);
     await expect(page.locator("#profile-card")).toContainText("Net Bowler");
     await expect(page.locator(".stat-tile").filter({ hasText: "Today's points" }).locator(".v")).toHaveText(String(points));
@@ -323,7 +323,7 @@ test.describe("accounts and leaderboards", () => {
   });
 
   test("sign-in form validates inline and reports wrong credentials", async ({ page }) => {
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     const summary = page.locator("#auth-summary");
     await page.locator("#auth-signin-btn").click();
     // Missing input is an inline field error, not a summary.
@@ -355,12 +355,12 @@ test.describe("accounts and leaderboards", () => {
     const pin = "246810";
     const phone = uniqPhone();
     await signUp(page, username, pin, phone);
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     await page.locator('.subnav-btn[data-subtab="account"]').click();
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page.locator("#nav-profile-label")).toHaveText("Sign in");
 
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     const country = page.locator("#signin-country");
     const id = page.locator("#signin-identifier");
     await expect(country).toBeHidden();
@@ -378,12 +378,12 @@ test.describe("accounts and leaderboards", () => {
     const username = uniq("pw");
     const phone = uniqPhone();
     await signUp(page, username, "246810", phone);
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     await page.locator('.subnav-btn[data-subtab="account"]').click();
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page.locator("#nav-profile-label")).toHaveText("Sign in");
 
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     await page.locator("#signin-identifier").fill("0091 " + phone.slice(0, 5) + " " + phone.slice(5));
     await expect(page.locator("#signin-country")).toBeHidden();
     await page.locator("#signin-pin").fill("246810");
@@ -392,7 +392,7 @@ test.describe("accounts and leaderboards", () => {
   });
 
   test("guest Account tab: the sign-in button opens the form and never mentions Google", async ({ page }) => {
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     await page.locator('.subnav-btn[data-subtab="account"]').click();
     await expect(page.locator("#profile-card")).not.toContainText("Google");
     await page.locator("#guest-to-auth-btn").click();
@@ -401,7 +401,7 @@ test.describe("accounts and leaderboards", () => {
   });
 
   test("inline errors: empty username, 5-digit PIN, PIN mismatch each mark their own field", async ({ page }) => {
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     await page.getByRole("tab", { name: "Create Account" }).click();
     for (const id of ["register-pin", "register-pin-confirm"]) {
       await expect(page.locator("#" + id)).toHaveAttribute("maxlength", "6");
@@ -441,7 +441,7 @@ test.describe("accounts and leaderboards", () => {
 test.describe("layout", () => {
   test("phone: bottom tab bar, no horizontal scroll, comfortable targets", async ({ page }) => {
     test.skip(test.info().project.name !== "phone", "phone project only");
-    await page.goto("/");
+    await page.goto("/index.html");
     await expect(page.locator(".tabbar")).toBeVisible();
     await expect(page.locator(".nav")).toBeHidden();
     const widths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
@@ -466,7 +466,7 @@ test.describe("layout", () => {
 
   test("desktop: top navigation, two-column play layout, help dialog", async ({ page }) => {
     test.skip(test.info().project.name !== "desktop", "desktop project only");
-    await page.goto("/");
+    await page.goto("/index.html");
     await expect(page.locator(".nav")).toBeVisible();
     await expect(page.locator(".tabbar")).toBeHidden();
     const cols = await page.locator(".view-play").evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
@@ -485,7 +485,7 @@ test.describe("theme", () => {
   const THEME_COLOR = { day: "#bfe3ff", night: "#0b1220" };
 
   test("theme toggle flips the tokens and persists across reload", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/index.html");
     const html = page.locator("html");
     const before = await html.getAttribute("data-theme");
     expect(["day", "night"]).toContain(before);
@@ -504,7 +504,7 @@ test.describe("theme", () => {
   test("auto mode follows the IST clock; a manual choice sticks", async ({ page }) => {
     // 17:59 IST is 12:29 UTC. Fake clock, no stored preference.
     await page.clock.install({ time: new Date("2026-10-27T12:29:00Z") });
-    await page.goto("/");
+    await page.goto("/index.html");
     const html = page.locator("html");
     await expect(html).toHaveAttribute("data-theme", "day");
 
@@ -532,7 +532,7 @@ test.describe("stadium scene", () => {
 
   test("day scene renders a blue sky", async ({ page }) => {
     await page.addInitScript(() => { try { localStorage.setItem("cricketle:v3:theme", "day"); } catch (_) {} });
-    await page.goto("/");
+    await page.goto("/index.html");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "day");
     const p = await skyPixel(page);
     expect(p.a, "opaque sky").toBe(255);
@@ -544,7 +544,7 @@ test.describe("stadium scene", () => {
 
   test("night scene renders a dark floodlit sky", async ({ page }) => {
     await page.addInitScript(() => { try { localStorage.setItem("cricketle:v3:theme", "night"); } catch (_) {} });
-    await page.goto("/");
+    await page.goto("/index.html");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "night");
     const p = await skyPixel(page);
     expect(p.a, "opaque sky").toBe(255);
@@ -556,7 +556,7 @@ test.describe("stadium scene", () => {
 
 test.describe("minimal information", () => {
   async function signOut(page) {
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     await page.locator('.subnav-btn[data-subtab="account"]').click();
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page.locator("#nav-profile-label")).toHaveText("Sign in");
@@ -564,7 +564,7 @@ test.describe("minimal information", () => {
 
   test("profile shows four tiles first and the rest behind More", async ({ page }) => {
     await signUp(page, uniq("pw"), "246810");
-    await page.goto("/#profile");
+    await page.goto("/index.html#profile");
     const firstTiles = page.locator(".stat-tile:not(#more-stats .stat-tile)");
     await expect(firstTiles).toHaveCount(4);
     await expect(firstTiles.locator(".k")).toHaveText(["Today's points", "Today's rank", "Streak", "All-time points"]);
@@ -582,14 +582,14 @@ test.describe("minimal information", () => {
   test("leaderboard rows show rank, avatar, name and points; only your own row adds time and guesses", async ({ page }) => {
     const other = uniq("pw");
     await signUp(page, other, "246810");
-    await page.goto("/");
+    await page.goto("/index.html");
     await solveCurrent(page, "easy", 0);
     await signOut(page);
 
     await signUp(page, uniq("pw"), "246810");
-    await page.goto("/");
+    await page.goto("/index.html");
     await solveCurrent(page, "easy", 0);
-    await page.goto("/#leaderboard");
+    await page.goto("/index.html#leaderboard");
     const me = page.locator("#board-list .board-row.me");
     await expect(me).toBeVisible();
     await expect(me.locator(".board-avatar")).toBeVisible();
@@ -604,7 +604,7 @@ test.describe("minimal information", () => {
   test("phone: the guest banner is a single line", async ({ page }) => {
     test.skip(test.info().project.name !== "phone", "phone project only");
     await page.setViewportSize({ width: 360, height: 740 });
-    await page.goto("/");
+    await page.goto("/index.html");
     const banner = page.locator("#guest-banner");
     await expect(banner).toBeVisible();
     await expect(banner).toContainText("Playing as a guest");
@@ -619,7 +619,7 @@ test.describe("motion", () => {
   test.describe("reduced", () => {
     test.use({ contextOptions: { reducedMotion: "reduce" } });
     test("reduced motion disables animations", async ({ page }) => {
-      await page.goto("/");
+      await page.goto("/index.html");
       await startPuzzle(page);
       await guess(page, wrongGuess("easy", 0));
       const row = page.locator("#last-guess .row");
@@ -636,7 +636,7 @@ test.describe("motion", () => {
   test.describe("full", () => {
     test.use({ contextOptions: { reducedMotion: "no-preference" } });
     test("motion on: the dot pops on solve, the sheet slides, the new row fades its heat", async ({ page }) => {
-      await page.goto("/");
+      await page.goto("/index.html");
       await startPuzzle(page);
       // The pop lasts 320 ms, shorter than an expect poll, so record it as it happens.
       await page.evaluate(() => {

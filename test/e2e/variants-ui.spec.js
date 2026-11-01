@@ -41,19 +41,20 @@ test.describe("Full UI & Gameplay Tests (Authenticated Member)", () => {
     });
   });
 
-  test("Hub: renders all 6 live game cards and locked pixel cricketer", async ({ page }) => {
+  test("Hub: renders all 7 live game cards and locked pixel cricketer", async ({ page }) => {
     const errors = monitorConsole(page);
     await page.goto("/hub.html");
 
     await expect(page.locator(".hub-hero h2")).toContainText("CHOOSE YOUR CHALLENGE");
 
-    // 6 Live game cards
+    // 7 Live game cards
     await expect(page.locator("#tile-cricketle")).toBeVisible();
     await expect(page.locator("#tile-connections")).toBeVisible();
     await expect(page.locator("#tile-journey")).toBeVisible();
     await expect(page.locator("#tile-scorecard")).toBeVisible();
     await expect(page.locator("#tile-puzzle")).toBeVisible();
     await expect(page.locator("#tile-stadium")).toBeVisible();
+    await expect(page.locator("#tile-facts")).toBeVisible();
 
     // Locked photo game
     await expect(page.locator("#tile-pixel")).toBeVisible();
@@ -81,7 +82,7 @@ test.describe("Full UI & Gameplay Tests (Authenticated Member)", () => {
     if (isMobile) {
       await expect(bar).toBeVisible();
       const pills = bar.locator(".mv-pill");
-      await expect(pills).toHaveCount(7);
+      await expect(pills).toHaveCount(8);
       await expect(bar.locator('.mv-pill[data-game="hub"]')).toHaveClass(/active/);
     } else {
       await expect(bar).toBeHidden();

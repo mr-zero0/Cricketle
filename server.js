@@ -918,8 +918,13 @@ function createApp(opts = {}) {
     if (pathname.startsWith("/api/")) done(api(req, res, pathname, url.searchParams));
     else if (pathname === "/" || pathname === "/hub" || pathname === "/hub/") serveStatic(req, res, "/hub.html");
     else if (pathname === "/play" || pathname === "/cricketle" || pathname === "/game") serveStatic(req, res, "/index.html");
-    else if (pathname === "/pixel" || pathname === "/pixel/") serveStatic(req, res, "/pixel.html");
+    else if (pathname === "/connections" || pathname === "/connections/") serveStatic(req, res, "/connections.html");
+    else if (pathname === "/journey" || pathname === "/journey/") serveStatic(req, res, "/journey.html");
     else if (pathname === "/scorecard" || pathname === "/scorecard/") serveStatic(req, res, "/scorecard.html");
+    else if (pathname === "/puzzle" || pathname === "/puzzle/") serveStatic(req, res, "/puzzle.html");
+    else if (pathname === "/stadium" || pathname === "/stadium/") serveStatic(req, res, "/stadium.html");
+    else if (pathname === "/facts" || pathname === "/facts/") serveStatic(req, res, "/facts.html");
+    else if (pathname === "/pixel" || pathname === "/pixel/") serveStatic(req, res, "/pixel.html");
     else if (pathname === "/admin" || pathname === "/admin/") serveStatic(req, res, "/admin.html");
     else serveStatic(req, res, pathname);
   });
