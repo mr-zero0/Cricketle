@@ -54,11 +54,12 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Aussie pace captain who won 2023 WTC Final, 2023 ODI World Cup, and retained the Ashes.",
-    "imageUrl": "photos/player_4.jpg",
+    "imageUrl": "photos/player_6.jpg",
     "images": [
-      "photos/player_4.jpg",
-      "photos/player_4_2.jpg",
-      "photos/player_4_3.jpg"
+      "photos/player_6.jpg",
+      "photos/player_6_2.jpg",
+      "photos/player_6_3.jpg",
+      "photos/player_6_4.jpg"
     ]
   },
   {
@@ -69,11 +70,11 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Aggressive southpaw who scored match-winning hundreds in both 2023 WTC and ODI WC finals.",
-    "imageUrl": "photos/player_5.jpg",
+    "imageUrl": "photos/player_7.jpg",
     "images": [
-      "photos/player_5.jpg",
-      "photos/player_5_2.jpg",
-      "photos/player_5_3.jpg"
+      "photos/player_7.jpg",
+      "photos/player_7_2.jpg",
+      "photos/player_7_3.jpg"
     ]
   },
   {
@@ -84,12 +85,11 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Left-arm lethal spearhead with most wickets across 2015 and 2019 World Cups.",
-    "imageUrl": "photos/player_6.jpg",
+    "imageUrl": "photos/player_8.jpg",
     "images": [
-      "photos/player_6.jpg",
-      "photos/player_6_2.jpg",
-      "photos/player_6_3.jpg",
-      "photos/player_6_4.jpg"
+      "photos/player_8.jpg",
+      "photos/player_8_2.jpg",
+      "photos/player_8_3.jpg"
     ]
   },
   {
@@ -100,11 +100,12 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Unorthodox stance, modern Test batting phenomenon with 32 Test centuries.",
-    "imageUrl": "photos/player_7.jpg",
+    "imageUrl": "photos/player_9.jpg",
     "images": [
-      "photos/player_7.jpg",
-      "photos/player_7_2.jpg",
-      "photos/player_7_3.jpg"
+      "photos/player_9.jpg",
+      "photos/player_9_2.jpg",
+      "photos/player_9_3.jpg",
+      "photos/player_9_4.jpg"
     ]
   },
   {
@@ -115,11 +116,11 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Hero of 2019 World Cup Final and Headingley miracle, Bazball Test captain.",
-    "imageUrl": "photos/player_8.jpg",
+    "imageUrl": "photos/player_10.jpg",
     "images": [
-      "photos/player_8.jpg",
-      "photos/player_8_2.jpg",
-      "photos/player_8_3.jpg"
+      "photos/player_10.jpg",
+      "photos/player_10_2.jpg",
+      "photos/player_10_4.jpg"
     ]
   },
   {
@@ -130,12 +131,11 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Fab Four maestro, highest Test run-scorer and century-maker for England.",
-    "imageUrl": "photos/player_9.jpg",
+    "imageUrl": "photos/player_11.jpg",
     "images": [
-      "photos/player_9.jpg",
-      "photos/player_9_2.jpg",
-      "photos/player_9_3.jpg",
-      "photos/player_9_4.jpg"
+      "photos/player_11.jpg",
+      "photos/player_11_2.jpg",
+      "photos/player_11_3.jpg"
     ]
   },
   {
@@ -146,11 +146,12 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Cover drive virtuoso and former all-format Pakistan captain.",
-    "imageUrl": "photos/player_10.jpg",
+    "imageUrl": "photos/player_12.jpg",
     "images": [
-      "photos/player_10.jpg",
-      "photos/player_10_2.jpg",
-      "photos/player_10_4.jpg"
+      "photos/player_12.jpg",
+      "photos/player_12_2.jpg",
+      "photos/player_12_3.jpg",
+      "photos/player_12_4.jpg"
     ]
   },
   {
@@ -161,11 +162,11 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Towering left-arm fast bowler known for devastating first-over breakthroughs.",
-    "imageUrl": "photos/player_11.jpg",
+    "imageUrl": "photos/player_13.jpg",
     "images": [
-      "photos/player_11.jpg",
-      "photos/player_11_2.jpg",
-      "photos/player_11_3.jpg"
+      "photos/player_13.jpg",
+      "photos/player_13_3.jpg",
+      "photos/player_13_4.jpg"
     ]
   },
   {
@@ -176,12 +177,10 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Gentleman cricketer, led Black Caps to 2019 WC Final and inaugural 2021 WTC title.",
-    "imageUrl": "photos/player_12.jpg",
+    "imageUrl": "photos/player_14.jpg",
     "images": [
-      "photos/player_12.jpg",
-      "photos/player_12_2.jpg",
-      "photos/player_12_3.jpg",
-      "photos/player_12_4.jpg"
+      "photos/player_14.jpg",
+      "photos/player_14_3.jpg"
     ]
   },
   {
@@ -192,11 +191,11 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Quick-arm leg-spinner and T20 sensation with over 550 franchise wickets.",
-    "imageUrl": "photos/player_13.jpg",
+    "imageUrl": "photos/player_15.jpg",
     "images": [
-      "photos/player_13.jpg",
-      "photos/player_13_3.jpg",
-      "photos/player_13_4.jpg"
+      "photos/player_15.jpg",
+      "photos/player_15_2.jpg",
+      "photos/player_15_3.jpg"
     ]
   },
   {
@@ -207,10 +206,10 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Proteas fast-bowling spearhead with blistering 145+ km/h pace and over 300 Test wickets.",
-    "imageUrl": "photos/player_14.jpg",
+    "imageUrl": "photos/player_16.jpg",
     "images": [
-      "photos/player_14.jpg",
-      "photos/player_14_3.jpg",
+      "photos/player_16.jpg",
+      "photos/player_16_2.jpg",
       "photos/p_02e5f0c156a4.jpg"
     ]
   },
@@ -222,11 +221,10 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Clutch seam-bowling all-rounder, defended 16 runs in the 2024 T20 World Cup final.",
-    "imageUrl": "photos/player_15.jpg",
+    "imageUrl": "photos/player_23.jpg",
     "images": [
-      "photos/player_15.jpg",
-      "photos/player_15_2.jpg",
-      "photos/player_15_3.jpg"
+      "photos/player_23.jpg",
+      "photos/player_23_2.jpg"
     ]
   },
   {
@@ -237,10 +235,11 @@
     "active": true,
     "difficulty": "easy",
     "hint": "'The Big Show', smashed 201* on one leg against Afghanistan in 2023 World Cup.",
-    "imageUrl": "photos/player_16.jpg",
+    "imageUrl": "photos/player_24.jpg",
     "images": [
-      "photos/player_16.jpg",
-      "photos/player_16_2.jpg",
+      "photos/player_24.jpg",
+      "photos/player_24_2.jpg",
+      "photos/player_24_3.jpg",
       "photos/p_afeb26247653.jpg"
     ]
   },
@@ -252,11 +251,11 @@
     "active": true,
     "difficulty": "easy",
     "hint": "'Sir Jadeja', rockstar left-arm spin all-rounder with bullet throws and 3000+ runs / 300+ Test wickets.",
-    "imageUrl": "photos/player_17.jpg",
+    "imageUrl": "photos/p_4e28ef5a42da.jpg",
     "images": [
-      "photos/player_17.jpg",
-      "photos/player_17_2.jpg",
-      "photos/player_17_3.jpg"
+      "photos/p_4e28ef5a42da.jpg",
+      "photos/p_59a10b6e16a6.jpg",
+      "photos/p_aadf80130b02.jpg"
     ]
   },
   {
@@ -267,10 +266,8 @@
     "active": true,
     "difficulty": "easy",
     "hint": "'Prince of Indian Cricket', youngest batsman to hit an ODI double century.",
-    "imageUrl": "photos/player_18.jpg",
+    "imageUrl": "photos/p_a61d624390f9.jpg",
     "images": [
-      "photos/player_18.jpg",
-      "photos/player_18_3.jpg",
       "photos/p_a61d624390f9.jpg"
     ]
   },
@@ -282,11 +279,10 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Elegant classical batter, middle-order rock and keeper across Test and ODI formats.",
-    "imageUrl": "photos/player_19.jpg",
+    "imageUrl": "photos/p_c2ea901c04a4.jpg",
     "images": [
-      "photos/player_19.jpg",
-      "photos/player_19_2.jpg",
-      "photos/player_19_4.jpg"
+      "photos/p_c2ea901c04a4.jpg",
+      "photos/p_01f826efd204.jpg"
     ]
   },
   {
@@ -297,9 +293,8 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Fearless southpaw hero of the Gabba 2021 fortress breach, holds multiple centuries in SENA.",
-    "imageUrl": "photos/player_20.jpg",
+    "imageUrl": "photos/p_efe5c87d29d8.jpg",
     "images": [
-      "photos/player_20.jpg",
       "photos/p_efe5c87d29d8.jpg",
       "photos/p_69a2aee43e41.jpg"
     ]
@@ -312,10 +307,9 @@
     "active": true,
     "difficulty": "easy",
     "hint": "'SKY', ICC Men's T20I Player of the Year, renowned for 360-degree scoop shots.",
-    "imageUrl": "photos/player_21.jpg",
+    "imageUrl": "photos/p_9d0c32c08514.jpg",
     "images": [
-      "photos/player_21.jpg",
-      "photos/player_21_2.jpg",
+      "photos/p_9d0c32c08514.jpg",
       "photos/p_1a7b5c3342be.jpg"
     ]
   },
@@ -327,9 +321,8 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Seam-position maestro with 24 wickets at 10.70 in the 2023 World Cup.",
-    "imageUrl": "photos/player_22.jpg",
+    "imageUrl": "photos/p_b828290df4c6.jpg",
     "images": [
-      "photos/player_22.jpg",
       "photos/p_b828290df4c6.jpg",
       "photos/p_6fd9e7c3ba8c.jpg"
     ]
@@ -342,10 +335,9 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Deadly swing bowler with over 300 Test wickets and deadly in-swingers with the white ball.",
-    "imageUrl": "photos/player_23.jpg",
+    "imageUrl": "photos/p_8c529eae301d.jpg",
     "images": [
-      "photos/player_23.jpg",
-      "photos/player_23_2.jpg",
+      "photos/p_8c529eae301d.jpg",
       "photos/p_1512d22806a7.jpg"
     ]
   },
@@ -357,11 +349,11 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Explosive opener with 335* Test score and player of the tournament in 2021 T20 World Cup.",
-    "imageUrl": "photos/player_24.jpg",
+    "imageUrl": "photos/p_188b6f1e0982.jpg",
     "images": [
-      "photos/player_24.jpg",
-      "photos/player_24_2.jpg",
-      "photos/player_24_3.jpg"
+      "photos/p_188b6f1e0982.jpg",
+      "photos/p_85b152fe9177.jpg",
+      "photos/p_022105102cfb.jpg"
     ]
   },
   {
@@ -372,11 +364,10 @@
     "active": true,
     "difficulty": "easy",
     "hint": "Destructive wicketkeeper-batter who smashed four centuries in the 2023 World Cup.",
-    "imageUrl": "photos/player_25.jpg",
+    "imageUrl": "photos/p_0f2e91d17209.jpg",
     "images": [
-      "photos/player_25.jpg",
-      "photos/player_25_2.jpg",
-      "photos/p_0f2e91d17209.jpg"
+      "photos/p_0f2e91d17209.jpg",
+      "photos/p_8c0e46337362.jpg"
     ]
   },
   {
@@ -465,7 +456,10 @@
     "images": [
       "photos/p_52befb664d5e.jpg",
       "photos/p_8eba04cf5326.jpg",
-      "photos/p_a64afa81109e.jpg"
+      "photos/p_a64afa81109e.jpg",
+      "photos/player_4.jpg",
+      "photos/player_4_2.jpg",
+      "photos/player_4_3.jpg"
     ]
   },
   {
@@ -480,7 +474,10 @@
     "images": [
       "photos/p_1f17d1d15cb3.jpg",
       "photos/p_fefcbfa44d73.jpg",
-      "photos/p_aa9bcc23f392.jpg"
+      "photos/p_aa9bcc23f392.jpg",
+      "photos/player_5.jpg",
+      "photos/player_5_2.jpg",
+      "photos/player_5_3.jpg"
     ]
   },
   {
@@ -495,7 +492,9 @@
     "images": [
       "photos/p_8f9c116ea094.jpg",
       "photos/p_ea8d501b3311.jpg",
-      "photos/p_70837b8ffd18.jpg"
+      "photos/p_70837b8ffd18.jpg",
+      "photos/player_17.jpg",
+      "photos/player_17_2.jpg"
     ]
   },
   {
@@ -510,7 +509,9 @@
     "images": [
       "photos/player_34_4.jpg",
       "photos/p_52a7f5ff9268.jpg",
-      "photos/p_0819f8bfc5ae.jpg"
+      "photos/p_0819f8bfc5ae.jpg",
+      "photos/player_18.jpg",
+      "photos/player_18_3.jpg"
     ]
   },
   {
@@ -525,7 +526,10 @@
     "images": [
       "photos/p_ebf906d05e2b.jpg",
       "photos/p_a8d506eaf4e4.jpg",
-      "photos/p_ca043a77d7ee.jpg"
+      "photos/p_ca043a77d7ee.jpg",
+      "photos/player_19.jpg",
+      "photos/player_19_2.jpg",
+      "photos/player_19_4.jpg"
     ]
   },
   {
@@ -540,7 +544,8 @@
     "images": [
       "photos/player_36_4.jpg",
       "photos/p_b04e4b9018b9.jpg",
-      "photos/p_af504b658e88.jpg"
+      "photos/p_af504b658e88.jpg",
+      "photos/player_20.jpg"
     ]
   },
   {
@@ -555,7 +560,9 @@
     "images": [
       "photos/p_9ec66f84911a.jpg",
       "photos/p_9d2722aa272d.jpg",
-      "photos/p_931babf5094d.jpg"
+      "photos/p_931babf5094d.jpg",
+      "photos/player_21.jpg",
+      "photos/player_21_2.jpg"
     ]
   },
   {
@@ -570,7 +577,8 @@
     "images": [
       "photos/p_14640a7688ba.jpg",
       "photos/p_b56c4df2b35e.jpg",
-      "photos/p_e7708570d50e.jpg"
+      "photos/p_e7708570d50e.jpg",
+      "photos/player_22.jpg"
     ]
   },
   {
@@ -585,7 +593,9 @@
     "images": [
       "photos/player_39_4.jpg",
       "photos/p_2eb957ce5ade.jpg",
-      "photos/p_3c2e1deb5d0a.jpg"
+      "photos/p_3c2e1deb5d0a.jpg",
+      "photos/player_25.jpg",
+      "photos/player_25_2.jpg"
     ]
   },
   {
@@ -689,8 +699,7 @@
     "imageUrl": "photos/player_46.jpg",
     "images": [
       "photos/player_46.jpg",
-      "photos/player_46_4.jpg",
-      "photos/p_6588e826a20c.jpg"
+      "photos/player_46_4.jpg"
     ]
   },
   {
