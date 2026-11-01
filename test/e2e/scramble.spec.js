@@ -51,8 +51,8 @@ test.describe("Scramble — Wordle Anagram Gameplay", () => {
     const firstTileText = await mysteryTiles.first().textContent();
     expect(firstTileText.trim()).toBe("_");
 
-    // Pattern text indicates word length
-    await expect(page.locator("#scramble-pattern-text")).toContainText("Letters");
+    // Pattern text indicates total character length
+    await expect(page.locator("#scramble-pattern-text")).toContainText("Characters");
 
     // Wordle rows rendered (6 rows) starting empty with _
     const rows = page.locator(".wordle-row");
@@ -72,25 +72,49 @@ test.describe("Scramble — Wordle Anagram Gameplay", () => {
     expect(fatal).toHaveLength(0);
   });
 
-  test("Wordle Feedback: wrong guess evaluates tiles to Green/Yellow/Red and updates keyboard", async ({ page }) => {
+  test("Autocomplete dropdown: typing shows matching players and clicking auto-fills", async ({ page }) => {
     await page.goto("/scramble.html");
 
-    // Type a well-known test guess
+    const input = page.locator("#guess-input");
+    await input.focus();
+    await input.pressSequentially("virat", { delay: 30 });
+
+    const suggestions = page.locator("#suggestions li");
+    await expect(suggestions.first()).toBeVisible();
+    const count = await suggestions.count();
+    expect(count).toBeGreaterThan(0);
+
+    const firstText = await suggestions.first().textContent();
+    expect(firstText).toContain("Virat");
+
+    // Clicking suggestion should auto-fill the full name and submit
+    await suggestions.first().click();
+
+    // After submission, first row should be evaluated
+    const firstRowTiles = page.locator(".wordle-row").first().locator(".wordle-tile");
+    const tileCount = await firstRowTiles.count();
+    expect(tileCount).toBeGreaterThan(5);
+  });
+
+  test("Wordle Feedback: wrong guess evaluates tiles to Green/Yellow/Red including space", async ({ page }) => {
+    await page.goto("/scramble.html");
+
+    // Type a test guess with space
     const input = page.locator("#guess-input");
     await input.fill("BEN STOKES");
     await page.locator("#btn-submit-guess").click();
 
     // First row should now contain evaluated tiles
-    const firstRowTiles = page.locator(".wordle-row").first().locator(".wordle-tile:not(.space-sep)");
+    const firstRowTiles = page.locator(".wordle-row").first().locator(".wordle-tile");
     const count = await firstRowTiles.count();
-    expect(count).toBeGreaterThan(5);
+    expect(count).toBe(10); // "BEN STOKES" has 10 characters
 
     // Verify at least one tile received Wordle status class (correct, present, or absent)
     const statuses = await firstRowTiles.evaluateAll(els => els.map(el => el.className));
     const hasWordleStatus = statuses.some(c => c.includes("correct") || c.includes("present") || c.includes("absent"));
     expect(hasWordleStatus).toBe(true);
 
-    // Verify keyboard keys updated
+    // Verify keyboard keys updated including SPACE key
     const coloredKeys = page.locator(".key-btn.key-correct, .key-btn.key-present, .key-btn.key-absent");
     const coloredCount = await coloredKeys.count();
     expect(coloredCount).toBeGreaterThan(0);

@@ -237,6 +237,96 @@
       letter-spacing: 0.08em;
     }
 
+    .wordle-tile.space-tile,
+    .scramble-letter-tile.space-tile {
+      font-size: clamp(14px, 3.5vw, 20px) !important;
+      font-family: monospace, var(--font-body) !important;
+      letter-spacing: 0;
+    }
+
+    .wordle-tile.typing.space-tile {
+      background: rgba(234, 88, 12, 0.25);
+      border-color: #ea580c;
+      color: #fed7aa;
+    }
+
+    /* Autocomplete Suggestions Dropdown */
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      margin: 0;
+      padding: 6px;
+      list-style: none;
+      background: var(--card-solid, #10192d);
+      border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.18));
+      border-radius: var(--radius-sm, 10px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+      max-height: min(280px, 40dvh);
+      overflow-y: auto;
+      z-index: 100;
+      animation: popIn 0.2s ease both;
+    }
+
+    .suggestions li {
+      min-height: 42px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      color: var(--fg, #ffffff);
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.15s ease;
+    }
+
+    .suggestions li:hover,
+    .suggestions li.highlighted {
+      background: rgba(234, 88, 12, 0.22);
+    }
+
+    .suggestions li mark {
+      background: none;
+      color: #fb923c;
+      font-weight: 700;
+    }
+
+    .suggestions li .sub {
+      color: var(--muted, rgba(255, 255, 255, 0.6));
+      font-size: 12.5px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    :root[data-theme="day"] .suggestions {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.15);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+    }
+
+    :root[data-theme="day"] .suggestions li {
+      color: #0f172a;
+    }
+
+    :root[data-theme="day"] .suggestions li:hover,
+    :root[data-theme="day"] .suggestions li.highlighted {
+      background: rgba(234, 88, 12, 0.1);
+    }
+
+    :root[data-theme="day"] .suggestions li mark {
+      color: #ea580c;
+    }
+
+    :root[data-theme="day"] .wordle-tile.typing.space-tile {
+      background: rgba(234, 88, 12, 0.15);
+      border-color: #ea580c;
+      color: #c2410c;
+    }
+
     /* Wordle Guess Board */
     .wordle-board {
       display: flex;
@@ -775,7 +865,7 @@
     <div id="game-view">
       <div class="scramble-header">
         <h2>CRICKETER WORDLE</h2>
-        <p>Guess the mystery cricketer in 6 attempts. Start from empty blanks _ _ _ _ and use Wordle-style clues!</p>
+        <p>Guess the mystery cricketer in 6 attempts. Search and auto-fill players or test letters using Wordle clues!</p>
       </div>
 
       <div class="scramble-badge-bar">
@@ -785,13 +875,13 @@
       <!-- Mystery Cricketer Pattern Card -->
       <div class="scrambled-card" id="scrambled-card">
         <div class="scrambled-label">
-          <span>🏏 Mystery Cricketer Pattern</span>
+          <span>🏏 Mystery Cricketer</span>
         </div>
-        <div class="scrambled-tiles-wrap" id="scrambled-tiles-wrap" aria-label="Mystery player letter slots">
+        <div class="scrambled-tiles-wrap" id="scrambled-tiles-wrap" aria-label="Mystery player character slots">
           <!-- Populated by scramble.js with blank dash slots _ _ _ _ _ -->
         </div>
         <div class="scramble-sub-actions">
-          <span class="scramble-pattern-text" id="scramble-pattern-text">Loading mystery pattern...</span>
+          <span class="scramble-pattern-text" id="scramble-pattern-text">Loading mystery cricketer...</span>
         </div>
       </div>
 

@@ -31,19 +31,20 @@
 
   let targetPlayer = null;
   let targetName = "";
-  let targetWords = [];
-  let scrambledLetters = [];
   let userGuesses = []; // array of strings
   let isGameOver = false;
   let isWon = false;
-  let keyStatuses = {}; // letter -> 'correct' | 'present' | 'absent'
+  let keyStatuses = {}; // letter/'SPACE' -> 'correct' | 'present' | 'absent'
+
+  // Autocomplete State
+  let highlightedIndex = -1;
+  let currentMatches = [];
 
   // DOM Elements
   const gameView = document.getElementById("game-view");
   const finishedView = document.getElementById("finished-view");
   const scrambledWrap = document.getElementById("scrambled-tiles-wrap");
   const scramblePatternText = document.getElementById("scramble-pattern-text");
-  const btnReshuffle = document.getElementById("btn-reshuffle");
   const boardEl = document.getElementById("wordle-board");
   const guessInput = document.getElementById("guess-input");
   const btnSubmitGuess = document.getElementById("btn-submit-guess");
@@ -84,15 +85,6 @@
       hash |= 0;
     }
     return Math.abs(hash);
-  }
-
-  function mulberry32(seed) {
-    return function () {
-      let t = (seed += 0x6d2b79f5);
-      t = Math.imul(t ^ (t >>> 15), t | 1);
-      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
   }
 
   let toastTimer = null;
@@ -177,62 +169,60 @@
 
     targetPlayer = findPlayerData(name);
     targetName = targetPlayer.name.toUpperCase();
-    targetWords = targetName.split(" ");
   }
 
+  /**
+   * Render Mystery Cricketer Pattern Card
+   * Shows total character slots (letters + space) as blank dashes '_'.
+   * Any letter or space correctly guessed in green is revealed in its slot!
+   */
   function renderPatternCard() {
     if (!scrambledWrap) return;
     scrambledWrap.innerHTML = "";
 
-    // Identify all letters that have been correctly positioned (Green) in previous guesses
+    // Identify all characters (letters & space) correctly positioned (Green) in previous guesses
     const solvedPositions = new Array(targetName.length).fill(null);
     userGuesses.forEach(g => {
       const evalResult = evaluateGuess(g);
       evalResult.forEach((item, idx) => {
-        if (item && item.status === "correct") {
+        if (idx < targetName.length && item && item.status === "correct") {
           solvedPositions[idx] = item.char;
         }
       });
     });
 
-    let charIdx = 0;
-    targetWords.forEach((word) => {
-      const group = document.createElement("div");
-      group.className = "scramble-word-group";
-
-      for (let w = 0; w < word.length; w++) {
-        const tile = document.createElement("span");
-        const correctChar = solvedPositions[charIdx];
-        if (correctChar) {
-          tile.className = "scramble-letter-tile revealed-green";
-          tile.textContent = correctChar;
+    for (let i = 0; i < targetName.length; i++) {
+      const tile = document.createElement("span");
+      const solvedChar = solvedPositions[i];
+      if (solvedChar !== null) {
+        tile.className = "scramble-letter-tile revealed-green";
+        if (solvedChar === " ") {
+          tile.classList.add("space-tile");
+          tile.textContent = "␣";
         } else {
-          tile.className = "scramble-letter-tile mystery-dash";
-          tile.textContent = "_";
+          tile.textContent = solvedChar;
         }
-        group.appendChild(tile);
-        charIdx++;
+      } else {
+        tile.className = "scramble-letter-tile mystery-dash";
+        tile.textContent = "_";
       }
-      charIdx++; // account for space
-
-      scrambledWrap.appendChild(group);
-    });
+      scrambledWrap.appendChild(tile);
+    }
 
     if (scramblePatternText) {
-      const patternDesc = targetWords.map(w => `${w.length} Letters`).join(" + ");
-      scramblePatternText.textContent = `Pattern: ${patternDesc} (${targetName.replace(/ /g, "").length} letters total)`;
+      scramblePatternText.textContent = `Total: ${targetName.length} Characters (Letters & Space)`;
     }
   }
 
   /**
-   * Wordle Letter Evaluation Algorithm
+   * Wordle Character Evaluation Algorithm (with Space Support)
    * Evaluates guess against targetName:
-   * Pass 1: exact letter & position match -> 'correct' (GREEN)
-   * Pass 2: letter present elsewhere in target -> 'present' (YELLOW)
+   * Pass 1: exact character & position match -> 'correct' (GREEN)
+   * Pass 2: character present elsewhere in target -> 'present' (YELLOW)
    * Otherwise -> 'absent' (RED)
    */
   function evaluateGuess(guessStr) {
-    const guess = guessStr.toUpperCase().trim();
+    const guess = (guessStr || "").toUpperCase();
     const target = targetName;
 
     const guessChars = Array.from(guess);
@@ -241,21 +231,18 @@
     const result = new Array(guessChars.length);
     const targetCounts = {};
 
+    // Count all characters in target, including space
     for (let i = 0; i < targetChars.length; i++) {
       const ch = targetChars[i];
-      if (ch !== " ") {
-        targetCounts[ch] = (targetCounts[ch] || 0) + 1;
-      }
+      targetCounts[ch] = (targetCounts[ch] || 0) + 1;
     }
 
-    // Pass 1: Exact matches (Green) & spaces
+    // Pass 1: Exact matches (Green)
     for (let i = 0; i < guessChars.length; i++) {
       const g = guessChars[i];
       const t = i < targetChars.length ? targetChars[i] : null;
 
-      if (g === " ") {
-        result[i] = { char: " ", status: "space" };
-      } else if (t === g) {
+      if (g === t) {
         result[i] = { char: g, status: "correct" };
         targetCounts[g]--;
       }
@@ -279,14 +266,15 @@
 
   function updateKeyStatuses(evalResult) {
     evalResult.forEach(({ char, status }) => {
-      if (!char || status === "space") return;
-      const cur = keyStatuses[char];
+      if (!char) return;
+      const key = char === " " ? "SPACE" : char;
+      const cur = keyStatuses[key];
       if (status === "correct") {
-        keyStatuses[char] = "correct";
+        keyStatuses[key] = "correct";
       } else if (status === "present") {
-        if (cur !== "correct") keyStatuses[char] = "present";
+        if (cur !== "correct") keyStatuses[key] = "present";
       } else if (status === "absent") {
-        if (!cur) keyStatuses[char] = "absent";
+        if (!cur) keyStatuses[key] = "absent";
       }
     });
     renderVirtualKeyboard();
@@ -336,11 +324,11 @@
 
       evaluated.forEach(({ char, status }) => {
         const tile = document.createElement("span");
-        if (status === "space") {
-          tile.className = "wordle-tile space-sep";
-          tile.innerHTML = "•";
+        tile.className = `wordle-tile ${status}`;
+        if (char === " ") {
+          tile.classList.add("space-tile");
+          tile.textContent = "␣";
         } else {
-          tile.className = `wordle-tile ${status}`;
           tile.textContent = char;
         }
         row.appendChild(tile);
@@ -355,24 +343,20 @@
       row.className = "wordle-row active-row";
       const typed = (typingValue !== undefined ? typingValue : (guessInput ? guessInput.value : "")).toUpperCase();
 
-      let typedLetterIdx = 0;
-      for (let i = 0; i < targetName.length; i++) {
+      const activeLength = Math.max(targetName.length, typed.length);
+      for (let i = 0; i < activeLength; i++) {
         const tile = document.createElement("span");
-        if (targetName[i] === " ") {
-          tile.className = "wordle-tile space-sep";
-          tile.innerHTML = "•";
-          if (typedLetterIdx < typed.length && typed[typedLetterIdx] === " ") {
-            typedLetterIdx++;
+        if (i < typed.length) {
+          tile.className = "wordle-tile typing";
+          if (typed[i] === " ") {
+            tile.classList.add("space-tile");
+            tile.textContent = "␣";
+          } else {
+            tile.textContent = typed[i];
           }
         } else {
-          if (typedLetterIdx < typed.length && typed[typedLetterIdx] !== " ") {
-            tile.className = "wordle-tile typing";
-            tile.textContent = typed[typedLetterIdx];
-            typedLetterIdx++;
-          } else {
-            tile.className = "wordle-tile empty";
-            tile.textContent = "_";
-          }
+          tile.className = "wordle-tile empty";
+          tile.textContent = "_";
         }
         row.appendChild(tile);
       }
@@ -388,13 +372,8 @@
 
       for (let i = 0; i < targetName.length; i++) {
         const tile = document.createElement("span");
-        if (targetName[i] === " ") {
-          tile.className = "wordle-tile space-sep";
-          tile.innerHTML = "•";
-        } else {
-          tile.className = "wordle-tile empty";
-          tile.textContent = "_";
-        }
+        tile.className = "wordle-tile empty";
+        tile.textContent = "_";
         row.appendChild(tile);
       }
 
@@ -448,58 +427,106 @@
     if (isGameOver || !guessInput) return;
 
     if (key === "ENTER") {
+      hideSuggestions();
       submitGuess(guessInput.value);
     } else if (key === "⌫" || key === "BACKSPACE") {
       guessInput.value = guessInput.value.slice(0, -1);
       renderBoard(guessInput.value);
       updateSuggestions(guessInput.value);
     } else if (key === "SPACE") {
-      if (guessInput.value.length < targetName.length) {
-        guessInput.value += " ";
-        renderBoard(guessInput.value);
-        updateSuggestions(guessInput.value);
-      }
+      guessInput.value += " ";
+      renderBoard(guessInput.value);
+      updateSuggestions(guessInput.value);
     } else if (/^[A-Z]$/i.test(key)) {
-      if (guessInput.value.length < targetName.length) {
-        guessInput.value += key.toUpperCase();
-        renderBoard(guessInput.value);
-        updateSuggestions(guessInput.value);
-      }
+      guessInput.value += key.toUpperCase();
+      renderBoard(guessInput.value);
+      updateSuggestions(guessInput.value);
     }
   }
 
-  function updateSuggestions(query) {
+  /* ---------------- Autocomplete Dropdown & Auto-fill ---------------- */
+
+  function hideSuggestions() {
     if (!suggestionsEl) return;
+    suggestionsEl.hidden = true;
+    suggestionsEl.innerHTML = "";
+    highlightedIndex = -1;
+    currentMatches = [];
+    if (guessInput) guessInput.setAttribute("aria-expanded", "false");
+  }
+
+  function updateSuggestions(query) {
+    if (!suggestionsEl || !guessInput) return;
     const q = (query || "").trim().toLowerCase();
-    if (q.length < 2 || typeof PLAYERS === "undefined" || !Array.isArray(PLAYERS)) {
-      suggestionsEl.hidden = true;
-      suggestionsEl.innerHTML = "";
+    if (!q || q.length < 1 || typeof PLAYERS === "undefined" || !Array.isArray(PLAYERS)) {
+      hideSuggestions();
       return;
     }
 
-    const matches = PLAYERS.filter(p => p.name.toLowerCase().includes(q)).slice(0, 5);
-    if (matches.length === 0) {
-      suggestionsEl.hidden = true;
-      suggestionsEl.innerHTML = "";
+    const startsWith = [];
+    const wordStartsWith = [];
+    const contains = [];
+
+    for (const p of PLAYERS) {
+      const pLower = p.name.toLowerCase();
+      if (pLower.startsWith(q)) {
+        startsWith.push(p);
+      } else {
+        const words = pLower.split(" ");
+        if (words.some(w => w.startsWith(q))) {
+          wordStartsWith.push(p);
+        } else if (pLower.includes(q)) {
+          contains.push(p);
+        }
+      }
+      if (startsWith.length + wordStartsWith.length + contains.length >= 25) break;
+    }
+
+    currentMatches = [...startsWith, ...wordStartsWith, ...contains].slice(0, 6);
+    if (currentMatches.length === 0) {
+      hideSuggestions();
       return;
     }
 
     suggestionsEl.innerHTML = "";
-    matches.forEach(p => {
+    currentMatches.forEach((p, idx) => {
       const li = document.createElement("li");
       li.setAttribute("role", "option");
+      li.setAttribute("data-name", p.name);
+
+      const flag = getCountryFlag(p.country);
+      const pName = p.name;
+      const matchStart = pName.toLowerCase().indexOf(q);
+      let highlightedName = pName;
+      if (matchStart !== -1) {
+        highlightedName = `${pName.slice(0, matchStart)}<mark>${pName.slice(matchStart, matchStart + q.length)}</mark>${pName.slice(matchStart + q.length)}`;
+      }
+
       li.innerHTML = `
-        <span><strong>${p.name}</strong> <span class="sub">(${p.country})</span></span>
+        <span>${flag} <strong>${highlightedName}</strong> <span class="sub">(${p.country})</span></span>
         <span class="sub">${p.role}</span>
       `;
-      li.addEventListener("click", () => {
-        guessInput.value = p.name;
-        suggestionsEl.hidden = true;
-        submitGuess(p.name);
+
+      // Use mousedown to prevent input blur before selection
+      li.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        choosePlayer(p.name);
       });
+
       suggestionsEl.appendChild(li);
     });
+
     suggestionsEl.hidden = false;
+    highlightedIndex = -1;
+    guessInput.setAttribute("aria-expanded", "true");
+  }
+
+  function choosePlayer(name) {
+    if (!guessInput) return;
+    guessInput.value = name;
+    hideSuggestions();
+    renderBoard(name);
+    submitGuess(name);
   }
 
   function submitGuess(rawGuess) {
@@ -507,11 +534,11 @@
     const guess = (rawGuess || "").trim();
 
     if (guess.length < 2) {
-      showToast("Please enter at least 2 letters for your guess!");
+      showToast("Please enter at least 2 characters for your guess!");
       return;
     }
 
-    if (suggestionsEl) suggestionsEl.hidden = true;
+    hideSuggestions();
 
     userGuesses.push(guess);
     const evalResult = evaluateGuess(guess);
@@ -530,6 +557,7 @@
     }
 
     saveState();
+    renderPatternCard();
     renderBoard();
     renderClues();
 
@@ -552,7 +580,7 @@
         if (status === "correct") grid += "🟩";
         else if (status === "present") grid += "🟨";
         else if (status === "absent") grid += "🟥";
-        else if (status === "space") grid += " ";
+        else grid += "⬜";
       });
       grid += "\n";
     });
@@ -669,10 +697,6 @@
     }
 
     // Event Listeners
-    if (btnReshuffle) {
-      btnReshuffle.addEventListener("click", reshuffleTiles);
-    }
-
     if (btnSubmitGuess) {
       btnSubmitGuess.addEventListener("click", () => {
         if (guessInput) submitGuess(guessInput.value);
@@ -681,15 +705,57 @@
 
     if (guessInput) {
       guessInput.addEventListener("input", (e) => {
-      renderBoard(e.target.value);
-      updateSuggestions(e.target.value);
-    });
+        renderBoard(e.target.value);
+        updateSuggestions(e.target.value);
+      });
 
       guessInput.addEventListener("keydown", (e) => {
+        if (suggestionsEl && !suggestionsEl.hidden && currentMatches.length > 0) {
+          const items = suggestionsEl.querySelectorAll("li");
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            highlightedIndex = (highlightedIndex + 1) % items.length;
+            items.forEach((it, i) => it.classList.toggle("highlighted", i === highlightedIndex));
+            if (highlightedIndex >= 0 && currentMatches[highlightedIndex]) {
+              guessInput.value = currentMatches[highlightedIndex].name;
+              renderBoard(guessInput.value);
+            }
+            return;
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
+            items.forEach((it, i) => it.classList.toggle("highlighted", i === highlightedIndex));
+            if (highlightedIndex >= 0 && currentMatches[highlightedIndex]) {
+              guessInput.value = currentMatches[highlightedIndex].name;
+              renderBoard(guessInput.value);
+            }
+            return;
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (highlightedIndex >= 0 && currentMatches[highlightedIndex]) {
+              choosePlayer(currentMatches[highlightedIndex].name);
+            } else {
+              const val = guessInput.value.trim();
+              hideSuggestions();
+              if (val) submitGuess(val);
+            }
+            return;
+          } else if (e.key === "Escape") {
+            hideSuggestions();
+            return;
+          }
+        }
+
         if (e.key === "Enter") {
           e.preventDefault();
-          submitGuess(guessInput.value);
+          hideSuggestions();
+          if (guessInput.value.trim()) submitGuess(guessInput.value.trim());
         }
+      });
+
+      guessInput.addEventListener("blur", () => {
+        // Small delay so mousedown on suggestion item can trigger
+        setTimeout(hideSuggestions, 160);
       });
     }
 
@@ -712,6 +778,8 @@
         handleKeyInput("ENTER");
       } else if (e.key === "Backspace") {
         handleKeyInput("⌫");
+      } else if (e.key === " " || e.code === "Space") {
+        handleKeyInput("SPACE");
       } else if (/^[a-zA-Z]$/.test(e.key)) {
         handleKeyInput(e.key.toUpperCase());
       }
@@ -720,7 +788,7 @@
     // Close suggestions on outside click
     document.addEventListener("click", (e) => {
       if (suggestionsEl && !e.target.closest(".guess-box")) {
-        suggestionsEl.hidden = true;
+        hideSuggestions();
       }
     });
   }
