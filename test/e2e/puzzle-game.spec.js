@@ -114,6 +114,48 @@ test.describe("Puzzle Cricketer — Interactive Rearrangeable Portrait Puzzle", 
     await expect(page.locator("#guess-controls")).toBeHidden();
   });
 
+  test("Hard Mode (Legends): switches to 24-piece randomized puzzle and allows tile rearranging", async ({ page }) => {
+    // Switch to Hard Mode
+    const hardBtn = page.locator("#mode-hard");
+    await hardBtn.click();
+    await expect(hardBtn).toHaveClass(/active/);
+
+    // Progress bar shows 24 pieces
+    await expect(page.locator("#puzzle-progress-text")).toContainText("of 24 pieces in place");
+
+    // Canvas is visible
+    const canvas = page.locator("#puzzle-canvas");
+    await expect(canvas).toBeVisible();
+    const box = await canvas.boundingBox();
+    expect(box).not.toBeNull();
+
+    // 4 cols x 6 rows tile size
+    const tileW = box.width / 4;
+    const tileH = box.height / 6;
+
+    // Tap tile at (0, 0)
+    await page.mouse.click(box.x + tileW / 2, box.y + tileH / 2);
+    await page.waitForTimeout(100);
+
+    // Tap tile at (1, 1) -> swaps them
+    await page.mouse.click(box.x + tileW * 1.5, box.y + tileH * 1.5);
+    await page.waitForTimeout(200);
+
+    // Still reports 24 pieces in place
+    await expect(page.locator("#puzzle-progress-text")).toContainText("of 24 pieces in place");
+
+    // Reset button restores scramble
+    await page.locator("#btn-reset-scramble").click();
+    await page.waitForTimeout(200);
+    await expect(page.locator("#puzzle-progress-text")).toContainText("of 24 pieces in place");
+
+    // Switch back to Easy Mode -> restores 9 pieces
+    const easyBtn = page.locator("#mode-easy");
+    await easyBtn.click();
+    await expect(easyBtn).toHaveClass(/active/);
+    await expect(page.locator("#puzzle-progress-text")).toContainText("of 9 pieces in place");
+  });
+
   test("Puzzle Responsiveness: zero horizontal overflow", async ({ page }) => {
     const viewports = [
       { width: 360, height: 740 },

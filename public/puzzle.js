@@ -1,11 +1,17 @@
 (function () {
   "use strict";
 
-  // 3x3 Grid = 9 interactive rearrangeable puzzle pieces
-  const GRID_COLS = 3;
-  const GRID_ROWS = 3;
-  const TOTAL_TILES = GRID_COLS * GRID_ROWS;
+  // Grid configs: Easy mode = 3x3 (9 pieces), Hard mode = 4x6 (24 pieces)
+  const GRID_CONFIG = {
+    easy: { cols: 3, rows: 3, total: 9, minDisplaced: 7 },
+    hard: { cols: 4, rows: 6, total: 24, minDisplaced: 24 }
+  };
+
   const MAX_ATTEMPTS = 3;
+
+  let gridCols = 3;
+  let gridRows = 3;
+  let totalTiles = 9;
 
   let allPlayers = [];
   let currentTarget = null;
@@ -82,24 +88,27 @@
     return arr[dayInCycle];
   }
 
-  // Generate a non-trivial scramble (at least 7 of 9 tiles displaced)
-  function generateScramble(seedStr) {
+  // Generate a non-trivial scramble (minDisplaced tiles displaced)
+  function generateScramble(seedStr, numTiles, minDisplaced) {
     const rng = mulberry32(hashString(seedStr));
-    let perm = Array.from({ length: TOTAL_TILES }, (_, i) => i);
+    let perm = Array.from({ length: numTiles }, (_, i) => i);
     let attempts = 0;
     let valid = false;
 
-    while (!valid && attempts < 50) {
+    const targetDisplaced = Math.min(minDisplaced, numTiles);
+    while (!valid && attempts < 100) {
       attempts++;
-      for (let i = TOTAL_TILES - 1; i > 0; i--) {
+      for (let i = numTiles - 1; i > 0; i--) {
         const j = Math.floor(rng() * (i + 1));
         [perm[i], perm[j]] = [perm[j], perm[i]];
       }
       let displaced = 0;
-      for (let i = 0; i < TOTAL_TILES; i++) {
+      for (let i = 0; i < numTiles; i++) {
         if (perm[i] !== i) displaced++;
       }
-      if (displaced >= 7) valid = true;
+      if (displaced >= targetDisplaced || (targetDisplaced === 24 && displaced >= 22)) {
+        valid = true;
+      }
     }
     return perm;
   }
@@ -143,30 +152,40 @@
       sy = (imgH - sh) / 2;
     }
 
-    const tileW = w / GRID_COLS;
-    const tileH = h / GRID_ROWS;
-    const srcTileW = sw / GRID_COLS;
-    const srcTileH = sh / GRID_ROWS;
+    const isHard = (totalTiles > 9);
+    const badgeRadius = isHard ? 7.5 : 9;
+    const badgeOffset = isHard ? 10.5 : 13;
+    const badgeFont = isHard ? "bold 8.5px sans-serif" : "bold 10px sans-serif";
 
     // 1. Draw each tile
-    for (let slot = 0; slot < TOTAL_TILES; slot++) {
-      // If game over, show solved order (0..8), else current board permutation
+    for (let slot = 0; slot < totalTiles; slot++) {
+      // If game over, show solved order (0..totalTiles-1), else current board permutation
       const tileId = isGameOver ? slot : board[slot];
 
-      const destCol = slot % GRID_COLS;
-      const destRow = Math.floor(slot / GRID_COLS);
-      const dx = destCol * tileW;
-      const dy = destRow * tileH;
+      const destCol = slot % gridCols;
+      const destRow = Math.floor(slot / gridCols);
+      const dx = Math.round((destCol * w) / gridCols);
+      const nextDx = Math.round(((destCol + 1) * w) / gridCols);
+      const tileW = nextDx - dx;
 
-      const srcCol = tileId % GRID_COLS;
-      const srcRow = Math.floor(tileId / GRID_COLS);
-      const tileSx = sx + srcCol * srcTileW;
-      const tileSy = sy + srcRow * srcTileH;
+      const dy = Math.round((destRow * h) / gridRows);
+      const nextDy = Math.round(((destRow + 1) * h) / gridRows);
+      const tileH = nextDy - dy;
+
+      const srcCol = tileId % gridCols;
+      const srcRow = Math.floor(tileId / gridCols);
+      const srcX0 = sx + (srcCol * sw) / gridCols;
+      const srcX1 = sx + ((srcCol + 1) * sw) / gridCols;
+      const srcTileW = srcX1 - srcX0;
+
+      const srcY0 = sy + (srcRow * sh) / gridRows;
+      const srcY1 = sy + ((srcRow + 1) * sh) / gridRows;
+      const srcTileH = srcY1 - srcY0;
 
       ctx.drawImage(
         loadedImage,
-        tileSx,
-        tileSy,
+        srcX0,
+        srcY0,
         srcTileW,
         srcTileH,
         dx,
@@ -179,20 +198,25 @@
     // 2. Draw borders & overlays if game active
     let correctCount = 0;
     if (!isGameOver) {
-      for (let slot = 0; slot < TOTAL_TILES; slot++) {
+      for (let slot = 0; slot < totalTiles; slot++) {
         const tileId = board[slot];
         const isSolved = (tileId === slot);
         if (isSolved) correctCount++;
 
-        const destCol = slot % GRID_COLS;
-        const destRow = Math.floor(slot / GRID_COLS);
-        const dx = destCol * tileW;
-        const dy = destRow * tileH;
+        const destCol = slot % gridCols;
+        const destRow = Math.floor(slot / gridCols);
+        const dx = Math.round((destCol * w) / gridCols);
+        const nextDx = Math.round(((destCol + 1) * w) / gridCols);
+        const tileW = nextDx - dx;
+
+        const dy = Math.round((destRow * h) / gridRows);
+        const nextDy = Math.round(((destRow + 1) * h) / gridRows);
+        const tileH = nextDy - dy;
 
         if (slot === selectedSlot) {
           // Selected tile: Bright glowing gold border + translucent amber wash
           ctx.strokeStyle = "#f59e0b";
-          ctx.lineWidth = 3;
+          ctx.lineWidth = isHard ? 2.5 : 3;
           ctx.strokeRect(dx + 1.5, dy + 1.5, tileW - 3, tileH - 3);
 
           ctx.fillStyle = "rgba(245, 158, 11, 0.28)";
@@ -201,60 +225,60 @@
           // Glowing badge
           ctx.fillStyle = "#f59e0b";
           ctx.beginPath();
-          ctx.arc(dx + 15, dy + 15, 10, 0, Math.PI * 2);
+          ctx.arc(dx + badgeOffset, dy + badgeOffset, badgeRadius, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.fillStyle = "#000000";
-          ctx.font = "bold 11px sans-serif";
+          ctx.font = badgeFont;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText("★", dx + 15, dy + 15);
+          ctx.fillText("★", dx + badgeOffset, dy + badgeOffset);
         } else if (isSolved) {
           // Correctly placed: Clean subtle green border + checkmark
           ctx.strokeStyle = "rgba(34, 197, 94, 0.85)";
-          ctx.lineWidth = 1.8;
+          ctx.lineWidth = isHard ? 1.5 : 1.8;
           ctx.strokeRect(dx + 1, dy + 1, tileW - 2, tileH - 2);
 
           // Checkmark badge in corner
           ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
           ctx.beginPath();
-          ctx.arc(dx + 14, dy + 14, 9, 0, Math.PI * 2);
+          ctx.arc(dx + badgeOffset, dy + badgeOffset, badgeRadius, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.fillStyle = "#22c55e";
-          ctx.font = "bold 10px sans-serif";
+          ctx.font = badgeFont;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText("✓", dx + 14, dy + 14);
+          ctx.fillText("✓", dx + badgeOffset, dy + badgeOffset);
         } else {
           // Scrambled tile: Subtle dashed border + tile number
           ctx.strokeStyle = "rgba(245, 158, 11, 0.35)";
           ctx.lineWidth = 1;
-          ctx.setLineDash([3, 3]);
+          ctx.setLineDash(isHard ? [2, 2] : [3, 3]);
           ctx.strokeRect(dx + 0.5, dy + 0.5, tileW - 1, tileH - 1);
           ctx.setLineDash([]);
 
           // Tile number badge
           ctx.fillStyle = "rgba(15, 23, 42, 0.7)";
           ctx.beginPath();
-          ctx.arc(dx + 14, dy + 14, 9, 0, Math.PI * 2);
+          ctx.arc(dx + badgeOffset, dy + badgeOffset, badgeRadius, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.fillStyle = "rgba(245, 158, 11, 0.9)";
-          ctx.font = "bold 10px sans-serif";
+          ctx.font = badgeFont;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText(String(tileId + 1), dx + 14, dy + 14);
+          ctx.fillText(String(tileId + 1), dx + badgeOffset, dy + badgeOffset);
         }
       }
     } else {
-      correctCount = TOTAL_TILES;
+      correctCount = totalTiles;
     }
 
     // 3. Update Progress Bar
-    const percent = Math.round((correctCount / TOTAL_TILES) * 100);
+    const percent = Math.round((correctCount / totalTiles) * 100);
     if (progressText) {
-      progressText.textContent = `🧩 ${correctCount} of ${TOTAL_TILES} pieces in place`;
+      progressText.textContent = `🧩 ${correctCount} of ${totalTiles} pieces in place`;
     }
     if (progressPercent) {
       progressPercent.textContent = `${percent}%`;
@@ -265,7 +289,7 @@
 
     // 4. Update Assembled Banner
     if (assembledBanner) {
-      if (!isGameOver && correctCount === TOTAL_TILES) {
+      if (!isGameOver && correctCount === totalTiles) {
         assembledBanner.style.display = "block";
       } else {
         assembledBanner.style.display = "none";
@@ -280,14 +304,14 @@
     const y = (clientY - rect.top) * (canvas.height / rect.height);
     if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return -1;
 
-    const col = Math.floor(x / (canvas.width / GRID_COLS));
-    const row = Math.floor(y / (canvas.height / GRID_ROWS));
-    if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return -1;
-    return row * GRID_COLS + col;
+    const col = Math.floor(x / (canvas.width / gridCols));
+    const row = Math.floor(y / (canvas.height / gridRows));
+    if (col < 0 || col >= gridCols || row < 0 || row >= gridRows) return -1;
+    return row * gridCols + col;
   }
 
   function handleTileTap(slot) {
-    if (isGameOver || slot < 0 || slot >= TOTAL_TILES) return;
+    if (isGameOver || slot < 0 || slot >= totalTiles) return;
 
     if (selectedSlot === -1) {
       selectedSlot = slot;
@@ -343,7 +367,7 @@
 
   // Reset Scramble Button
   resetBtn?.addEventListener("click", () => {
-    if (isGameOver || initialScramble.length !== TOTAL_TILES) return;
+    if (isGameOver || initialScramble.length !== totalTiles) return;
     board = [...initialScramble];
     selectedSlot = -1;
     saveProgress();
@@ -397,9 +421,18 @@
       const variantSeed = hashString(today + "_" + currentTarget.id + "_jigsaw_variant");
       currentPhotoUrl = variants[variantSeed % variants.length];
 
-      // Daily scramble seed
-      const scrambleSeed = today + "_" + currentTarget.id + "_puzzle_scramble";
-      initialScramble = generateScramble(scrambleSeed);
+      // Update grid dimensions for current mode
+      const cfg = GRID_CONFIG[currentMode] || GRID_CONFIG.easy;
+      gridCols = cfg.cols;
+      gridRows = cfg.rows;
+      totalTiles = cfg.total;
+
+      // Scramble seed specific to mode and target
+      const scrambleSeed = today + "_" + currentTarget.id + "_puzzle_scramble_" + currentMode;
+      initialScramble = generateScramble(scrambleSeed, totalTiles, cfg.minDisplaced);
+
+      selectedSlot = -1;
+      dragStartSlot = -1;
 
       // Restore saved progress if any
       const saved = localStorage.getItem(`cricketle_puzzle_${today}_${currentMode}`);
@@ -407,7 +440,7 @@
         const data = JSON.parse(saved);
         currentAttempts = data.attempts || [];
         isGameOver = data.isGameOver || false;
-        if (Array.isArray(data.board) && data.board.length === TOTAL_TILES) {
+        if (Array.isArray(data.board) && data.board.length === totalTiles) {
           board = data.board;
         } else {
           board = [...initialScramble];
@@ -475,7 +508,7 @@
     selectedSlot = -1;
 
     // Reveal all pieces in solved order
-    for (let i = 0; i < TOTAL_TILES; i++) board[i] = i;
+    for (let i = 0; i < totalTiles; i++) board[i] = i;
     renderBoard();
     updateTrack();
 
@@ -710,7 +743,7 @@
     if (currentMode === "easy") return;
     currentMode = "easy";
     document.querySelectorAll(".mode-btn").forEach((b) => b.classList.remove("active"));
-    e.target.classList.add("active");
+    e.currentTarget.classList.add("active");
     if (guessControls) guessControls.style.display = "block";
     if (resetBtn) resetBtn.style.display = "inline-flex";
     if (resultCard) resultCard.style.display = "none";
@@ -721,7 +754,7 @@
     if (currentMode === "hard") return;
     currentMode = "hard";
     document.querySelectorAll(".mode-btn").forEach((b) => b.classList.remove("active"));
-    e.target.classList.add("active");
+    e.currentTarget.classList.add("active");
     if (guessControls) guessControls.style.display = "block";
     if (resetBtn) resetBtn.style.display = "inline-flex";
     if (resultCard) resultCard.style.display = "none";
