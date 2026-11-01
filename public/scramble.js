@@ -54,6 +54,7 @@
   const kbRow1 = document.getElementById("kb-row-1");
   const kbRow2 = document.getElementById("kb-row-2");
   const kbRow3 = document.getElementById("kb-row-3");
+  const kbRow4 = document.getElementById("kb-row-4");
   const gateModal = document.getElementById("member-gate-modal");
   const toastEl = document.getElementById("scramble-toast");
 
@@ -168,23 +169,6 @@
     return { name, country: "IND", role: "Cricket Legend", debut: 2008, matches: 300, runs: 10000, wkts: 50 };
   }
 
-  function scrambleWord(word, rng) {
-    const letters = word.toUpperCase().split("");
-    if (letters.length <= 1) return letters;
-
-    let shuffled = [...letters];
-    let attempts = 0;
-    while (attempts < 20) {
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      if (shuffled.join("") !== word.toUpperCase()) break;
-      attempts++;
-    }
-    return shuffled;
-  }
-
   function initDailyPlayer() {
     const today = getTodayKey();
     const seed = hashString(`${today}_scramble_challenge_v1`);
@@ -194,40 +178,50 @@
     targetPlayer = findPlayerData(name);
     targetName = targetPlayer.name.toUpperCase();
     targetWords = targetName.split(" ");
-
-    // Scramble letters per word
-    const rng = mulberry32(seed + 99);
-    scrambledLetters = targetWords.map(w => scrambleWord(w, rng));
   }
 
-  function renderScrambledCard() {
+  function renderPatternCard() {
     if (!scrambledWrap) return;
     scrambledWrap.innerHTML = "";
 
-    scrambledLetters.forEach((wordLetters) => {
+    // Identify all letters that have been correctly positioned (Green) in previous guesses
+    const solvedPositions = new Array(targetName.length).fill(null);
+    userGuesses.forEach(g => {
+      const evalResult = evaluateGuess(g);
+      evalResult.forEach((item, idx) => {
+        if (item && item.status === "correct") {
+          solvedPositions[idx] = item.char;
+        }
+      });
+    });
+
+    let charIdx = 0;
+    targetWords.forEach((word) => {
       const group = document.createElement("div");
       group.className = "scramble-word-group";
 
-      wordLetters.forEach(ch => {
+      for (let w = 0; w < word.length; w++) {
         const tile = document.createElement("span");
-        tile.className = "scramble-letter-tile";
-        tile.textContent = ch;
+        const correctChar = solvedPositions[charIdx];
+        if (correctChar) {
+          tile.className = "scramble-letter-tile revealed-green";
+          tile.textContent = correctChar;
+        } else {
+          tile.className = "scramble-letter-tile mystery-dash";
+          tile.textContent = "_";
+        }
         group.appendChild(tile);
-      });
+        charIdx++;
+      }
+      charIdx++; // account for space
 
       scrambledWrap.appendChild(group);
     });
 
     if (scramblePatternText) {
       const patternDesc = targetWords.map(w => `${w.length} Letters`).join(" + ");
-      scramblePatternText.textContent = `Word pattern: ${patternDesc} (${targetName.replace(/ /g, "").length} letters total)`;
+      scramblePatternText.textContent = `Pattern: ${patternDesc} (${targetName.replace(/ /g, "").length} letters total)`;
     }
-  }
-
-  function reshuffleTiles() {
-    const rng = mulberry32(Date.now());
-    scrambledLetters = targetWords.map(w => scrambleWord(w, rng));
-    renderScrambledCard();
   }
 
   /**
@@ -330,11 +324,11 @@
     }
   }
 
-  function renderBoard() {
+  function renderBoard(typingValue) {
     if (!boardEl) return;
     boardEl.innerHTML = "";
 
-    // Render evaluated guesses
+    // 1. Render evaluated guesses
     userGuesses.forEach((guessStr) => {
       const row = document.createElement("div");
       row.className = "wordle-row";
@@ -355,13 +349,43 @@
       boardEl.appendChild(row);
     });
 
-    // Render remaining empty rows
-    const remaining = MAX_GUESSES - userGuesses.length;
+    // 2. Render active row (if game still active)
+    if (!isGameOver && userGuesses.length < MAX_GUESSES) {
+      const row = document.createElement("div");
+      row.className = "wordle-row active-row";
+      const typed = (typingValue !== undefined ? typingValue : (guessInput ? guessInput.value : "")).toUpperCase();
+
+      let typedLetterIdx = 0;
+      for (let i = 0; i < targetName.length; i++) {
+        const tile = document.createElement("span");
+        if (targetName[i] === " ") {
+          tile.className = "wordle-tile space-sep";
+          tile.innerHTML = "•";
+          if (typedLetterIdx < typed.length && typed[typedLetterIdx] === " ") {
+            typedLetterIdx++;
+          }
+        } else {
+          if (typedLetterIdx < typed.length && typed[typedLetterIdx] !== " ") {
+            tile.className = "wordle-tile typing";
+            tile.textContent = typed[typedLetterIdx];
+            typedLetterIdx++;
+          } else {
+            tile.className = "wordle-tile empty";
+            tile.textContent = "_";
+          }
+        }
+        row.appendChild(tile);
+      }
+      boardEl.appendChild(row);
+    }
+
+    // 3. Render remaining empty rows
+    const usedRows = userGuesses.length + (isGameOver || userGuesses.length >= MAX_GUESSES ? 0 : 1);
+    const remaining = MAX_GUESSES - usedRows;
     for (let r = 0; r < remaining; r++) {
       const row = document.createElement("div");
       row.className = "wordle-row";
 
-      // Render slots matching target length
       for (let i = 0; i < targetName.length; i++) {
         const tile = document.createElement("span");
         if (targetName[i] === " ") {
@@ -369,7 +393,7 @@
           tile.innerHTML = "•";
         } else {
           tile.className = "wordle-tile empty";
-          tile.textContent = "";
+          tile.textContent = "_";
         }
         row.appendChild(tile);
       }
@@ -389,10 +413,11 @@
     const layout = [
       ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
       ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
-      ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "⌫"]
+      ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "⌫"],
+      ["SPACE"]
     ];
 
-    [kbRow1, kbRow2, kbRow3].forEach((rowEl, rowIdx) => {
+    [kbRow1, kbRow2, kbRow3, kbRow4].forEach((rowEl, rowIdx) => {
       if (!rowEl) return;
       rowEl.innerHTML = "";
 
@@ -404,6 +429,8 @@
 
         if (key === "ENTER" || key === "⌫") {
           btn.classList.add("key-wide");
+        } else if (key === "SPACE") {
+          btn.classList.add("key-space");
         }
 
         const status = keyStatuses[key];
@@ -424,10 +451,20 @@
       submitGuess(guessInput.value);
     } else if (key === "⌫" || key === "BACKSPACE") {
       guessInput.value = guessInput.value.slice(0, -1);
+      renderBoard(guessInput.value);
       updateSuggestions(guessInput.value);
-    } else if (/^[A-Z ]$/i.test(key)) {
-      guessInput.value += key.toUpperCase();
-      updateSuggestions(guessInput.value);
+    } else if (key === "SPACE") {
+      if (guessInput.value.length < targetName.length) {
+        guessInput.value += " ";
+        renderBoard(guessInput.value);
+        updateSuggestions(guessInput.value);
+      }
+    } else if (/^[A-Z]$/i.test(key)) {
+      if (guessInput.value.length < targetName.length) {
+        guessInput.value += key.toUpperCase();
+        renderBoard(guessInput.value);
+        updateSuggestions(guessInput.value);
+      }
     }
   }
 
@@ -609,7 +646,7 @@
     const isAuthed = await checkAuth();
     if (!isAuthed) return;
     initDailyPlayer();
-    renderScrambledCard();
+    renderPatternCard();
     renderVirtualKeyboard();
 
     const saved = loadSavedState();
@@ -644,8 +681,9 @@
 
     if (guessInput) {
       guessInput.addEventListener("input", (e) => {
-        updateSuggestions(e.target.value);
-      });
+      renderBoard(e.target.value);
+      updateSuggestions(e.target.value);
+    });
 
       guessInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {

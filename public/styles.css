@@ -115,7 +115,7 @@ body, .card { transition: background-color 600ms var(--ease-out), color 600ms va
 
 * { box-sizing: border-box; }
 
-html { color-scheme: dark; scroll-behavior: smooth; }
+html { color-scheme: dark; scroll-behavior: smooth; overflow-x: hidden; max-width: 100%; }
 
 body {
   margin: 0;
@@ -127,6 +127,7 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh;
   overflow-x: hidden;
+  max-width: 100%;
   padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--space-4));
 }
 
@@ -187,8 +188,9 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-width: 0;
-  flex: 0 1 auto;
+  min-width: max-content;
+  flex: 0 0 auto;
+  flex-shrink: 0;
 }
 .brand-mark {
   flex: none;
@@ -207,13 +209,13 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 .brand:hover .brand-mark svg { transform: rotate(180deg); }
 .brand-text {
   min-width: 0;
-  overflow: hidden;
+  flex-shrink: 0;
 }
 .topbar h1 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
   letter-spacing: 0.04em;
   line-height: 1;
   white-space: nowrap;
@@ -240,7 +242,7 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
   display: none;
   align-items: center;
   gap: 3px;
-  padding: 3px 6px;
+  padding: 3px 8px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -249,12 +251,13 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
   flex: 0 0 auto;
   flex-shrink: 0;
   min-width: 0;
+  overflow: visible;
 }
 .nav-link {
   display: inline-flex; align-items: center; gap: 6px;
   min-height: 36px; padding: 0 10px;
   border-radius: 999px;
-  color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.84rem;
+  color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.82rem;
   transition: color var(--dur-fast), background var(--dur-fast);
   white-space: nowrap;
   flex-shrink: 0;
@@ -295,31 +298,34 @@ body.hard .nav-link[aria-current="page"] { color: #1a1200; background: var(--acc
   body { padding-bottom: var(--space-7); }
 }
 
-/* Tablet & compact laptop (768px - 1219px): icon-only nav pills with pristine spacing so .brand NEVER gets squeezed */
-@media (min-width: 768px) and (max-width: 1219px) {
+/* Tablet & compact laptop (768px - 1319px): icon-only nav pills with pristine spacing so .brand NEVER gets squeezed */
+@media (min-width: 768px) and (max-width: 1319px) {
   .tagline { display: none; }
   .nav-link span { display: none; }
   .nav-link { padding: 0 9px; min-height: 36px; }
+  .nav { padding: 3px 6px; gap: 3px; }
   .topbar { gap: 10px; }
-  .topbar h1 { font-size: clamp(1.35rem, 2vw, 1.8rem); }
+  .topbar h1 { font-size: clamp(1.3rem, 1.8vw, 1.65rem); }
 }
 
-/* Standard Desktop & Laptops (1220px - 1379px): compact text pills fitting all 9 variants comfortably */
-@media (min-width: 1220px) and (max-width: 1379px) {
+/* Standard Desktop & Laptops (1320px - 1479px): compact text pills fitting all 9 variants comfortably */
+@media (min-width: 1320px) and (max-width: 1479px) {
   .tagline { display: none; }
   .nav-link span { display: inline; }
-  .nav-link { padding: 0 6px; font-size: 0.77rem; gap: 3px; min-height: 34px; }
-  .topbar { gap: 8px; }
-  .topbar h1 { font-size: clamp(1.4rem, 1.8vw, 1.85rem); }
+  .nav-link { padding: 0 6px; font-size: 0.76rem; gap: 3px; min-height: 34px; }
+  .nav { padding: 3px 8px; gap: 3px; }
+  .topbar { gap: 10px; }
+  .topbar h1 { font-size: clamp(1.35rem, 1.6vw, 1.75rem); }
 }
 
-/* Wide Desktop (>= 1380px): spacious luxury sports UI */
-@media (min-width: 1380px) {
-  .tagline { display: block; max-width: 34ch; font-size: 0.82rem; }
+/* Wide Desktop (>= 1480px): spacious luxury sports UI */
+@media (min-width: 1480px) {
+  .tagline { display: block; max-width: 32ch; font-size: 0.8rem; }
   .nav-link span { display: inline; }
-  .nav-link { padding: 0 9px; font-size: 0.82rem; gap: 5px; min-height: 36px; }
+  .nav-link { padding: 0 8px; font-size: 0.82rem; gap: 5px; min-height: 36px; }
+  .nav { padding: 4px 10px; gap: 4px; }
   .topbar { gap: 14px; }
-  .topbar h1 { font-size: clamp(1.6rem, 2vw, 2.2rem); }
+  .topbar h1 { font-size: clamp(1.5rem, 1.8vw, 2.1rem); }
 }
 
 /* ---------- Views ---------- */

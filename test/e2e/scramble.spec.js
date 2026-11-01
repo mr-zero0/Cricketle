@@ -39,29 +39,31 @@ test.describe("Scramble — Wordle Anagram Gameplay", () => {
     });
   });
 
-  test("Scramble UI: renders scrambled letter tiles, 6 wordle rows, and virtual keyboard", async ({ page }) => {
+  test("Scramble UI: renders mystery blank slots, 6 wordle rows, and virtual keyboard", async ({ page }) => {
     const errors = monitorConsole(page);
     await page.goto("/scramble.html");
     await expect(page.locator("h1")).toContainText("Scramble");
 
-    // Scrambled letters rendered
-    const scrambledTiles = page.locator(".scramble-letter-tile");
-    const tileCount = await scrambledTiles.count();
+    // Mystery tiles rendered as empty dashes _ (no letters revealed upfront)
+    const mysteryTiles = page.locator(".scramble-letter-tile");
+    const tileCount = await mysteryTiles.count();
     expect(tileCount).toBeGreaterThan(4);
+    const firstTileText = await mysteryTiles.first().textContent();
+    expect(firstTileText.trim()).toBe("_");
 
-    // Shuffle button works
-    const shuffleBtn = page.locator("#btn-reshuffle");
-    await expect(shuffleBtn).toBeVisible();
-    await shuffleBtn.click();
-    await expect(page.locator(".scramble-letter-tile").first()).toBeVisible();
+    // Pattern text indicates word length
+    await expect(page.locator("#scramble-pattern-text")).toContainText("Letters");
 
-    // Wordle rows rendered (6 rows)
+    // Wordle rows rendered (6 rows) starting empty with _
     const rows = page.locator(".wordle-row");
     await expect(rows).toHaveCount(6);
+    const firstRowEmptyTiles = rows.first().locator(".wordle-tile.empty");
+    const emptyCount = await firstRowEmptyTiles.count();
+    expect(emptyCount).toBeGreaterThan(4);
 
-    // Virtual keyboard rendered
+    // Virtual keyboard rendered (26 letters + ENTER + ⌫ + SPACE = 29 keys)
     const keys = page.locator(".key-btn");
-    await expect(keys).toHaveCount(28); // 26 letters + ENTER + ⌫
+    await expect(keys).toHaveCount(29);
 
     // Country clue unlocked
     await expect(page.locator("#clue-country")).toHaveClass(/unlocked/);
@@ -145,3 +147,4 @@ test.describe("Scramble — Wordle Anagram Gameplay", () => {
     }
   });
 });
+

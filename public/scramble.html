@@ -198,6 +198,45 @@
       opacity: 0.6;
     }
 
+    
+    .scramble-letter-tile.mystery-dash {
+      background: rgba(255, 255, 255, 0.04) !important;
+      border: 2px dashed rgba(255, 255, 255, 0.28) !important;
+      color: rgba(255, 255, 255, 0.4) !important;
+      font-size: clamp(18px, 4.5vw, 24px) !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+
+    .scramble-letter-tile.revealed-green {
+      background: linear-gradient(135deg, #16a34a, #15803d) !important;
+      border: 2px solid #4ade80 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35) !important;
+      animation: flipIn 0.4s ease both;
+    }
+
+    .wordle-tile.empty {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.25);
+      font-size: clamp(13px, 3.2vw, 18px);
+    }
+
+    .wordle-tile.typing {
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      color: #ffffff;
+      transform: scale(1.05);
+      animation: popIn 0.15s ease both;
+    }
+
+    .key-space {
+      width: clamp(120px, 40vw, 200px) !important;
+      font-size: 11px !important;
+      letter-spacing: 0.08em;
+    }
+
     /* Wordle Guess Board */
     .wordle-board {
       display: flex;
@@ -677,15 +716,15 @@
       </div>
     </div>
     <nav class="nav" aria-label="Primary">
-      <a href="hub.html" class="nav-link title="All Games""><svg aria-hidden="true"><use href="#i-ball"/></svg><span>All Games</span></a>
-      <a href="index.html" class="nav-link title="Cricketle""><svg aria-hidden="true"><use href="#i-stumps"/></svg><span>Cricketle</span></a>
-      <a href="connections.html" class="nav-link title="Connections""><svg aria-hidden="true"><use href="#i-link"/></svg><span>Connections</span></a>
-      <a href="journey.html" class="nav-link title="Journey""><svg aria-hidden="true"><use href="#i-journey"/></svg><span>Journey</span></a>
-      <a href="scorecard.html" class="nav-link title="Scorecard""><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Scorecard</span></a>
-      <a href="puzzle.html" class="nav-link title="Puzzle""><svg aria-hidden="true"><use href="#i-puzzle"/></svg><span>Puzzle</span></a>
-      <a href="stadium.html" class="nav-link title="Stadium""><svg aria-hidden="true"><use href="#i-stadium"/></svg><span>Stadium</span></a>
-      <a href="facts.html" class="nav-link title="Facts""><svg aria-hidden="true"><use href="#i-scale"/></svg><span>Facts</span></a>
-      <a href="scramble.html" class="nav-link title="Scramble"" aria-current="page"><svg aria-hidden="true"><use href="#i-scramble"/></svg><span>Scramble</span></a>
+      <a href="hub.html" class="nav-link" title="All Games"><svg aria-hidden="true"><use href="#i-ball"/></svg><span>All Games</span></a>
+      <a href="index.html" class="nav-link" title="Cricketle"><svg aria-hidden="true"><use href="#i-stumps"/></svg><span>Cricketle</span></a>
+      <a href="connections.html" class="nav-link" title="Connections"><svg aria-hidden="true"><use href="#i-link"/></svg><span>Connections</span></a>
+      <a href="journey.html" class="nav-link" title="Journey"><svg aria-hidden="true"><use href="#i-journey"/></svg><span>Journey</span></a>
+      <a href="scorecard.html" class="nav-link" title="Scorecard"><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Scorecard</span></a>
+      <a href="puzzle.html" class="nav-link" title="Puzzle"><svg aria-hidden="true"><use href="#i-puzzle"/></svg><span>Puzzle</span></a>
+      <a href="stadium.html" class="nav-link" title="Stadium"><svg aria-hidden="true"><use href="#i-stadium"/></svg><span>Stadium</span></a>
+      <a href="facts.html" class="nav-link" title="Facts"><svg aria-hidden="true"><use href="#i-scale"/></svg><span>Facts</span></a>
+      <a href="scramble.html" class="nav-link" title="Scramble" aria-current="page"><svg aria-hidden="true"><use href="#i-scramble"/></svg><span>Scramble</span></a>
     </nav>
     <div class="topbar-actions">
       <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch to day">
@@ -735,27 +774,24 @@
     <!-- Active Game View -->
     <div id="game-view">
       <div class="scramble-header">
-        <h2>CRICKETER SCRAMBLE</h2>
-        <p>A cricket superstar's name has been scrambled! You have 6 attempts to guess them.</p>
+        <h2>CRICKETER WORDLE</h2>
+        <p>Guess the mystery cricketer in 6 attempts. Start from empty blanks _ _ _ _ and use Wordle-style clues!</p>
       </div>
 
       <div class="scramble-badge-bar">
         <span class="scramble-badge-pill">📅 Daily Challenge · 6 Attempts</span>
       </div>
 
-      <!-- Scrambled Letters Card -->
+      <!-- Mystery Cricketer Pattern Card -->
       <div class="scrambled-card" id="scrambled-card">
         <div class="scrambled-label">
-          <span>🔀 Scrambled Name</span>
+          <span>🏏 Mystery Cricketer Pattern</span>
         </div>
-        <div class="scrambled-tiles-wrap" id="scrambled-tiles-wrap">
-          <!-- Populated by scramble.js -->
+        <div class="scrambled-tiles-wrap" id="scrambled-tiles-wrap" aria-label="Mystery player letter slots">
+          <!-- Populated by scramble.js with blank dash slots _ _ _ _ _ -->
         </div>
         <div class="scramble-sub-actions">
-          <button type="button" class="btn-shuffle" id="btn-reshuffle" title="Shuffle scrambled tiles">
-            <span>🔄 Shuffle Tiles</span>
-          </button>
-          <span class="scramble-pattern-text" id="scramble-pattern-text">Loading player...</span>
+          <span class="scramble-pattern-text" id="scramble-pattern-text">Loading mystery pattern...</span>
         </div>
       </div>
 
@@ -794,6 +830,7 @@
         <div class="keyboard-row" id="kb-row-1"></div>
         <div class="keyboard-row" id="kb-row-2"></div>
         <div class="keyboard-row" id="kb-row-3"></div>
+        <div class="keyboard-row" id="kb-row-4"></div>
       </div>
     </div>
 
