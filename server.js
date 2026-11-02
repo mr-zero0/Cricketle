@@ -1119,6 +1119,8 @@ function createApp(opts = {}) {
     else if (pathname === "/facts" || pathname === "/facts/") serveStatic(req, res, "/facts.html");
     else if (pathname === "/pixel" || pathname === "/pixel/") serveStatic(req, res, "/pixel.html");
     else if (pathname === "/admin" || pathname === "/admin/") serveStatic(req, res, "/admin.html");
+    else if (pathname === "/privacy" || pathname === "/privacy/") serveStatic(req, res, "/privacy.html");
+    else if (pathname === "/terms" || pathname === "/terms/") serveStatic(req, res, "/terms.html");
     else serveStatic(req, res, pathname);
   });
 
