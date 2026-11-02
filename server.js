@@ -105,6 +105,7 @@ function createApp(opts = {}) {
     logger.info(cleanTag, msg);
   };
 
+  const googleClientId = opts.googleClientId !== undefined ? opts.googleClientId : (process.env.GOOGLE_CLIENT_ID || "847228057426-kjtqedlusfe3euq3ip78f11ddnagsdt1.apps.googleusercontent.com");
   const supabaseUrl = opts.supabaseUrl || process.env.SUPABASE_URL;
   const supabaseKey = opts.supabaseKey || process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
   let db;
@@ -621,7 +622,7 @@ function createApp(opts = {}) {
         return fail(res, 401, "invalid_google_token", "Invalid Google account data.");
       }
 
-      const expectedAud = process.env.GOOGLE_CLIENT_ID;
+      const expectedAud = googleClientId;
       if (expectedAud && !credential.startsWith("mock_google_") && payload.aud !== expectedAud) {
         return fail(res, 401, "audience_mismatch", "Token audience does not match configured Google Client ID.");
       }
@@ -709,7 +710,7 @@ function createApp(opts = {}) {
 
     if (key === "GET /api/me") {
       const user = await currentUser(req);
-      if (!user) return send(res, 200, { user: null, day: core.todayKey(now()), now: now(), googleClientId: process.env.GOOGLE_CLIENT_ID || null });
+      if (!user) return send(res, 200, { user: null, day: core.todayKey(now()), now: now(), googleClientId });
       return send(res, 200, {
         user: {
           id: user.id,
