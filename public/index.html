@@ -24,9 +24,9 @@
   <!-- Fonts load without blocking first paint: fetched early, applied by theme.js once ready. -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
   <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
-  <link rel="stylesheet" href="styles.css?v=2.6.0" />
+  <link rel="stylesheet" href="styles.css?v=2.7.0" />
   <!-- Theme runs before first paint so day pages never flash the night tokens. -->
-  <script src="theme.js?v=2.6.0"></script>
+  <script src="theme.js?v=2.7.0"></script>
   <style id="glass-nav-css">
 /* ==========================================================================
    Smooth Glassmorphism Mobile Variants Rail
@@ -202,6 +202,7 @@
   }
 }
   </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to the game</a>
@@ -415,7 +416,16 @@
       <div id="auth-card" class="card auth auth-card-clean" hidden>
         <div class="auth-clean-header">
           <h3 class="auth-title">Welcome to Cricketle</h3>
-          <p class="muted small-text">Username or mobile number, plus your PIN. That's all.</p>
+          <p class="muted small-text">Instant 1-tap Google sign-in or mobile PIN.</p>
+        </div>
+
+        <div id="google-auth-section" class="google-auth-section" style="margin: 14px 0 16px; display: flex; flex-direction: column; align-items: center;">
+          <div id="google-signin-btn" style="min-height: 40px; display: flex; justify-content: center;"></div>
+          <div class="auth-divider" style="display: flex; align-items: center; width: 100%; margin: 14px 0 6px; color: var(--muted, #8b949e); font-size: 0.8rem;">
+            <span style="flex: 1; border-bottom: 1px solid var(--border, #30363d);"></span>
+            <span style="padding: 0 10px;">or continue with mobile & PIN</span>
+            <span style="flex: 1; border-bottom: 1px solid var(--border, #30363d);"></span>
+          </div>
         </div>
 
         <div class="auth-tabs" role="tablist">
@@ -550,10 +560,10 @@
     </form>
   </dialog>
 
-  <script src="players.js?v=2.6.0" charset="utf-8" defer></script>
-  <script src="game-core.js?v=2.6.0" charset="utf-8" defer></script>
-  <script src="bg.js?v=2.6.0" charset="utf-8" defer></script>
-  <script src="app.js?v=2.6.0" charset="utf-8" defer></script>
-  <script src="mobile-keyboard.js?v=2.6.0" defer></script>
+  <script src="players.js?v=2.7.0" charset="utf-8" defer></script>
+  <script src="game-core.js?v=2.7.0" charset="utf-8" defer></script>
+  <script src="bg.js?v=2.7.0" charset="utf-8" defer></script>
+  <script src="app.js?v=2.7.0" charset="utf-8" defer></script>
+  <script src="mobile-keyboard.js?v=2.7.0" defer></script>
 </body>
 </html>

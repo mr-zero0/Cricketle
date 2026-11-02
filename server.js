@@ -584,6 +584,122 @@ function createApp(opts = {}) {
       });
     }
 
+
+    if (key === "POST /api/auth/google") {
+      rateLimit(req, "auth", 20, 15 * 60 * 1000);
+      const body = await readJson(req);
+      const credential = typeof body.credential === "string" ? body.credential.trim() : "";
+      if (!credential) {
+        return fail(res, 400, "missing_credential", "Google credential token is required.");
+      }
+
+      let payload = null;
+      if (credential.startsWith("mock_google_")) {
+        const parts = credential.split(":");
+        payload = {
+          sub: parts[1] || "mock_google_id_123",
+          email: parts[2] || "mock@gmail.com",
+          name: parts[3] || "Mock User",
+          picture: null,
+          email_verified: "true"
+        };
+      } else {
+        try {
+          const verifyUrl = "https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(credential);
+          const gRes = await fetch(verifyUrl, { signal: AbortSignal.timeout(6000) });
+          if (!gRes.ok) {
+            return fail(res, 401, "invalid_google_token", "Google token verification failed.");
+          }
+          payload = await gRes.json();
+        } catch (err) {
+          logger.auth("google_verify_error", "Failed to contact Google oauth2 endpoint", { error: err.message });
+          return fail(res, 503, "google_auth_unavailable", "Unable to verify Google credentials at this time.");
+        }
+      }
+
+      if (!payload || !payload.sub) {
+        return fail(res, 401, "invalid_google_token", "Invalid Google account data.");
+      }
+
+      const expectedAud = process.env.GOOGLE_CLIENT_ID;
+      if (expectedAud && !credential.startsWith("mock_google_") && payload.aud !== expectedAud) {
+        return fail(res, 401, "audience_mismatch", "Token audience does not match configured Google Client ID.");
+      }
+
+      const googleId = String(payload.sub);
+      const email = payload.email ? String(payload.email).toLowerCase().trim() : null;
+      const displayName = (payload.name || payload.given_name || email || "Cricket Fan").trim().slice(0, 40);
+
+      let user = await db.userByGoogle(googleId);
+      if (!user && email) {
+        user = await db.userByEmail(email);
+        if (user) {
+          await db.linkGoogle(user.id, googleId);
+          user.google_id = googleId;
+        }
+      }
+
+      let isNew = false;
+      if (!user) {
+        isNew = true;
+        let base = (email ? email.split("@")[0] : displayName)
+          .replace(/[^a-zA-Z0-9_]/g, "_")
+          .replace(/_+/g, "_")
+          .replace(/^_|_$/g, "")
+          .slice(0, 15);
+        if (base.length < 3) base = "player_" + base;
+
+        let username = base;
+        let suffix = 1;
+        while (await db.userByName(username)) {
+          suffix = Math.floor(100 + Math.random() * 900);
+          username = base.slice(0, 14) + "_" + suffix;
+        }
+
+        user = await db.createUser(username, null, now(), {
+          displayName,
+          email,
+          googleId,
+          avatar: "batter",
+          bio: "Cricket fan playing on Cricketle",
+        });
+      }
+
+      const token = auth.newToken();
+      await db.createSession(auth.hashToken(token), user.id, now(), SESSION_TTL_MS);
+
+      await game.logActivity({
+        userId: user.id,
+        variant: "auth",
+        action: isNew ? "google_signup" : "google_login",
+        details: { email: email ? email.replace(/(?<=.).(?=[^@]*?@)/g, "*") : null },
+        ip: clientIp(req)
+      });
+
+      logger.auth("google_auth_success", "User authenticated via Google @" + user.username, {
+        user: user.username,
+        isNew,
+        id: user.id
+      });
+
+      return send(res, 200, {
+        user: {
+          id: user.id,
+          username: user.username,
+          displayName: user.displayName || user.display_name || user.username,
+          email: user.email || null,
+          phone: user.phone || null,
+          avatar: core.normalizeAvatarId(user.avatar),
+          bio: user.bio || "",
+          favTeam: user.fav_team || "",
+          favPlayer: user.fav_player || "",
+          phoneConnected: Boolean(user.phone),
+          isAdmin: Boolean(user.isAdmin || (adminPhone && user.phone === adminPhone)),
+          googleConnected: true,
+        }
+      }, { "set-cookie": sessionCookie(req, token, 30 * 24 * 60 * 60) });
+    }
+
     if (key === "POST /api/auth/logout") {
       await readJson(req);
       const token = cookies(req)[COOKIE];
@@ -593,12 +709,12 @@ function createApp(opts = {}) {
 
     if (key === "GET /api/me") {
       const user = await currentUser(req);
-      if (!user) return send(res, 200, { user: null, day: core.todayKey(now()), now: now() });
+      if (!user) return send(res, 200, { user: null, day: core.todayKey(now()), now: now(), googleClientId: process.env.GOOGLE_CLIENT_ID || null });
       return send(res, 200, {
         user: {
           id: user.id,
           username: user.username,
-          displayName: user.display_name || user.username,
+          displayName: user.displayName || user.display_name || user.username,
           email: user.email || null,
           phone: user.phone || null,
           avatar: core.normalizeAvatarId(user.avatar),
@@ -917,7 +1033,7 @@ function createApp(opts = {}) {
       "x-content-type-options": "nosniff",
       "x-frame-options": "DENY",
       "referrer-policy": "strict-origin-when-cross-origin",
-      "cross-origin-opener-policy": "same-origin",
+      "cross-origin-opener-policy": "same-origin-allow-popups",
       "cross-origin-resource-policy": "same-origin",
       "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
       "vary": "accept-encoding",

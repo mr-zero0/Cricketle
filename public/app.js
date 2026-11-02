@@ -744,6 +744,51 @@
     renderGate();
   }
 
+  
+  function initGoogleAuth(clientId) {
+    const id = clientId || app.googleClientId;
+    if (!id || !window.google || !window.google.accounts) return;
+    try {
+      window.google.accounts.id.initialize({
+        client_id: id,
+        callback: async (response) => {
+          if (!response || !response.credential) return;
+          try {
+            const res = await api("POST", "/api/auth/google", { credential: response.credential });
+            app.user = res.user;
+            toast("Signed in with Google as " + (app.user.displayName || app.user.username), "success");
+            location.hash = "#play";
+            await bootUser();
+          } catch (err) {
+            toast(err.message || "Google sign-in failed", "warn");
+          }
+        },
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+
+      if (!app.user) {
+        window.google.accounts.id.prompt();
+      }
+
+      const btn = $("google-signin-btn");
+      if (btn) {
+        btn.innerHTML = "";
+        window.google.accounts.id.renderButton(btn, {
+          theme: "outline",
+          size: "large",
+          type: "standard",
+          text: "signin_with",
+          shape: "pill",
+          logo_alignment: "left",
+          width: 280,
+        });
+      }
+    } catch (err) {
+      console.warn("Google GIS init error:", err);
+    }
+  }
+
   function openAuth(view) {
     hideGate();
     location.hash = "#profile";
@@ -751,6 +796,7 @@
     const card = $("auth-card");
     if (card) card.hidden = false;
     switchAuthView(view);
+    if (app.googleClientId) initGoogleAuth(app.googleClientId);
   }
 
   function renderGate() {
@@ -2128,7 +2174,8 @@
     }
     try {
       const me = await api("GET", "/api/me");
-      if (me.user) { app.stats = me.stats; if (app.store && app.store.sync) app.store.sync(me); }
+      if (me.googleClientId) { app.googleClientId = me.googleClientId; initGoogleAuth(me.googleClientId); }
+        if (me.user) { app.stats = me.stats; if (app.store && app.store.sync) app.store.sync(me); }
       else { becomeGuest(); return; }
       app.board.data = {};
       renderTracker();

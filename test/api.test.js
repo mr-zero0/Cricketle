@@ -596,7 +596,6 @@ test("unverified sign-in endpoints no longer exist", async () => {
   try {
     const c = client(app.base);
     const gone = [
-      ["POST", "/api/auth/google", { sub: "google-1", email: "x@example.com" }],
       ["POST", "/api/auth/otp/send", { phone: "+919876543210" }],
       ["POST", "/api/auth/otp/verify", { phone: "+919876543210", code: "000000" }],
       ["POST", "/api/auth/firebase-phone", { phone: "+919876543210" }],

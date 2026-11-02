@@ -73,7 +73,7 @@ test.describe("onboarding", () => {
     const sheet = page.locator("#onboard");
     await expect(sheet).toBeVisible();
     await expect(sheet).toContainText("Guess the secret cricketer");
-    await expect(sheet).toContainText("The first is free");
+    await expect(sheet).toContainText("1 free guest guess");
     await expect(page.locator("#onboard-signin")).toBeVisible();
     await page.locator("#onboard-play").click();
     await expect(sheet).toBeHidden();
@@ -536,7 +536,7 @@ test.describe("layout", () => {
     expect(cols).toBe(2);
     await page.locator("#help-btn").click();
     await expect(page.locator("#onboard")).toBeVisible();
-    await expect(page.locator("#onboard")).toContainText("3 puzzles a day");
+    await expect(page.locator("#onboard")).toContainText("1 puzzle a day");
     await expect(page.locator("#onboard")).toContainText("3 hints per puzzle");
     await page.locator("#onboard-play").click();
     await expect(page.locator("#onboard")).toBeHidden();
