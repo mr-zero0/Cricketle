@@ -102,3 +102,39 @@ test("Google Auth: rejects missing or invalid credential", async () => {
     await app.close();
   }
 });
+
+test("Google Auth: allows user to update their username to a custom handle and rejects taken handles", async () => {
+  const app = await boot();
+  try {
+    const c1 = client(app.base);
+    const reg = await c1.post("/api/auth/google", {
+      credential: "mock_google_:987654321:chosen_user@gmail.com:Player One"
+    });
+    assert.equal(reg.status, 200);
+    assert.equal(reg.json.isNew, true);
+
+    // Update username to custom handle
+    const updateRes = await c1.post("/api/profile/update", {
+      username: "my_chosen_handle"
+    });
+
+    assert.equal(updateRes.status, 200);
+    assert.equal(updateRes.json.user.username, "my_chosen_handle");
+
+    // Attempting to change to an existing username returns 409
+    const c2 = client(app.base);
+    const secondUser = await c2.post("/api/auth/google", {
+      credential: "mock_google_:123456789:second_user@gmail.com:Player Two"
+    });
+    assert.equal(secondUser.status, 200);
+
+    const takenRes = await c2.post("/api/profile/update", {
+      username: "my_chosen_handle"
+    });
+
+    assert.equal(takenRes.status, 409);
+    assert.equal(takenRes.json.error, "username_taken");
+  } finally {
+    await app.close();
+  }
+});

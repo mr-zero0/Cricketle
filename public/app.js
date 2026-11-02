@@ -753,11 +753,11 @@
     try {
       btn.innerHTML = "";
       window.google.accounts.id.renderButton(btn, {
-        theme: "outline",
+        theme: "filled_blue",
         size: "large",
         type: "standard",
         text: "signin_with",
-        shape: "pill",
+        shape: "rectangular",
         logo_alignment: "left",
         width: 280,
       });
@@ -815,6 +815,84 @@
     }
 
     attemptInit();
+  }
+
+  
+  function openChooseUsernameDialog(user) {
+    const dlg = $("choose-username-dialog");
+    if (!dlg) return;
+    const input = $("new-username-input");
+    const errEl = $("new-username-error");
+    const titleEl = $("choose-username-title");
+    if (titleEl && user && user.displayName) {
+      titleEl.textContent = `Welcome, ${user.displayName.split(" ")[0]}!`;
+    }
+    if (input && user) {
+      input.value = user.username || "";
+      if (errEl) errEl.hidden = true;
+    }
+    try {
+      dlg.showModal();
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    } catch (_) {}
+  }
+
+  function initChooseUsernameDialog() {
+    const form = $("choose-username-form");
+    if (!form) return;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = $("new-username-input");
+      const errEl = $("new-username-error");
+      const btn = $("btn-save-username");
+      const val = (input ? input.value : "").trim();
+
+      if (!val) {
+        if (errEl) { errEl.textContent = "Please choose a username."; errEl.hidden = false; }
+        return;
+      }
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(val)) {
+        if (errEl) { errEl.textContent = "3-20 letters, numbers, or underscores."; errEl.hidden = false; }
+        return;
+      }
+      if (/^\d+$/.test(val)) {
+        if (errEl) { errEl.textContent = "Username cannot be only numbers."; errEl.hidden = false; }
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      try {
+        const res = await api("POST", "/api/profile/update", { username: val });
+        app.user = res.user;
+        safeSet("cricketle:username_set_" + res.user.id, "1");
+        toast(`Handle set to @${res.user.username}! 🏏`, "success");
+        const dlg = $("choose-username-dialog");
+        if (dlg && dlg.open) dlg.close();
+        renderNav();
+        renderProfile();
+        location.hash = "#play";
+        showView();
+      } catch (err) {
+        if (errEl) {
+          errEl.textContent = err.code === "username_taken" ? "That username is taken. Try another." : (err.message || "Failed to save username.");
+          errEl.hidden = false;
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+
+    const customGoogleBtn = $("google-custom-trigger");
+    if (customGoogleBtn) {
+      customGoogleBtn.addEventListener("click", () => {
+        if (window.google && window.google.accounts && window.google.accounts.id) {
+          try { window.google.accounts.id.prompt(); } catch (_) {}
+        }
+      });
+    }
   }
 
   function openAuth(view) {
@@ -1348,7 +1426,7 @@
   }
 
   function renderNav() {
-    const label = app.user ? app.user.username : "Sign in";
+    const label = app.user ? "@" + app.user.username : "Sign in";
     $("nav-profile-label").textContent = label;
     $("tab-profile-label").textContent = app.user ? "Profile" : "Sign in";
     const navAdmin = $("nav-admin");
@@ -1711,6 +1789,15 @@
           </div>
 
           <div class="field" style="margin-top:var(--space-4);">
+            <label for="edit-username">Player Handle (@username)</label>
+            <div style="position:relative;display:flex;align-items:center;">
+              <span style="position:absolute;left:14px;color:var(--muted);font-weight:700;font-size:16px;">@</span>
+              <input id="edit-username" type="text" maxlength="20" value="${escapeHtml(pUser.username)}" required style="padding-left:32px;font-weight:600;" placeholder="virat_fan" ${pUser.isGuest ? 'disabled title="Guests cannot customize handle."' : ''} />
+            </div>
+            <p class="help-text">3-20 characters: letters, numbers, underscores.</p>
+          </div>
+
+          <div class="field">
             <label for="edit-display-name">Display Name</label>
             <input id="edit-display-name" type="text" maxlength="30" value="${escapeHtml(pUser.displayName)}" required placeholder="e.g. Virat Fan 18" />
             <p class="help-text">Shown on today's and all-time leaderboards.</p>
@@ -1884,6 +1971,7 @@
     if (editForm) {
       editForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+        const username = $("edit-username") ? $("edit-username").value.trim() : undefined;
         const displayName = $("edit-display-name").value.trim();
         const bio = $("edit-bio").value.trim();
         const favTeam = $("edit-fav-team").value;
@@ -1892,7 +1980,8 @@
 
         if (app.user) {
           try {
-            const res = await api("POST", "/api/profile/update", { displayName, bio, avatar, favTeam, favPlayer });
+            const res = await api("POST", "/api/profile/update", { username, displayName, bio, avatar, favTeam, favPlayer });
+            safeSet("cricketle:username_set_" + res.user.id, "1");
             app.user = res.user;
             app.stats = res.stats;
             toast("Profile updated successfully!", "success");
@@ -2344,6 +2433,7 @@
     fillHelp();
     initOnboard();
     initPhoneAuth();
+    initChooseUsernameDialog();
     // A static host (GitHub Pages, file://) has no API: play as a guest only.
     // Accounts, leaderboards and ranks live on the server, which is the only
     // place that can verify them.
@@ -2364,6 +2454,10 @@
           app.stats = me.stats;
           app.store = new RemoteStore();
           app.store.sync(me);
+          const hasCustomHandle = safeGet("cricketle:username_set_" + me.user.id) === "1";
+          if (!hasCustomHandle && (me.user.googleConnected || me.user.google_id || (me.user.username && me.user.username.includes("_")))) {
+            setTimeout(() => openChooseUsernameDialog(me.user), 600);
+          }
         } else {
           app.store = new LocalStore();
         }

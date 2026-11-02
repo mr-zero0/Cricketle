@@ -24,9 +24,9 @@
   <!-- Fonts load without blocking first paint: fetched early, applied by theme.js once ready. -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
   <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
-  <link rel="stylesheet" href="styles.css?v=2.8.0" />
+  <link rel="stylesheet" href="styles.css?v=2.9.0" />
   <!-- Theme runs before first paint so day pages never flash the night tokens. -->
-  <script src="theme.js?v=2.8.0"></script>
+  <script src="theme.js?v=2.9.0"></script>
   <style id="glass-nav-css">
 /* ==========================================================================
    Smooth Glassmorphism Mobile Variants Rail
@@ -420,7 +420,20 @@
         </div>
 
         <div id="google-auth-section" class="google-auth-section" style="margin: 14px 0 16px; display: flex; flex-direction: column; align-items: center;">
-          <div id="google-signin-btn" style="min-height: 40px; display: flex; justify-content: center;"></div>
+          <div id="google-signin-btn" style="min-height: 44px; display: flex; justify-content: center; width: 100%;">
+            <button type="button" id="google-custom-trigger" class="google-blue-btn" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: #fff; border: none; border-radius: 8px; padding: 4px 16px 4px 6px; font-size: 15px; font-weight: 600; cursor: pointer; width: min(100%, 280px); height: 44px; box-shadow: 0 1px 3px rgba(0,0,0,0.25);">
+              <span style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: #fff; border-radius: 6px; margin-right: 12px; flex-shrink: 0;">
+                <svg viewBox="0 0 48 48" width="20" height="20">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                  <path fill="none" d="M0 0h48v48H0z"/>
+                </svg>
+              </span>
+              <span style="flex: 1; text-align: center; padding-right: 10px;">Sign in with Google</span>
+            </button>
+          </div>
           <div class="auth-divider" style="display: flex; align-items: center; width: 100%; margin: 14px 0 6px; color: var(--muted, #8b949e); font-size: 0.8rem;">
             <span style="flex: 1; border-bottom: 1px solid var(--border, #30363d);"></span>
             <span style="padding: 0 10px;">or continue with mobile & PIN</span>
@@ -560,10 +573,30 @@
     </form>
   </dialog>
 
-  <script src="players.js?v=2.8.0" charset="utf-8" defer></script>
-  <script src="game-core.js?v=2.8.0" charset="utf-8" defer></script>
-  <script src="bg.js?v=2.8.0" charset="utf-8" defer></script>
-  <script src="app.js?v=2.8.0" charset="utf-8" defer></script>
-  <script src="mobile-keyboard.js?v=2.8.0" defer></script>
+  <dialog id="choose-username-dialog" class="sheet" aria-labelledby="choose-username-title" style="max-width: 440px; padding: var(--space-5);">
+    <div style="text-align: center; margin-bottom: var(--space-4);">
+      <span style="font-size: 2.4rem; display: block; margin-bottom: 6px;">🏏</span>
+      <h2 id="choose-username-title" style="font-family: var(--font-display); font-size: 1.8rem; margin: 0 0 6px; letter-spacing: 0.03em;">Choose Your Handle</h2>
+      <p id="choose-username-desc" class="muted small-text" style="margin: 0;">Pick your unique @username for leaderboards, streaks, and player stats.</p>
+    </div>
+    <form id="choose-username-form">
+      <div class="field" style="margin-bottom: var(--space-4);">
+        <label for="new-username-input">Player Handle</label>
+        <div style="position: relative; display: flex; align-items: center;">
+          <span style="position: absolute; left: 14px; color: var(--muted); font-weight: 700; font-size: 16px;">@</span>
+          <input id="new-username-input" type="text" maxlength="20" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="padding-left: 32px; font-weight: 600; width: 100%; box-sizing: border-box;" placeholder="virat_fan" />
+        </div>
+        <p id="new-username-error" class="error-text" style="color: var(--danger, #ef4444); font-size: 13px; margin: 6px 0 0;" hidden></p>
+        <p class="help-text">3-20 letters, numbers, or underscores.</p>
+      </div>
+      <button id="btn-save-username" class="btn primary big full-width" type="submit">Save &amp; Continue</button>
+    </form>
+  </dialog>
+
+  <script src="players.js?v=2.9.0" charset="utf-8" defer></script>
+  <script src="game-core.js?v=2.9.0" charset="utf-8" defer></script>
+  <script src="bg.js?v=2.9.0" charset="utf-8" defer></script>
+  <script src="app.js?v=2.9.0" charset="utf-8" defer></script>
+  <script src="mobile-keyboard.js?v=2.9.0" defer></script>
 </body>
 </html>

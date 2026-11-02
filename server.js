@@ -559,6 +559,25 @@ function createApp(opts = {}) {
       rateLimit(req, "profile", 40, 5 * 60 * 1000);
       const body = await readJson(req);
 
+      if (typeof body.username === "string" && body.username.trim() && body.username.trim() !== user.username) {
+        const u = body.username.trim();
+        if (!/^[a-zA-Z0-9_]{3,20}$/.test(u)) {
+          return fail(res, 400, "invalid_username", "Username must be 3-20 letters, numbers, or underscores.");
+        }
+        if (/^\d+$/.test(u)) {
+          return fail(res, 400, "invalid_username", "Username cannot be only digits.");
+        }
+        try {
+          await db.updateUsername(user.id, u);
+          user.username = u;
+        } catch (err) {
+          if (err.code === "username_taken" || (err.message && err.message.includes("unique"))) {
+            return fail(res, 409, "username_taken", "That username is already taken. Try another.");
+          }
+          throw err;
+        }
+      }
+
       const displayName = typeof body.displayName === "string" ? body.displayName.trim().slice(0, 30) : undefined;
       const bio = typeof body.bio === "string" ? body.bio.trim().slice(0, 160) : undefined;
       const avatar = typeof body.avatar === "string" ? body.avatar.trim().slice(0, 100) : undefined;
@@ -684,6 +703,7 @@ function createApp(opts = {}) {
       });
 
       return send(res, 200, {
+        isNew,
         user: {
           id: user.id,
           username: user.username,
