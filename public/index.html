@@ -24,9 +24,9 @@
   <!-- Fonts load without blocking first paint: fetched early, applied by theme.js once ready. -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
   <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
-  <link rel="stylesheet" href="styles.css?v=2.5.4" />
+  <link rel="stylesheet" href="styles.css?v=2.6.0" />
   <!-- Theme runs before first paint so day pages never flash the night tokens. -->
-  <script src="theme.js?v=2.5.1"></script>
+  <script src="theme.js?v=2.6.0"></script>
   <style id="glass-nav-css">
 /* ==========================================================================
    Smooth Glassmorphism Mobile Variants Rail
@@ -312,7 +312,7 @@
 
         <section class="tracker card" aria-label="Today's puzzles">
           <div class="tracker-row">
-            <span class="tracker-label" id="tracker-label">Easy · Puzzle 1 of 3</span>
+            <span class="tracker-label" id="tracker-label">Easy · Puzzle 1 of 1</span>
             <span class="reset" id="reset">Resets in --:--:--</span>
           </div>
           <div class="dots" id="dots"></div>
@@ -336,7 +336,7 @@
         </section>
 
         <section id="start-panel" class="start card" hidden>
-          <p class="eyebrow" id="start-eyebrow">Puzzle 1 of 3 · Easy</p>
+          <p class="eyebrow" id="start-eyebrow">Puzzle 1 of 1 · Easy</p>
           <h3 id="start-title">Ready when you are</h3>
           <p id="start-copy" class="muted">The clock starts the moment you press Start. Fewer guesses, fewer hints and a faster time all earn more points.</p>
           <button id="start-btn" class="btn primary big" type="button"><svg aria-hidden="true"><use href="#i-play"/></svg> Start puzzle</button>
@@ -520,7 +520,7 @@
     <ul class="onboard-rows">
       <li><span class="onboard-icon"><svg aria-hidden="true"><use href="#i-stumps"/></svg></span><span>Rank 1 is the answer. Lower is closer.</span></li>
       <li><span class="onboard-icon"><svg aria-hidden="true"><use href="#i-bulb"/></svg></span><span>3 hints per puzzle. Each costs 10 points.</span></li>
-      <li><span class="onboard-icon"><svg aria-hidden="true"><use href="#i-clock"/></svg></span><span>3 puzzles a day in each mode. The first is free.</span></li>
+      <li><span class="onboard-icon"><svg aria-hidden="true"><use href="#i-clock"/></svg></span><span>1 puzzle a day in each mode. 1 free guest guess in Classic.</span></li>
     </ul>
     <details id="onboard-scoring" class="onboard-details">
       <summary>Scoring details</summary>
@@ -550,10 +550,10 @@
     </form>
   </dialog>
 
-  <script src="players.js?v=2.4.0" charset="utf-8" defer></script>
-  <script src="game-core.js?v=2.4.0" charset="utf-8" defer></script>
-  <script src="bg.js?v=2.4.0" charset="utf-8" defer></script>
-  <script src="app.js?v=2.4.0" charset="utf-8" defer></script>
-  <script src="mobile-keyboard.js?v=1.0.0" defer></script>
+  <script src="players.js?v=2.6.0" charset="utf-8" defer></script>
+  <script src="game-core.js?v=2.6.0" charset="utf-8" defer></script>
+  <script src="bg.js?v=2.6.0" charset="utf-8" defer></script>
+  <script src="app.js?v=2.6.0" charset="utf-8" defer></script>
+  <script src="mobile-keyboard.js?v=2.6.0" defer></script>
 </body>
 </html>

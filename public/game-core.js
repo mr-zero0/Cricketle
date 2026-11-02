@@ -856,7 +856,7 @@
     {
       id: "hat_trick",
       title: "Hat-Trick",
-      desc: "Solve all 3 puzzles of a mode in a single day.",
+      desc: "Solve a puzzle in a single day.",
       tier: "silver",
       icon: "stumps",
       check: function (s, h) {

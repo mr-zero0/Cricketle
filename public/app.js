@@ -630,7 +630,7 @@
         note = `<p class="done-note">All ${core.PUZZLES_PER_DAY} ${modeLabel(app.mode)} puzzles done for today.</p>`;
       } else {
         actions += `<a href="#leaderboard" class="btn primary">Leaderboard <svg aria-hidden="true"><use href="#i-trophy"/></svg></a>`;
-        note = `<p class="done-note">That's all six for today. New puzzles at midnight IST.</p>`;
+        note = `<p class="done-note">That's all puzzles for today. New puzzles at midnight IST.</p>`;
       }
     }
     const puzzleTiles = guessTiles(p.guesses, poolSize());
@@ -1127,9 +1127,9 @@
     const dateFormatted = formatDayDDMMMYY(app.day);
 
     const modeHeadline = allDone
-      ? `${mode} Mode · Finished (3/3 Solved)`
-      : `${mode} Mode · Puzzle ${idx() + 1} of 3 (${solvedCount}/3 Solved)`;
-    const timeLabel = allDone ? "Total Time (3 puzzles)" : "Total Time";
+      ? `${mode} Mode · Finished (${core.PUZZLES_PER_DAY}/${core.PUZZLES_PER_DAY} Solved)`
+      : `${mode} Mode · Puzzle ${idx() + 1} of ${core.PUZZLES_PER_DAY} (${solvedCount}/${core.PUZZLES_PER_DAY} Solved)`;
+    const timeLabel = allDone ? `Total Time (${core.PUZZLES_PER_DAY} puzzle${core.PUZZLES_PER_DAY === 1 ? "" : "s"})` : "Total Time";
 
     const lines = [
       `🏏 Cricketle · ${dateFormatted} (# ${guessSeq})`,
