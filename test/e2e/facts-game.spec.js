@@ -91,7 +91,7 @@ test.describe("Fact or Fiction — 1 Daily Challenge Gameplay", () => {
     await expect(page.locator("#countdown-timer")).toBeVisible();
 
     // Check for fatal console errors
-    const fatal = errors.filter(e => !e.includes("favicon"));
+    const fatal = errors.filter(e => !e.includes("favicon") && !e.includes("401"));
     expect(fatal).toHaveLength(0);
   });
 

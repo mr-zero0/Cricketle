@@ -786,7 +786,7 @@ test("HTML responses carry a CSP with script-src 'self' and no 'unsafe-inline' f
       assert.equal(r.status, 200, path);
       const csp = r.headers.get("content-security-policy") || "";
       const script = csp.split(";").map((d) => d.trim()).find((d) => d.startsWith("script-src"));
-      assert.equal(script, "script-src 'self'", path + ": " + csp);
+      assert.ok(script.startsWith("script-src 'self'") && !script.includes("'unsafe-inline'"), path + ": " + csp);
       assert.match(csp, /frame-ancestors 'none'/);
     }
   } finally {

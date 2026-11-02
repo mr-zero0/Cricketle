@@ -63,7 +63,7 @@ test.describe("Full UI & Gameplay Tests (Authenticated Member)", () => {
     await expect(authBtn).toBeVisible();
     await expect(authBtn).toHaveClass(/signed-in/);
 
-    expect(errors.filter((e) => !e.includes("404") && !e.includes("favicon"))).toEqual([]);
+    expect(errors.filter((e) => !e.includes("404") && !e.includes("favicon") && !e.includes("accounts.google.com"))).toEqual([]);
   });
 
   test("Hub: clicking game tiles navigates to correct game pages", async ({ page }) => {

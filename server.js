@@ -1040,13 +1040,14 @@ function createApp(opts = {}) {
       "vary": "accept-encoding",
     };
     if (ext === ".html") {
-      const csp = [
+            const csp = [
         "default-src 'self'",
-        "script-src 'self'",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "script-src 'self' https://accounts.google.com/gsi/client",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style",
         "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: https://upload.wikimedia.org",
-        "connect-src 'self' https://upload.wikimedia.org",
+        "img-src 'self' data: https://upload.wikimedia.org https://lh3.googleusercontent.com https://accounts.google.com",
+        "connect-src 'self' https://upload.wikimedia.org https://accounts.google.com",
+        "frame-src 'self' https://accounts.google.com",
         "object-src 'none'",
         "frame-ancestors 'none'",
         "base-uri 'self'",
