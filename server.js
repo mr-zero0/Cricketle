@@ -41,6 +41,7 @@ const core = require("./public/game-core.js");
 const { Db } = require("./lib/db.js");
 const { SupabaseDb } = require("./lib/supabase-db.js");
 const auth = require("./lib/auth.js");
+const profanity = require("./lib/profanity.js");
 const { GameService } = require("./lib/game.js");
 const { createLogger } = require("./lib/logger.js");
 const { toE164 } = require("./lib/phone.js");
@@ -488,10 +489,14 @@ function createApp(opts = {}) {
       }
 
       let username = "";
+      const isRegisterAdmin = Boolean(adminPhone && phone === adminPhone);
       if (typeof body.username === "string" && body.username.trim()) {
         const candidate = body.username.trim();
         if (!auth.validUsername(candidate)) {
           return fail(res, 400, "invalid_username", "Username must be 3-20 letters, numbers, or underscores.");
+        }
+        if (!isRegisterAdmin && profanity.isAbusiveUsername(candidate)) {
+          return fail(res, 400, "abusive_username", profanity.ABUSIVE_USERNAME_MESSAGE);
         }
         if (await db.userByName(candidate)) {
           logger.authWarn("phone_register_conflict", `Registration rejected: username "${candidate}" already taken`, { username: candidate, phone });
@@ -567,6 +572,9 @@ function createApp(opts = {}) {
         if (/^\d+$/.test(u)) {
           return fail(res, 400, "invalid_username", "Username cannot be only digits.");
         }
+        if (!isAdmin(user, req) && profanity.isAbusiveUsername(u)) {
+          return fail(res, 400, "abusive_username", profanity.ABUSIVE_USERNAME_MESSAGE);
+        }
         try {
           await db.updateUsername(user.id, u);
           user.username = u;
@@ -624,6 +632,11 @@ function createApp(opts = {}) {
           email_verified: "true"
         };
       } else {
+        // Google ID tokens are JWTs with 3 segments (header.payload.signature).
+        // Immediately reject non-JWT strings to avoid slow external network timeouts.
+        if (credential.split(".").length !== 3) {
+          return fail(res, 401, "invalid_google_token", "Google token verification failed.");
+        }
         try {
           const verifyUrl = "https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(credential);
           const gRes = await fetch(verifyUrl, { signal: AbortSignal.timeout(6000) });

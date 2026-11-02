@@ -12,13 +12,45 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
   <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
-  <link rel="stylesheet" href="styles.css?v=2.9.0" />
-  <script src="theme.js?v=2.9.0"></script>
+  <link rel="stylesheet" href="styles.css?v=3.0.0" />
+  <script src="theme.js?v=3.0.0"></script>
   <style>
     .scorecard-container {
       width: min(100%, 780px);
       margin: 0 auto;
       padding: var(--space-4) var(--space-4) var(--space-8);
+    }
+
+    .scorecard-game-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 960px) {
+      .scorecard-container {
+        width: min(100%, 1180px);
+        padding-top: var(--space-3);
+      }
+      .scorecard-game-grid {
+        display: grid;
+        grid-template-columns: minmax(460px, 560px) minmax(0, 1fr);
+        gap: var(--space-6);
+        align-items: start;
+      }
+      .scorecard-col-visual {
+        position: sticky;
+        top: var(--space-4);
+      }
+      .scorecard-col-input {
+        min-width: 0;
+      }
+      .scorecard-col-input .guess-history {
+        max-height: calc(100dvh - 280px);
+        overflow-y: auto;
+        padding-right: 4px;
+        scrollbar-width: thin;
+      }
     }
 
     .game-header {
@@ -755,82 +787,88 @@
       </div>
     </div>
 
-    <!-- Match Metadata Card (Easy mode shows, Hard hides) -->
-    <div class="match-meta-card" id="match-meta">
-      <h3 class="match-meta-title" id="meta-title">2011 ICC Cricket World Cup Final</h3>
-      <div class="match-meta-details">
-        <span id="meta-teams">📍 India vs Sri Lanka</span>
-        <span id="meta-venue">🏟️ Wankhede Stadium, Mumbai</span>
-        <span id="meta-date">📅 2 April 2011</span>
-        <span id="meta-result">🏆 India won by 6 wickets</span>
+    <div class="scorecard-game-grid">
+      <div class="scorecard-col-visual">
+        <!-- Match Metadata Card (Easy mode shows, Hard hides) -->
+        <div class="match-meta-card" id="match-meta">
+          <h3 class="match-meta-title" id="meta-title">2011 ICC Cricket World Cup Final</h3>
+          <div class="match-meta-details">
+            <span id="meta-teams">📍 India vs Sri Lanka</span>
+            <span id="meta-venue">🏟️ Wankhede Stadium, Mumbai</span>
+            <span id="meta-date">📅 2 April 2011</span>
+            <span id="meta-result">🏆 India won by 6 wickets</span>
+          </div>
+        </div>
+
+        <!-- Scorecard Table -->
+        <div class="scorecard-card">
+          <div class="scorecard-table-wrap">
+            <table class="scorecard-table">
+              <thead>
+                <tr>
+                  <th>Batter</th>
+                  <th>Dismissal</th>
+                  <th style="text-align:right;">R</th>
+                  <th style="text-align:right;">B</th>
+                  <th style="text-align:right;">4s</th>
+                  <th style="text-align:right;">6s</th>
+                  <th style="text-align:right;">SR</th>
+                </tr>
+              </thead>
+              <tbody id="scorecard-body">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+          <div class="scorecard-footer">
+            <span id="scorecard-extras">Extras: 15</span>
+            <strong id="scorecard-total">Total: 277/4</strong>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Scorecard Table -->
-    <div class="scorecard-card">
-      <div class="scorecard-table-wrap">
-        <table class="scorecard-table">
-          <thead>
-            <tr>
-              <th>Batter</th>
-              <th>Dismissal</th>
-              <th style="text-align:right;">R</th>
-              <th style="text-align:right;">B</th>
-              <th style="text-align:right;">4s</th>
-              <th style="text-align:right;">6s</th>
-              <th style="text-align:right;">SR</th>
-            </tr>
-          </thead>
-          <tbody id="scorecard-body">
-            <!-- Populated dynamically -->
-          </tbody>
-        </table>
+      <div class="scorecard-col-input">
+        <!-- Attempts Indicator -->
+        <div class="attempts-track" id="attempts-track">
+          <span class="attempt-dot current"></span>
+          <span class="attempt-dot"></span>
+          <span class="attempt-dot"></span>
+          <span class="attempt-dot"></span>
+          <span class="attempt-dot"></span>
+          <span class="attempt-dot"></span>
+        </div>
+
+        <!-- Hint banner (unlocked after 3 wrong guesses) -->
+        <div class="hint-banner" id="hint-banner">
+          💡 <strong>Hint:</strong> <span id="hint-text"></span>
+        </div>
+
+        <!-- Guess Controls -->
+        <div class="guess-box" id="guess-controls">
+          <div class="guess-input-wrap">
+            <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. MS Dhoni)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
+            <button id="btn-guess" class="btn-guess">Guess</button>
+          </div>
+          <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+        </div>
+
+        <!-- History -->
+        <div class="guess-history" id="guess-history"></div>
+
+        <!-- Result Card -->
+        <div class="result-card" id="result-card">
+          <h3 class="result-title" id="result-status">OUT!</h3>
+          <p style="font-size:22px;font-weight:700;color:var(--fg);margin:0 0 6px;" id="result-name"></p>
+          <p style="font-size:14px;color:var(--muted);margin:0 0 16px;line-height:1.5;" id="result-desc"></p>
+          <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#2563eb;color:#fff;font-weight:700;">Play Other Games →</a>
+        </div>
       </div>
-      <div class="scorecard-footer">
-        <span id="scorecard-extras">Extras: 15</span>
-        <strong id="scorecard-total">Total: 277/4</strong>
-      </div>
-    </div>
-
-    <!-- Attempts Indicator -->
-    <div class="attempts-track" id="attempts-track">
-      <span class="attempt-dot current"></span>
-      <span class="attempt-dot"></span>
-      <span class="attempt-dot"></span>
-      <span class="attempt-dot"></span>
-      <span class="attempt-dot"></span>
-      <span class="attempt-dot"></span>
-    </div>
-
-    <!-- Hint banner (unlocked after 3 wrong guesses) -->
-    <div class="hint-banner" id="hint-banner">
-      💡 <strong>Hint:</strong> <span id="hint-text"></span>
-    </div>
-
-    <!-- Guess Controls -->
-    <div class="guess-box" id="guess-controls">
-      <div class="guess-input-wrap">
-        <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. MS Dhoni)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
-        <button id="btn-guess" class="btn-guess">Guess</button>
-      </div>
-      <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
-    </div>
-
-    <!-- History -->
-    <div class="guess-history" id="guess-history"></div>
-
-    <!-- Result Card -->
-    <div class="result-card" id="result-card">
-      <h3 class="result-title" id="result-status">OUT!</h3>
-      <p style="font-size:22px;font-weight:700;color:var(--fg);margin:0 0 6px;" id="result-name"></p>
-      <p style="font-size:14px;color:var(--muted);margin:0 0 16px;line-height:1.5;" id="result-desc"></p>
-      <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#2563eb;color:#fff;font-weight:700;">Play Other Games →</a>
     </div>
   </main>
 
   <script src="bg.js"></script>
   <script src="players.js"></script>
   <script src="scorecard.js"></script>
-  <script src="mobile-keyboard.js?v=2.9.0" defer></script>
+  <script src="mobile-keyboard.js?v=3.0.0" defer></script>
 </body>
 </html>

@@ -134,6 +134,26 @@ test("Google Auth: allows user to update their username to a custom handle and r
 
     assert.equal(takenRes.status, 409);
     assert.equal(takenRes.json.error, "username_taken");
+
+    // Attempting to change to an abusive or offensive handle is blocked with the required message
+    const sampleAbusive1 = Buffer.from("Zl91X2Nfa195b3U=", "base64").toString("utf8");
+    const abusiveRes = await c2.post("/api/profile/update", {
+      username: sampleAbusive1
+    });
+    assert.equal(abusiveRes.status, 400);
+    assert.equal(abusiveRes.json.error, "abusive_username");
+    assert.equal(abusiveRes.json.message, "This username can't be chosen to avoid misuse and abuse.");
+
+    // Phone registration also blocks abusive username
+    const sampleAbusive2 = Buffer.from("bjFnZ2VyX2JhZA==", "base64").toString("utf8");
+    const phoneAbusive = await c2.post("/api/auth/phone/register", {
+      phone: "+919999888877",
+      username: sampleAbusive2,
+      pin: "123456"
+    });
+    assert.equal(phoneAbusive.status, 400);
+    assert.equal(phoneAbusive.json.error, "abusive_username");
+    assert.equal(phoneAbusive.json.message, "This username can't be chosen to avoid misuse and abuse.");
   } finally {
     await app.close();
   }

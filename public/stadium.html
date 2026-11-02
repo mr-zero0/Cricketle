@@ -12,13 +12,45 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
   <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
-  <link rel="stylesheet" href="styles.css?v=2.9.0" />
-  <script src="theme.js?v=2.9.0"></script>
+  <link rel="stylesheet" href="styles.css?v=3.0.0" />
+  <script src="theme.js?v=3.0.0"></script>
   <style>
     .stadium-container {
       width: min(100%, 680px);
       margin: 0 auto;
       padding: var(--space-4) var(--space-4) var(--space-8);
+    }
+
+    .stadium-game-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 960px) {
+      .stadium-container {
+        width: min(100%, 1160px);
+        padding-top: var(--space-3);
+      }
+      .stadium-game-grid {
+        display: grid;
+        grid-template-columns: minmax(400px, 480px) minmax(0, 1fr);
+        gap: var(--space-6);
+        align-items: start;
+      }
+      .stadium-col-visual {
+        position: sticky;
+        top: var(--space-4);
+      }
+      .stadium-col-input {
+        min-width: 0;
+      }
+      .stadium-col-input .guess-history {
+        max-height: calc(100dvh - 280px);
+        overflow-y: auto;
+        padding-right: 4px;
+        scrollbar-width: thin;
+      }
     }
 
     .game-header {
@@ -712,71 +744,77 @@
       <p>Guess the iconic cricket ground before your 6 attempts run out!</p>
     </div>
 
-    <!-- Stadium Blueprint Vector Card -->
-    <div class="stadium-blueprint-card">
-      <div class="stadium-svg-wrap">
-        <svg class="stadium-svg" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
-          <!-- Outer Grass Outfield -->
-          <ellipse cx="200" cy="160" rx="180" ry="140" fill="#0d3320" stroke="#16a34a" stroke-width="3"/>
-          <ellipse cx="200" cy="160" rx="172" ry="132" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-dasharray="4 4"/>
-          <!-- 30-Yard Circle -->
-          <ellipse cx="200" cy="160" rx="90" ry="68" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="6 6"/>
-          <!-- Cricket Pitch -->
-          <rect x="188" y="115" width="24" height="90" rx="3" fill="#b08968" stroke="#7f5539" stroke-width="1.5"/>
-          <line x1="188" y1="126" x2="212" y2="126" stroke="#ffffff" stroke-width="1.5"/>
-          <line x1="188" y1="194" x2="212" y2="194" stroke="#ffffff" stroke-width="1.5"/>
-          <circle cx="200" cy="123" r="2" fill="#ffffff"/>
-          <circle cx="200" cy="197" r="2" fill="#ffffff"/>
-          <!-- Boundary Distance Callouts -->
-          <text id="svg-dist-straight" x="200" y="32" fill="#34d399" font-family="'Source Sans 3', sans-serif" font-size="12" font-weight="700" text-anchor="middle">Straight: 75m</text>
-          <text id="svg-dist-square-l" x="32" y="164" fill="#34d399" font-family="'Source Sans 3', sans-serif" font-size="12" font-weight="700" text-anchor="middle">66m</text>
-          <text id="svg-dist-square-r" x="368" y="164" fill="#34d399" font-family="'Source Sans 3', sans-serif" font-size="12" font-weight="700" text-anchor="middle">66m</text>
-          <text id="svg-dist-bottom" x="200" y="294" fill="#34d399" font-family="'Source Sans 3', sans-serif" font-size="12" font-weight="700" text-anchor="middle">Straight: 75m</text>
-        </svg>
+    <div class="stadium-game-grid">
+      <div class="stadium-col-visual">
+        <!-- Stadium Blueprint Vector Card -->
+        <div class="stadium-blueprint-card">
+          <div class="stadium-svg-wrap">
+            <svg class="stadium-svg" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
+              <!-- Outer Grass Outfield -->
+              <ellipse cx="200" cy="160" rx="180" ry="140" fill="#0d3320" stroke="#16a34a" stroke-width="3"/>
+              <ellipse cx="200" cy="160" rx="172" ry="132" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-dasharray="4 4"/>
+              <!-- 30-Yard Circle -->
+              <ellipse cx="200" cy="160" rx="90" ry="68" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="6 6"/>
+              <!-- Cricket Pitch -->
+              <rect x="188" y="115" width="24" height="90" rx="3" fill="#b08968" stroke="#7f5539" stroke-width="1.5"/>
+              <line x1="188" y1="126" x2="212" y2="126" stroke="#ffffff" stroke-width="1.5"/>
+              <line x1="188" y1="194" x2="212" y2="194" stroke="#ffffff" stroke-width="1.5"/>
+              <circle cx="200" cy="123" r="2" fill="#ffffff"/>
+              <circle cx="200" cy="197" r="2" fill="#ffffff"/>
+              <!-- Boundary Distance Callouts -->
+              <text id="svg-dist-straight" x="200" y="32" fill="#34d399" font-family="'Source Sans 3', sans-serif" font-size="12" font-weight="700" text-anchor="middle">Straight: 75m</text>
+              <text id="svg-dist-square-l" x="32" y="164" fill="#34d399" font-family="'Source Sans 3', sans-serif" font-size="12" font-weight="700" text-anchor="middle">66m</text>
+              <text id="svg-dist-square-r" x="368" y="164" fill="#34d399" font-family="'Source Sans 3', sans-serif" font-size="12" font-weight="700" text-anchor="middle">66m</text>
+              <text id="svg-dist-bottom" x="200" y="294" fill="#34d399" font-family="'Source Sans 3', sans-serif" font-size="12" font-weight="700" text-anchor="middle">Straight: 75m</text>
+            </svg>
+          </div>
+
+          <!-- Progressive Clues Deck -->
+          <div class="clues-deck" id="clues-deck"></div>
+
+          <!-- Attempts track -->
+          <div class="attempts-track" id="attempts-track">
+            <span class="attempt-dot current"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+          </div>
+        </div>
       </div>
 
-      <!-- Progressive Clues Deck -->
-      <div class="clues-deck" id="clues-deck"></div>
+      <div class="stadium-col-input">
+        <!-- Guess Controls -->
+        <div class="guess-box" id="guess-controls">
+          <div class="guess-input-wrap">
+            <input type="text" id="guess-input" class="guess-input" placeholder="Type stadium name (e.g. Wankhede Stadium)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
+            <button id="btn-skip" class="btn-skip" title="Skip to unlock next clue">Skip</button>
+            <button id="btn-guess" class="btn-stadium">Guess</button>
+          </div>
+          <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+        </div>
 
-      <!-- Attempts track -->
-      <div class="attempts-track" id="attempts-track">
-        <span class="attempt-dot current"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-      </div>
-    </div>
+        <!-- Guess History -->
+        <div class="guess-history" id="guess-history"></div>
 
-    <!-- Guess Controls -->
-    <div class="guess-box" id="guess-controls">
-      <div class="guess-input-wrap">
-        <input type="text" id="guess-input" class="guess-input" placeholder="Type stadium name (e.g. Wankhede Stadium)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
-        <button id="btn-skip" class="btn-skip" title="Skip to unlock next clue">Skip</button>
-        <button id="btn-guess" class="btn-stadium">Guess</button>
-      </div>
-      <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
-    </div>
-
-    <!-- Guess History -->
-    <div class="guess-history" id="guess-history"></div>
-
-    <!-- Result Card -->
-    <div class="result-card" id="result-card">
-      <h3 class="result-title" id="result-status">STADIUM CONQUERED! 🏆</h3>
-      <p class="result-name" id="result-name"></p>
-      <p class="result-desc" id="result-desc"></p>
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-        <button id="btn-share" class="btn-stadium">Share Result 📋</button>
-        <a href="hub.html" class="btn-skip" style="text-decoration:none;">Play Other Games →</a>
+        <!-- Result Card -->
+        <div class="result-card" id="result-card">
+          <h3 class="result-title" id="result-status">STADIUM CONQUERED! 🏆</h3>
+          <p class="result-name" id="result-name"></p>
+          <p class="result-desc" id="result-desc"></p>
+          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+            <button id="btn-share" class="btn-stadium">Share Result 📋</button>
+            <a href="hub.html" class="btn-skip" style="text-decoration:none;">Play Other Games →</a>
+          </div>
+        </div>
       </div>
     </div>
   </main>
 
   <script src="bg.js"></script>
   <script src="stadium.js"></script>
-  <script src="mobile-keyboard.js?v=2.9.0" defer></script>
+  <script src="mobile-keyboard.js?v=3.0.0" defer></script>
 </body>
 </html>
 

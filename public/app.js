@@ -818,6 +818,8 @@
   }
 
   
+  const ABUSIVE_USERNAME_MESSAGE = "This username can't be chosen to avoid misuse and abuse.";
+
   function openChooseUsernameDialog(user) {
     const dlg = $("choose-username-dialog");
     if (!dlg) return;
@@ -877,7 +879,7 @@
         showView();
       } catch (err) {
         if (errEl) {
-          errEl.textContent = err.code === "username_taken" ? "That username is taken. Try another." : (err.message || "Failed to save username.");
+          errEl.textContent = err.code === "abusive_username" ? ABUSIVE_USERNAME_MESSAGE : (err.code === "username_taken" ? "That username is taken. Try another." : (err.message || "Failed to save username."));
           errEl.hidden = false;
         }
       } finally {
@@ -1426,7 +1428,7 @@
   }
 
   function renderNav() {
-    const label = app.user ? "@" + app.user.username : "Sign in";
+    const label = app.user ? app.user.username : "Sign in";
     $("nav-profile-label").textContent = label;
     $("tab-profile-label").textContent = app.user ? "Profile" : "Sign in";
     const navAdmin = $("nav-admin");
@@ -1872,51 +1874,53 @@
       `;
     }
 
+    const isGuestAuthVisible = !app.user && $("auth-card") && !$("auth-card").hidden;
+    const wrapEl = $("profile-layout-wrap");
+    if (wrapEl) {
+      wrapEl.classList.toggle("guest-split-layout", Boolean(isGuestAuthVisible));
+    }
+
     const heroHtml = `
-      ${pUser.isGuest ? `
-        <div class="guest-callout-banner">
-          <div class="guest-callout-text">
-            <h4>Playing as a guest</h4>
-            <p>Create an account to be ranked.</p>
+      <div class="${pUser.isGuest ? 'profile-guest-stack' : 'profile-member-grid'}">
+        <div class="profile-sidebar-col">
+          <div class="profile-hero card">
+            <div class="profile-avatar-wrap">
+              <div class="avatar-badge" style="background:${av.bg};" aria-hidden="true">${avatarIcon(av)}</div>
+              <button class="avatar-edit-trigger" id="avatar-edit-btn" type="button" title="Change Avatar" aria-label="Change Avatar"><svg aria-hidden="true"><use href="#i-edit"/></svg></button>
+            </div>
+            <div class="profile-hero-meta">
+              <div class="profile-name-row">
+                <h3 class="profile-display-name">${escapeHtml(pUser.displayName)}</h3>
+                <span class="profile-username">${pUser.isGuest ? "· Guest" : `@${escapeHtml(pUser.username)}`}</span>
+                ${pUser.isAdmin ? `<span class="pill-admin" style="background:rgba(245, 158, 11, 0.2);color:#fbbf24;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;border:1px solid rgba(245, 158, 11, 0.4);display:inline-flex;align-items:center;gap:4px;">👑 Admin</span>` : ""}
+                ${pUser.phone ? `<span class="pill-phone"><svg aria-hidden="true" style="width:12px;height:12px;vertical-align:-1px;"><use href="#i-phone"/></svg> Phone</span>` : ""}
+              </div>
+              <div class="profile-tag-row">
+                <span class="title-badge"><svg aria-hidden="true"><use href="#i-trophy"/></svg> ${escapeHtml(title.title)}</span>
+                ${pUser.favTeam ? `<span class="profile-chip team">🏏 ${escapeHtml(pUser.favTeam)}</span>` : ""}
+                ${pUser.favPlayer ? `<span class="profile-chip">⭐ ${escapeHtml(pUser.favPlayer)}</span>` : ""}
+              </div>
+              ${pUser.bio ? `<p class="profile-bio">${escapeHtml(pUser.bio)}</p>` : ""}
+            </div>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPct}" aria-label="Progress to next title"><span style="width:${progressPct}%"></span></div>
+              <div class="progress-text"><span>${s.allTimePoints || 0} pts</span><span>${title.next ? `${title.next.min - (s.allTimePoints || 0)} pts to ${title.next.title}` : "Top of the ladder"}</span></div>
+            </div>
           </div>
-          <button id="guest-signin-btn" class="btn primary small" type="button">Sign in</button>
         </div>
-      ` : ""}
-      <div class="profile-hero card">
-        <div class="profile-avatar-wrap">
-          <div class="avatar-badge" style="background:${av.bg};" aria-hidden="true">${avatarIcon(av)}</div>
-          <button class="avatar-edit-trigger" id="avatar-edit-btn" type="button" title="Change Avatar" aria-label="Change Avatar"><svg aria-hidden="true"><use href="#i-edit"/></svg></button>
-        </div>
-        <div class="profile-hero-meta">
-          <div class="profile-name-row">
-            <h3 class="profile-display-name">${escapeHtml(pUser.displayName)}</h3>
-            <span class="profile-username">${pUser.isGuest ? "· Guest" : `@${escapeHtml(pUser.username)}`}</span>
-            ${pUser.isAdmin ? `<span class="pill-admin" style="background:rgba(245, 158, 11, 0.2);color:#fbbf24;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;border:1px solid rgba(245, 158, 11, 0.4);display:inline-flex;align-items:center;gap:4px;">👑 Admin</span>` : ""}
-            
-            ${pUser.phone ? `<span class="pill-phone"><svg aria-hidden="true" style="width:12px;height:12px;vertical-align:-1px;"><use href="#i-phone"/></svg> Phone</span>` : ""}
-          </div>
-          <div class="profile-tag-row">
-            <span class="title-badge"><svg aria-hidden="true"><use href="#i-trophy"/></svg> ${escapeHtml(title.title)}</span>
-            ${pUser.favTeam ? `<span class="profile-chip team">🏏 ${escapeHtml(pUser.favTeam)}</span>` : ""}
-            ${pUser.favPlayer ? `<span class="profile-chip">⭐ ${escapeHtml(pUser.favPlayer)}</span>` : ""}
-          </div>
-          ${pUser.bio ? `<p class="profile-bio">${escapeHtml(pUser.bio)}</p>` : ""}
-        </div>
-        <div class="progress">
-          <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPct}" aria-label="Progress to next title"><span style="width:${progressPct}%"></span></div>
-          <div class="progress-text"><span>${s.allTimePoints || 0} pts</span><span>${title.next ? `${title.next.min - (s.allTimePoints || 0)} pts to ${title.next.title}` : "Top of the ladder"}</span></div>
-        </div>
-      </div>
 
-      <div class="profile-subnav" role="tablist" aria-label="Profile navigation">
-        <button class="subnav-btn${app.profileTab === "stats" ? " active" : ""}" data-subtab="stats" type="button"><svg aria-hidden="true"><use href="#i-ball"/></svg> Career & Streaks</button>
-        <button class="subnav-btn${app.profileTab === "badges" ? " active" : ""}" data-subtab="badges" type="button"><svg aria-hidden="true"><use href="#i-medal"/></svg> Badges (${unlockedCount}/${achievements.length})</button>
-        <button class="subnav-btn${app.profileTab === "edit" ? " active" : ""}" data-subtab="edit" type="button"><svg aria-hidden="true"><use href="#i-edit"/></svg> Edit Profile</button>
-        <button class="subnav-btn${app.profileTab === "account" ? " active" : ""}" data-subtab="account" type="button"><svg aria-hidden="true"><use href="#i-lock"/></svg> Account</button>
-      </div>
+        <div class="profile-content-col">
+          <div class="profile-subnav" role="tablist" aria-label="Profile navigation">
+            <button class="subnav-btn${app.profileTab === "stats" ? " active" : ""}" data-subtab="stats" type="button"><svg aria-hidden="true"><use href="#i-ball"/></svg> Career & Streaks</button>
+            <button class="subnav-btn${app.profileTab === "badges" ? " active" : ""}" data-subtab="badges" type="button"><svg aria-hidden="true"><use href="#i-medal"/></svg> Badges (${unlockedCount}/${achievements.length})</button>
+            <button class="subnav-btn${app.profileTab === "edit" ? " active" : ""}" data-subtab="edit" type="button"><svg aria-hidden="true"><use href="#i-edit"/></svg> Edit Profile</button>
+            <button class="subnav-btn${app.profileTab === "account" ? " active" : ""}" data-subtab="account" type="button"><svg aria-hidden="true"><use href="#i-lock"/></svg> Account</button>
+          </div>
 
-      <div class="profile-tab-content">
-        ${subViewHtml}
+          <div class="profile-tab-content">
+            ${subViewHtml}
+          </div>
+        </div>
       </div>
     `;
 
@@ -1988,7 +1992,7 @@
             app.profileTab = "stats";
             renderProfile();
           } catch (err) {
-            toast(err.message || "Failed to update profile", "error");
+            toast(err.code === "abusive_username" ? ABUSIVE_USERNAME_MESSAGE : (err.message || "Failed to update profile"), "error");
           }
         } else {
           // Guest mode
@@ -2216,7 +2220,11 @@
         location.hash = "#play";
         showView();
       } catch (err) {
-        if (err.code === "username_taken") {
+        if (err.code === "abusive_username") {
+          fieldError("register-username", ABUSIVE_USERNAME_MESSAGE);
+          regUsername.focus();
+          regUsername.select();
+        } else if (err.code === "username_taken") {
           fieldError("register-username", "That username is taken. Try another.");
           regUsername.focus();
           regUsername.select();

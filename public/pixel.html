@@ -12,14 +12,46 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
   <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
-  <link rel="stylesheet" href="styles.css?v=2.9.0" />
-  <script src="theme.js?v=2.9.0"></script>
+  <link rel="stylesheet" href="styles.css?v=3.0.0" />
+  <script src="theme.js?v=3.0.0"></script>
   <style>
     .pixel-container {
       width: min(100%, 640px);
       margin: 0 auto;
       padding: var(--space-4) var(--space-4) var(--space-8);
       --mode-text: #9333ea;
+    }
+
+    .pixel-game-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 960px) {
+      .pixel-container {
+        width: min(100%, 1120px);
+        padding-top: var(--space-3);
+      }
+      .pixel-game-grid {
+        display: grid;
+        grid-template-columns: minmax(360px, 440px) minmax(0, 1fr);
+        gap: var(--space-6);
+        align-items: start;
+      }
+      .pixel-col-visual {
+        position: sticky;
+        top: var(--space-4);
+      }
+      .pixel-col-input {
+        min-width: 0;
+      }
+      .pixel-col-input .guess-history {
+        max-height: calc(100dvh - 280px);
+        overflow-y: auto;
+        padding-right: 4px;
+        scrollbar-width: thin;
+      }
     }
 
     .game-header {
@@ -798,46 +830,52 @@
       </div>
     </div>
 
-    <!-- Photo Card -->
-    <div class="photo-card">
-      <div class="canvas-wrapper">
-        <canvas id="pixel-canvas" width="280" height="340"></canvas>
+    <div class="pixel-game-grid">
+      <div class="pixel-col-visual">
+        <!-- Photo Card -->
+        <div class="photo-card">
+          <div class="canvas-wrapper">
+            <canvas id="pixel-canvas" width="280" height="340"></canvas>
+          </div>
+          <div class="attempts-track" id="attempts-track">
+            <span class="attempt-dot current"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+          </div>
+        </div>
       </div>
-      <div class="attempts-track" id="attempts-track">
-        <span class="attempt-dot current"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
+
+      <div class="pixel-col-input">
+        <!-- Guess Input with Classic Dropdown -->
+        <div class="guess-box" id="guess-controls">
+          <div class="guess-input-wrap">
+            <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. Virat Kohli)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
+            <button id="btn-skip" class="btn-skip" title="Skip to unblur more">Skip</button>
+            <button id="btn-guess" class="btn-guess">Guess</button>
+          </div>
+          <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+        </div>
+
+        <!-- Guess History -->
+        <div class="guess-history" id="guess-history"></div>
+
+        <!-- Result Card -->
+        <div class="result-card" id="result-card">
+          <h3 class="result-title" id="result-status">OUT!</h3>
+          <p class="result-name" id="result-name"></p>
+          <p class="result-hint" id="result-hint"></p>
+          <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#9333ea;color:#fff;font-weight:700;">Play Other Games →</a>
+        </div>
       </div>
-    </div>
-
-    <!-- Guess Input with Classic Dropdown -->
-    <div class="guess-box" id="guess-controls">
-      <div class="guess-input-wrap">
-        <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. Virat Kohli)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
-        <button id="btn-skip" class="btn-skip" title="Skip to unblur more">Skip</button>
-        <button id="btn-guess" class="btn-guess">Guess</button>
-      </div>
-      <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
-    </div>
-
-    <!-- Guess History -->
-    <div class="guess-history" id="guess-history"></div>
-
-    <!-- Result Card -->
-    <div class="result-card" id="result-card">
-      <h3 class="result-title" id="result-status">OUT!</h3>
-      <p class="result-name" id="result-name"></p>
-      <p class="result-hint" id="result-hint"></p>
-      <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#9333ea;color:#fff;font-weight:700;">Play Other Games →</a>
     </div>
   </main>
 
   <script src="bg.js"></script>
   <script src="players.js"></script>
   <script src="pixel.js"></script>
-  <script src="mobile-keyboard.js?v=2.9.0" defer></script>
+  <script src="mobile-keyboard.js?v=3.0.0" defer></script>
 </body>
 </html>

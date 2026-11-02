@@ -375,10 +375,38 @@ body.hard .nav-link[aria-current="page"] { color: #1a1200; background: var(--acc
   }
   .col-main { position: sticky; top: var(--space-4); }
   .col-side { padding-top: 4px; }
+  .col-side .history {
+    max-height: calc(100dvh - 140px);
+    overflow-y: auto;
+    padding-right: 6px;
+    scrollbar-width: thin;
+  }
+  .col-side .history::-webkit-scrollbar { width: 6px; }
+  .col-side .history::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 9999px;
+  }
 }
 
-.view-board, .view-profile { width: min(100%, 760px); margin: 0 auto; }
+.view-board { width: min(100%, 760px); margin: 0 auto; }
+.view-profile { width: min(100%, 760px); margin: 0 auto; }
 .view-board > * + *, .view-profile > * + * { margin-top: var(--space-4); }
+
+@media (min-width: 960px) {
+  .view-profile {
+    width: min(100%, 1200px);
+    margin: 0 auto;
+  }
+  .view-board {
+    width: min(100%, 1040px);
+    margin: 0 auto;
+  }
+  #board-panel {
+    max-height: calc(100dvh - 220px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
 .view-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-2); }
 .view-head h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(2.2rem, 7vw, 3rem); letter-spacing: 0.05em; line-height: 1; }
 
@@ -1225,6 +1253,58 @@ dialog form { margin-top: var(--space-4); text-align: right; }
 }
 .profile-chip.team { border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.12); color: var(--gold); font-weight: 600; }
 .profile-bio { margin: 6px 0 0; font-size: 0.88rem; color: var(--fg); line-height: 1.4; }
+
+/* ---------- 2-Column Responsive Profile Layout ---------- */
+.profile-layout-wrap {
+  width: 100%;
+}
+.profile-layout-wrap > * + * {
+  margin-top: var(--space-4);
+}
+
+.profile-member-grid, .profile-guest-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (min-width: 960px) {
+  /* Guest View: Left side is Guest Player preview, Right side is Sticky Auth Card */
+  .profile-layout-wrap.guest-split-layout {
+    display: grid;
+    grid-template-columns: minmax(360px, 480px) minmax(380px, 1fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+  .profile-layout-wrap.guest-split-layout #profile-card {
+    order: 1;
+    margin-top: 0;
+  }
+  .profile-layout-wrap.guest-split-layout #auth-card {
+    order: 2;
+    position: sticky;
+    top: var(--space-4);
+    margin-top: 0;
+  }
+
+  /* Member View: Left side is Sticky Player Hero, Right side is Subnav & Tab Content */
+  .profile-member-grid {
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+  .profile-sidebar-col {
+    position: sticky;
+    top: var(--space-4);
+  }
+  .profile-content-col {
+    min-width: 0;
+  }
+  .profile-content-col .profile-subnav {
+    margin-top: 0;
+  }
+}
 
 /* Subnav Tabs inside Profile */
 .profile-subnav {
