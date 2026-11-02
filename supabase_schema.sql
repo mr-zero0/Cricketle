@@ -80,7 +80,7 @@ WITH agg AS (
          SUM(jsonb_array_length(p.guesses)) AS guesses,
          SUM(COALESCE(p.finished_at - p.started_at, 0)) AS ms
   FROM puzzles p JOIN users u ON u.id = p.user_id
-  WHERE p.day = p_day AND p.status IN ('solved', 'gaveUp')
+  WHERE p.day = p_day AND (p.status IN ('solved', 'gaveUp', 'active') OR p.started_at IS NOT NULL OR jsonb_array_length(p.guesses) > 0 OR p.points > 0)
   GROUP BY p.user_id, u.username, u.display_name, u.avatar
 ),
 ranked AS (
@@ -113,7 +113,7 @@ WITH agg AS (
          SUM(jsonb_array_length(p.guesses)) AS guesses,
          SUM(COALESCE(p.finished_at - p.started_at, 0)) AS ms
   FROM puzzles p JOIN users u ON u.id = p.user_id
-  WHERE p.day = p_day AND p.status IN ('solved', 'gaveUp')
+  WHERE p.day = p_day AND (p.status IN ('solved', 'gaveUp', 'active') OR p.started_at IS NOT NULL OR jsonb_array_length(p.guesses) > 0 OR p.points > 0)
   GROUP BY p.user_id, u.username, u.display_name, u.avatar
 ),
 ranked AS (
@@ -144,7 +144,7 @@ WITH agg AS (
          SUM(CASE WHEN p.status = 'solved' THEN 1 ELSE 0 END) AS solved,
          COUNT(DISTINCT p.day) AS days
   FROM puzzles p JOIN users u ON u.id = p.user_id
-  WHERE p.status IN ('solved', 'gaveUp')
+  WHERE (p.status IN ('solved', 'gaveUp', 'active') OR p.started_at IS NOT NULL OR jsonb_array_length(p.guesses) > 0 OR p.points > 0)
   GROUP BY p.user_id, u.username, u.display_name, u.avatar
 ),
 ranked AS (
@@ -175,7 +175,7 @@ WITH agg AS (
          SUM(CASE WHEN p.status = 'solved' THEN 1 ELSE 0 END) AS solved,
          COUNT(DISTINCT p.day) AS days
   FROM puzzles p JOIN users u ON u.id = p.user_id
-  WHERE p.status IN ('solved', 'gaveUp')
+  WHERE (p.status IN ('solved', 'gaveUp', 'active') OR p.started_at IS NOT NULL OR jsonb_array_length(p.guesses) > 0 OR p.points > 0)
   GROUP BY p.user_id, u.username, u.display_name, u.avatar
 ),
 ranked AS (

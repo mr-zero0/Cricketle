@@ -354,6 +354,47 @@ test("the all-time leaderboard accumulates across days and tracks streaks", asyn
   } finally { await app.close(); }
 });
 
+test("players who attempted only one puzzle appear on leaderboard even with 0 points", async () => {
+  const app = await boot();
+  try {
+    const day = "2026-10-27";
+    const solver = await signUp(app.base, "solver");
+    const attempter = await signUp(app.base, "attempter");
+    const giveUpper = await signUp(app.base, "giveupper");
+
+    app.setNow(T0);
+    await solve(solver, "easy", 0, day);
+
+    await attempter.post("/api/puzzle/start", { mode: "easy", idx: 0 });
+    const wrong = core.poolFor("easy").find((p) => p.name !== core.answerFor(day, "easy", 0).name).name;
+    await attempter.post("/api/puzzle/guess", { mode: "easy", idx: 0, name: wrong });
+
+    await giveUpper.post("/api/puzzle/start", { mode: "easy", idx: 0 });
+    await giveUpper.post("/api/puzzle/giveup", { mode: "easy", idx: 0 });
+
+    const today = await solver.get("/api/leaderboard/today");
+    assert.equal(today.status, 200);
+    assert.equal(today.json.total, 3);
+    const usernames = today.json.rows.map((r) => r.username);
+    assert.ok(usernames.includes("solver"));
+    assert.ok(usernames.includes("attempter"));
+    assert.ok(usernames.includes("giveupper"));
+
+    const attempterLb = await attempter.get("/api/leaderboard/today");
+    assert.ok(attempterLb.json.me);
+    assert.equal(attempterLb.json.me.username, "attempter");
+    assert.equal(attempterLb.json.me.points, 0);
+
+    const alltime = await solver.get("/api/leaderboard/alltime");
+    assert.equal(alltime.status, 200);
+    assert.equal(alltime.json.total, 3);
+    const allUsernames = alltime.json.rows.map((r) => r.username);
+    assert.ok(allUsernames.includes("solver"));
+    assert.ok(allUsernames.includes("attempter"));
+    assert.ok(allUsernames.includes("giveupper"));
+  } finally { await app.close(); }
+});
+
 test("POST requests must be JSON from the same origin", async () => {
   const app = await boot();
   try {

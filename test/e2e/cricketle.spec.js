@@ -317,6 +317,7 @@ test.describe("accounts and leaderboards", () => {
     await expect(myRow).toContainText(username);
     await expect(myRow.locator(".board-pts .v")).toHaveText(String(points));
     await expect(page.locator("#board-me")).toContainText(/#\d+/);
+    await page.screenshot({ path: "C:\\Users\\mohda\\.gemini\\antigravity\\brain\\d748b24f-a62e-4d5c-8d35-1525283d84ac\\verify_leaderboard_zero_points.png", fullPage: false });
     await shot(page, "leaderboard-today");
 
     await page.getByRole("tab", { name: "All-time" }).click();
@@ -336,6 +337,36 @@ test.describe("accounts and leaderboards", () => {
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page.locator("#nav-profile-label")).toHaveText("Sign in");
     await expect(page.locator("#guest-banner")).toBeVisible();
+  });
+
+  test("players who attempt one puzzle appear on leaderboard even with 0 points", async ({ page }) => {
+    const username = uniq("zero");
+    await signUp(page, username, "246810");
+    await expect(page).toHaveURL(/#play$/);
+
+    // Start puzzle 1 (status = active, points = 0)
+    await startPuzzle(page);
+    const wrong = wrongGuess("easy", 0);
+    await guess(page, wrong);
+
+    // Navigate to leaderboard
+    await page.goto("/index.html#leaderboard");
+    await expect(page.locator("#view-leaderboard")).toBeVisible();
+
+    // User appears on today's leaderboard with 0 pts
+    const myRow = page.locator("#board-list .board-row.me");
+    await expect(myRow).toBeVisible();
+    await expect(myRow).toContainText(username);
+    await expect(myRow.locator(".board-pts .v")).toHaveText("0");
+    await expect(page.locator("#board-me")).toContainText(/#\d+/);
+    await page.screenshot({ path: "C:/Users/mohda/.gemini/antigravity/brain/d748b24f-a62e-4d5c-8d35-1525283d84ac/verify_leaderboard_zero_points.png", fullPage: false });
+
+    // Check All-time tab as well
+    await page.getByRole("tab", { name: "All-time" }).click();
+    const myAllTimeRow = page.locator("#board-list .board-row.me");
+    await expect(myAllTimeRow).toBeVisible();
+    await expect(myAllTimeRow).toContainText(username);
+    await expect(myAllTimeRow.locator(".board-pts .v")).toHaveText("0");
   });
 
   test("sign-in form validates inline and reports wrong credentials", async ({ page }) => {
