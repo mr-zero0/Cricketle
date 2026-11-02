@@ -745,48 +745,76 @@
   }
 
   
+    let gisInitialized = false;
+  function renderGoogleButton() {
+    const btn = $("google-signin-btn");
+    if (!btn) return;
+    if (!window.google || !window.google.accounts || !window.google.accounts.id) return;
+    try {
+      btn.innerHTML = "";
+      window.google.accounts.id.renderButton(btn, {
+        theme: "outline",
+        size: "large",
+        type: "standard",
+        text: "signin_with",
+        shape: "pill",
+        logo_alignment: "left",
+        width: 280,
+      });
+    } catch (err) {
+      console.warn("Failed to render Google button:", err);
+    }
+  }
+
   function initGoogleAuth(clientId) {
     const id = clientId || app.googleClientId;
-    if (!id || !window.google || !window.google.accounts) return;
-    try {
-      window.google.accounts.id.initialize({
-        client_id: id,
-        callback: async (response) => {
-          if (!response || !response.credential) return;
-          try {
-            const res = await api("POST", "/api/auth/google", { credential: response.credential });
-            app.user = res.user;
-            toast("Signed in with Google as " + (app.user.displayName || app.user.username), "success");
-            location.hash = "#play";
-            await bootUser();
-          } catch (err) {
-            toast(err.message || "Google sign-in failed", "warn");
-          }
-        },
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
+    if (!id) return;
+    app.googleClientId = id;
+
+    let retries = 0;
+    function attemptInit() {
+      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+        if (++retries < 40) {
+          setTimeout(attemptInit, 100);
+        }
+        return;
+      }
+      if (!gisInitialized) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: id,
+            callback: async (response) => {
+              if (!response || !response.credential) return;
+              try {
+                const res = await api("POST", "/api/auth/google", { credential: response.credential });
+                app.user = res.user;
+                toast("Signed in with Google as " + (app.user.displayName || app.user.username), "success");
+                location.hash = "#play";
+                await bootUser();
+              } catch (err) {
+                toast(err.message || "Google sign-in failed", "warn");
+              }
+            },
+            auto_select: false,
+            cancel_on_tap_outside: true,
+          });
+          gisInitialized = true;
+        } catch (err) {
+          console.warn("Google GIS init error:", err);
+          return;
+        }
+      }
 
       if (!app.user) {
-        window.google.accounts.id.prompt();
+        try {
+          window.google.accounts.id.prompt();
+        } catch (_) {}
       }
 
-      const btn = $("google-signin-btn");
-      if (btn) {
-        btn.innerHTML = "";
-        window.google.accounts.id.renderButton(btn, {
-          theme: "outline",
-          size: "large",
-          type: "standard",
-          text: "signin_with",
-          shape: "pill",
-          logo_alignment: "left",
-          width: 280,
-        });
-      }
-    } catch (err) {
-      console.warn("Google GIS init error:", err);
+      renderGoogleButton();
     }
+
+    attemptInit();
   }
 
   function openAuth(view) {
@@ -1501,6 +1529,8 @@
       // If guest and not on a guest tab, show auth card
       $("auth-card").hidden = false;
       renderAuthTab();
+      if (app.googleClientId) initGoogleAuth(app.googleClientId);
+      else renderGoogleButton();
     }
 
     // Determine current profile & stats (whether signed in or guest)
@@ -1988,6 +2018,7 @@
     }
     if (viewSignin) viewSignin.hidden = view !== "signin";
     if (viewRegister) viewRegister.hidden = view !== "register";
+    renderGoogleButton();
 
     const first = $(view === "signin" ? "signin-identifier" : "register-username");
     if (first) first.focus();
@@ -2324,6 +2355,10 @@
       try {
         const me = await api("GET", "/api/me");
         app.offline = false;
+        if (me.googleClientId) {
+          app.googleClientId = me.googleClientId;
+          initGoogleAuth(me.googleClientId);
+        }
         if (me.user) {
           app.user = me.user;
           app.stats = me.stats;
