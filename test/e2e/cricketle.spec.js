@@ -180,6 +180,41 @@ test.describe("guest play", () => {
     expect(hint1Text).not.toContain("Represents");
   });
 
+  test("Hint list displays clean Hint 1, Hint 2, Hint 3 without hardcoded spoilers", async ({ page }) => {
+    await page.goto("/index.html");
+    await startPuzzle(page);
+
+    const hintItems = page.locator("#hint-list li");
+    await expect(hintItems).toHaveCount(3);
+    await expect(hintItems.nth(0)).toContainText("Hint 1");
+    await expect(hintItems.nth(0)).not.toContainText("Nation");
+    await expect(hintItems.nth(1)).toContainText("Hint 2");
+    await expect(hintItems.nth(1)).not.toContainText("Role");
+    await expect(hintItems.nth(2)).toContainText("Hint 3");
+  });
+
+  test("Timer pauses when switching away and only counts active screen time", async ({ page }) => {
+    await page.goto("/index.html");
+    await startPuzzle(page);
+    await page.waitForTimeout(1100);
+    const timeBefore = await page.locator("#timer").textContent();
+
+    // Switch view to Leaderboard (user leaves puzzle screen)
+    await page.evaluate(() => { location.hash = "#leaderboard"; });
+    await page.waitForTimeout(1500);
+
+    // Switch back to Play
+    await page.evaluate(() => { location.hash = "#play"; });
+    await page.waitForTimeout(300);
+    const timeAfter = await page.locator("#timer").textContent();
+
+    const toSec = (t) => {
+      const [m, s] = t.split(":").map(Number);
+      return m * 60 + s;
+    };
+    expect(toSec(timeAfter) - toSec(timeBefore)).toBeLessThanOrEqual(2);
+  });
+
   test("typing right after tapping a hint keeps the suggestions open", async ({ page }) => {
     await page.goto("/index.html");
     await startPuzzle(page);

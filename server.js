@@ -639,6 +639,10 @@ function createApp(opts = {}) {
       const body = await readJson(req);
       const { mode, idx } = puzzleArgs(body);
       if (typeof body.name !== "string") return fail(res, 400, "unknown_player");
+      if (Number(body.awayMs) > 0) {
+        const awayMs = Math.max(0, Math.min(Number(body.awayMs) || 0, 7 * 24 * 3600 * 1000));
+        await game.adjustTimer(user.id, mode, idx, awayMs);
+      }
       const r = await game.guess(user.id, mode, idx, body.name);
       if (!r.ok) {
         logger.game("guess_rejected", `Guess rejected for @${user.username} on ${mode} #${idx + 1}: ${r.error}`, {
@@ -690,6 +694,16 @@ function createApp(opts = {}) {
         });
       }
       return engineResult(res, req, r, r.ok ? { hint: r.hint } : null);
+    }
+
+    if (key === "POST /api/puzzle/resume") {
+      const user = await requireUser(req);
+      rateLimit(req, "play", 600, 10 * 60 * 1000);
+      const body = await readJson(req);
+      const { mode, idx } = puzzleArgs(body);
+      const awayMs = Math.max(0, Math.min(Number(body.awayMs) || 0, 7 * 24 * 3600 * 1000));
+      const r = await game.adjustTimer(user.id, mode, idx, awayMs);
+      return engineResult(res, req, r, { ok: true });
     }
 
     if (key === "POST /api/puzzle/giveup") {

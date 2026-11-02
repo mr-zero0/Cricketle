@@ -258,6 +258,17 @@ test("hints come back in order, three at most, and cost points", async () => {
   } finally { await app.close(); }
 });
 
+test("POST /api/puzzle/resume adjusts puzzle timer for away duration", async () => {
+  const app = await boot();
+  try {
+    const c = await signUp(app.base, "timer_test");
+    await c.post("/api/puzzle/start", { mode: "easy", idx: 0 });
+    const res = await c.post("/api/puzzle/resume", { mode: "easy", idx: 0, awayMs: 3600000 });
+    assert.equal(res.status, 200);
+    assert.equal(res.json.ok, true);
+  } finally { await app.close(); }
+});
+
 test("giving up closes the puzzle with no points and unlocks the next", async () => {
   const app = await boot();
   try {

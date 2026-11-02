@@ -671,6 +671,19 @@
     return { ok: true, state: next };
   }
 
+  function adjustPuzzleTimer(state, mode, idx, awayMs, now) {
+    const loc = locate(state, mode, idx);
+    if (loc.error) return fail(state, loc.error);
+    if (loc.puzzle.status !== "active" || !loc.puzzle.startedAt) return fail(state, "not_active");
+    const ms = Math.max(0, Number(awayMs) || 0);
+    if (ms <= 0) return { ok: true, state };
+    const next = clone(state);
+    const p = next.modes[mode].puzzles[idx];
+    const currentNow = now === undefined ? Date.now() : now;
+    p.startedAt = Math.min(currentNow, (p.startedAt || currentNow) + ms);
+    return { ok: true, state: next };
+  }
+
   function revealedHints(state, mode, idx, opts) {
     const loc = locate(state, mode, idx);
     if (loc.error) return [];
@@ -1018,7 +1031,7 @@
     todayKey, msUntilReset, shiftDay, istHour, sceneForHour, hashString, mulberry32,
     dailyAnswers, answerFor, ranksFor,
     hintFor, getHintsForPuzzle, isNationIdentified, isRoleIdentified, scorePuzzle, rankTitle,
-    newDayState, startPuzzle, applyGuess, useHint, giveUp, revealedHints,
+    newDayState, startPuzzle, applyGuess, useHint, giveUp, adjustPuzzleTimer, revealedHints,
     modeDone, dayPoints, elapsedMs, totalElapsedMs, formatTime, isFinished,
     evaluateAchievements, streakDetails,
   };

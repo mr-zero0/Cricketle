@@ -420,6 +420,15 @@ test("elapsedMs runs while active and freezes when finished", () => {
   assert.equal(core.elapsedMs(fresh().modes.easy.puzzles[0], NOW), 0);
 });
 
+test("adjustPuzzleTimer shifts startedAt to exclude away duration", () => {
+  const s = core.startPuzzle(fresh(), "easy", 0, NOW).state;
+  assert.equal(s.modes.easy.puzzles[0].startedAt, NOW);
+  // User was away for 5000ms
+  const adjusted = core.adjustPuzzleTimer(s, "easy", 0, 5000, NOW + 7000).state;
+  assert.equal(adjusted.modes.easy.puzzles[0].startedAt, NOW + 5000);
+  assert.equal(core.elapsedMs(adjusted.modes.easy.puzzles[0], NOW + 7000), 2000);
+});
+
 test("formatTime renders mm:ss and grows to h:mm:ss", () => {
   assert.equal(core.formatTime(0), "00:00");
   assert.equal(core.formatTime(61 * 1000), "01:01");

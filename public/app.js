@@ -276,6 +276,9 @@
         return { answer: core.describe(core.answerFor(r.state.day, mode, idx)) };
       });
     }
+    async adjustTimer(mode, idx, awayMs) {
+      return this.run((s, now) => core.adjustPuzzleTimer(s, mode, idx, awayMs, now));
+    }
   }
 
   class RemoteStore {
@@ -287,9 +290,10 @@
     }
     async load() { return this.sync(await api("GET", "/api/state")); }
     async start(mode, idx) { return this.sync(await api("POST", "/api/puzzle/start", { mode, idx })); }
-    async guess(mode, idx, name) { return this.sync(await api("POST", "/api/puzzle/guess", { mode, idx, name })); }
-    async hint(mode, idx) { return this.sync(await api("POST", "/api/puzzle/hint", { mode, idx })); }
-    async giveUp(mode, idx) { return this.sync(await api("POST", "/api/puzzle/giveup", { mode, idx })); }
+    async guess(mode, idx, name, extra = {}) { return this.sync(await api("POST", "/api/puzzle/guess", Object.assign({ mode, idx, name }, extra))); }
+    async hint(mode, idx, extra = {}) { return this.sync(await api("POST", "/api/puzzle/hint", Object.assign({ mode, idx }, extra))); }
+    async giveUp(mode, idx, extra = {}) { return this.sync(await api("POST", "/api/puzzle/giveup", Object.assign({ mode, idx }, extra))); }
+    async adjustTimer(mode, idx, awayMs) { return this.sync(await api("POST", "/api/puzzle/resume", { mode, idx, awayMs })); }
   }
 
   // ---------- App state ----------
@@ -533,28 +537,19 @@
     const p = puzzle();
     const revealed = (app.state.hints && app.state.hints[app.mode] && app.state.hints[app.mode][idx()]) || [];
     const items = [];
-    let candidates = null;
-    try {
-      if (!app.user && core.answerFor && core.getHintsForPuzzle) {
-        const ans = core.answerFor(app.state.day, app.mode, idx());
-        if (ans) candidates = core.getHintsForPuzzle(ans, app.mode, p.guesses);
-      }
-    } catch (_) {}
 
     for (let n = 1; n <= core.HINTS_PER_PUZZLE; n++) {
-      const h = revealed[n - 1];
-      const label = (h && h.label) || (candidates && candidates[n - 1] && candidates[n - 1].label) || core.HINT_LABELS[n - 1];
       if (n <= p.hints) {
         const h = revealed[n - 1];
         items.push(`<li class="hint revealed"><span class="hint-num" aria-hidden="true"><svg><use href="#i-bulb"/></svg></span>
-          <div class="hint-body"><span class="hint-label">Hint ${n} · ${label}</span><span class="hint-text">${escapeHtml(h ? h.text : "")}</span></div><span></span></li>`);
+          <div class="hint-body"><span class="hint-label">Hint ${n}</span><span class="hint-text">${escapeHtml(h ? h.text : "")}</span></div><span></span></li>`);
       } else if (n === p.hints + 1 && p.status === "active") {
         items.push(`<li class="hint next"><span class="hint-num" aria-hidden="true">${n}</span>
-          <div class="hint-body"><span class="hint-label">Hint ${n}</span><span class="hint-text">${label}</span></div>
-          <button type="button" class="btn small reveal-btn" data-n="${n}" aria-label="Reveal hint ${n}, ${label}, costs ${core.HINT_COST} points">Reveal · −${core.HINT_COST}</button></li>`);
+          <div class="hint-body"><span class="hint-text">Hint ${n}</span></div>
+          <button type="button" class="btn small reveal-btn" data-n="${n}" aria-label="Reveal hint ${n}, costs ${core.HINT_COST} points">Reveal · −${core.HINT_COST}</button></li>`);
       } else {
         items.push(`<li class="hint locked"><span class="hint-num" aria-hidden="true"><svg><use href="#i-lock"/></svg></span>
-          <div class="hint-body"><span class="hint-label">Hint ${n}</span><span class="hint-text">${label}</span></div><span class="muted small-text">After hint ${n - 1}</span></li>`);
+          <div class="hint-body"><span class="hint-text">Hint ${n}</span></div><span class="muted small-text">After hint ${n - 1}</span></li>`);
       }
     }
     hintList.innerHTML = items.join("");
@@ -754,10 +749,85 @@
     $("gate-signin").addEventListener("click", () => openAuth("signin"));
   }
 
-  // ---------- Timer + countdown ----------
+  // ---------- Timer + countdown + engagement tracking ----------
 
   let lastTimerText = "";
   let lastWorth = "";
+  let awayStartedAt = 0;
+  let lastActiveTick = Date.now();
+  let pendingAwayMs = 0;
+
+  function isUserActiveOnPuzzle() {
+    if (!app.state) return false;
+    const p = puzzle();
+    return app.view === "play" && !document.hidden && p && p.status === "active";
+  }
+
+  function handleLeavingPuzzle() {
+    const p = puzzle();
+    if (!p || p.status !== "active") return;
+    if (!awayStartedAt) {
+      awayStartedAt = Date.now();
+      safeSet("cricketle:away_at", String(awayStartedAt));
+      safeSet("cricketle:away_mode", app.mode);
+      safeSet("cricketle:away_idx", String(idx()));
+    }
+  }
+
+  async function handleReturningToPuzzle() {
+    const p = puzzle();
+    if (!p || p.status !== "active") {
+      awayStartedAt = 0;
+      safeRemove("cricketle:away_at");
+      safeRemove("cricketle:away_mode");
+      safeRemove("cricketle:away_idx");
+      return;
+    }
+    const storedAway = Number(safeGet("cricketle:away_at") || 0);
+    const storedMode = safeGet("cricketle:away_mode");
+    const storedIdx = Number(safeGet("cricketle:away_idx"));
+
+    let awayMs = 0;
+    if (awayStartedAt > 0) {
+      awayMs = Date.now() - awayStartedAt;
+    } else if (storedAway > 0 && storedMode === app.mode && storedIdx === idx()) {
+      awayMs = Date.now() - storedAway;
+    }
+
+    awayStartedAt = 0;
+    safeRemove("cricketle:away_at");
+    safeRemove("cricketle:away_mode");
+    safeRemove("cricketle:away_idx");
+
+    if (awayMs > 500) {
+      await adjustActiveTimer(awayMs);
+      updateTimer(true);
+    }
+    lastActiveTick = Date.now();
+  }
+
+  async function adjustActiveTimer(awayMs) {
+    const p = puzzle();
+    if (!p || p.status !== "active" || !p.startedAt) return;
+    const ms = Math.max(0, Number(awayMs) || 0);
+    if (ms <= 0) return;
+
+    // Shift startedAt forward so elapsed active time excludes away duration
+    p.startedAt = Math.min(app.store.now(), (p.startedAt || app.store.now()) + ms);
+    pendingAwayMs += ms;
+
+    if (app.store && app.store.kind === "local") {
+      app.store.write(app.state);
+    } else if (app.store && app.store.kind === "remote") {
+      try {
+        const toSync = pendingAwayMs;
+        await app.store.adjustTimer(app.mode, idx(), toSync);
+        pendingAwayMs -= toSync;
+      } catch (err) {
+        CricketleLog.warn("TIMER", "Failed to sync adjusted timer to server", err);
+      }
+    }
+  }
 
   function updateTimer(force) {
     if (!app.state) return;
@@ -797,7 +867,24 @@
     }
     const ms = Math.max(0, core.msUntilReset(now));
     resetEl.textContent = "Resets in " + core.formatTime(ms);
-    updateTimer(false);
+
+    if (isUserActiveOnPuzzle()) {
+      if (awayStartedAt > 0) {
+        await handleReturningToPuzzle();
+      }
+      lastActiveTick = Date.now();
+      safeSet("cricketle:last_active_tick", String(lastActiveTick));
+      safeSet("cricketle:active_target", `${app.day}:${app.mode}:${idx()}`);
+      updateTimer(false);
+    } else {
+      const p = puzzle();
+      if (p && p.status === "active" && !awayStartedAt) {
+        awayStartedAt = lastActiveTick || Date.now();
+        safeSet("cricketle:away_at", String(awayStartedAt));
+        safeSet("cricketle:away_mode", app.mode);
+        safeSet("cricketle:away_idx", String(idx()));
+      }
+    }
   }
 
   // ---------- Actions ----------
@@ -807,6 +894,11 @@
     const i = idx();
     try {
       setBusy(true);
+      awayStartedAt = 0;
+      safeRemove("cricketle:away_at");
+      safeRemove("cricketle:away_mode");
+      safeRemove("cricketle:away_idx");
+      lastActiveTick = Date.now();
       $("start-btn").classList.add("loading");
       applyPresentation(await app.store.start(app.mode, i));
       setMessage("");
@@ -842,7 +934,9 @@
     const i = idx();
     try {
       setBusy(true);
-      const res = await app.store.guess(app.mode, i, name);
+      const extra = pendingAwayMs > 0 ? { awayMs: pendingAwayMs } : {};
+      pendingAwayMs = 0;
+      const res = await app.store.guess(app.mode, i, name, extra);
       applyPresentation(res);
       setMessage("");
       if (res.solved) {
@@ -1152,10 +1246,16 @@
   }
 
   function showView() {
+    const prevView = app.view;
     app.view = currentView();
     for (const v of VIEWS) $("view-" + v).hidden = v !== app.view;
     renderNav();
     hideSuggestions();
+    if (prevView === "play" && app.view !== "play") {
+      handleLeavingPuzzle();
+    } else if (prevView !== "play" && app.view === "play") {
+      handleReturningToPuzzle();
+    }
     if (app.view === "leaderboard") loadBoard(false);
     if (app.view === "profile") renderProfile();
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -2090,7 +2190,20 @@
   $("board-refresh").addEventListener("click", () => loadBoard(true));
 
   window.addEventListener("hashchange", showView);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) tick(); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      handleLeavingPuzzle();
+    } else {
+      handleReturningToPuzzle().then(() => tick());
+    }
+  });
+
+  const onUnload = () => {
+    handleLeavingPuzzle();
+    safeSet("cricketle:last_active_tick", String(Date.now()));
+  };
+  window.addEventListener("pagehide", onUnload);
+  window.addEventListener("beforeunload", onUnload);
   setInterval(() => { if (app.view === "leaderboard" && !document.hidden) loadBoard(true); }, 60 * 1000);
 
   // ---------- Boot ----------
@@ -2143,6 +2256,21 @@
       if (app.store && app.store.kind === "remote") { app.offline = false; await becomeGuest(); } else throw err;
     }
     showView();
+    try {
+      const p = puzzle();
+      if (p && p.status === "active") {
+        const storedAway = Number(safeGet("cricketle:away_at") || safeGet("cricketle:last_active_tick") || 0);
+        if (storedAway > 0) {
+          const awayMs = Date.now() - storedAway;
+          if (awayMs > 1000) {
+            await adjustActiveTimer(awayMs);
+          }
+        }
+      }
+    } catch (_) {}
+    safeRemove("cricketle:away_at");
+    safeRemove("cricketle:away_mode");
+    safeRemove("cricketle:away_idx");
     if (safeGet(SEEN_HELP_KEY) !== "1") openOnboard({ firstVisit: true });
     CricketleLog.info("READY", `Cricketle ready · Day: ${core.todayKey()} · Mode: ${app.mode} · Storage: ${app.store.kind}`);
     tick();
