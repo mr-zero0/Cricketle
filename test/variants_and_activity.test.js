@@ -185,3 +185,60 @@ test("POST /api/variant/complete requires authenticated member", async () => {
   }
 });
 
+test("POST /api/feedback/inaccuracy captures player reports and admin can view them", async () => {
+  const app = await boot();
+  try {
+    const guest = client(app.base);
+    const member = await registerUser(app.base, "diligent_player");
+
+    // 1. Guest reports wrong photo for a cricketer
+    const r1 = await guest.post("/api/feedback/inaccuracy", {
+      variant: "pixel",
+      issueType: "wrong_photo",
+      targetName: "Rashid Khan",
+      targetId: "13",
+      photoUrl: "photos/player_15.jpg",
+      details: "Photo shows Rashid Khan but answer was revealed as another player",
+      meta: { mode: "easy" },
+    });
+    assert.equal(r1.status, 200);
+    assert.equal(r1.json.ok, true);
+
+    // 2. Member reports a stat or hint inconsistency
+    const r2 = await member.post("/api/feedback/inaccuracy", {
+      variant: "stadium",
+      issueType: "incorrect_hint",
+      targetName: "Wankhede Stadium",
+      details: "Capacity listed as 33,000, updated capacity is 33,108",
+    });
+    assert.equal(r2.status, 200);
+    assert.equal(r2.json.ok, true);
+
+    // 3. Validation: missing details/type rejected
+    const rBad = await guest.post("/api/feedback/inaccuracy", {
+      variant: "pixel",
+      details: "",
+      issueType: "",
+    });
+    assert.equal(rBad.status, 400);
+
+    // 4. Non-admin cannot access admin reports endpoint
+    const nonAdminGet = await guest.get("/api/admin/reports");
+    assert.equal(nonAdminGet.status, 403);
+
+    // 5. Admin can retrieve submitted inaccuracy reports
+    const admin = client(app.base);
+    const adminLogin = await admin.post("/api/admin/login", { key: "adminkey1234567890abcdef" });
+    assert.equal(adminLogin.status, 200);
+
+    const reportsRes = await admin.get("/api/admin/reports");
+    assert.equal(reportsRes.status, 200);
+    assert.equal(reportsRes.json.ok, true);
+    assert.equal(reportsRes.json.reports.length, 2);
+    assert.equal(reportsRes.json.reports[0].target_name, "Wankhede Stadium");
+    assert.equal(reportsRes.json.reports[1].target_name, "Rashid Khan");
+  } finally {
+    await app.close();
+  }
+});
+

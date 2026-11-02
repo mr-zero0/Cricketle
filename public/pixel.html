@@ -12,8 +12,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
   <link id="font-css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" media="print" />
-  <link rel="stylesheet" href="styles.css?v=3.0.0" />
-  <script src="theme.js?v=3.0.0"></script>
+  <link rel="stylesheet" href="styles.css?v=3.1.0" />
+  <script src="theme.js?v=3.1.0"></script>
   <style>
     .pixel-container {
       width: min(100%, 640px);
@@ -549,6 +549,104 @@
 
     .gate-btn-ghost:hover { color: var(--fg, #f8fafc); }
 
+    /* Inaccuracy Report Pill & Dialog */
+    .photo-card-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: calc(-1 * var(--space-2));
+      margin-bottom: var(--space-3);
+    }
+
+    .report-inaccuracy-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .report-inaccuracy-pill:hover {
+      color: var(--fg);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(147, 51, 234, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .report-dialog-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: var(--space-3);
+    }
+
+    .report-icon-pill {
+      font-size: 24px;
+      line-height: 1;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(147, 51, 234, 0.15);
+      border: 1px solid rgba(147, 51, 234, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .report-field {
+      margin-bottom: var(--space-3);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .report-field label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .report-field label .req {
+      color: var(--danger, #ef4444);
+    }
+
+    .report-select, .report-input, .report-textarea {
+      width: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm, 8px);
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border 0.15s ease;
+    }
+
+    .report-select:focus, .report-input:focus, .report-textarea:focus {
+      border-color: #9333ea;
+      box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
+    }
+
+    .report-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .inaccuracy-dialog {
+      max-width: 480px;
+      width: 90vw;
+    }
   </style>
   <style id="glass-nav-css">
 /* ==========================================================================
@@ -846,6 +944,12 @@
             <span class="attempt-dot"></span>
           </div>
         </div>
+        <div class="photo-card-actions">
+          <button type="button" id="btn-report-inaccuracy" class="report-inaccuracy-pill" title="Report wrong photo or inconsistent cricketer info">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+            <span>Report Inaccuracy</span>
+          </button>
+        </div>
       </div>
 
       <div class="pixel-col-input">
@@ -867,15 +971,66 @@
           <h3 class="result-title" id="result-status">OUT!</h3>
           <p class="result-name" id="result-name"></p>
           <p class="result-hint" id="result-hint"></p>
-          <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#9333ea;color:#fff;font-weight:700;">Play Other Games →</a>
+          <div style="margin-top: 14px; display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap;">
+            <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#9333ea;color:#fff;font-weight:700;">Play Other Games →</a>
+            <button type="button" id="btn-result-report" class="report-inaccuracy-pill" title="Report wrong photo or inconsistent cricketer info">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Report Inaccuracy</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </main>
 
+  <!-- Inaccuracy Report Dialog -->
+  <dialog id="inaccuracy-dialog" class="sheet inaccuracy-dialog" aria-labelledby="report-dialog-title">
+    <button class="dialog-close icon-btn" type="button" id="report-dialog-close" aria-label="Close dialog">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="report-dialog-head">
+      <div class="report-icon-pill">🚩</div>
+      <div>
+        <h2 id="report-dialog-title" style="margin:0; font-size:1.4rem;">Report Inaccuracy</h2>
+        <p class="muted small-text" style="margin:2px 0 0;">Notice a wrong photo, incorrect name, or bad clue? Help us fix it!</p>
+      </div>
+    </div>
+
+    <form id="inaccuracy-form" novalidate style="margin-top: var(--space-4); text-align: left;">
+      <div class="report-field">
+        <label for="report-issue-type">What's inconsistent? <span class="req">*</span></label>
+        <select id="report-issue-type" class="report-select" required>
+          <option value="wrong_photo" selected>Wrong photo (photo shows a different cricketer)</option>
+          <option value="wrong_name">Wrong name / incorrect answer</option>
+          <option value="incorrect_hint">Incorrect hint or career stat</option>
+          <option value="bad_image">Broken or unreadable image</option>
+          <option value="other">Other inconsistency</option>
+        </select>
+      </div>
+
+      <div class="report-field">
+        <label for="report-target-info">Current Puzzle Target</label>
+        <input type="text" id="report-target-info" class="report-input" readonly />
+      </div>
+
+      <div class="report-field">
+        <label for="report-details">Correction details <span class="req">*</span></label>
+        <textarea id="report-details" class="report-textarea" rows="3" placeholder="e.g. The photo shown is Rashid Khan (Afghanistan), but the puzzle name/answer was different..." required></textarea>
+        <p id="report-details-error" class="field-error" aria-live="polite" style="color:var(--danger,#ef4444);font-size:12px;margin:2px 0 0;" hidden></p>
+      </div>
+
+      <div class="confirm-actions" style="margin-top: var(--space-4); display: flex; gap: 8px; justify-content: flex-end;">
+        <button type="button" id="report-cancel-btn" class="btn secondary">Cancel</button>
+        <button type="submit" id="report-submit-btn" class="btn primary" style="background:#9333ea; border-color:#9333ea; color:#fff;">Submit Report</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
   <script src="bg.js"></script>
   <script src="players.js"></script>
-  <script src="pixel.js"></script>
-  <script src="mobile-keyboard.js?v=3.0.0" defer></script>
+  <script src="pixel.js?v=3.1.0"></script>
+  <script src="mobile-keyboard.js?v=3.1.0" defer></script>
 </body>
 </html>

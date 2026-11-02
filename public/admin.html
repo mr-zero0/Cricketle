@@ -490,6 +490,13 @@
             <div class="metric-val" id="metric-day" style="font-size: 18px; font-family: var(--font-mono);">-</div>
           </div>
         </div>
+        <div class="metric-card">
+          <div class="metric-icon">🚩</div>
+          <div class="metric-info">
+            <h4>Inaccuracy Reports</h4>
+            <div class="metric-val" id="metric-reports" style="color: #f59e0b;">0</div>
+          </div>
+        </div>
       </div>
 
       <!-- Player Management -->
@@ -514,6 +521,32 @@
             <tbody id="users-tbody">
               <tr>
                 <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">Loading players...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Inaccuracy Reports Panel -->
+      <div class="panel" style="margin-top: 24px;">
+        <div class="panel-header">
+          <h3>🚩 Inaccuracy & Feedback Reports</h3>
+          <button id="btn-refresh-reports" class="btn btn-secondary btn-sm">🔄 Refresh Reports</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Game</th>
+                <th>Target / Photo</th>
+                <th>Issue Type</th>
+                <th>Correction Details</th>
+              </tr>
+            </thead>
+            <tbody id="reports-tbody">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 36px;">Loading reports...</td>
               </tr>
             </tbody>
           </table>
@@ -547,7 +580,7 @@
 
   <div id="toast"></div>
 
-  <script src="admin.js?v=3.0.0"></script>
-  <script src="mobile-keyboard.js?v=3.0.0" defer></script>
+  <script src="admin.js?v=3.1.0"></script>
+  <script src="mobile-keyboard.js?v=3.1.0" defer></script>
 </body>
 </html>

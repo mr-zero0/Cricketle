@@ -54,6 +54,7 @@ function showDashboard(stats) {
     document.getElementById("metric-day").textContent = stats.day || "-";
   }
   loadUsers();
+  loadReports();
 }
 
 let searchTimeout = null;
@@ -67,6 +68,47 @@ document.getElementById("user-search").addEventListener("input", (e) => {
 document.getElementById("btn-refresh").addEventListener("click", () => {
   loadUsers(document.getElementById("user-search").value);
 });
+
+document.getElementById("btn-refresh-reports")?.addEventListener("click", () => {
+  loadReports();
+});
+
+async function loadReports() {
+  const tbody = document.getElementById("reports-tbody");
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 36px;">Loading reports...</td></tr>';
+  try {
+    const data = await api("/api/admin/reports");
+    const reports = data.reports || [];
+    const metricReports = document.getElementById("metric-reports");
+    if (metricReports) metricReports.textContent = reports.length;
+
+    if (!reports || reports.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 36px;">No inaccuracy reports submitted yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = reports.map(r => {
+      const dateStr = r.created_at ? new Date(r.created_at).toLocaleString() : "-";
+      const target = r.target_name ? `${escapeHtml(r.target_name)}${r.photo_url ? ` <br><code style="font-size:11px;color:var(--text-muted);">${escapeHtml(r.photo_url)}</code>` : ""}` : (r.photo_url || "-");
+      const issueBadge = `<span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);text-transform:uppercase;">${escapeHtml(r.issue_type || "issue")}</span>`;
+      const details = escapeHtml(r.details || "");
+      const gameBadge = `<span style="font-weight:600;text-transform:capitalize;">${escapeHtml(r.variant || "game")}</span>`;
+
+      return `
+        <tr>
+          <td style="color: var(--text-muted); font-size: 12px; white-space: nowrap;">${dateStr}</td>
+          <td>${gameBadge}</td>
+          <td>${target}</td>
+          <td>${issueBadge}</td>
+          <td style="max-width: 340px; word-break: break-word;">${details}</td>
+        </tr>
+      `;
+    }).join("");
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--danger); padding: 36px;">Failed to load reports: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
 
 async function loadUsers(search = "") {
   const tbody = document.getElementById("users-tbody");

@@ -931,6 +931,52 @@ function createApp(opts = {}) {
       return send(res, 200, { ok: true });
     }
 
+    if (key === "POST /api/feedback/inaccuracy") {
+      rateLimit(req, "feedback", 60, 10 * 60 * 1000);
+      const user = await currentUser(req);
+      const body = await readJson(req);
+
+      const variant = typeof body.variant === "string" ? body.variant.trim().slice(0, 50) : "pixel";
+      const issueType = typeof body.issueType === "string" ? body.issueType.trim().slice(0, 50) : "wrong_photo";
+      const targetName = typeof body.targetName === "string" ? body.targetName.trim().slice(0, 100) : "";
+      const targetId = body.targetId != null ? String(body.targetId).slice(0, 50) : "";
+      const photoUrl = typeof body.photoUrl === "string" ? body.photoUrl.trim().slice(0, 255) : "";
+      const details = typeof body.details === "string" ? body.details.trim().slice(0, 1000) : "";
+      const meta = typeof body.meta === "object" && body.meta ? body.meta : {};
+
+      if (!details && !issueType) {
+        return fail(res, 400, "missing_details", "Please provide details about the inaccuracy.");
+      }
+
+      logger.info("INACCURACY_REPORT", `🚩 Inaccuracy reported in [${variant}] by @${user ? user.username : "guest"}: "${issueType}" on ${targetName || "unknown target"}`, {
+        user: user ? user.username : "guest",
+        variant,
+        issueType,
+        targetName,
+        targetId,
+        photoUrl,
+        details,
+        ip: clientIp(req),
+      });
+
+      const reportResult = await db.saveInaccuracyReport(user ? user.id : null, {
+        variant,
+        issueType,
+        targetName,
+        targetId,
+        photoUrl,
+        details,
+        meta,
+        ip: clientIp(req),
+      });
+
+      return send(res, 200, {
+        ok: true,
+        reportId: reportResult ? reportResult.id : undefined,
+        message: "Thank you for reporting! We will review and correct any inconsistency."
+      });
+    }
+
     if (key === "GET /api/leaderboard/today") {
       rateLimit(req, "leaderboard", 120, 60 * 1000);
       const user = await currentUser(req);
@@ -1030,6 +1076,14 @@ function createApp(opts = {}) {
       await db.adminDeleteUser(userId);
       log("admin_delete_user", userId);
       return send(res, 200, { ok: true, message: "User account deleted." });
+    }
+
+    if (key === "GET /api/admin/reports") {
+      const user = await currentUser(req);
+      requireAdmin(req, user);
+      const limit = clampLimit(query.get("limit"), 50, 200);
+      const reports = await db.getInaccuracyReports(limit);
+      return send(res, 200, { ok: true, reports });
     }
 
     return fail(res, 404, "not_found", "No such endpoint.");

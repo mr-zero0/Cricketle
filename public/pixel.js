@@ -645,7 +645,144 @@
   }
   checkAuth();
 
+  // Toast notification helper
+  function showToast(text, kind = "success") {
+    let container = document.getElementById("toasts");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "toasts";
+      container.className = "toasts";
+      document.body.appendChild(container);
+    }
+    const el = document.createElement("div");
+    el.className = "toast" + (kind ? " " + kind : "");
+    el.textContent = text;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = "0";
+      setTimeout(() => el.remove(), 300);
+    }, 4000);
+  }
+
+  // Inaccuracy Reporting Modal & Submissions
+  function setupInaccuracyReporting() {
+    const dialog = document.getElementById("inaccuracy-dialog");
+    const btnReport = document.getElementById("btn-report-inaccuracy");
+    const btnResultReport = document.getElementById("btn-result-report");
+    const closeBtn = document.getElementById("report-dialog-close");
+    const cancelBtn = document.getElementById("report-cancel-btn");
+    const form = document.getElementById("inaccuracy-form");
+    const targetInput = document.getElementById("report-target-info");
+    const issueSelect = document.getElementById("report-issue-type");
+    const detailsText = document.getElementById("report-details");
+    const errorEl = document.getElementById("report-details-error");
+    const submitBtn = document.getElementById("report-submit-btn");
+
+    if (!dialog || !form) return;
+
+    function openReportDialog() {
+      if (targetInput) {
+        if (currentTarget) {
+          const shownName = isGameOver
+            ? `${currentTarget.name} (${currentTarget.country})`
+            : `Today's Cricketer (${currentMode === "easy" ? "Active" : "Legends"} Mode)`;
+          targetInput.value = `${shownName} [Photo: ${currentPhotoUrl || "current"}]`;
+        } else {
+          targetInput.value = `Pixel Cricketer (${currentMode})`;
+        }
+      }
+      if (detailsText) detailsText.value = "";
+      if (errorEl) {
+        errorEl.textContent = "";
+        errorEl.hidden = true;
+      }
+      if (typeof dialog.showModal === "function") {
+        dialog.showModal();
+      } else {
+        dialog.setAttribute("open", "");
+      }
+      if (detailsText) detailsText.focus();
+    }
+
+    function closeReportDialog() {
+      if (typeof dialog.close === "function") {
+        dialog.close();
+      } else {
+        dialog.removeAttribute("open");
+      }
+    }
+
+    btnReport?.addEventListener("click", openReportDialog);
+    btnResultReport?.addEventListener("click", openReportDialog);
+    closeBtn?.addEventListener("click", closeReportDialog);
+    cancelBtn?.addEventListener("click", closeReportDialog);
+
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) closeReportDialog();
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const details = detailsText ? detailsText.value.trim() : "";
+      if (!details) {
+        if (errorEl) {
+          errorEl.textContent = "Please provide details or the correct cricketer name.";
+          errorEl.hidden = false;
+        }
+        if (detailsText) detailsText.focus();
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+      }
+
+      try {
+        const payload = {
+          variant: "pixel",
+          issueType: issueSelect ? issueSelect.value : "wrong_photo",
+          targetName: currentTarget ? currentTarget.name : "",
+          targetId: currentTarget ? currentTarget.id : null,
+          photoUrl: currentPhotoUrl || "",
+          details,
+          meta: {
+            mode: currentMode,
+            isGameOver,
+            attemptsCount: currentAttempts.length,
+            country: currentTarget ? currentTarget.country : null
+          }
+        };
+
+        const res = await fetch("/api/feedback/inaccuracy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          throw new Error(data.message || "Failed to submit report.");
+        }
+
+        closeReportDialog();
+        showToast("🚩 Inaccuracy report sent! Thank you for helping keep Cricketle accurate.", "success");
+      } catch (err) {
+        if (errorEl) {
+          errorEl.textContent = err.message || "Failed to submit. Please try again.";
+          errorEl.hidden = false;
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit Report";
+        }
+      }
+    });
+  }
+
   // Initialize
   setupAutocomplete();
+  setupInaccuracyReporting();
   loadPuzzle();
 })();
