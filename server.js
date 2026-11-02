@@ -724,6 +724,63 @@ function createApp(opts = {}) {
       return engineResult(res, req, r, null);
     }
 
+    if (key === "POST /api/variant/complete") {
+      const user = await requireUser(req);
+      rateLimit(req, "play", 600, 10 * 60 * 1000);
+      const body = await readJson(req);
+      const variant = typeof body.variant === "string" ? body.variant.trim() : "";
+      const allowedVariants = ["connections", "facts", "journey", "scorecard", "scramble", "stadium", "pixel", "puzzle_easy", "puzzle_hard"];
+      if (!allowedVariants.includes(variant)) {
+        return fail(res, 400, "invalid_variant", "Unknown puzzle variant.");
+      }
+      const score = Math.max(0, Math.min(300, Number(body.score) || 0));
+      const status = body.status === "solved" ? "solved" : "gaveUp";
+      const durationMs = Math.max(0, Math.min(24 * 3600 * 1000, Number(body.durationMs) || 0));
+      const guesses = Array.isArray(body.guesses) ? body.guesses.slice(0, 50) : [];
+
+      await game.recordVariant(user.id, variant, score, status, durationMs, guesses);
+      logger.game("variant_completed", `🏆 @${user.username} finished ${variant}: ${status} (+${score} pts in ${Math.round(durationMs / 1000)}s)`, {
+        user: user.username,
+        variant,
+        status,
+        score,
+        durationMs,
+        guessesCount: guesses.length,
+      });
+
+      await game.logActivity(user.id, variant, "completed", { status, score, durationMs, guessesCount: guesses.length }, durationMs, score, clientIp(req));
+
+      return send(res, 200, { ok: true, variant, score, status, day: game.day() });
+    }
+
+    if (key === "POST /api/activity") {
+      rateLimit(req, "activity", 600, 5 * 60 * 1000);
+      const user = await currentUser(req);
+      const body = await readJson(req);
+      const variant = typeof body.variant === "string" ? body.variant.trim().slice(0, 50) : "unknown";
+      const action = typeof body.action === "string" ? body.action.trim().slice(0, 50) : "unknown";
+      const durationMs = Math.max(0, Math.min(24 * 3600 * 1000, Number(body.durationMs) || 0));
+      const score = Math.max(0, Math.min(1000, Number(body.score) || 0));
+      const details = typeof body.details === "object" && body.details ? Object.assign({}, body.details) : {};
+      delete details.pin;
+      delete details.password;
+      delete details.pass_hash;
+      delete details.token;
+
+      logger.info("USER_ACTIVITY", `[${variant}] @${user ? user.username : "guest"} -> ${action}`, {
+        user: user ? user.username : null,
+        ip: clientIp(req),
+        variant,
+        action,
+        durationMs,
+        score,
+      });
+
+      await game.logActivity(user ? user.id : null, variant, action, details, durationMs, score, clientIp(req));
+
+      return send(res, 200, { ok: true });
+    }
+
     if (key === "GET /api/leaderboard/today") {
       rateLimit(req, "leaderboard", 120, 60 * 1000);
       const user = await currentUser(req);

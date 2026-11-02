@@ -2,10 +2,29 @@ const { test, expect } = require("@playwright/test");
 
 test.describe("Pixel Cricketer — Daily Photo Unblur Gameplay", () => {
   test.beforeEach(async ({ page }) => {
-    // Clear localStorage to ensure fresh daily state
+    // Authenticate member so gameplay controls are active
+    await page.route("/api/me", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          user: { id: 1, username: "cricketfan", phone: "+919876543210" },
+        }),
+      });
+    });
     await page.goto("/pixel.html");
     await page.evaluate(() => localStorage.clear());
     await page.reload();
+  });
+
+  test("Pixel Member Gate: unauthenticated visitor sees Member Access Only modal", async ({ page }) => {
+    await page.unroute("/api/me");
+    await page.route("/api/me", async (route) => {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({}) });
+    });
+    await page.goto("/pixel.html");
+    await expect(page.locator("#member-gate-modal")).toBeVisible();
+    await expect(page.locator("#guess-input")).toBeDisabled();
   });
 
   test("Pixel UI: renders canvas, 6 attempt dots, skip and guess controls", async ({ page }) => {

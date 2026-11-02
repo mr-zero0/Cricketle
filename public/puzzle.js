@@ -19,6 +19,9 @@
   let currentMode = "easy";
   let loadedImage = null;
   let isGameOver = false;
+  let puzzleStartTime = Date.now();
+  let currentUser = null;
+  const gateModal = document.getElementById("member-gate-modal");
   let currentPhotoUrl = "";
   let initialScramble = [];
   let initialRotations = [];
@@ -931,20 +934,37 @@
     loadPuzzle();
   });
 
-  // Auth button check
-  fetch("/api/me")
-    .then((r) => r.json())
-    .then((d) => {
+  async function checkAuth() {
+    try {
+      const res = await fetch("/api/me");
+      const d = await res.json();
       if (d && d.user) {
+        currentUser = d.user;
         const topbarAuth = document.getElementById("topbar-auth-btn");
         if (topbarAuth) {
           topbarAuth.classList.add("signed-in");
           topbarAuth.title = `@${d.user.username} (Account)`;
           topbarAuth.setAttribute("aria-label", `Account for @${d.user.username}`);
         }
+        if (gateModal) gateModal.hidden = true;
+        if (input) {
+          input.disabled = false;
+          input.placeholder = "Type player name (e.g. Virat Kohli)...";
+        }
+        if (guessBtn) guessBtn.disabled = false;
+        return true;
       }
-    })
-    .catch(() => {});
+    } catch (_) {}
+    currentUser = null;
+    if (gateModal) gateModal.hidden = false;
+    if (input) {
+      input.disabled = true;
+      input.placeholder = "Member access only — Log in to play...";
+    }
+    if (guessBtn) guessBtn.disabled = true;
+    return false;
+  }
+  checkAuth();
 
   // Initialize
   setupAutocomplete();

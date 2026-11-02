@@ -2,10 +2,30 @@ const { test, expect } = require("@playwright/test");
 
 test.describe("Puzzle Cricketer — Interactive Rearrangeable Portrait Puzzle", () => {
   test.beforeEach(async ({ page }) => {
+    // Authenticate member
+    await page.route("/api/me", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          user: { id: 1, username: "cricketfan", phone: "+919876543210" },
+        }),
+      });
+    });
     // Clear localStorage to ensure fresh daily state
     await page.goto("/puzzle.html");
     await page.evaluate(() => localStorage.clear());
     await page.reload();
+  });
+
+  test("Puzzle Member Gate: unauthenticated visitor sees Member Access Only modal", async ({ page }) => {
+    await page.unroute("/api/me");
+    await page.route("/api/me", async (route) => {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({}) });
+    });
+    await page.goto("/puzzle.html");
+    await expect(page.locator("#member-gate-modal")).toBeVisible();
+    await expect(page.locator("#guess-input")).toBeDisabled();
   });
 
   test("Puzzle UI: renders canvas, 3 attempt dots, reset button, and no skip button", async ({ page }) => {

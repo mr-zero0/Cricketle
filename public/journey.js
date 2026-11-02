@@ -131,6 +131,7 @@
   let currentMode = "easy";
   let isGameOver = false;
   let currentUser = null;
+  let puzzleStartTime = Date.now();
   const gateModal = document.getElementById("member-gate-modal");
 
   const timelineTrail = document.getElementById("timeline-trail");
@@ -592,6 +593,36 @@
 
   function finishGame(won) {
     renderLetters();
+
+    const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
+    const elapsedSec = Math.floor(elapsedMs / 1000);
+    const speedBonus = Math.max(0, 25 - Math.floor(elapsedSec / 15));
+    const attemptPen = Math.max(0, (currentAttempts.length - 1) * 10);
+    const calculatedScore = won ? Math.max(20, 100 - attemptPen + speedBonus) : 0;
+
+    fetch("/api/variant/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "journey",
+        score: calculatedScore,
+        status: won ? "solved" : "gaveUp",
+        durationMs: elapsedMs,
+        guesses: currentAttempts,
+      }),
+    }).catch(() => {});
+
+    fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "journey",
+        action: "game_completed",
+        details: { won, score: calculatedScore, attempts: currentAttempts.length },
+        durationMs: elapsedMs,
+        score: calculatedScore,
+      }),
+    }).catch(() => {});
 
     if (guessControls) guessControls.style.display = "none";
     if (resultCard) {

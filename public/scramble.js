@@ -33,6 +33,7 @@
   let targetName = "";
   let userGuesses = []; // array of strings
   let isGameOver = false;
+  let puzzleStartTime = Date.now();
   let isWon = false;
   let keyStatuses = {}; // letter/'SPACE' -> 'correct' | 'present' | 'absent'
 
@@ -601,6 +602,37 @@
 
   function showFinalSummary() {
     if (finishedView) finishedView.style.display = "block";
+
+    const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
+    const elapsedSec = Math.floor(elapsedMs / 1000);
+    const speedBonus = Math.max(0, 25 - Math.floor(elapsedSec / 15));
+    const guessPen = Math.max(0, (userGuesses.length - 1) * 8);
+    const hintPen = revealedCluesCount * 10;
+    const calculatedScore = isWon ? Math.max(20, 100 - guessPen - hintPen + speedBonus) : 0;
+
+    fetch("/api/variant/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "scramble",
+        score: calculatedScore,
+        status: isWon ? "solved" : "gaveUp",
+        durationMs: elapsedMs,
+        guesses: userGuesses,
+      }),
+    }).catch(() => {});
+
+    fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "scramble",
+        action: "game_completed",
+        details: { won: isWon, score: calculatedScore, guessesCount: userGuesses.length },
+        durationMs: elapsedMs,
+        score: calculatedScore,
+      }),
+    }).catch(() => {});
     if (guessInput) guessInput.disabled = true;
     if (btnSubmitGuess) btnSubmitGuess.disabled = true;
 

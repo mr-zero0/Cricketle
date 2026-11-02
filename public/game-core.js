@@ -22,7 +22,7 @@
 
   // ---------- Constants ----------
 
-  const PUZZLES_PER_DAY = 3;
+  const PUZZLES_PER_DAY = 1;
   // Guests (no account) may play this many puzzles per mode per day; the rest
   // ask them to sign in. Signed-in play is never gated.
   const GUEST_PUZZLES_PER_MODE = 1;

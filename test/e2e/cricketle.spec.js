@@ -114,14 +114,26 @@ test.describe("onboarding", () => {
 });
 
 test.describe("guest play", () => {
-  test("Easy puzzle: timer runs, hint costs points, tags explain closeness, solve unlocks the next", async ({ page }) => {
+  test("Guest 1-guess limit: allows 1 guess in classic, then prompts to sign in / register", async ({ page }) => {
     await page.goto("/index.html");
     await expect(page.getByRole("heading", { name: "Cricketle", level: 1 })).toBeVisible();
     await expect(page.locator("#guest-banner")).toBeVisible();
+    await startPuzzle(page);
+
+    const wrong = wrongGuess("easy", 0);
+    await guess(page, wrong);
+
+    // After 1 guess, guest is prompted to sign up or sign in
+    await expect(page.locator("#auth-card")).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("#auth-view-register")).toBeVisible();
+  });
+
+  test("Easy puzzle (signed in): timer runs, hint costs points, tags explain closeness, solve records score", async ({ page }) => {
+    await signUp(page, uniq("easyplay"), "246810");
+    await page.goto("/index.html");
+    await expect(page.getByRole("heading", { name: "Cricketle", level: 1 })).toBeVisible();
     await expect(page.locator("#timer")).toHaveText("00:00");
     await expect(page.locator("#worth")).toHaveText("100");
-    await expect(page.locator("#dots .dot").nth(1)).toHaveClass(/gated/);
-    await expect(page.locator("#dots .dot").nth(1)).toBeEnabled();
 
     await startPuzzle(page);
     await page.waitForTimeout(1500);
@@ -147,7 +159,6 @@ test.describe("guest play", () => {
     await expect(page.locator("#win .win-stat.points .v")).toContainText("+");
     await expect(page.locator(".stat-timer")).toHaveClass(/done/);
     await expect(page.locator("#dots .dot").nth(0)).toHaveClass(/solved/);
-    await expect(page.locator("#dots .dot").nth(1)).toHaveClass(/gated/);
     await expect(page.locator("#today-points")).toContainText(/Today: \d+ pts/);
     await shot(page, "play-solved");
 
@@ -156,15 +167,15 @@ test.describe("guest play", () => {
     await expect(page.locator("#dots .dot").nth(0)).toHaveClass(/solved/);
     await expect(page.locator("#win")).toContainText(answer("easy", 0));
 
-    // Guests get no "Next puzzle": the gate card and the other mode's free one.
+    // 1 puzzle per mode: Try Hard mode button available
     await expect(page.getByRole("button", { name: "Next puzzle" })).toHaveCount(0);
-    await expect(page.locator("#gate")).toBeVisible();
-    await page.getByRole("button", { name: /Try Hard mode, also free/ }).click();
+    await page.getByRole("button", { name: "Try Hard mode" }).click();
     await expect(page.getByRole("button", { name: "Start puzzle" })).toBeVisible();
-    await expect(page.locator("#tracker-label")).toHaveText("Hard · Puzzle 1 of 3");
+    await expect(page.locator("#tracker-label")).toHaveText("Hard · Puzzle 1 of 1");
   });
 
   test("Dynamic hints: adapts hint when nation or role is already identified by previous guesses", async ({ page }) => {
+    await signUp(page, uniq("dynhint"), "246810");
     await page.goto("/index.html");
     await startPuzzle(page);
 
@@ -194,6 +205,7 @@ test.describe("guest play", () => {
   });
 
   test("Timer pauses when switching away and only counts active screen time", async ({ page }) => {
+    await signUp(page, uniq("timertest"), "246810");
     await page.goto("/index.html");
     await startPuzzle(page);
     await page.waitForTimeout(1100);
@@ -216,6 +228,7 @@ test.describe("guest play", () => {
   });
 
   test("typing right after tapping a hint keeps the suggestions open", async ({ page }) => {
+    await signUp(page, uniq("typetest"), "246810");
     await page.goto("/index.html");
     await startPuzzle(page);
     await page.locator("#guess-input").fill("vir");
@@ -230,6 +243,7 @@ test.describe("guest play", () => {
   });
 
   test("Hard mode: rank only, three hints at most, give up reveals the answer and scores zero", async ({ page }) => {
+    await signUp(page, uniq("hardtest"), "246810");
     await page.goto("/index.html");
     await page.getByRole("button", { name: "Hard" }).click();
     await expect(page.locator("body")).toHaveClass(/hard/);
@@ -253,78 +267,45 @@ test.describe("guest play", () => {
     await expect(page.locator("#win")).toContainText(answer("hard", 0));
     await expect(page.locator("#win .win-stat.points .v")).toHaveText("0");
     await expect(page.locator("#dots .dot").nth(0)).toHaveClass(/gaveUp/);
-    await expect(page.locator("#dots .dot").nth(1)).toHaveClass(/gated/);
+    await expect(page.locator("#dots .dot")).toHaveCount(1);
     await shot(page, "hard-gave-up");
   });
 
-  test("three puzzles a day: the mode closes after the third (signed in)", async ({ page }) => {
-    // Guests get only the first puzzle (see "guest gate"); the full day needs an account.
-    await signUp(page, uniq("trio"), "246810");
+  test("1 puzzle per mode per day: the mode completes upon solving (signed in)", async ({ page }) => {
+    await signUp(page, uniq("single"), "246810");
     await page.goto("/index.html");
-    for (let i = 0; i < 3; i++) {
-      await solveCurrent(page, "easy", i);
-      if (i < 2) await page.getByRole("button", { name: "Next puzzle" }).click();
-    }
-    await expect(page.locator("#win")).toContainText("All 3 Easy puzzles done");
-    await expect(page.getByRole("button", { name: "Next puzzle" })).toHaveCount(0);
-    await expect(page.locator("#dots .dot.solved")).toHaveCount(3);
+    await solveCurrent(page, "easy", 0);
+    await expect(page.locator("#dots .dot.solved")).toHaveCount(1);
     await expect(page.locator("#today-points")).toContainText("Today:");
     await page.getByRole("button", { name: "Try Hard mode" }).click();
-    await expect(page.locator("#tracker-label")).toHaveText("Hard · Puzzle 1 of 3");
+    await expect(page.locator("#tracker-label")).toHaveText("Hard · Puzzle 1 of 1");
     await expect(page.getByRole("button", { name: "Start puzzle" })).toBeVisible();
     await shot(page, "easy-complete");
   });
 });
 
 test.describe("guest gate", () => {
-  test("guest: puzzles 2 and 3 are gated and the gate card appears after solving puzzle 1", async ({ page }) => {
+  test("guest: after using 1 free guess, input is disabled and gate asks to sign up", async ({ page }) => {
     await page.goto("/index.html");
-    await expect(page.locator("#dots .dot.gated")).toHaveCount(2);
-    await expect(page.locator("#dots .dot.gated").first()).toBeEnabled();
-    await expect(page.locator("#gate")).toBeHidden();
+    await startPuzzle(page);
+    const wrong = wrongGuess("easy", 0);
+    await guess(page, wrong);
 
-    // Tapping a gated dot explains, without starting anything.
-    await page.locator("#dots .dot.gated").first().click();
+    // Return to play view if auth modal redirected
+    await page.evaluate(() => { location.hash = "#play"; });
+    await expect(page.locator("#guess-input")).toBeDisabled();
     await expect(page.locator("#gate")).toBeVisible();
-    await expect(page.locator("#gate")).toContainText("Sign up or sign in");
-    await page.locator("#gate-close").click();
-    await expect(page.locator("#gate")).toBeHidden();
-
-    await solveCurrent(page, "easy", 0);
-    await expect(page.locator("#gate")).toBeVisible();
-    await expect(page.locator("#gate")).toContainText("free puzzle in Easy");
-    await expect(page.locator("#gate-signup")).toBeVisible();
-    await expect(page.locator("#gate-signin")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Next puzzle" })).toHaveCount(0);
-    await shot(page, "guest-gate");
-
-    await page.locator("#gate-signup").click();
-    await expect(page.locator("#auth-card")).toBeVisible();
-    await expect(page.locator("#auth-view-register")).toBeVisible();
+    await expect(page.locator("#gate")).toContainText("free guest guess");
   });
 
-  test("guest: after Easy 1 the win card offers Hard for free, then Hard gates too", async ({ page }) => {
-    await page.goto("/index.html");
-    await solveCurrent(page, "easy", 0);
-    const other = page.locator("#other-mode-btn");
-    await expect(other).toHaveText(/Try Hard mode, also free/);
-    await other.click();
-    await expect(page.locator("#tracker-label")).toHaveText("Hard · Puzzle 1 of 3");
-    await expect(page.locator("#gate")).toBeHidden();
-    await solveCurrent(page, "hard", 0);
-    await expect(page.locator("#gate")).toBeVisible();
-    await expect(page.locator("#gate")).toContainText("free puzzle in Hard");
-    await expect(page.locator("#other-mode-btn")).toHaveCount(0);
-  });
-
-  test("signed in: no gated dots and the next puzzle unlocks", async ({ page }) => {
+  test("signed in: 1 daily puzzle per mode, win completes the mode", async ({ page }) => {
     await signUp(page, uniq("gate"), "246810");
     await page.goto("/index.html");
     await expect(page.locator("#dots .dot.gated")).toHaveCount(0);
     await expect(page.locator("#gate")).toBeHidden();
     await solveCurrent(page, "easy", 0);
-    await expect(page.locator("#gate")).toBeHidden();
-    await expect(page.getByRole("button", { name: "Next puzzle" })).toBeVisible();
+    await expect(page.locator("#dots .dot.solved")).toHaveCount(1);
+    await expect(page.getByRole("button", { name: "Try Hard mode" })).toBeVisible();
   });
 });
 
@@ -334,7 +315,7 @@ test.describe("accounts and leaderboards", () => {
     await signUp(page, username, "246810");
     await expect(page).toHaveURL(/#play$/);
     await expect(page.locator("#guest-banner")).toBeHidden();
-    await expect(page.locator("#today-rank")).toContainText("Finish a puzzle");
+    await expect(page.locator("#today-rank")).toContainText(/Rank #\d+/);
 
     await solveCurrent(page, "easy", 0);
     await expect(page.locator("#today-rank")).toContainText(/Rank #\d+/);
@@ -718,6 +699,7 @@ test.describe("motion", () => {
   test.describe("full", () => {
     test.use({ contextOptions: { reducedMotion: "no-preference" } });
     test("motion on: the dot pops on solve, the sheet slides, the new row fades its heat", async ({ page }) => {
+      await signUp(page, uniq("motion"), "246810");
       await page.goto("/index.html");
       await startPuzzle(page);
       // The pop lasts 320 ms, shorter than an expect poll, so record it as it happens.

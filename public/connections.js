@@ -11,6 +11,7 @@
   let guessHistory = [];
   let pastGuesses = new Set();
   let isGameOver = false;
+  let puzzleStartTime = Date.now();
   let currentUser = null;
 
   const gridEl = document.getElementById("connections-grid");
@@ -197,6 +198,7 @@
   }
 
   function toggleSelect(item) {
+    if (!currentUser) { if (gateModal) gateModal.hidden = false; return; }
     const idx = selectedItems.findIndex((s) => s.name === item.name);
     if (idx >= 0) {
       selectedItems.splice(idx, 1);
@@ -305,6 +307,35 @@
   function handleGameOver(won) {
     isGameOver = true;
     updateButtons();
+
+    const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
+    const elapsedSec = Math.floor(elapsedMs / 1000);
+    const speedBonus = Math.max(0, 30 - Math.floor(elapsedSec / 10));
+    const calculatedScore = won ? (80 + (mistakesLeft * 5) + speedBonus) : (solvedGroups.length * 10);
+
+    fetch("/api/variant/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "connections",
+        score: calculatedScore,
+        status: won ? "solved" : "gaveUp",
+        durationMs: elapsedMs,
+        guesses: guessHistory,
+      }),
+    }).catch(() => {});
+
+    fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "connections",
+        action: "game_completed",
+        details: { won, score: calculatedScore, mistakesLeft },
+        durationMs: elapsedMs,
+        score: calculatedScore,
+      }),
+    }).catch(() => {});
 
     if (!won) {
       // Reveal remaining groups

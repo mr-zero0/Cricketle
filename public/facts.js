@@ -10,6 +10,7 @@
   let roundResults = []; // array of results for daily challenge
   let isRoundSubmitted = false;
   let currentUser = null;
+  let puzzleStartTime = Date.now();
 
   // DOM elements
   const gameView = document.getElementById("game-view");
@@ -347,6 +348,35 @@
       score: correctCount,
       details: roundDetails
     };
+
+    const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
+    const elapsedSec = Math.floor(elapsedMs / 1000);
+    const speedBonus = correctCount > 0 ? Math.max(0, 25 - Math.floor(elapsedSec / 15)) : 0;
+    const calculatedScore = (correctCount * 15) + speedBonus;
+
+    fetch("/api/variant/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "facts",
+        score: calculatedScore,
+        status: correctCount >= 4 ? "solved" : "gaveUp",
+        durationMs: elapsedMs,
+        guesses: roundDetails,
+      }),
+    }).catch(() => {});
+
+    fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "facts",
+        action: "game_completed",
+        details: { correctCount, score: calculatedScore },
+        durationMs: elapsedMs,
+        score: calculatedScore,
+      }),
+    }).catch(() => {});
 
     saveState();
     updateRoundPills();

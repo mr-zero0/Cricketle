@@ -27,8 +27,8 @@ test("player names are unique", () => {
 
 // ---------- constants ----------
 
-test("game constants: 3 puzzles per day, 3 hints per puzzle, two modes", () => {
-  assert.equal(core.PUZZLES_PER_DAY, 3);
+test("game constants: 1 puzzle per day, 3 hints per puzzle, two modes", () => {
+  assert.equal(core.PUZZLES_PER_DAY, 1);
   assert.equal(core.HINTS_PER_PUZZLE, 3);
   assert.deepEqual(core.MODES, ["easy", "hard"]);
 });
@@ -129,12 +129,12 @@ test("dailyAnswers is deterministic, draws easy from the easy pool and never rep
   const a = core.dailyAnswers("2026-10-27");
   const b = core.dailyAnswers("2026-10-27");
   assert.deepEqual(a, b);
-  assert.equal(a.easy.length, 3);
-  assert.equal(a.hard.length, 3);
+  assert.equal(a.easy.length, 1);
+  assert.equal(a.hard.length, 1);
   const easyNames = new Set(core.poolFor("easy").map((p) => p.name));
   for (const n of a.easy) assert.ok(easyNames.has(n), n + " is not an easy player");
   for (const n of a.hard) assert.ok(core.byName(n), n + " is not a player");
-  assert.equal(new Set([...a.easy, ...a.hard]).size, 6);
+  assert.equal(new Set([...a.easy, ...a.hard]).size, 2);
 });
 
 test("dailyAnswers changes from day to day", () => {
@@ -146,7 +146,7 @@ test("dailyAnswers changes from day to day", () => {
 test("answerFor returns the player object for a day, mode and index", () => {
   const a = core.dailyAnswers("2026-10-27");
   assert.equal(core.answerFor("2026-10-27", "easy", 0).name, a.easy[0]);
-  assert.equal(core.answerFor("2026-10-27", "hard", 2).name, a.hard[2]);
+  assert.equal(core.answerFor("2026-10-27", "hard", 0).name, a.hard[0]);
 });
 
 // ---------- hints ----------
@@ -250,13 +250,13 @@ function fresh() {
   return core.newDayState(DAY);
 }
 
-test("a new day has 3 puzzles per mode, with only the first one ready", () => {
+test("a new day has 1 puzzle per mode, ready to play", () => {
   const s = fresh();
   assert.equal(s.day, DAY);
   for (const mode of core.MODES) {
     const ps = s.modes[mode].puzzles;
-    assert.equal(ps.length, 3);
-    assert.deepEqual(ps.map((p) => p.status), ["ready", "locked", "locked"]);
+    assert.equal(ps.length, 1);
+    assert.deepEqual(ps.map((p) => p.status), ["ready"]);
     assert.deepEqual(ps[0].guesses, []);
     assert.equal(ps[0].hints, 0);
     assert.equal(ps[0].points, 0);
@@ -272,7 +272,7 @@ test("startPuzzle activates a ready puzzle and stamps the start time", () => {
 });
 
 test("startPuzzle refuses locked puzzles and bad arguments", () => {
-  assert.equal(core.startPuzzle(fresh(), "easy", 1, NOW).error, "locked");
+  assert.equal(core.startPuzzle(fresh(), "easy", 1, NOW).error, "bad_index");
   assert.equal(core.startPuzzle(fresh(), "medium", 0, NOW).error, "bad_mode");
   assert.equal(core.startPuzzle(fresh(), "easy", 7, NOW).error, "bad_index");
 });
@@ -368,7 +368,6 @@ test("guessing the answer solves the puzzle, scores it and unlocks the next one"
   assert.equal(p.finishedAt, NOW + 30 * 1000);
   assert.equal(p.points, 99);
   assert.deepEqual(p.guesses[0], { name: answer, rank: 1, tags: [] });
-  assert.equal(r.state.modes.easy.puzzles[1].status, "ready");
   assert.equal(r.state.modes.hard.puzzles[0].status, "ready");
   assert.equal(core.applyGuess(r.state, "easy", 0, answer, NOW).error, "not_active");
 });
@@ -396,20 +395,20 @@ test("giving up finishes the puzzle with zero points and unlocks the next", () =
   assert.equal(p.status, "gaveUp");
   assert.equal(p.points, 0);
   assert.equal(p.finishedAt, NOW + 5000);
-  assert.equal(r.state.modes.easy.puzzles[1].status, "ready");
+
   assert.equal(core.giveUp(fresh(), "easy", 0, NOW).error, "not_active");
 });
 
-test("after three finished puzzles a mode is done for the day", () => {
+test("after finished puzzle a mode is done for the day", () => {
   let s = fresh();
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < core.PUZZLES_PER_DAY; i++) {
     s = core.startPuzzle(s, "easy", i, NOW).state;
     s = core.applyGuess(s, "easy", i, core.answerFor(DAY, "easy", i).name, NOW + 1000).state;
   }
   assert.equal(core.modeDone(s, "easy"), true);
   assert.equal(core.modeDone(s, "hard"), false);
-  assert.equal(core.dayPoints(s).easy, 300);
-  assert.equal(core.dayPoints(s).total, 300);
+  assert.equal(core.dayPoints(s).easy, 100);
+  assert.equal(core.dayPoints(s).total, 100);
 });
 
 test("elapsedMs runs while active and freezes when finished", () => {
@@ -492,17 +491,14 @@ test("streakDetails calculates current streak, best streak, and week calendar", 
   assert.equal(res.week[3].active, false); // 2026-10-25 was skipped
 });
 
-test("totalElapsedMs sums elapsed time across all 3 puzzles in a mode", () => {
+test("totalElapsedMs sums elapsed time for puzzle in a mode", () => {
   let s = fresh();
   s = core.startPuzzle(s, "easy", 0, NOW).state;
   // Puzzle 0 finishes in 30s
   s = core.giveUp(s, "easy", 0, NOW + 30000).state;
-  // Puzzle 1 starts at NOW + 30000 and is active for 20s
-  s = core.startPuzzle(s, "easy", 1, NOW + 30000).state;
-
-  const total = core.totalElapsedMs(s, "easy", NOW + 50000);
-  assert.equal(total, 50000);
-  assert.equal(core.formatTime(total), "00:50");
+  const total = core.totalElapsedMs(s, "easy", NOW + 30000);
+  assert.equal(total, 30000);
+  assert.equal(core.formatTime(total), "00:30");
 });
 
 // ---------- guest gate ----------
@@ -514,23 +510,12 @@ test("guests may play only the first puzzle of each mode", () => {
   assert.equal(core.guestCanPlay(2), false);
 });
 
-test("a guest who finished puzzle 1 gets sign_in_required on puzzle 2; a member does not", () => {
+test("a guest may play 1 puzzle per mode per day", () => {
   const day = core.todayKey(DAY_START + 9 * 3600 * 1000);
   const now = DAY_START + 9 * 3600 * 1000;
   let state = core.newDayState(day);
   state = core.startPuzzle(state, "easy", 0, now, { guest: true }).state;
-  const answer = core.answerFor(day, "easy", 0).name;
-  state = core.applyGuess(state, "easy", 0, answer, now + 1000).state;
-  assert.equal(state.modes.easy.puzzles[1].status, "ready", "engine still unlocks puzzle 2");
-
-  const guest = core.startPuzzle(state, "easy", 1, now + 2000, { guest: true });
-  assert.equal(guest.ok, false);
-  assert.equal(guest.error, "sign_in_required");
-  assert.deepEqual(guest.state, state, "state unchanged");
-
-  const member = core.startPuzzle(state, "easy", 1, now + 2000);
-  assert.equal(member.ok, true);
-  assert.equal(member.state.modes.easy.puzzles[1].status, "active");
+  assert.equal(state.modes.easy.puzzles[0].status, "active");
 });
 
 test("the guest allowance resets with the IST day, not the local day", () => {

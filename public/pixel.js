@@ -12,6 +12,9 @@
   let currentMode = "easy";
   let loadedImage = null;
   let isGameOver = false;
+  let puzzleStartTime = Date.now();
+  let currentUser = null;
+  const gateModal = document.getElementById("member-gate-modal");
   let currentPhotoUrl = "";
 
   const canvas = document.getElementById("pixel-canvas");
@@ -380,6 +383,36 @@
     // Reveal full photo!
     renderPixelated(1);
 
+    const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
+    const elapsedSec = Math.floor(elapsedMs / 1000);
+    const speedBonus = Math.max(0, 25 - Math.floor(elapsedSec / 15));
+    const stagePen = Math.max(0, (currentAttempts.length - 1) * 12);
+    const calculatedScore = won ? Math.max(25, 100 - stagePen + speedBonus) : 0;
+
+    fetch("/api/variant/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "pixel",
+        score: calculatedScore,
+        status: won ? "solved" : "gaveUp",
+        durationMs: elapsedMs,
+        guesses: currentAttempts,
+      }),
+    }).catch(() => {});
+
+    fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "pixel",
+        action: "game_completed",
+        details: { won, score: calculatedScore, attempts: currentAttempts.length },
+        durationMs: elapsedMs,
+        score: calculatedScore,
+      }),
+    }).catch(() => {});
+
     if (guessControls) guessControls.style.display = "none";
     if (resultCard) {
       resultCard.style.display = "block";
@@ -578,20 +611,39 @@
   });
 
   
-  // Session check for mobile auth button
-  fetch("/api/me")
-    .then((r) => r.json())
-    .then((d) => {
+  async function checkAuth() {
+    try {
+      const res = await fetch("/api/me");
+      const d = await res.json();
       if (d && d.user) {
+        currentUser = d.user;
         const topbarAuth = document.getElementById("topbar-auth-btn");
         if (topbarAuth) {
           topbarAuth.classList.add("signed-in");
           topbarAuth.title = `@${d.user.username} (Account)`;
           topbarAuth.setAttribute("aria-label", `Account for @${d.user.username}`);
         }
+        if (gateModal) gateModal.hidden = true;
+        if (input) {
+          input.disabled = false;
+          input.placeholder = "Type cricketer name (e.g. Virat Kohli)...";
+        }
+        if (guessBtn) guessBtn.disabled = false;
+        if (skipBtn) skipBtn.disabled = false;
+        return true;
       }
-    })
-    .catch(() => {});
+    } catch (_) {}
+    currentUser = null;
+    if (gateModal) gateModal.hidden = false;
+    if (input) {
+      input.disabled = true;
+      input.placeholder = "Member access only — Log in to play...";
+    }
+    if (guessBtn) guessBtn.disabled = true;
+    if (skipBtn) skipBtn.disabled = true;
+    return false;
+  }
+  checkAuth();
 
   // Initialize
   setupAutocomplete();

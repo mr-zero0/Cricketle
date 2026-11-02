@@ -169,7 +169,7 @@ test("state needs a session and starts fresh with the first puzzle ready", async
     assert.equal(r.json.day, "2026-10-27");
     assert.equal(r.json.now, T0);
     for (const mode of core.MODES) {
-      assert.deepEqual(r.json.state.modes[mode].puzzles.map((p) => p.status), ["ready", "locked", "locked"]);
+      assert.deepEqual(r.json.state.modes[mode].puzzles.map((p) => p.status), ["ready"]);
     }
   } finally { await app.close(); }
 });
@@ -202,13 +202,11 @@ test("a signed-in player can start, guess, solve and unlock the next puzzle", as
     assert.equal(p.status, "solved");
     assert.equal(p.points, 96);
     assert.equal(p.finishedAt, T0 + 25 * 1000);
-    assert.equal(right.json.state.modes.easy.puzzles[1].status, "ready");
 
     const again = await c.get("/api/state");
     assert.equal(again.json.state.modes.easy.puzzles[0].status, "solved");
     assert.deepEqual(again.json.state.modes.easy.puzzles[0].guesses.map((g) => g.name), [other, answer]);
     assert.equal(again.json.state.answers.easy[0].name, answer);
-    assert.equal(again.json.state.answers.easy[1], null);
   } finally { await app.close(); }
 });
 
@@ -217,7 +215,7 @@ test("the server enforces the rules: locked puzzles, unknown players, pools and 
   try {
     const c = await signUp(app.base, "rahul");
     const day = "2026-10-27";
-    assert.equal((await c.post("/api/puzzle/start", { mode: "easy", idx: 1 })).json.error, "locked");
+    assert.equal((await c.post("/api/puzzle/start", { mode: "easy", idx: 1 })).json.error, "bad_index");
     assert.equal((await c.post("/api/puzzle/start", { mode: "medium", idx: 0 })).status, 400);
     assert.equal((await c.post("/api/puzzle/guess", { mode: "easy", idx: 0, name: "Virat Kohli" })).json.error, "not_active");
     await c.post("/api/puzzle/start", { mode: "easy", idx: 0 });
@@ -279,7 +277,6 @@ test("giving up closes the puzzle with no points and unlocks the next", async ()
     assert.equal(r.status, 200, r.text);
     assert.equal(r.json.state.modes.easy.puzzles[0].status, "gaveUp");
     assert.equal(r.json.state.modes.easy.puzzles[0].points, 0);
-    assert.equal(r.json.state.modes.easy.puzzles[1].status, "ready");
     assert.equal(r.json.answer.name, core.answerFor("2026-10-27", "easy", 0).name);
   } finally { await app.close(); }
 });
@@ -311,13 +308,13 @@ test("today's leaderboard ranks players by points then time, and shows the viewe
     const wrongs = core.poolFor("easy").filter((p) => p.name !== bAnswer).slice(0, 2).map((p) => p.name);
     await solve(b, "easy", 0, day, wrongs);               // 94 pts, 0 s (3 guesses)
     app.setNow(T0 + 120 * 1000);
-    await solve(b, "easy", 1, day);                       // +100
+    await solve(b, "hard", 0, day);                       // +150
 
     const lb = await g.get("/api/leaderboard/today");
     assert.equal(lb.status, 200);
     assert.equal(lb.json.day, day);
     assert.equal(lb.json.total, 2);
-    assert.deepEqual(lb.json.rows.map((r) => [r.rank, r.username, r.points, r.solved]), [[1, "bravo", 194, 2], [2, "alpha", 100, 1]]);
+    assert.deepEqual(lb.json.rows.map((r) => [r.rank, r.username, r.points, r.solved]), [[1, "bravo", 244, 2], [2, "alpha", 100, 1]]);
     assert.equal(lb.json.rows[1].guesses, 1);
     assert.equal(lb.json.me, null);
 

@@ -429,6 +429,134 @@
     .back-hub-btn:hover {
       color: var(--fg);
     }
+  
+    /* Member Gate Overlay */
+    .member-gate-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 18, 32, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4, 16px);
+      z-index: 1000;
+    }
+    .member-gate-backdrop[hidden] {
+      display: none !important;
+    }
+
+    .member-gate-card {
+      background: var(--card-solid, #151d30);
+      border: 1px solid var(--border-strong, #334155);
+      border-radius: var(--radius-lg, 16px);
+      padding: var(--space-6, 24px) var(--space-5, 20px);
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    .gate-lock-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(2, 132, 199, 0.15);
+      border: 1px solid rgba(2, 132, 199, 0.4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin-bottom: var(--space-3, 12px);
+    }
+
+    .gate-title {
+      font-family: var(--font-display, inherit);
+      font-size: 30px;
+      letter-spacing: 1.5px;
+      color: var(--fg, #f8fafc);
+      margin: 0 0 var(--space-2, 8px);
+      line-height: 1.1;
+    }
+
+    .gate-desc {
+      font-size: 15px;
+      color: var(--muted, #94a3b8);
+      line-height: 1.55;
+      margin: 0 0 var(--space-4, 16px);
+    }
+
+    .gate-perks {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 var(--space-5, 20px);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--card, #1e293b);
+      border: 1px solid var(--border, #334155);
+      border-radius: var(--radius-sm, 8px);
+      padding: 14px 18px;
+    }
+
+    .gate-perks li {
+      font-size: 13px;
+      color: var(--fg, #f8fafc);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .gate-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .gate-btn-primary {
+      display: block;
+      background: #0284c7;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm, 8px);
+      transition: opacity 0.2s;
+    }
+
+    .gate-btn-primary:hover { opacity: 0.9; }
+
+    .gate-btn-secondary {
+      display: block;
+      background: var(--card, #1e293b);
+      border: 1px solid var(--border, #334155);
+      color: var(--fg, #f8fafc);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 11px 20px;
+      border-radius: var(--radius-sm, 8px);
+      transition: background 0.2s;
+    }
+
+    .gate-btn-secondary:hover { background: var(--card-2, #25334d); }
+
+    .gate-btn-ghost {
+      display: inline-block;
+      color: var(--muted, #94a3b8);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 6px;
+      transition: color 0.2s;
+    }
+
+    .gate-btn-ghost:hover { color: var(--fg, #f8fafc); }
+
   </style>
   <style id="glass-nav-css">
 /* Smooth Glassmorphism Mobile Variants Rail */
@@ -618,6 +746,26 @@
   </nav>
 
   <main id="main" class="puzzle-container">
+    <!-- Member Gate Overlay (Displayed for Guests) -->
+    <div class="member-gate-backdrop" id="member-gate-modal" role="dialog" aria-modal="true" aria-labelledby="gate-title" hidden>
+      <div class="member-gate-card">
+        <div class="gate-lock-icon">🔒</div>
+        <h3 id="gate-title" class="gate-title">MEMBER ACCESS ONLY</h3>
+        <p class="gate-desc"><strong>Cricketer Photo Puzzle</strong> is an exclusive daily challenge for registered Cricketle members.</p>
+        <ul class="gate-perks">
+          <li><span>⚡</span> <span><strong>Free Instant Account</strong> — 100% free to join in seconds</span></li>
+          <li><span>📈</span> <span><strong>Stats & Streaks</strong> — Track personal solve times and win records</span></li>
+          <li><span>🏆</span> <span><strong>Live Leaderboards</strong> — Compete with players worldwide</span></li>
+          <li><span>🔓</span> <span><strong>Full Access</strong> — Unlock all daily Cricketle puzzles & bonus games</span></li>
+        </ul>
+        <div class="gate-actions">
+          <a href="index.html#profile" class="gate-btn-primary">Log In / Sign Up Free →</a>
+          <a href="index.html#play" class="gate-btn-secondary">Play Cricketle (1 Free Guest Guess)</a>
+          <a href="hub.html" class="gate-btn-ghost">Back to Game Hub</a>
+        </div>
+      </div>
+    </div>
+
     <a href="hub.html" class="back-hub-btn">← Back to Game Hub</a>
 
     <div class="game-header">

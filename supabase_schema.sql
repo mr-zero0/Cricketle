@@ -59,6 +59,22 @@ CREATE TABLE IF NOT EXISTS puzzles (
 CREATE INDEX IF NOT EXISTS idx_puzzles_user_day ON puzzles (user_id, day);
 CREATE INDEX IF NOT EXISTS idx_puzzles_day_status ON puzzles (day, status);
 
+-- 4b. Activity Log Table
+CREATE TABLE IF NOT EXISTS activity_log (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
+  day TEXT NOT NULL,
+  variant TEXT NOT NULL,
+  action TEXT NOT NULL,
+  details TEXT,
+  duration_ms BIGINT DEFAULT 0,
+  score BIGINT DEFAULT 0,
+  ip TEXT,
+  created_at BIGINT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_activity_user ON activity_log (user_id);
+CREATE INDEX IF NOT EXISTS idx_activity_day ON activity_log (day);
+
 -- 5. Leaderboard Functions (RPC)
 CREATE OR REPLACE FUNCTION get_leaderboard_today(p_day TEXT, p_limit INTEGER DEFAULT 50)
 RETURNS TABLE (

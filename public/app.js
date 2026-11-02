@@ -121,6 +121,17 @@
   const PROFILE_KEY = "cricketle:v2:profile";
   const HISTORY_KEY = "cricketle:v2:history";
 
+  
+  function logActivity(variant, action, details = {}, durationMs = 0, score = 0) {
+    try {
+      fetch("/api/activity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ variant, action, details, durationMs, score }),
+      }).catch(() => {});
+    } catch (_) {}
+  }
+
   class LocalStore {
     constructor() { this.kind = "local"; }
     now() { return Date.now(); }
@@ -238,6 +249,11 @@
       return this.run((s, now) => core.startPuzzle(s, mode, idx, now, { guest: true }));
     }
     async guess(mode, idx, name) {
+      const cur = this.raw();
+      const cp = cur && cur.modes && cur.modes[mode] && cur.modes[mode].puzzles[idx];
+      if (cp && cp.guesses && cp.guesses.length >= 1) {
+        throw new Error("GUEST_GUESS_LIMIT");
+      }
       return this.run((s, now) => core.applyGuess(s, mode, idx, name, now), (r) => {
         const p = r.state.modes[mode].puzzles[idx];
         if (r.solved) {
@@ -434,6 +450,11 @@
   }
 
   function handleError(err) {
+    if (err && (err.message === "GUEST_GUESS_LIMIT" || (err instanceof ApiError && err.code === "guest_guess_limit"))) {
+      toast("You've used your 1 free guest guess! Sign in or register to keep playing.", "warn");
+      openAuth("register");
+      return;
+    }
     if (err instanceof ApiError && err.status === 401 && app.store && app.store.kind === "remote") {
       toast("Your session ended. Sign in again to keep playing for the leaderboard.", "error");
       becomeGuest();
@@ -681,8 +702,13 @@
       lastGuess.hidden = true;
     }
 
-    input.disabled = !active;
-    input.placeholder = isHard() ? "Type any cricketer's name" : "Type a well-known cricketer";
+    if (isGuest() && p && p.guesses && p.guesses.length >= 1 && !core.isFinished(p)) {
+      input.disabled = true;
+      input.placeholder = "1 free guest guess used — Sign in to continue";
+    } else {
+      input.disabled = !active;
+      input.placeholder = isHard() ? "Type any cricketer's name" : "Type a well-known cricketer";
+    }
     renderWin();
     renderGate();
     renderNav();
@@ -699,6 +725,8 @@
     const st = app.gate[app.mode];
     if (st === "open") return true;
     if (st === "closed") return false;
+    const p = puzzle();
+    if (p && ((p.guesses && p.guesses.length >= 1) || core.isFinished(p))) return true;
     const ps = puzzles();
     const next = ps[idx() + 1];
     return core.isFinished(puzzle()) && Boolean(next) && isGated(idx() + 1);
@@ -731,15 +759,18 @@
     const show = gateShouldShow();
     g.hidden = !show;
     if (!show) { g.innerHTML = ""; return; }
-    const played = core.isFinished(puzzle()) || puzzles().some(core.isFinished);
+    const p = puzzle();
+    const played = core.isFinished(p) || puzzles().some(core.isFinished);
     const lead = played
-      ? `You've played today's free puzzle in ${modeLabel(app.mode)}.`
-      : `Puzzle 1 is free for guests.`;
+      ? `You've completed today's puzzle in ${modeLabel(app.mode)}.`
+      : (isGuest() && p && p.guesses && p.guesses.length >= 1)
+        ? `You've used your 1 free guest guess!`
+        : `1 free guess for guests in Classic Cricketle.`;
     g.innerHTML = `
       <button id="gate-close" class="icon-btn gate-close" type="button" aria-label="Dismiss"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
       <span class="gate-icon" aria-hidden="true"><svg><use href="#i-lock"/></svg></span>
       <h3>${lead}</h3>
-      <p>Sign up or sign in for all three, hints, streaks and the leaderboard.</p>
+      <p>Create a free account or sign in for unlimited guesses, daily puzzles, hints, streaks, and global leaderboards!</p>
       <div class="actions">
         <button id="gate-signup" class="btn primary" type="button">Sign up</button>
         <button id="gate-signin" class="btn" type="button">Sign in</button>
@@ -910,6 +941,11 @@
   async function submitGuess(name) {
     const p = puzzle();
     if (!p || p.status !== "active" || app.busy) return;
+    if (isGuest() && p.guesses && p.guesses.length >= 1) {
+      toast("You've used your 1 free guest guess! Sign in or register to keep playing.", "warn");
+      openAuth("register");
+      return;
+    }
     const pl = core.byName(name);
     if (!pl || !core.inPool(app.mode, name)) {
       setMessage(pl ? `${name} is not in the ${modeLabel(app.mode)} pool.` : "Pick a player from the list.", true);
@@ -945,20 +981,38 @@
         window.CricketleFX?.burst(isHard() ? ["#f59e0b", "#fbbf24", "#f8fafc", "#22c55e"] : ["#22c55e", "#86efac", "#f8fafc", "#f59e0b"]);
       }
       render({ animateLast: true });
+      logActivity("classic", "guess", { mode: app.mode, idx: i, name, rank: res.rank, solved: res.solved });
       if (res.solved) {
         const pts = app.state.modes[app.mode].puzzles[i].points;
         toast(`Solved in ${res.state.modes[app.mode].puzzles[i].guesses.length} guess${res.state.modes[app.mode].puzzles[i].guesses.length === 1 ? "" : "es"}. +${pts} points.`, "success");
         win.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "nearest" });
         $("win-title")?.focus({ preventScroll: true });
         refreshStats();
+        if (isGuest()) {
+          setTimeout(() => {
+            toast("Incredible solve! Create a free account to rank on the daily leaderboard!", "info");
+            openAuth("register");
+          }, 1200);
+        }
       } else {
         input.focus();
+        if (isGuest()) {
+          setTimeout(() => {
+            toast("You've used your 1 free guest guess! Sign in or register to keep playing.", "info");
+            openAuth("register");
+          }, 800);
+        }
       }
     } catch (err) { handleError(err); input.focus(); } finally { setBusy(false); }
   }
 
   async function revealHint(btn) {
     if (app.busy) return;
+    if (isGuest()) {
+      toast("Hints are available for registered members. Sign up or log in free!", "info");
+      openAuth("register");
+      return;
+    }
     const i = idx();
     try {
       setBusy(true);
