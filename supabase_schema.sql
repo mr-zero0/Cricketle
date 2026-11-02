@@ -206,6 +206,16 @@ DROP POLICY IF EXISTS "Allow backend access" ON users;
 DROP POLICY IF EXISTS "Allow backend access" ON sessions;
 DROP POLICY IF EXISTS "Allow backend access" ON puzzles;
 
+-- Revoke default public execution of RPC functions; only service_role should execute them.
+REVOKE EXECUTE ON FUNCTION get_leaderboard_today(TEXT, INTEGER) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION get_leaderboard_today_user(TEXT, BIGINT) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION get_leaderboard_alltime(INTEGER) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION get_leaderboard_alltime_user(BIGINT) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_leaderboard_today(TEXT, INTEGER) TO service_role;
+GRANT EXECUTE ON FUNCTION get_leaderboard_today_user(TEXT, BIGINT) TO service_role;
+GRANT EXECUTE ON FUNCTION get_leaderboard_alltime(INTEGER) TO service_role;
+GRANT EXECUTE ON FUNCTION get_leaderboard_alltime_user(BIGINT) TO service_role;
+
 -- 8. One-time phone normalisation (run once, after deploying v3).
 -- Numbers saved before the strict E.164 rule may be bare Indian mobiles. Rows
 -- whose normalised number already belongs to another account are left as they

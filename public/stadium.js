@@ -315,9 +315,9 @@
           const before = escapeHtml(label.slice(0, qIdx));
           const match = escapeHtml(label.slice(qIdx, qIdx + query.length));
           const after = escapeHtml(label.slice(qIdx + query.length));
-          li.innerHTML = `<span>${before}<mark>${match}</mark>${after}</span> <span style="font-size:12px;color:var(--muted);">${s.capacity}</span>`;
+          li.innerHTML = `<span>${before}<mark>${match}</mark>${after}</span> <span style="font-size:12px;color:var(--muted);">${escapeHtml(s.capacity)}</span>`;
         } else {
-          li.innerHTML = `<span>${escapeHtml(label)}</span> <span style="font-size:12px;color:var(--muted);">${s.capacity}</span>`;
+          li.innerHTML = `<span>${escapeHtml(label)}</span> <span style="font-size:12px;color:var(--muted);">${escapeHtml(s.capacity)}</span>`;
         }
 
         li.addEventListener("mousedown", (e) => {

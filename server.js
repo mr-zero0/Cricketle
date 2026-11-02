@@ -65,7 +65,6 @@ const MIME = {
   ".webmanifest": "application/manifest+json",
   ".woff2": "font/woff2",
   ".txt": "text/plain; charset=utf-8",
-  ".map": "application/json",
 };
 
 const MESSAGES = {
@@ -107,7 +106,7 @@ function createApp(opts = {}) {
   };
 
   const supabaseUrl = opts.supabaseUrl || process.env.SUPABASE_URL;
-  const supabaseKey = opts.supabaseKey || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+  const supabaseKey = opts.supabaseKey || process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
   let db;
   if (opts.db) {
     db = opts.db;
@@ -342,6 +341,8 @@ function createApp(opts = {}) {
         const allowed = ["http://" + host, "https://" + host];
         if (!allowed.includes(origin)) return reject(new HttpError(403, "bad_origin", "Cross-origin requests are not allowed."));
       }
+      const secFetchSite = req.headers["sec-fetch-site"];
+      if (secFetchSite === "cross-site") return reject(new HttpError(403, "bad_origin", "Cross-origin requests are not allowed."));
       let size = 0;
       const chunks = [];
       req.on("data", (c) => {
@@ -713,11 +714,13 @@ function createApp(opts = {}) {
     }
 
     if (key === "GET /api/leaderboard/today") {
+      rateLimit(req, "leaderboard", 120, 60 * 1000);
       const user = await currentUser(req);
       return send(res, 200, await game.leaderboardToday(user ? user.id : null, clampLimit(query.get("limit"), 50, 50)));
     }
 
     if (key === "GET /api/leaderboard/alltime") {
+      rateLimit(req, "leaderboard", 120, 60 * 1000);
       const user = await currentUser(req);
       return send(res, 200, await game.leaderboardAllTime(user ? user.id : null, clampLimit(query.get("limit"), 50, 50)));
     }
@@ -852,17 +855,20 @@ function createApp(opts = {}) {
       "vary": "accept-encoding",
     };
     if (ext === ".html") {
-      headers["content-security-policy"] = [
+      const csp = [
         "default-src 'self'",
         "script-src 'self'",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
         "img-src 'self' data: https://upload.wikimedia.org",
         "connect-src 'self' https://upload.wikimedia.org",
+        "object-src 'none'",
         "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'",
-      ].join("; ");
+      ];
+      if (isSecure(req)) csp.push("upgrade-insecure-requests");
+      headers["content-security-policy"] = csp.join("; ");
     }
     // Text assets are gzipped on the fly (no build step, no dependencies).
     const compressible = /^(text\/|application\/(json|manifest)|image\/svg)/.test(type);

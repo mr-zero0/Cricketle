@@ -59,6 +59,15 @@
   const gateModal = document.getElementById("member-gate-modal");
   const toastEl = document.getElementById("scramble-toast");
 
+  function escapeHtml(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   // Finished View Elements
   const summaryTitle = document.getElementById("summary-title");
   const summarySub = document.getElementById("summary-sub");
@@ -497,14 +506,17 @@
       const flag = getCountryFlag(p.country);
       const pName = p.name;
       const matchStart = pName.toLowerCase().indexOf(q);
-      let highlightedName = pName;
+      let highlightedName = escapeHtml(pName);
       if (matchStart !== -1) {
-        highlightedName = `${pName.slice(0, matchStart)}<mark>${pName.slice(matchStart, matchStart + q.length)}</mark>${pName.slice(matchStart + q.length)}`;
+        const before = escapeHtml(pName.slice(0, matchStart));
+        const match = escapeHtml(pName.slice(matchStart, matchStart + q.length));
+        const after = escapeHtml(pName.slice(matchStart + q.length));
+        highlightedName = `${before}<mark>${match}</mark>${after}`;
       }
 
       li.innerHTML = `
-        <span>${flag} <strong>${highlightedName}</strong> <span class="sub">(${p.country})</span></span>
-        <span class="sub">${p.role}</span>
+        <span>${flag} <strong>${highlightedName}</strong> <span class="sub">(${escapeHtml(p.country)})</span></span>
+        <span class="sub">${escapeHtml(p.role)}</span>
       `;
 
       // Use mousedown to prevent input blur before selection
