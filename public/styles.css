@@ -1177,50 +1177,6 @@ dialog form { margin-top: var(--space-4); text-align: right; }
 /* Headings that receive programmatic focus should not draw a ring. */
 #win-title:focus, .error-summary:focus, #main:focus { outline: none; box-shadow: none; }
 
-/* ---------- Google Auth & Divider ---------- */
-
-.google-auth-wrap { width: 100%; margin-bottom: var(--space-3); }
-.google-btn {
-  width: 100%; min-height: 48px; border-radius: 12px;
-  background: #ffffff; color: #1f2937;
-  font-family: var(--font-body); font-weight: 600; font-size: 0.96rem;
-  border: 1px solid rgba(255,255,255,0.25);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  transition: transform var(--dur-fast), box-shadow var(--dur-fast), background var(--dur-fast);
-  cursor: pointer;
-}
-.google-btn:hover { background: #f8fafc; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.3); }
-.google-btn:active { transform: translateY(0); }
-.google-icon { width: 22px; height: 22px; flex: none; }
-
-.auth-divider {
-  display: flex; align-items: center; text-align: center;
-  margin: var(--space-3) 0 var(--space-4);
-  color: var(--muted-2); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
-}
-.auth-divider::before, .auth-divider::after {
-  content: ""; flex: 1; border-bottom: 1px solid var(--border);
-}
-.auth-divider span { padding: 0 var(--space-3); }
-
-/* Google Modal Dialog */
-.google-modal { width: min(92vw, 440px); }
-.google-modal-head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
-.google-icon-lg { width: 36px; height: 36px; flex: none; }
-.google-accounts-list { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-4); }
-.google-account-btn {
-  width: 100%; padding: 12px 14px; border-radius: 12px;
-  background: var(--card-2); border: 1px solid var(--border);
-  color: var(--fg); text-align: left;
-  display: flex; align-items: center; gap: 12px; cursor: pointer;
-  transition: background var(--dur-fast), border-color var(--dur-fast);
-}
-.google-account-btn:hover { background: var(--card-3); border-color: var(--mode); }
-.google-acc-info { display: flex; flex-direction: column; line-height: 1.25; }
-.acc-name { font-weight: 600; font-size: 0.95rem; }
-.acc-email { font-size: 0.8rem; color: var(--muted); }
-.custom-google-form { border-top: 1px solid var(--border); padding-top: var(--space-3); margin-top: var(--space-2); text-align: left; }
 .full-width { width: 100%; }
 
 /* ---------- Enhanced Profile Section ---------- */
@@ -1681,16 +1637,6 @@ dialog form { margin-top: var(--space-4); text-align: right; }
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 2px;
-}
-
-#otp-expiry-hint {
-  margin-top: 6px;
-  color: var(--muted);
-  font-size: 0.82rem;
-}
-
-#otp-display-name-wrap {
   margin-top: 2px;
 }
 
