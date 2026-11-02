@@ -311,23 +311,219 @@
 
   const HINT_LABELS = ["Nation", "Role", "Era"];
 
+  const PLAYER_FEATS = {
+    "Virat Kohli": { label: "Famous Inning", text: "Masterful 82* vs Pakistan at Melbourne in 2022 T20 World Cup chase" },
+    "Rohit Sharma": { label: "Famous Inning", text: "World-record 264 vs Sri Lanka at Eden Gardens and 5 centuries in 2019 World Cup" },
+    "MS Dhoni": { label: "Famous Inning", text: "Match-winning 91* in 2011 World Cup Final with the iconic winning six over long-on" },
+    "Sachin Tendulkar": { label: "Famous Inning", text: "'Desert Storm' 143 vs Australia in Sharjah and first male double-century in ODIs" },
+    "Jasprit Bumrah": { label: "Known For", text: "Premier death-overs yorker specialist with 2/18 in the 2024 T20 World Cup Final" },
+    "Ravindra Jadeja": { label: "Known For", text: "Only Indian with three first-class triple centuries; 10 wickets and 175* in Mohali 2022" },
+    "Ravichandran Ashwin": { label: "Known For", text: "Fastest to 250, 300, and 350 Test wickets; over 500 Test wickets and 5 Test tons" },
+    "Hardik Pandya": { label: "Known For", text: "Defended 16 in final over of 2024 T20 World Cup Final and 76 off 43 in 2017 CT Final" },
+    "KL Rahul": { label: "Known For", text: "Fastest 50 in IPL history (14 balls) and scored century on ODI debut" },
+    "Shubman Gill": { label: "Famous Inning", text: "Blasted 208 vs New Zealand in Hyderabad becoming youngest ODI double-centurion" },
+    "Yuvraj Singh": { label: "Famous Inning", text: "6 sixes in one over off Stuart Broad in 2007 T20 World Cup and 2011 WC Player of Tournament" },
+    "Virender Sehwag": { label: "Famous Inning", text: "Two triple-centuries in Tests (309 in Multan, 319 vs SA) and an ODI 219" },
+    "Rahul Dravid": { label: "Famous Inning", text: "'The Wall' with marathon 180 in Kolkata 2001 and over 31,000 balls faced in Tests" },
+    "Zaheer Khan": { label: "Known For", text: "Joint-highest wicket-taker in 2011 World Cup with 21 wickets including knuckle-ball mastery" },
+    "Harbhajan Singh": { label: "Famous Inning", text: "First Indian to take a Test hat-trick (2001 vs Australia) and 700+ international wickets" },
+    "Mohammed Shami": { label: "Famous Inning", text: "Stunning 7/57 vs New Zealand in 2023 World Cup Semi-Final; leading wicket-taker of 2023 WC" },
+    "Rishabh Pant": { label: "Famous Inning", text: "Heroic 89* at the Gabba on Day 5 to breach Australia's 32-year fortress in 2021" },
+    "Suryakumar Yadav": { label: "Known For", text: "World No. 1 360-degree T20 batter with 4 T20I tons and iconic 2024 final boundary catch" },
+    "Gautam Gambhir": { label: "Famous Inning", text: "Top-scored in both the 2007 T20 World Cup Final (75) and 2011 World Cup Final (97)" },
+    "Shikhar Dhawan": { label: "Famous Inning", text: "Fastest century on Test debut (85 balls vs Australia) and 'Mr. ICC' with 6 ICC tournament tons" },
+    "Kuldeep Yadav": { label: "Known For", text: "Only Indian bowler with two international hat-tricks (ODIs vs Australia and West Indies)" },
+    "Yuzvendra Chahal": { label: "Known For", text: "First Indian bowler to take a 6-wicket haul in T20Is (6/25 vs England in Bengaluru)" },
+    "Bhuvneshwar Kumar": { label: "Known For", text: "Took a wicket on his very first ball in T20Is and bowled Mohammad Hafeez first ball in ODIs" },
+    "Mohammed Siraj": { label: "Famous Inning", text: "Sensational 6/21 in Asia Cup 2023 Final dismantling Sri Lanka for 50" },
+    "Ajinkya Rahane": { label: "Famous Inning", text: "Captain's century (112) at the MCG in Boxing Day Test to turn the 2020-21 Border-Gavaskar series" },
+    "Irfan Pathan": { label: "Famous Inning", text: "Historic hat-trick in the first over of a Test match vs Pakistan in Karachi (2006)" },
+    "Ishant Sharma": { label: "Famous Inning", text: "Iconic 7/74 at Lord's in 2014 to seal a historic Test win in England" },
+    "Dinesh Karthik": { label: "Famous Inning", text: "Smashed 29 off 8 balls including a last-ball six to win the 2018 Nidahas Trophy Final" },
+    "Suresh Raina": { label: "Known For", text: "First Indian to score a century in all three international formats (Tests, ODIs, T20Is)" },
+    "Shreyas Iyer": { label: "Famous Inning", text: "Scored 105 off 70 balls in the 2023 World Cup Semi-Final vs New Zealand in Mumbai" },
+    "Axar Patel": { label: "Known For", text: "Crucial 47 off 31 in 2024 T20 World Cup Final and 27 wickets in debut 3-Test series vs England" },
+    "Yashasvi Jaiswal": { label: "Famous Inning", text: "Consecutive Test double-centuries (209 & 214*) vs England in 2024 at age 22" },
+    "Babar Azam": { label: "Known For", text: "Fastest player in history to 5,000 ODI runs, achieving it in just 97 innings" },
+    "Shaheen Afridi": { label: "Famous Inning", text: "Sensational opening spell of 3/31 dismantling India's top order at 2021 T20 World Cup" },
+    "Shahid Afridi": { label: "Famous Inning", text: "Blasted a 37-ball ODI century using Sachin Tendulkar's bat in only his second innings" },
+    "Shoaib Akhtar": { label: "Known For", text: "'Rawalpindi Express' who bowled the fastest officially recorded ball at 161.3 km/h" },
+    "Inzamam-ul-Haq": { label: "Famous Inning", text: "Match-turning 60 off 37 balls in 1992 World Cup Semi-Final vs New Zealand" },
+    "Younis Khan": { label: "Known For", text: "Only Pakistani batsman with 10,000+ Test runs and captained 2009 T20 World Cup win" },
+    "Misbah-ul-Haq": { label: "Known For", text: "Equalled Viv Richards' then-record for fastest Test century off 56 balls vs Australia" },
+    "Mohammad Rizwan": { label: "Known For", text: "Scored 1,326 T20I runs in a single calendar year (2021), a world record" },
+    "Mohammad Amir": { label: "Famous Inning", text: "Blistering spell of 3/16 taking out Rohit, Kohli, and Dhawan in 2017 Champions Trophy Final" },
+    "Fakhar Zaman": { label: "Famous Inning", text: "Match-winning 114 in 2017 Champions Trophy Final and Pakistan's first ODI double-centurion (210*)" },
+    "Ricky Ponting": { label: "Famous Inning", text: "Dominant 140* in 2003 World Cup Final and led Australia to two World Cup crowns" },
+    "Steve Smith": { label: "Known For", text: "Averaged over 110 in the 2019 Ashes series with 774 runs in just 7 innings" },
+    "David Warner": { label: "Famous Inning", text: "Triple-centurion in Tests (335*) and 2021 T20 World Cup Player of the Tournament" },
+    "Glenn McGrath": { label: "Known For", text: "All-time leading World Cup wicket-taker with 71 wickets at an average of 18.19" },
+    "Adam Gilchrist": { label: "Famous Inning", text: "Blistering 149 in 2007 World Cup Final with a squash ball in his glove" },
+    "Pat Cummins": { label: "Known For", text: "Captained Australia to 2023 WTC and 2023 ODI World Cup victories in the same year" },
+    "Mitchell Starc": { label: "Known For", text: "Fastest bowler to 150, 200, and 250 ODI wickets and 2015 World Cup Player of the Tournament" },
+    "Glenn Maxwell": { label: "Famous Inning", text: "Miraculous 201* from 91/7 vs Afghanistan in the 2023 World Cup while battling cramps" },
+    "Travis Head": { label: "Famous Inning", text: "Player of the Match in both the 2023 WTC Final (163) and 2023 World Cup Final (137)" },
+    "Brett Lee": { label: "Known For", text: "One of the fastest bowlers ever clocked at 161.1 km/h with 718 international wickets" },
+    "Matthew Hayden": { label: "Famous Inning", text: "Broke Brian Lara's Test record with 380 vs Zimbabwe in Perth (2003)" },
+    "Ben Stokes": { label: "Famous Inning", text: "Unbelievable 135* at Headingley in 2019 Ashes chase and 84* in 2019 World Cup Final" },
+    "Joe Root": { label: "Known For", text: "England's leading Test century-maker with 35+ Test hundreds and 12,000+ Test runs" },
+    "Jos Buttler": { label: "Known For", text: "Captained England to 2022 T20 World Cup title and smashed 863 runs in IPL 2022" },
+    "James Anderson": { label: "Known For", text: "Most wickets by any pacer in Test history (704 Test wickets across 188 matches)" },
+    "Stuart Broad": { label: "Famous Inning", text: "Devastating 8/15 at Trent Bridge in 2015 Ashes and 604 Test wickets" },
+    "Kevin Pietersen": { label: "Famous Inning", text: "Player of the Tournament in 2010 T20 World Cup and iconic 158 at the Oval in 2005 Ashes" },
+    "Alastair Cook": { label: "Famous Inning", text: "Batted for 2,171 minutes scoring 766 runs in the 2010-11 Ashes series in Australia" },
+    "Jofra Archer": { label: "Famous Inning", text: "Bowled the dramatic Super Over in the 2019 World Cup Final to win the title for England" },
+    "AB de Villiers": { label: "Known For", text: "Fastest century in ODI history off just 31 balls vs West Indies in Johannesburg" },
+    "Jacques Kallis": { label: "Known For", text: "Only player in cricket history with 10,000+ runs and 250+ wickets in both Tests and ODIs" },
+    "Dale Steyn": { label: "Known For", text: "Held the world No. 1 Test bowling ranking for a record 2,356 days with 439 Test wickets" },
+    "Kagiso Rabada": { label: "Known For", text: "Youngest bowler to take a 6-wicket haul on ODI debut including a hat-trick (6/16 vs BAN)" },
+    "Quinton de Kock": { label: "Famous Inning", text: "Smashed 4 centuries in the 2023 World Cup and 178 vs Australia at Centurion" },
+    "Faf du Plessis": { label: "Famous Inning", text: "Marathon 110* on Test debut batting 376 balls on Day 5 to save the Adelaide Test in 2012" },
+    "Hashim Amla": { label: "Known For", text: "Fastest batsman to 2,000, 3,000, 4,000, 5,000, 6,000, and 7,000 ODI runs" },
+    "Kane Williamson": { label: "Known For", text: "Player of the Tournament at the 2019 World Cup and led New Zealand to 2021 WTC glory" },
+    "Brendon McCullum": { label: "Famous Inning", text: "Fastest Test century in history off 54 balls and 158* on IPL opening night in 2008" },
+    "Trent Boult": { label: "Known For", text: "Took a World Cup hat-trick at Lord's in 2019 and over 600 international wickets" },
+    "Martin Guptill": { label: "Famous Inning", text: "World Cup record 237* off 163 balls vs West Indies in 2015 Quarter-Final" },
+    "Kumar Sangakkara": { label: "Famous Inning", text: "Scored four consecutive centuries in the 2015 World Cup and over 28,000 international runs" },
+    "Mahela Jayawardene": { label: "Famous Inning", text: "Scored a century in 2011 World Cup Final (103*) and 374 in Tests vs South Africa" },
+    "Muttiah Muralitharan": { label: "Known For", text: "All-time leading international wicket-taker with 800 Test and 534 ODI wickets" },
+    "Lasith Malinga": { label: "Known For", text: "Four wickets in four balls twice in international cricket and two World Cup hat-tricks" },
+    "Sanath Jayasuriya": { label: "Known For", text: "Revolutionized ODI batting in 1996 World Cup; 13,000+ runs and 300+ ODI wickets" },
+    "Chris Gayle": { label: "Known For", text: "'Universe Boss' with 175* off 66 balls in IPL and first double-century in World Cup history" },
+    "Brian Lara": { label: "Famous Inning", text: "World record 400* in Test cricket and 501* in first-class cricket" },
+    "Carlos Brathwaite": { label: "Famous Inning", text: "'Remember the name!' - hit 4 consecutive sixes in the final over of 2016 T20 World Cup Final" },
+    "Shakib Al Hasan": { label: "Known For", text: "Only player to score 600+ runs and take 10+ wickets in a single World Cup (2019)" },
+    "Rashid Khan": { label: "Known For", text: "Fastest bowler to 100 ODI wickets in just 44 matches and premier global T20 leg-spinner" },
+    "Kapil Dev": { label: "Famous Inning", text: "Legendary 175* from 17/5 vs Zimbabwe in 1983 World Cup sparking India's triumph" },
+    "Viv Richards": { label: "Famous Inning", text: "Blasted 138* in 1979 World Cup Final and a 56-ball Test century vs England" },
+    "Wasim Akram": { label: "Famous Inning", text: "'Sultan of Swing' with two wickets in two balls in 1992 World Cup Final" },
+    "Sunil Gavaskar": { label: "Known For", text: "First batsman to reach 10,000 Test runs and score 34 Test centuries" },
+    "Anil Kumble": { label: "Famous Inning", text: "Took all 10 wickets in a single Test innings (10/74 vs Pakistan in Delhi 1999)" },
+    "Sourav Ganguly": { label: "Famous Inning", text: "'God of the Off-Side' who scored 183 in 1999 World Cup and led India to 2003 Final" },
+    "VVS Laxman": { label: "Famous Inning", text: "Epic 281 against Australia at Eden Gardens in 2001 after following on" },
+    "Shane Watson": { label: "Famous Inning", text: "Scored 117* on one leg in 2019 IPL Final and won two World Cup titles" },
+    "Kevin O'Brien": { label: "Famous Inning", text: "Fastest century in World Cup history (off 50 balls) to defeat England in Bengaluru (2011)" }
+  };
+
+  function getPlayerFeat(player) {
+    if (PLAYER_FEATS[player.name]) return PLAYER_FEATS[player.name];
+    if (player.titles >= 2) {
+      return { label: "Career Feat", text: "Multi-time ICC title winner with " + player.titles + " global championships" };
+    }
+    if (player.titles === 1) {
+      return { label: "Career Feat", text: "ICC trophy winner who represented " + COUNTRIES[player.country] + " in " + player.matches + " matches" };
+    }
+    if (player.runs >= 10000) {
+      return { label: "Career Feat", text: "Prolific run-scorer with over " + (Math.floor(player.runs / 1000) * 1000).toLocaleString() + " international runs" };
+    }
+    if (player.wkts >= 300) {
+      return { label: "Career Feat", text: "Premier strike bowler with over " + (Math.floor(player.wkts / 50) * 50).toLocaleString() + " international wickets" };
+    }
+    if (player.runs >= 3000 && player.wkts >= 100) {
+      return { label: "Career Feat", text: "Accomplished all-rounder with " + player.runs.toLocaleString() + " runs and " + player.wkts + " international wickets" };
+    }
+    if (player.ipl && player.ipl.length) {
+      const teams = player.ipl.map((t) => (typeof IPL_TEAMS !== "undefined" && IPL_TEAMS[t]) || t).join(", ");
+      return { label: "Known For", text: "Featured for " + teams + " in the IPL" };
+    }
+    return {
+      label: "Career Feat",
+      text: (player.active ? "Active international cricketer" : "Retired international cricketer") + " with " + player.matches + " appearances for " + COUNTRIES[player.country],
+    };
+  }
+
   function initials(name) {
     return name.split(/\s+/).map((w) => w[0].toUpperCase()).join(".") + ".";
   }
 
-  function hintFor(player, n, mode) {
-    if (!Number.isInteger(n) || n < 1 || n > HINTS_PER_PUZZLE) throw new RangeError("Hint number out of range: " + n);
-    let text;
-    if (n === 1) {
-      text = "Represents " + COUNTRIES[player.country];
-    } else if (n === 2) {
-      text = (player.bat === "L" ? "Left-handed " : "Right-handed ") + player.role.toLowerCase();
-      if (player.bowl !== "-") text += ", bowls " + BOWL_STYLES[player.bowl].toLowerCase();
-    } else {
-      text = "Debuted in " + player.debut + " · " + (player.active ? "still playing" : "retired");
-      if (mode === "easy") text += " · initials " + initials(player.name);
+  function isNationIdentified(player, guesses) {
+    if (!guesses || !guesses.length) return false;
+    return guesses.some((g) => {
+      if (g.tags && g.tags.includes("Same nation")) return true;
+      if (g.country && g.country === player.country) return true;
+      const gp = byName(g.name || g);
+      return gp && gp.country === player.country;
+    });
+  }
+
+  function isRoleIdentified(player, guesses) {
+    if (!guesses || !guesses.length) return false;
+    return guesses.some((g) => {
+      if (g.tags && g.tags.includes("Same role")) return true;
+      if (g.role && g.role === player.role) return true;
+      const gp = byName(g.name || g);
+      return gp && gp.role === player.role;
+    });
+  }
+
+  function getHintsForPuzzle(player, mode, guesses) {
+    const nationIdentified = isNationIdentified(player, guesses);
+    const roleIdentified = isRoleIdentified(player, guesses);
+
+    const pool = [];
+
+    // 1. Nation (only if not already identified)
+    if (!nationIdentified) {
+      pool.push({
+        key: "nation",
+        label: "Nation",
+        text: "Represents " + COUNTRIES[player.country],
+        cost: HINT_COST,
+      });
     }
-    return { n, label: HINT_LABELS[n - 1], text, cost: HINT_COST };
+
+    // 2. Role (only if not already identified)
+    if (!roleIdentified) {
+      let roleText = (player.bat === "L" ? "Left-handed " : "Right-handed ") + player.role.toLowerCase();
+      if (player.bowl !== "-") roleText += ", bowls " + BOWL_STYLES[player.bowl].toLowerCase();
+      pool.push({
+        key: "role",
+        label: "Role",
+        text: roleText,
+        cost: HINT_COST,
+      });
+    }
+
+    // 3. Era
+    let eraText = "Debuted in " + player.debut + " · " + (player.active ? "still playing" : "retired");
+    if (mode === "easy" && !nationIdentified && !roleIdentified) {
+      eraText += " · initials " + initials(player.name);
+    }
+    pool.push({
+      key: "era",
+      label: "Era",
+      text: eraText,
+      cost: HINT_COST,
+    });
+
+    // 4. Famous Inning or Known For
+    const feat = getPlayerFeat(player);
+    if (feat) {
+      pool.push({
+        key: "feat",
+        label: feat.label || "Known For",
+        text: feat.text,
+        cost: HINT_COST,
+      });
+    }
+
+    // 5. Name Initials
+    pool.push({
+      key: "initials",
+      label: "Initials",
+      text: "Player's name initials are " + initials(player.name),
+      cost: HINT_COST,
+    });
+
+    return pool;
+  }
+
+  function hintFor(player, n, mode, context) {
+    if (!Number.isInteger(n) || n < 1 || n > HINTS_PER_PUZZLE) throw new RangeError("Hint number out of range: " + n);
+    const guesses = (context && context.guesses) ? context.guesses : (Array.isArray(context) ? context : []);
+    const hints = getHintsForPuzzle(player, mode, guesses);
+    const chosen = hints[n - 1] || hints[hints.length - 1];
+    return { n, label: chosen.label, text: chosen.text, cost: HINT_COST };
   }
 
   // ---------- Scoring ----------
@@ -461,7 +657,7 @@
     const next = clone(state);
     const p = next.modes[mode].puzzles[idx];
     p.hints += 1;
-    const hint = hintFor(answerFor(state.day, mode, idx, secret), p.hints, mode);
+    const hint = hintFor(answerFor(state.day, mode, idx, secret), p.hints, mode, p);
     void now;
     return { ok: true, state: next, hint };
   }
@@ -480,7 +676,7 @@
     if (loc.error) return [];
     const answer = answerFor(state.day, mode, idx, opts && opts.secret);
     const out = [];
-    for (let n = 1; n <= loc.puzzle.hints; n++) out.push(hintFor(answer, n, mode));
+    for (let n = 1; n <= loc.puzzle.hints; n++) out.push(hintFor(answer, n, mode, loc.puzzle));
     return out;
   }
 
@@ -821,7 +1017,7 @@
     similarity, reasons, buildRanks, tiers, tier,
     todayKey, msUntilReset, shiftDay, istHour, sceneForHour, hashString, mulberry32,
     dailyAnswers, answerFor, ranksFor,
-    hintFor, scorePuzzle, rankTitle,
+    hintFor, getHintsForPuzzle, isNationIdentified, isRoleIdentified, scorePuzzle, rankTitle,
     newDayState, startPuzzle, applyGuess, useHint, giveUp, revealedHints,
     modeDone, dayPoints, elapsedMs, totalElapsedMs, formatTime, isFinished,
     evaluateAchievements, streakDetails,

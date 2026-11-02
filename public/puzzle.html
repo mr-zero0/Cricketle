@@ -119,6 +119,16 @@
       gap: 6px;
     }
 
+    .puzzle-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-puzzle-rotate,
     .btn-puzzle-reset {
       background: var(--card);
       border: 1px solid var(--border);
@@ -131,14 +141,20 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-top: 10px;
       transition: all 0.2s ease;
     }
 
+    .btn-puzzle-rotate:hover,
     .btn-puzzle-reset:hover {
       background: var(--card-2);
       color: var(--fg);
       border-color: var(--puzzle-accent);
+    }
+
+    .btn-puzzle-rotate.active {
+      background: rgba(245, 158, 11, 0.16);
+      color: #f59e0b;
+      border-color: #f59e0b;
     }
 
     .puzzle-assembled-banner {
@@ -606,7 +622,7 @@
 
     <div class="game-header">
       <h2>PUZZLE CRICKETER</h2>
-      <p>Tap or drag any two tiles to swap and reassemble the face (9 pieces in Active, 24 in Legends). You have 3 guesses — no hints!</p>
+      <p>Swap and rotate tiles to reassemble the portrait (9 pieces in Active, 24 in Legends). You have 3 guesses — no hints!</p>
       <div class="mode-toggle">
         <button id="mode-easy" class="mode-btn active" data-mode="easy">Active (9 Pieces)</button>
         <button id="mode-hard" class="mode-btn" data-mode="hard">Legends (24 Pieces)</button>
@@ -620,10 +636,13 @@
       </div>
 
       <div class="puzzle-instructions">
-        <span>💡 Tap tile to select, tap another to swap</span>
+        <span>💡 Tap to swap tiles. Tap selected tile or ↷ Rotate to spin upright</span>
       </div>
 
-      <button id="btn-reset-scramble" class="btn-puzzle-reset" type="button" title="Reset pieces to start">🔄 Reset Scramble</button>
+      <div class="puzzle-actions">
+        <button id="btn-rotate-tile" class="btn-puzzle-rotate" type="button" title="Rotate selected tile 90° clockwise">↷ Rotate Piece (90°)</button>
+        <button id="btn-reset-scramble" class="btn-puzzle-reset" type="button" title="Reset pieces to start">🔄 Reset Scramble</button>
+      </div>
 
       <div id="puzzle-assembled-banner" class="puzzle-assembled-banner" style="display:none;">🎉 Portrait assembled! Enter your guess below.</div>
 

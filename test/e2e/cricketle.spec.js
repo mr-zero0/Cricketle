@@ -164,6 +164,22 @@ test.describe("guest play", () => {
     await expect(page.locator("#tracker-label")).toHaveText("Hard · Puzzle 1 of 3");
   });
 
+  test("Dynamic hints: adapts hint when nation or role is already identified by previous guesses", async ({ page }) => {
+    await page.goto("/index.html");
+    await startPuzzle(page);
+
+    const target = core.answerFor(day(), "easy", 0);
+    const sameNation = core.poolFor("easy").find((p) => p.country === target.country && p.name !== target.name) ||
+                       core.poolFor("hard").find((p) => p.country === target.country && p.name !== target.name);
+    expect(sameNation).toBeDefined();
+
+    await guess(page, sameNation.name);
+    await page.locator(".reveal-btn").click();
+
+    const hint1Text = await page.locator(".hint.revealed .hint-text").first().textContent();
+    expect(hint1Text).not.toContain("Represents");
+  });
+
   test("typing right after tapping a hint keeps the suggestions open", async ({ page }) => {
     await page.goto("/index.html");
     await startPuzzle(page);

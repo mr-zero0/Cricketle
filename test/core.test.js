@@ -183,6 +183,27 @@ test("hints never contain the player's full name", () => {
   }
 });
 
+test("hints dynamically adapt when nation or role is already identified by guesses", () => {
+  const kohli = core.byName("Virat Kohli");
+  const withNation = { guesses: [{ name: "Jasprit Bumrah", tags: ["Same nation"] }] };
+  const h1_n = core.hintFor(kohli, 1, "easy", withNation);
+  const h2_n = core.hintFor(kohli, 2, "easy", withNation);
+  const h3_n = core.hintFor(kohli, 3, "easy", withNation);
+  assert.equal(h1_n.label, "Role");
+  assert.equal(h2_n.label, "Era");
+  assert.equal(h3_n.label, "Famous Inning");
+  assert.match(h3_n.text, /82\*/);
+
+  const withBoth = { guesses: [{ name: "Rohit Sharma", tags: ["Same nation", "Same role"] }] };
+  const h1_b = core.hintFor(kohli, 1, "easy", withBoth);
+  const h2_b = core.hintFor(kohli, 2, "easy", withBoth);
+  const h3_b = core.hintFor(kohli, 3, "easy", withBoth);
+  assert.equal(h1_b.label, "Era");
+  assert.equal(h2_b.label, "Famous Inning");
+  assert.equal(h3_b.label, "Initials");
+  assert.match(h3_b.text, /V\.K\./);
+});
+
 test("hintFor rejects hint numbers outside 1..3", () => {
   assert.throws(() => core.hintFor(core.byName("Virat Kohli"), 0, "easy"));
   assert.throws(() => core.hintFor(core.byName("Virat Kohli"), 4, "easy"));

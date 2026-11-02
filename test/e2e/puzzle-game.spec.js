@@ -19,8 +19,9 @@ test.describe("Puzzle Cricketer — Interactive Rearrangeable Portrait Puzzle", 
     await expect(dots.first()).toHaveClass(/current/);
     await expect(page.locator("#attempts-label")).toContainText("3 guesses remaining");
 
-    // Controls: Reset button & Guess button present; No skip button!
+    // Controls: Reset button, Rotate button & Guess button present; No skip button!
     await expect(page.locator("#btn-reset-scramble")).toBeVisible();
+    await expect(page.locator("#btn-rotate-tile")).toBeVisible();
     await expect(page.locator("#guess-input")).toBeEnabled();
     await expect(page.locator("#btn-guess")).toBeVisible();
     await expect(page.locator("#btn-skip")).toHaveCount(0);
@@ -54,6 +55,41 @@ test.describe("Puzzle Cricketer — Interactive Rearrangeable Portrait Puzzle", 
     await page.locator("#btn-reset-scramble").click();
     await page.waitForTimeout(200);
     await expect(page.locator("#puzzle-progress-text")).toContainText("of 9 pieces in place");
+  });
+
+  test("Piece Rotation: selecting tile and clicking rotate button or tapping rotates piece", async ({ page }) => {
+    await expect(page.locator("#puzzle-canvas")).toBeVisible();
+    const canvas = page.locator("#puzzle-canvas");
+    const box = await canvas.boundingBox();
+    expect(box).not.toBeNull();
+
+    const tileW = box.width / 3;
+    const tileH = box.height / 3;
+    const rotateBtn = page.locator("#btn-rotate-tile");
+
+    // Initially rotate button is visible but not active
+    await expect(rotateBtn).toBeVisible();
+    await expect(rotateBtn).not.toHaveClass(/active/);
+
+    // Tap tile at (0, 0) to select it
+    await page.mouse.click(box.x + tileW / 2, box.y + tileH / 2);
+    await page.waitForTimeout(100);
+
+    // Rotate button becomes active
+    await expect(rotateBtn).toHaveClass(/active/);
+
+    // Click rotate button -> rotates tile
+    await rotateBtn.click();
+    await page.waitForTimeout(100);
+
+    // Tapping the selected tile again rotates it another 90°
+    await page.mouse.click(box.x + tileW / 2, box.y + tileH / 2);
+    await page.waitForTimeout(100);
+
+    // Reset button restores initial scramble and orientations
+    await page.locator("#btn-reset-scramble").click();
+    await page.waitForTimeout(200);
+    await expect(rotateBtn).not.toHaveClass(/active/);
   });
 
   test("Puzzle Guessing: wrong guess consumes 1 of 3 attempts", async ({ page }) => {

@@ -21,7 +21,9 @@
   let isGameOver = false;
   let currentPhotoUrl = "";
   let initialScramble = [];
+  let initialRotations = [];
   let board = [];
+  let rotations = [];
   let selectedSlot = -1;
   let dragStartSlot = -1;
 
@@ -30,6 +32,7 @@
   const input = document.getElementById("guess-input");
   const guessBtn = document.getElementById("btn-guess");
   const resetBtn = document.getElementById("btn-reset-scramble");
+  const rotateBtn = document.getElementById("btn-rotate-tile");
   const suggestions = document.getElementById("suggestions");
   const historyList = document.getElementById("guess-history");
   const track = document.getElementById("attempts-track");
@@ -113,6 +116,46 @@
     return perm;
   }
 
+  // Generate randomized piece rotations: 0 = 0° (up), 1 = 90° (right), 2 = 180° (down), 3 = 270° (left)
+  function generateRotations(seedStr, numTiles) {
+    const rng = mulberry32(hashString(seedStr + "_rotations"));
+    const rots = [];
+    let nonZero = 0;
+    for (let i = 0; i < numTiles; i++) {
+      const r = Math.floor(rng() * 4);
+      rots.push(r);
+      if (r !== 0) nonZero++;
+    }
+    // Guarantee that at least 60% of pieces are rotated
+    if (nonZero < Math.ceil(numTiles * 0.6)) {
+      for (let i = 0; i < numTiles; i++) {
+        if (rots[i] === 0 && Math.floor(rng() * 3) !== 0) {
+          rots[i] = Math.floor(rng() * 3) + 1;
+        }
+      }
+    }
+    return rots;
+  }
+
+  function updateRotateBtn() {
+    if (!rotateBtn) return;
+    if (isGameOver) {
+      rotateBtn.style.display = "none";
+      return;
+    }
+    rotateBtn.style.display = "inline-flex";
+    if (selectedSlot !== -1) {
+      rotateBtn.classList.add("active");
+      const currentRot = (rotations[selectedSlot] || 0) * 90;
+      rotateBtn.textContent = `↷ Rotate Piece (${currentRot}°)`;
+      rotateBtn.title = `Rotate piece in slot ${selectedSlot + 1} (currently ${currentRot}°)`;
+    } else {
+      rotateBtn.classList.remove("active");
+      rotateBtn.textContent = "↷ Rotate Piece (90°)";
+      rotateBtn.title = "Tap a tile to select, then click to rotate";
+    }
+  }
+
   function saveProgress() {
     if (!currentTarget) return;
     const today = getTodayKey();
@@ -120,7 +163,9 @@
       attempts: currentAttempts,
       isGameOver: isGameOver,
       board: board,
+      rotations: rotations,
       initialScramble: initialScramble,
+      initialRotations: initialRotations,
       photoUrl: currentPhotoUrl
     };
     try {
@@ -159,8 +204,9 @@
 
     // 1. Draw each tile
     for (let slot = 0; slot < totalTiles; slot++) {
-      // If game over, show solved order (0..totalTiles-1), else current board permutation
+      // If game over, show solved order (0..totalTiles-1) upright (rot = 0), else current permutation
       const tileId = isGameOver ? slot : board[slot];
+      const rot = isGameOver ? 0 : (rotations[slot] || 0);
 
       const destCol = slot % gridCols;
       const destRow = Math.floor(slot / gridCols);
@@ -182,17 +228,36 @@
       const srcY1 = sy + ((srcRow + 1) * sh) / gridRows;
       const srcTileH = srcY1 - srcY0;
 
+      ctx.save();
+      // Clip to tile slot boundary to prevent edge bleeding
+      ctx.beginPath();
+      ctx.rect(dx, dy, tileW, tileH);
+      ctx.clip();
+
+      const cx = dx + tileW / 2;
+      const cy = dy + tileH / 2;
+      ctx.translate(cx, cy);
+
+      if (rot !== 0) {
+        ctx.rotate(rot * (Math.PI / 2));
+      }
+
+      const isSideways = (rot === 1 || rot === 3);
+      const drawW = isSideways ? tileH : tileW;
+      const drawH = isSideways ? tileW : tileH;
+
       ctx.drawImage(
         loadedImage,
         srcX0,
         srcY0,
         srcTileW,
         srcTileH,
-        dx,
-        dy,
-        tileW,
-        tileH
+        -drawW / 2,
+        -drawH / 2,
+        drawW,
+        drawH
       );
+      ctx.restore();
     }
 
     // 2. Draw borders & overlays if game active
@@ -200,7 +265,8 @@
     if (!isGameOver) {
       for (let slot = 0; slot < totalTiles; slot++) {
         const tileId = board[slot];
-        const isSolved = (tileId === slot);
+        const rot = rotations[slot] || 0;
+        const isSolved = (tileId === slot && rot === 0);
         if (isSolved) correctCount++;
 
         const destCol = slot % gridCols;
@@ -233,8 +299,22 @@
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText("★", dx + badgeOffset, dy + badgeOffset);
+
+          // Rotation badge in bottom right corner if rotated
+          if (rot !== 0) {
+            ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+            ctx.beginPath();
+            ctx.arc(dx + tileW - badgeOffset, dy + tileH - badgeOffset, badgeRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "#f59e0b";
+            ctx.font = badgeFont;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("↻", dx + tileW - badgeOffset, dy + tileH - badgeOffset);
+          }
         } else if (isSolved) {
-          // Correctly placed: Clean subtle green border + checkmark
+          // Correctly placed and upright: Clean subtle green border + checkmark
           ctx.strokeStyle = "rgba(34, 197, 94, 0.85)";
           ctx.lineWidth = isHard ? 1.5 : 1.8;
           ctx.strokeRect(dx + 1, dy + 1, tileW - 2, tileH - 2);
@@ -250,6 +330,24 @@
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText("✓", dx + badgeOffset, dy + badgeOffset);
+        } else if (tileId === slot && rot !== 0) {
+          // Correct slot but rotated: subtle amber dashed border + rotate indicator
+          ctx.strokeStyle = "rgba(245, 158, 11, 0.85)";
+          ctx.lineWidth = isHard ? 1.5 : 1.8;
+          ctx.setLineDash(isHard ? [2, 2] : [3, 3]);
+          ctx.strokeRect(dx + 1, dy + 1, tileW - 2, tileH - 2);
+          ctx.setLineDash([]);
+
+          ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+          ctx.beginPath();
+          ctx.arc(dx + badgeOffset, dy + badgeOffset, badgeRadius, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = "#f59e0b";
+          ctx.font = badgeFont;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("↻", dx + badgeOffset, dy + badgeOffset);
         } else {
           // Scrambled tile: Subtle dashed border + tile number
           ctx.strokeStyle = "rgba(245, 158, 11, 0.35)";
@@ -269,6 +367,20 @@
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(String(tileId + 1), dx + badgeOffset, dy + badgeOffset);
+
+          // If rotated, show small rotate symbol in bottom right
+          if (rot !== 0) {
+            ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+            ctx.beginPath();
+            ctx.arc(dx + tileW - badgeOffset, dy + tileH - badgeOffset, badgeRadius * 0.9, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "rgba(245, 158, 11, 0.75)";
+            ctx.font = badgeFont;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("↷", dx + tileW - badgeOffset, dy + tileH - badgeOffset);
+          }
         }
       }
     } else {
@@ -315,17 +427,26 @@
 
     if (selectedSlot === -1) {
       selectedSlot = slot;
+      updateRotateBtn();
       renderBoard();
     } else if (selectedSlot === slot) {
-      selectedSlot = -1;
+      // Tapping already-selected piece spins it 90° clockwise!
+      rotations[slot] = ((rotations[slot] || 0) + 1) % 4;
+      saveProgress();
       renderBoard();
+      updateRotateBtn();
     } else {
-      const temp = board[selectedSlot];
+      // Swapping two tiles: swap tile IDs and their orientations
+      const tempTile = board[selectedSlot];
+      const tempRot = rotations[selectedSlot];
       board[selectedSlot] = board[slot];
-      board[slot] = temp;
+      rotations[selectedSlot] = rotations[slot];
+      board[slot] = tempTile;
+      rotations[slot] = tempRot;
       selectedSlot = -1;
       saveProgress();
       renderBoard();
+      updateRotateBtn();
     }
   }
 
@@ -344,13 +465,17 @@
 
       if (dragStartSlot !== -1 && endSlot !== -1 && dragStartSlot !== endSlot) {
         // Drag-swapped between two different slots!
-        const temp = board[dragStartSlot];
+        const tempTile = board[dragStartSlot];
+        const tempRot = rotations[dragStartSlot];
         board[dragStartSlot] = board[endSlot];
-        board[endSlot] = temp;
+        rotations[dragStartSlot] = rotations[endSlot];
+        board[endSlot] = tempTile;
+        rotations[endSlot] = tempRot;
         selectedSlot = -1;
         dragStartSlot = -1;
         saveProgress();
         renderBoard();
+        updateRotateBtn();
       } else if (dragStartSlot !== -1 && dragStartSlot === endSlot) {
         // Single tap on a slot
         handleTileTap(dragStartSlot);
@@ -363,15 +488,43 @@
     canvas.addEventListener("pointercancel", () => {
       dragStartSlot = -1;
     });
+
+    canvas.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      if (isGameOver) return;
+      const slot = getSlotFromCoords(e.clientX, e.clientY);
+      if (slot !== -1) {
+        selectedSlot = slot;
+        rotations[slot] = ((rotations[slot] || 0) + 1) % 4;
+        saveProgress();
+        renderBoard();
+        updateRotateBtn();
+      }
+    });
   }
+
+  // Rotate Selected Tile Button
+  rotateBtn?.addEventListener("click", () => {
+    if (isGameOver) return;
+    if (selectedSlot === -1) {
+      const candidate = board.findIndex((t, idx) => t !== idx || (rotations[idx] || 0) !== 0);
+      selectedSlot = candidate !== -1 ? candidate : 0;
+    }
+    rotations[selectedSlot] = ((rotations[selectedSlot] || 0) + 1) % 4;
+    saveProgress();
+    renderBoard();
+    updateRotateBtn();
+  });
 
   // Reset Scramble Button
   resetBtn?.addEventListener("click", () => {
     if (isGameOver || initialScramble.length !== totalTiles) return;
     board = [...initialScramble];
+    rotations = [...initialRotations];
     selectedSlot = -1;
     saveProgress();
     renderBoard();
+    updateRotateBtn();
   });
 
   // Update dots indicator
@@ -430,6 +583,7 @@
       // Scramble seed specific to mode and target
       const scrambleSeed = today + "_" + currentTarget.id + "_puzzle_scramble_" + currentMode;
       initialScramble = generateScramble(scrambleSeed, totalTiles, cfg.minDisplaced);
+      initialRotations = generateRotations(scrambleSeed, totalTiles);
 
       selectedSlot = -1;
       dragStartSlot = -1;
@@ -445,16 +599,26 @@
         } else {
           board = [...initialScramble];
         }
+        if (Array.isArray(data.rotations) && data.rotations.length === totalTiles) {
+          rotations = data.rotations;
+        } else {
+          rotations = [...initialRotations];
+        }
+        if (Array.isArray(data.initialRotations) && data.initialRotations.length === totalTiles) {
+          initialRotations = data.initialRotations;
+        }
         if (data.photoUrl) currentPhotoUrl = data.photoUrl;
       } else {
         currentAttempts = [];
         isGameOver = false;
         board = [...initialScramble];
+        rotations = [...initialRotations];
       }
 
       loadImage(currentPhotoUrl);
       renderHistory();
       updateTrack();
+      updateRotateBtn();
 
       if (isGameOver) {
         finishGame(currentAttempts.some((a) => a.isCorrect));
@@ -507,13 +671,17 @@
     isGameOver = true;
     selectedSlot = -1;
 
-    // Reveal all pieces in solved order
-    for (let i = 0; i < totalTiles; i++) board[i] = i;
+    // Reveal all pieces in solved order and upright (0° rotation)
+    for (let i = 0; i < totalTiles; i++) {
+      board[i] = i;
+      rotations[i] = 0;
+    }
     renderBoard();
     updateTrack();
 
     if (guessControls) guessControls.style.display = "none";
     if (resetBtn) resetBtn.style.display = "none";
+    if (rotateBtn) rotateBtn.style.display = "none";
 
     if (resultCard) {
       resultCard.style.display = "block";
@@ -746,6 +914,7 @@
     e.currentTarget.classList.add("active");
     if (guessControls) guessControls.style.display = "block";
     if (resetBtn) resetBtn.style.display = "inline-flex";
+    if (rotateBtn) rotateBtn.style.display = "inline-flex";
     if (resultCard) resultCard.style.display = "none";
     loadPuzzle();
   });
@@ -757,6 +926,7 @@
     e.currentTarget.classList.add("active");
     if (guessControls) guessControls.style.display = "block";
     if (resetBtn) resetBtn.style.display = "inline-flex";
+    if (rotateBtn) rotateBtn.style.display = "inline-flex";
     if (resultCard) resultCard.style.display = "none";
     loadPuzzle();
   });

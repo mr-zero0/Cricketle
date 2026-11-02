@@ -533,8 +533,17 @@
     const p = puzzle();
     const revealed = (app.state.hints && app.state.hints[app.mode] && app.state.hints[app.mode][idx()]) || [];
     const items = [];
+    let candidates = null;
+    try {
+      if (!app.user && core.answerFor && core.getHintsForPuzzle) {
+        const ans = core.answerFor(app.state.day, app.mode, idx());
+        if (ans) candidates = core.getHintsForPuzzle(ans, app.mode, p.guesses);
+      }
+    } catch (_) {}
+
     for (let n = 1; n <= core.HINTS_PER_PUZZLE; n++) {
-      const label = core.HINT_LABELS[n - 1];
+      const h = revealed[n - 1];
+      const label = (h && h.label) || (candidates && candidates[n - 1] && candidates[n - 1].label) || core.HINT_LABELS[n - 1];
       if (n <= p.hints) {
         const h = revealed[n - 1];
         items.push(`<li class="hint revealed"><span class="hint-num" aria-hidden="true"><svg><use href="#i-bulb"/></svg></span>
