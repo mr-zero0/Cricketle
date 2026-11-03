@@ -614,7 +614,11 @@
       <button id="whatsapp-share-btn" class="btn whatsapp-btn" type="button">
         <svg class="whatsapp-icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Share on WhatsApp
       </button>
-      <button id="share-btn" class="btn" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg> Copy result</button>`;
+      <button id="share-btn" class="btn" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg> Copy result</button>
+      <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy data-variant="cricketle" title="Report incorrect hints or cricketer stats">
+        <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        <span>Report Inaccuracy</span>
+      </button>`;
     let note = "";
     const otherFreeOpen = isGuest() && !core.isFinished(app.state.modes[otherMode].puzzles[0]);
     if (nextReady && isGated(idx() + 1)) {
@@ -2511,6 +2515,12 @@
     safeRemove("cricketle:away_idx");
     if (safeGet(SEEN_HELP_KEY) !== "1") openOnboard({ firstVisit: true });
     CricketleLog.info("READY", `Cricketle ready · Day: ${core.todayKey()} · Mode: ${app.mode} · Storage: ${app.store.kind}`);
+    if (window.CricketleInaccuracy) {
+      window.CricketleInaccuracy.setTargetProvider(() => {
+        const a = app.state && app.state.answers && app.state.answers[app.mode] ? app.state.answers[app.mode][idx()] : null;
+        return a ? { name: a.name, id: a.id } : null;
+      });
+    }
     tick();
     setInterval(tick, 250);
   }

@@ -781,6 +781,13 @@
             <span class="attempt-dot"></span>
             <span class="attempt-dot"></span>
           </div>
+
+          <div style="text-align: center; margin-top: 8px;">
+            <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report wrong stadium details or clues">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Report Inaccuracy</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -803,9 +810,13 @@
           <h3 class="result-title" id="result-status">STADIUM CONQUERED! 🏆</h3>
           <p class="result-name" id="result-name"></p>
           <p class="result-desc" id="result-desc"></p>
-          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center;">
             <button id="btn-share" class="btn-stadium">Share Result 📋</button>
             <a href="hub.html" class="btn-skip" style="text-decoration:none;">Play Other Games →</a>
+            <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report wrong stadium details or clues">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Report Inaccuracy</span>
+            </button>
           </div>
         </div>
       </div>
@@ -813,6 +824,7 @@
   </main>
 
   <script src="bg.js"></script>
+  <script src="report-inaccuracy.js?v=3.1.0" defer></script>
   <script src="stadium.js"></script>
   <script src="mobile-keyboard.js?v=3.0.0" defer></script>
 </body>

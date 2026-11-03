@@ -2216,3 +2216,130 @@ dialog form { margin-top: var(--space-4); text-align: right; }
     border-color: rgba(251, 146, 60, 0.8);
     box-shadow: 0 8px 32px rgba(234, 88, 12, 0.35);
   }
+
+
+/* ==========================================================================
+   Universal Inaccuracy Report Modal & Button Styling
+   ========================================================================== */
+.report-inaccuracy-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted, #94a3b8);
+  background: var(--card, #1e293b);
+  border: 1px solid var(--border, #334155);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  margin: 10px auto 4px;
+  text-decoration: none;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.report-inaccuracy-pill:hover,
+.report-inaccuracy-pill:focus-visible {
+  color: var(--fg, #f8fafc);
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.report-inaccuracy-pill svg {
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.inaccuracy-dialog {
+  max-width: 460px;
+  width: calc(100% - 32px);
+  padding: clamp(16px, 4vw, 24px);
+  border-radius: 16px;
+  background: var(--card, #111c30);
+  border: 1px solid var(--border, #1e293b);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  color: var(--fg, #f8fafc);
+  z-index: 10000;
+  position: fixed;
+  inset: 0;
+  margin: auto;
+}
+
+.inaccuracy-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.report-dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--space-3, 12px);
+  padding-bottom: var(--space-2, 8px);
+  border-bottom: 1px solid var(--border, #1e293b);
+}
+
+.report-icon-pill {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.report-field {
+  margin-bottom: var(--space-3, 12px);
+}
+
+.report-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted, #94a3b8);
+  margin-bottom: 4px;
+}
+
+.report-field label .req {
+  color: #ef4444;
+}
+
+.report-select,
+.report-input,
+.report-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg, #0b1220);
+  color: var(--fg, #f8fafc);
+  border: 1px solid var(--border, #334155);
+  border-radius: var(--radius-sm, 8px);
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.report-select:focus,
+.report-input:focus,
+.report-textarea:focus {
+  border-color: var(--accent, #3b82f6);
+}
+
+.report-textarea {
+  resize: vertical;
+  min-height: 72px;
+}

@@ -179,6 +179,9 @@
 
     targetPlayer = findPlayerData(name);
     targetName = targetPlayer.name.toUpperCase();
+    if (window.CricketleInaccuracy) {
+      window.CricketleInaccuracy.setTargetProvider(() => targetPlayer ? { name: targetPlayer.name, id: targetPlayer.id } : null);
+    }
   }
 
   /**
@@ -602,12 +605,23 @@
 
   function showFinalSummary() {
     if (finishedView) finishedView.style.display = "block";
+    if (guessInput) guessInput.disabled = true;
+    if (btnSubmitGuess) btnSubmitGuess.disabled = true;
+
+    const flag = getCountryFlag(targetPlayer.country);
+    if (playerRevealFlag) playerRevealFlag.textContent = flag;
+    if (playerRevealName) playerRevealName.textContent = targetPlayer.name;
+    if (playerRevealMeta) {
+      const activeText = targetPlayer.active ? "Active" : "Retired";
+      playerRevealMeta.textContent = `${targetPlayer.country || ""} · ${targetPlayer.role || "Cricketer"} · Debut ${targetPlayer.debut || "2000"} (${activeText})`;
+    }
 
     const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
     const elapsedSec = Math.floor(elapsedMs / 1000);
     const speedBonus = Math.max(0, 25 - Math.floor(elapsedSec / 15));
     const guessPen = Math.max(0, (userGuesses.length - 1) * 8);
-    const hintPen = revealedCluesCount * 10;
+    const revealedCount = userGuesses.length >= 4 ? 3 : (userGuesses.length >= 2 ? 2 : 1);
+    const hintPen = Math.max(0, (revealedCount - 1) * 10);
     const calculatedScore = isWon ? Math.max(20, 100 - guessPen - hintPen + speedBonus) : 0;
 
     fetch("/api/variant/complete", {
@@ -633,18 +647,6 @@
         score: calculatedScore,
       }),
     }).catch(() => {});
-    if (guessInput) guessInput.disabled = true;
-    if (btnSubmitGuess) btnSubmitGuess.disabled = true;
-
-    const attemptsCount = userGuesses.length;
-    const flag = getCountryFlag(targetPlayer.country);
-
-    if (playerRevealFlag) playerRevealFlag.textContent = flag;
-    if (playerRevealName) playerRevealName.textContent = targetPlayer.name;
-    if (playerRevealMeta) {
-      const activeText = targetPlayer.active ? "Active" : "Retired";
-      playerRevealMeta.textContent = `${targetPlayer.country || ""} · ${targetPlayer.role || "Cricketer"} · Debut ${targetPlayer.debut || "2000"} (${activeText})`;
-    }
 
     if (isWon) {
       if (summaryIcon) summaryIcon.textContent = "🏆";

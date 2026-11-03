@@ -1090,6 +1090,13 @@
         <span class="attempt-dot"></span>
         <span class="attempt-dot"></span>
       </div>
+
+      <div style="text-align: center; margin-top: 8px;">
+        <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect franchise history or player info">
+          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          <span>Report Inaccuracy</span>
+        </button>
+      </div>
     </div>
 
     <!-- Guess Input with Autocomplete -->
@@ -1111,12 +1118,19 @@
       <p class="result-name" id="result-name"></p>
       <p class="result-stats" id="result-stats"></p>
       <p class="result-funfact" id="result-funfact"></p>
-      <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#0284c7;color:#fff;font-weight:700;">Play Other Games →</a>
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center;">
+        <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#0284c7;color:#fff;font-weight:700;">Play Other Games →</a>
+        <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect franchise history or player info">
+          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          <span>Report Inaccuracy</span>
+        </button>
+      </div>
     </div>
   </main>
 
   <script src="bg.js"></script>
   <script src="players.js"></script>
+  <script src="report-inaccuracy.js?v=3.1.0" defer></script>
   <script src="journey.js"></script>
   <script src="mobile-keyboard.js?v=3.0.0" defer></script>
 </body>

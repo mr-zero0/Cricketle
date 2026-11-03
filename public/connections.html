@@ -750,14 +750,25 @@
       <button id="btn-submit" class="conn-btn conn-btn-submit" disabled>Submit</button>
     </div>
 
+    <div style="text-align: center; margin: 10px 0 4px;">
+      <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect category or player association">
+        <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        <span>Report Inaccuracy</span>
+      </button>
+    </div>
+
     <!-- Result Card -->
     <div class="result-card" id="result-card">
       <h3 class="result-title" id="result-status">GENIUS! 🏆</h3>
       <p class="result-desc" id="result-desc">You solved all four cricket categories!</p>
       <div class="result-grid-share" id="result-grid-share"></div>
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center;">
         <button id="btn-share" class="conn-btn conn-btn-submit">Share Result 📋</button>
         <a href="hub.html" class="conn-btn" style="text-decoration:none;">Play Other Games →</a>
+        <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect category or player association">
+          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          <span>Report Inaccuracy</span>
+        </button>
       </div>
     </div>
 
@@ -766,6 +777,7 @@
   </main>
 
   <script src="bg.js"></script>
+  <script src="report-inaccuracy.js?v=3.1.0" defer></script>
   <script src="connections.js"></script>
   <script src="mobile-keyboard.js?v=3.0.0" defer></script>
 </body>
