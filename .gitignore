@@ -35,6 +35,7 @@ Thumbs.db
 .idea/
 
 # Tooling Cache & Logs
+.agents/
 .aiforce_*.json
 .claude/
 .superpowers/
