@@ -101,12 +101,23 @@
     return POOLS[mode];
   }
 
+  const PLAYER_BY_LOWER = new Map(PLAYERS.map((p) => [p.name.toLowerCase(), p]));
+
   function inPool(mode, name) {
-    return Boolean(POOL_SETS[mode] && POOL_SETS[mode].has(name));
+    if (!name || typeof name !== "string") return false;
+    const pl = byName(name);
+    const canonicalName = pl ? pl.name : name.trim();
+    return Boolean(POOL_SETS[mode] && POOL_SETS[mode].has(canonicalName));
   }
 
   function byName(name) {
-    return PLAYER_BY_NAME.get(name);
+    if (!name || typeof name !== "string") return undefined;
+    const direct = PLAYER_BY_NAME.get(name);
+    if (direct) return direct;
+    const trimmed = name.trim();
+    const directTrimmed = PLAYER_BY_NAME.get(trimmed);
+    if (directTrimmed) return directTrimmed;
+    return PLAYER_BY_LOWER.get(trimmed.toLowerCase());
   }
 
   // ---------- Similarity ----------

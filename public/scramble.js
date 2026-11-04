@@ -164,6 +164,32 @@
     return flags[code] || "🏏";
   }
 
+  function getCountryName(code) {
+    const names = (typeof window !== "undefined" && window.COUNTRIES) || (typeof COUNTRIES !== "undefined" ? COUNTRIES : null);
+    if (names && names[code]) return names[code];
+    const map = {
+      IND: "India", PAK: "Pakistan", AUS: "Australia", ENG: "England", SA: "South Africa",
+      NZ: "New Zealand", SL: "Sri Lanka", WI: "West Indies", BAN: "Bangladesh",
+      AFG: "Afghanistan", ZIM: "Zimbabwe", IRE: "Ireland"
+    };
+    return map[code] || code || "International";
+  }
+
+  const EXTRA_LEGENDS = [
+    { name: "Shane Warne", country: "AUS", role: "Bowler", debut: 1992, active: false },
+    { name: "Brian Lara", country: "WI", role: "Batter", debut: 1990, active: false },
+    { name: "Vivian Richards", country: "WI", role: "Batter", debut: 1974, active: false },
+    { name: "Kapil Dev", country: "IND", role: "All-rounder", debut: 1978, active: false },
+    { name: "Wasim Akram", country: "PAK", role: "Bowler", debut: 1984, active: false },
+    { name: "Sourav Ganguly", country: "IND", role: "Batter", debut: 1992, active: false },
+    { name: "Anil Kumble", country: "IND", role: "Bowler", debut: 1990, active: false },
+    { name: "Imran Khan", country: "PAK", role: "All-rounder", debut: 1971, active: false },
+    { name: "VVS Laxman", country: "IND", role: "Batter", debut: 1996, active: false },
+    { name: "Robin Uthappa", country: "IND", role: "Batter", debut: 2006, active: false },
+    { name: "Ambati Rayudu", country: "IND", role: "Batter", debut: 2013, active: false },
+    { name: "Mohammad Azharuddin", country: "IND", role: "Batter", debut: 1984, active: false }
+  ];
+
   let shuffledAnagramLetters = [];
 
   function initAnagramLetters() {
@@ -185,11 +211,13 @@
   }
 
   function findPlayerData(name) {
+    const trimmed = (name || "").trim().toLowerCase();
     if (typeof PLAYERS !== "undefined" && Array.isArray(PLAYERS)) {
-      const trimmed = (name || "").trim().toLowerCase();
       const found = PLAYERS.find(p => p.name.toLowerCase() === trimmed);
       if (found) return found;
     }
+    const leg = EXTRA_LEGENDS.find(p => p.name.toLowerCase() === trimmed);
+    if (leg) return leg;
     return { name, country: "ICC", role: "Cricket Legend", debut: 2005, matches: 200, runs: 5000, wkts: 50, active: false };
   }
 
@@ -323,12 +351,12 @@
 
   function renderClues() {
     const count = userGuesses.length;
-    const countryName = targetPlayer.country || "International";
+    const countryName = getCountryName(targetPlayer.country);
     const countryFlag = getCountryFlag(targetPlayer.country);
 
     if (clueCountry) {
       clueCountry.className = "clue-pill unlocked";
-      clueCountry.innerHTML = `<span>${countryFlag} Country: <strong>${countryName}</strong></span>`;
+      clueCountry.innerHTML = `<span>${countryFlag} Country: <strong>${escapeHtml(countryName)}</strong></span>`;
     }
 
     if (clueRole) {
@@ -499,16 +527,26 @@
   function updateSuggestions(query) {
     if (!suggestionsEl || !guessInput) return;
     const q = (query || "").trim().toLowerCase();
-    if (!q || q.length < 1 || typeof PLAYERS === "undefined" || !Array.isArray(PLAYERS)) {
+    if (!q || q.length < 1) {
       hideSuggestions();
       return;
     }
+
+    const pool = [];
+    if (typeof PLAYERS !== "undefined" && Array.isArray(PLAYERS)) {
+      pool.push(...PLAYERS);
+    }
+    EXTRA_LEGENDS.forEach((leg) => {
+      if (!pool.some((p) => p.name.toLowerCase() === leg.name.toLowerCase())) {
+        pool.push(leg);
+      }
+    });
 
     const startsWith = [];
     const wordStartsWith = [];
     const contains = [];
 
-    for (const p of PLAYERS) {
+    for (const p of pool) {
       const pLower = p.name.toLowerCase();
       if (pLower.startsWith(q)) {
         startsWith.push(p);
@@ -575,7 +613,7 @@
 
   function submitGuess(rawGuess) {
     if (isGameOver) return;
-    const guess = (rawGuess || "").trim();
+    let guess = (rawGuess || "").trim();
 
     if (guess.length < 2) {
       showToast("Please enter at least 2 characters for your guess!");
@@ -583,6 +621,34 @@
     }
 
     hideSuggestions();
+
+    // Smart player name resolution (e.g. "kohli" -> "Virat Kohli", "dhoni" -> "MS Dhoni")
+    const guessLower = guess.toLowerCase();
+    const targetLower = targetName.toLowerCase();
+    if (guessLower === targetLower) {
+      guess = targetPlayer.name;
+    } else if (
+      targetLower.endsWith(" " + guessLower) ||
+      targetLower.startsWith(guessLower + " ") ||
+      targetLower.split(/\s+/).includes(guessLower)
+    ) {
+      guess = targetPlayer.name;
+    } else {
+      const pool = [];
+      if (typeof PLAYERS !== "undefined" && Array.isArray(PLAYERS)) pool.push(...PLAYERS);
+      EXTRA_LEGENDS.forEach(leg => {
+        if (!pool.some(p => p.name.toLowerCase() === leg.name.toLowerCase())) pool.push(leg);
+      });
+      const match = pool.find(
+        p =>
+          p.name.toLowerCase() === guessLower ||
+          p.name.toLowerCase().endsWith(" " + guessLower) ||
+          p.name.toLowerCase().split(/\s+/).includes(guessLower)
+      );
+      if (match) {
+        guess = match.name;
+      }
+    }
 
     userGuesses.push(guess);
     const evalResult = evaluateGuess(guess);
@@ -636,12 +702,14 @@
     if (guessInput) guessInput.disabled = true;
     if (btnSubmitGuess) btnSubmitGuess.disabled = true;
 
+    const attemptsCount = userGuesses.length;
     const flag = getCountryFlag(targetPlayer.country);
+    const countryName = getCountryName(targetPlayer.country);
     if (playerRevealFlag) playerRevealFlag.textContent = flag;
     if (playerRevealName) playerRevealName.textContent = targetPlayer.name;
     if (playerRevealMeta) {
       const activeText = targetPlayer.active ? "Active" : "Retired";
-      playerRevealMeta.textContent = `${targetPlayer.country || ""} · ${targetPlayer.role || "Cricketer"} · Debut ${targetPlayer.debut || "2000"} (${activeText})`;
+      playerRevealMeta.textContent = `${countryName} · ${targetPlayer.role || "Cricketer"} · Debut ${targetPlayer.debut || "2000"} (${activeText})`;
     }
 
     const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
@@ -692,7 +760,7 @@
     }
 
     const outcomeText = isWon ? `Solved in ${attemptsCount}/${MAX_GUESSES}!` : `X/${MAX_GUESSES}`;
-    const shareText = `Cricketle · Scramble 🔀\nDaily Challenge · ${getTodayKey()}\n${outcomeText}\n\n${emojiGrid}\n\nCan you unscramble the cricket legend?\nhttps://cricketle.onrender.com/scramble.html`;
+    const shareText = `Cricketle · Scramble 🔀\nDaily Challenge · ${getTodayKey()}\n${outcomeText}\n\n${emojiGrid}\n\nCan you unscramble the cricket legend?\nhttps://playcricketle.onrender.com/scramble.html`;
 
     if (btnShareWhatsapp) {
       btnShareWhatsapp.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
@@ -745,11 +813,10 @@
   }
 
   async function init() {
-    const isAuthed = await checkAuth();
-    if (!isAuthed) return;
     initDailyPlayer();
     renderPatternCard();
     renderVirtualKeyboard();
+    await checkAuth();
 
     const saved = loadSavedState();
     if (saved && Array.isArray(saved.guesses)) {

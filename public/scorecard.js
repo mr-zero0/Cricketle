@@ -63,6 +63,10 @@
       const idx = seed % activePool.length;
       currentCard = activePool[idx];
 
+      if (window.CricketleInaccuracy) {
+        window.CricketleInaccuracy.setTargetProvider(() => currentCard ? { name: currentCard.targetPlayer, id: currentCard.id } : null);
+      }
+
       // Restore saved progress
       const saved = localStorage.getItem(`cricketle_scorecard_${today}_${currentMode}`);
       if (saved) {

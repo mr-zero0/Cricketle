@@ -446,6 +446,10 @@
       const targetIndex = getSpacedDailyIndex(today, activePool.length, "journey_" + currentMode);
       currentTarget = activePool[targetIndex];
 
+      if (window.CricketleInaccuracy) {
+        window.CricketleInaccuracy.setTargetProvider(() => currentTarget ? { name: currentTarget.name, id: currentTarget.id } : null);
+      }
+
       const saved = localStorage.getItem(`cricketle_journey_${today}_${currentMode}`);
       if (saved) {
         const data = JSON.parse(saved);

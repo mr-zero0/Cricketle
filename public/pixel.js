@@ -186,6 +186,10 @@
       const targetIndex = getSpacedDailyIndex(today, activePool.length, "pixel_" + currentMode);
       currentTarget = activePool[targetIndex];
 
+      if (window.CricketleInaccuracy) {
+        window.CricketleInaccuracy.setTargetProvider(() => currentTarget ? { name: currentTarget.name, id: currentTarget.id } : null);
+      }
+
       // Select variant deterministically so different encounters show different photos
       const variants = Array.isArray(currentTarget.images) && currentTarget.images.length > 0
         ? currentTarget.images
@@ -422,10 +426,10 @@
         resultStatus.style.color = won ? "#16a34a" : "var(--danger)";
       }
       if (resultName) {
-        resultName.textContent = currentTarget.name + ` (${currentTarget.country})`;
+        resultName.textContent = currentTarget.name + ` (${currentTarget.country} · ${currentTarget.role})`;
       }
       if (resultHint) {
-        resultHint.textContent = currentTarget.hint;
+        resultHint.textContent = (won ? "Clue: " : "Answer: ") + currentTarget.hint;
       }
     }
   }

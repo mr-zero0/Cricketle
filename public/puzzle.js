@@ -571,6 +571,10 @@
       const targetIndex = getSpacedDailyIndex(today, activePool.length, "portrait_puzzle_" + currentMode);
       currentTarget = activePool[targetIndex];
 
+      if (window.CricketleInaccuracy) {
+        window.CricketleInaccuracy.setTargetProvider(() => currentTarget ? { name: currentTarget.name, id: currentTarget.id } : null);
+      }
+
       const variants = Array.isArray(currentTarget.images) && currentTarget.images.length > 0
         ? currentTarget.images
         : [currentTarget.imageUrl];
@@ -704,6 +708,36 @@
         ? `Solved in ${currentAttempts.length} of ${MAX_ATTEMPTS} guesses!`
         : `The cricketer was ${currentTarget ? currentTarget.name : ""}`;
     }
+
+    const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
+    const elapsedSec = Math.floor(elapsedMs / 1000);
+    const speedBonus = Math.max(0, 25 - Math.floor(elapsedSec / 15));
+    const stagePen = Math.max(0, (currentAttempts.length - 1) * 12);
+    const calculatedScore = won ? Math.max(25, 100 - stagePen + speedBonus) : 0;
+
+    fetch("/api/variant/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "puzzle_" + currentMode,
+        score: calculatedScore,
+        status: won ? "solved" : "gaveUp",
+        durationMs: elapsedMs,
+        guesses: currentAttempts,
+      }),
+    }).catch(() => {});
+
+    fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        variant: "puzzle_" + currentMode,
+        action: "game_completed",
+        details: { won, score: calculatedScore, attempts: currentAttempts.length },
+        durationMs: elapsedMs,
+        score: calculatedScore,
+      }),
+    }).catch(() => {});
 
     saveProgress();
   }

@@ -85,7 +85,7 @@
         ]
       },
       {
-        "category": "Cricketers with a Stumper/Wicketkeeper Father or Son",
+        "category": "Cricketers Whose Fathers Played International Cricket",
         "level": 3,
         "color": "#a855f7",
         "members": [
@@ -112,7 +112,7 @@
         ]
       },
       {
-        "category": "Took 6 Wickets in an Over in Domestic / T20 Cricket",
+        "category": "Hit 6 Sixes in an Over in International Cricket",
         "level": 1,
         "color": "#22c55e",
         "members": [
@@ -161,7 +161,7 @@
         ]
       },
       {
-        "category": "Bowlers Who Took 10 Wickets in a Test Innings",
+        "category": "Took 9 or More Wickets in a Single Test Innings",
         "level": 1,
         "color": "#22c55e",
         "members": [
@@ -210,14 +210,14 @@
         ]
       },
       {
-        "category": "Hit 6 Sixes in an Over in T20 Internationals",
+        "category": "Hit 6 Sixes in an Over in Professional T20 Cricket",
         "level": 1,
         "color": "#22c55e",
         "members": [
+          "Yuvraj Singh",
+          "Kieron Pollard",
           "Dipendra Singh Airee",
-          "Stuart Broad",
-          "Akila Dananjaya",
-          "Kamran Khan"
+          "Hazratullah Zazai"
         ]
       },
       {
@@ -232,13 +232,13 @@
         ]
       },
       {
-        "category": "Captains Who Won the IPL in Their First Season as Captain",
+        "category": "Captains Who Won the Indian Premier League (IPL)",
         "level": 3,
         "color": "#a855f7",
         "members": [
           "Shane Warne",
           "Hardik Pandya",
-          "Shreyas Iyer",
+          "Rohit Sharma",
           "David Warner"
         ]
       }
@@ -308,7 +308,7 @@
         ]
       },
       {
-        "category": "Won the ICC Men's Cricket World Cup as Both Player and Coach",
+        "category": "Head Coaches Who Won an ICC World Cup Trophy",
         "level": 1,
         "color": "#22c55e",
         "members": [
@@ -330,12 +330,12 @@
         ]
       },
       {
-        "category": "Cricketers with Iconic Nicknames ending in 'Punter' or 'Dada'",
+        "category": "Indian Cricketers Who Served as Members of Parliament (MP)",
         "level": 3,
         "color": "#a855f7",
         "members": [
+          "Sachin Tendulkar",
           "Gautam Gambhir",
-          "VVS Laxman",
           "Navjot Singh Sidhu",
           "Harbhajan Singh"
         ]
@@ -462,7 +462,7 @@
           "Sourav Ganguly",
           "Sanath Jayasuriya",
           "Sarfaraz Ahmed",
-          "Chris Cairns"
+          "Stephen Fleming"
         ]
       },
       {
@@ -673,7 +673,7 @@
         ]
       },
       {
-        "category": "Took Hat-trick in Debut Test Match",
+        "category": "Bowlers Who Took a Test Match Hat-trick",
         "level": 3,
         "color": "#a855f7",
         "members": [
@@ -711,7 +711,7 @@
         ]
       },
       {
-        "category": "Captains Who Won the Border-Gavaskar Trophy in Australia",
+        "category": "Captains Who Won the Border-Gavaskar Trophy",
         "level": 2,
         "color": "#3b82f6",
         "members": [
@@ -858,13 +858,13 @@
         ]
       },
       {
-        "category": "Bowlers with 3 or More IPL Hat-tricks",
+        "category": "Bowlers Who Took a Hat-trick in the IPL",
         "level": 2,
         "color": "#3b82f6",
         "members": [
           "Amit Mishra",
           "Yuvraj Singh",
-          "Axar Patel",
+          "Rohit Sharma",
           "Sunil Narine"
         ]
       },
@@ -945,14 +945,14 @@
         ]
       },
       {
-        "category": "Scored a Double Century in World Cup Matches",
+        "category": "Scored 175+ in an ICC Men's Cricket World Cup Match",
         "level": 1,
         "color": "#22c55e",
         "members": [
+          "Kapil Dev",
           "Chris Gayle",
           "Martin Guptill",
-          "Glenn Maxwell",
-          "Rohit Sharma"
+          "Glenn Maxwell"
         ]
       },
       {

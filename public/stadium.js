@@ -100,6 +100,10 @@
       const sIdx = seed % allStadiums.length;
       currentTarget = allStadiums[sIdx];
 
+      if (window.CricketleInaccuracy) {
+        window.CricketleInaccuracy.setTargetProvider(() => currentTarget ? { name: currentTarget.name, id: currentTarget.id } : null);
+      }
+
       // Update SVG boundary callouts
       const b = currentTarget.boundaries || { straight: 75, square: 66 };
       if (svgStraightTop) svgStraightTop.textContent = `Straight: ${b.straight}m`;
