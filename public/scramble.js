@@ -46,6 +46,7 @@
   const finishedView = document.getElementById("finished-view");
   const scrambledWrap = document.getElementById("scrambled-tiles-wrap");
   const scramblePatternText = document.getElementById("scramble-pattern-text");
+  const btnReshuffle = document.getElementById("btn-reshuffle");
   const boardEl = document.getElementById("wordle-board");
   const guessInput = document.getElementById("guess-input");
   const btnSubmitGuess = document.getElementById("btn-submit-guess");
@@ -163,22 +164,47 @@
     return flags[code] || "🏏";
   }
 
+  let shuffledAnagramLetters = [];
+
+  function initAnagramLetters() {
+    const lettersOnly = targetName.replace(/[^A-Z]/g, "").split("");
+    const rng = mulberry32(hashString(`${getTodayKey()}_scramble_anagram_v1`));
+    shuffledAnagramLetters = [...lettersOnly];
+    for (let i = shuffledAnagramLetters.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [shuffledAnagramLetters[i], shuffledAnagramLetters[j]] = [shuffledAnagramLetters[j], shuffledAnagramLetters[i]];
+    }
+  }
+
+  function reshuffleAnagram() {
+    for (let i = shuffledAnagramLetters.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledAnagramLetters[i], shuffledAnagramLetters[j]] = [shuffledAnagramLetters[j], shuffledAnagramLetters[i]];
+    }
+    renderPatternCard();
+  }
+
   function findPlayerData(name) {
     if (typeof PLAYERS !== "undefined" && Array.isArray(PLAYERS)) {
-      const found = PLAYERS.find(p => p.name.toLowerCase() === name.toLowerCase());
+      const trimmed = (name || "").trim().toLowerCase();
+      const found = PLAYERS.find(p => p.name.toLowerCase() === trimmed);
       if (found) return found;
     }
-    return { name, country: "IND", role: "Cricket Legend", debut: 2008, matches: 300, runs: 10000, wkts: 50 };
+    return { name, country: "ICC", role: "Cricket Legend", debut: 2005, matches: 200, runs: 5000, wkts: 50, active: false };
   }
 
   function initDailyPlayer() {
     const today = getTodayKey();
-    const seed = hashString(`${today}_scramble_challenge_v1`);
-    const idx = seed % SCRAMBLE_POOL.length;
+    // Non-repeating calendar day progression so no player repeats for 106 consecutive days
+    const epoch = new Date("2026-01-01T00:00:00Z").getTime();
+    const current = new Date(`${today}T00:00:00Z`).getTime();
+    const dayNumber = Math.max(0, Math.floor((current - epoch) / 86400000));
+    const idx = ((dayNumber + 71) % SCRAMBLE_POOL.length + SCRAMBLE_POOL.length) % SCRAMBLE_POOL.length;
     const name = SCRAMBLE_POOL[idx];
 
     targetPlayer = findPlayerData(name);
     targetName = targetPlayer.name.toUpperCase();
+    initAnagramLetters();
     if (window.CricketleInaccuracy) {
       window.CricketleInaccuracy.setTargetProvider(() => targetPlayer ? { name: targetPlayer.name, id: targetPlayer.id } : null);
     }
@@ -223,7 +249,9 @@
     }
 
     if (scramblePatternText) {
-      scramblePatternText.textContent = `Total: ${targetName.length} Characters (Letters & Space)`;
+      const wordBreakdown = targetName.split(" ").map(w => `${w.length}`).join(" + ");
+      const anagramDisplay = shuffledAnagramLetters.join(" ");
+      scramblePatternText.innerHTML = `<strong>Total: ${targetName.length} Characters</strong> (${wordBreakdown} letters) · Scramble: <span style="letter-spacing:2px; font-weight:700; color:var(--accent, #38bdf8);">${escapeHtml(anagramDisplay)}</span>`;
     }
   }
 
@@ -743,6 +771,13 @@
     }
 
     // Event Listeners
+    if (btnReshuffle) {
+      btnReshuffle.addEventListener("click", () => {
+        reshuffleAnagram();
+        showToast("🔀 Reshuffled anagram letters!");
+      });
+    }
+
     if (btnSubmitGuess) {
       btnSubmitGuess.addEventListener("click", () => {
         if (guessInput) submitGuess(guessInput.value);

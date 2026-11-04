@@ -1,505 +1,1641 @@
 [
   {
-    "id": "facts-set-1",
     "theme": "Legendary Feats & Curiosities",
     "facts": [
       {
-        "id": "f1-1",
         "statement": "Sanath Jayasuriya scored more ODI runs than Brian Lara and took more ODI wickets than Shane Warne.",
         "isReal": true,
-        "explanation": "TRUE! Jayasuriya scored 13,430 ODI runs (Brian Lara scored 10,405) and took 323 ODI wickets with his left-arm spin (Shane Warne took 293)."
+        "explanation": "TRUE! Jayasuriya scored 13,430 ODI runs (Brian Lara scored 10,405) and took 323 ODI wickets with his left-arm spin (Shane Warne took 293).",
+        "id": "f1-1"
       },
       {
-        "id": "f1-2",
         "statement": "Brian Lara's world-record 400 not out against England included 50 boundaries and 10 sixes.",
         "isReal": false,
-        "explanation": "FALSE! Lara hit 43 fours and only 4 sixes during his marathon 400* at the Antigua Recreation Ground in 2004."
+        "explanation": "FALSE! Lara hit 43 fours and only 4 sixes during his marathon 400* at the Antigua Recreation Ground in 2004.",
+        "id": "f1-2"
       },
       {
-        "id": "f1-3",
         "statement": "Sachin Tendulkar fielded as a substitute fielder for Pakistan in an exhibition match before his international debut for India.",
         "isReal": true,
-        "explanation": "TRUE! On January 20, 1987, at Mumbai's Brabourne Stadium, a 13-year-old Sachin fielded for Imran Khan's Pakistan team when Javed Miandad and Abdul Qadir took a break."
+        "explanation": "TRUE! In January 1987 at the Brabourne Stadium in Mumbai, a 13-year-old Tendulkar came on as a substitute fielder for Imran Khan's Pakistan team when Javed Miandad and Abdul Qadir left the field.",
+        "id": "f1-3"
       },
       {
-        "id": "f1-4",
         "statement": "Rahul Dravid once batted across two entire days of a Test match without hitting a single boundary.",
         "isReal": false,
-        "explanation": "FALSE! While 'The Wall' famously defended for long stretches (once taking 40 balls to get off the mark), he never batted across two full days without hitting a single four."
+        "explanation": "FALSE! While Dravid famously played grinding defensive innings, he never went two whole days boundary-less. His longest boundary drought in a Test innings was 173 balls against Australia in 2008.",
+        "id": "f1-4"
       },
       {
-        "id": "f1-5",
         "statement": "Virat Kohli took a wicket off the 0th legal ball of his international Twenty20 bowling career.",
         "isReal": true,
-        "explanation": "TRUE! In 2011 against England, Kohli bowled a wide down leg, and MS Dhoni stumped Kevin Pietersen. Because the ball was an illegal wide, the wicket fell before a single legal ball was bowled!"
+        "explanation": "TRUE! Against England in 2011, Kohli bowled a wide down the leg side with his first delivery; Kevin Pietersen stepped out and MS Dhoni whipped off the bails for a stumping before any legal ball was bowled.",
+        "id": "f1-5"
       },
       {
-        "id": "f1-6",
         "statement": "Muttiah Muralitharan's doosra was measured by ICC high-speed biomechanics cameras as having 0.0 degrees of elbow extension.",
         "isReal": false,
-        "explanation": "FALSE! Murali's doosra flexed around 10 to 14 degrees, which prompted the ICC to establish the universal 15-degree elbow extension tolerance for all bowlers."
+        "explanation": "FALSE! Muralitharan's doosra was measured at around 14 degrees of elbow extension during testing at the University of Western Australia, within the legal 15-degree ICC limit.",
+        "id": "f1-6"
       }
     ]
   },
   {
-    "id": "facts-set-2",
     "theme": "World Cup Fireworks & Heartbreaks",
     "facts": [
       {
-        "id": "f2-1",
         "statement": "In the 1975 World Cup 60-over match against England, Sunil Gavaskar carried his bat through all 60 overs for 36 not out.",
         "isReal": true,
-        "explanation": "TRUE! Chasing England's 334/4 in 60 overs, Gavaskar batted through the entire 60 overs, facing 174 balls and hitting only one boundary for 36* as India finished 132/3."
+        "explanation": "TRUE! Facing England's 334/4 at Lord's in 1975, Gavaskar batted through the entire 60 overs for India, scoring an ultra-defensive 36 not out off 174 balls with only one four.",
+        "id": "f2-1"
       },
       {
-        "id": "f2-2",
         "statement": "MS Dhoni was run out by Martin Guptill on 49 in the 2019 World Cup semifinal, falling one run short of a fighting fifty.",
         "isReal": false,
-        "explanation": "FALSE! Dhoni was run out on 50 off 72 balls; he had just completed the first run to bring up his half-century and was inches short turning for the second."
+        "explanation": "FALSE! Dhoni had just completed his half-century (50 off 72 balls) when Guptill's direct hit from backward square leg ran him out in the 49th over.",
+        "id": "f2-2"
       },
       {
-        "id": "f2-3",
         "statement": "India won the 1983 World Cup final against the West Indies without a single Indian batsman hitting a six.",
         "isReal": true,
-        "explanation": "TRUE! In India's total of 183 all out at Lord's, Indian batsmen struck 18 boundaries (fours) but did not hit a single six against the West Indies pace battery."
+        "explanation": "TRUE! India was bowled out for 183 in 54.4 overs at Lord's without hitting a single six (top score Kris Srikkanth 38 with 7 fours and 0 sixes), and defended it brilliantly to bowl WI out for 140.",
+        "id": "f2-3"
       },
       {
-        "id": "f2-4",
         "statement": "Brett Lee took a hat-trick in the final over of the 2003 World Cup Final against India to seal Australia's victory.",
         "isReal": false,
-        "explanation": "FALSE! Australia won the 2003 final by 125 runs with McGrath taking 3 wickets. Brett Lee took his 2003 World Cup hat-trick earlier in the tournament against Kenya."
+        "explanation": "FALSE! Australia defeated India by 125 runs in the 2003 final with Glenn McGrath taking the final wicket (Zaheer Khan); Brett Lee took 2 wickets in the match, not a hat-trick.",
+        "id": "f2-4"
       },
       {
-        "id": "f2-5",
         "statement": "Sri Lanka's Lasith Malinga has taken 4 wickets in 4 consecutive balls twice in international cricket.",
         "isReal": true,
-        "explanation": "TRUE! Malinga achieved this against South Africa in the 2007 World Cup (Pollock, Hall, Kallis, Ntini) and repeated the feat against New Zealand in a 2019 T20I."
+        "explanation": "TRUE! Malinga achieved this double four-in-four feat first against South Africa in the 2007 World Cup in Guyana, and repeated it against New Zealand in a T20I in Pallekele in 2019.",
+        "id": "f2-5"
       },
       {
-        "id": "f2-6",
         "statement": "In the famous 438 match in Johannesburg in 2006, Herschelle Gibbs hit his 175 off just 85 balls.",
         "isReal": false,
-        "explanation": "FALSE! Gibbs played a breathtaking knock, but he scored his 175 off 111 balls (with 21 fours and 7 sixes). Mark Boucher hit the fastest fifty of the chase in 26 balls."
+        "explanation": "FALSE! Gibbs scored 175 off 111 balls (21 fours and 7 sixes). It was a breathtaking innings, but took 111 deliveries, not 85.",
+        "id": "f2-6"
       }
     ]
   },
   {
-    "id": "facts-set-3",
     "theme": "Test Cricket Wonders",
     "facts": [
       {
-        "id": "f3-1",
         "statement": "Chris Gayle is the only batsman in Test cricket history to hit a six off the very first ball of a Test match.",
         "isReal": true,
-        "explanation": "TRUE! On November 13, 2012, in Mirpur, Gayle smashed the first ball of the Test from Bangladesh off-spinner Sohag Gazi over long-on for six."
+        "explanation": "TRUE! Against Bangladesh in Mirpur in November 2012, Gayle smashed debutant off-spinner Sohag Gazi over long-on for six off ball one of the Test.",
+        "id": "f3-1"
       },
       {
-        "id": "f3-2",
         "statement": "Sir Viv Richards scored a century in both innings of the 1976 Lord's Test match without wearing a helmet.",
         "isReal": false,
-        "explanation": "FALSE! Richards famously played without a helmet, but he never scored twin centuries in a single Test. His iconic 291 in that series came at The Oval, not Lord's."
+        "explanation": "FALSE! Richards scored 232 in the first innings at Trent Bridge and 291 at The Oval in 1976, but he never scored twin centuries in both innings at Lord's.",
+        "id": "f3-2"
       },
       {
-        "id": "f3-3",
         "statement": "Pakistan fast bowler Wasim Akram has a higher highest Test match score than Sachin Tendulkar.",
         "isReal": true,
-        "explanation": "TRUE! Wasim Akram hit 257 not out with 12 sixes against Zimbabwe in 1996. Sachin Tendulkar's career-best Test score is 248 not out against Bangladesh in 2004."
+        "explanation": "TRUE! Wasim Akram scored 257 not out against Zimbabwe in Sheikhupura in 1996 (hitting 12 sixes), whereas Sachin Tendulkar's highest Test score was 248 not out against Bangladesh in 2004.",
+        "id": "f3-3"
       },
       {
-        "id": "f3-4",
         "statement": "Glenn McGrath scored his only Test half-century against India in Mumbai on a raging dustbowl turner.",
         "isReal": false,
-        "explanation": "FALSE! McGrath's solitary Test half-century was 61 against New Zealand at the Gabba in Brisbane in 2004, sharing a 114-run stand with Jason Gillespie."
+        "explanation": "FALSE! McGrath scored his sole Test half-century (61) against New Zealand at the Gabba in Brisbane in 2004, sharing a 114-run tenth-wicket stand with Jason Gillespie.",
+        "id": "f3-4"
       },
       {
-        "id": "f3-5",
         "statement": "England wicketkeeper Alec Stewart was born on 8-4-63 and finished his Test career with exactly 8,463 runs.",
         "isReal": true,
-        "explanation": "TRUE! One of sport's most famous numerical coincidences: born on 8th April 1963 (8-4-63), he scored exactly 8,463 Test runs in 133 matches!"
+        "explanation": "TRUE! In one of cricket's most astounding numerical coincidences, Alec Stewart was born on 8 April 1963 (8-4-63) and retired with 8,463 Test runs in 133 Tests.",
+        "id": "f3-5"
       },
       {
-        "id": "f3-6",
         "statement": "Ricky Ponting was given out LBW on 99 on his Test debut at the WACA by umpire Darrell Hair.",
         "isReal": false,
-        "explanation": "FALSE! Ponting was dismissed for 96 on his Test debut against Sri Lanka in Perth in 1995, falling 4 runs shy of a debut century."
+        "explanation": "FALSE! Ponting was given out LBW on 96 (not 99) on debut against Sri Lanka in Perth in 1995 off Chaminda Vaas; replays showed the ball had struck him well above the stumps.",
+        "id": "f3-6"
       }
     ]
   },
   {
-    "id": "facts-set-4",
     "theme": "Bowling Masters & Historic Dismissals",
     "facts": [
       {
-        "id": "f4-1",
         "statement": "The first ever dismissal adjudicated by a TV third umpire in international cricket was Sachin Tendulkar run out in 1992.",
         "isReal": true,
-        "explanation": "TRUE! On November 14, 1992, in Durban, Jonty Rhodes threw down the stumps and TV umpire Karl Liebenberg pushed the red button to confirm Sachin was run out for 11."
+        "explanation": "TRUE! On 14 November 1992 in the Durban Test against South Africa, third umpire Karl Liebenberg reviewed Jonty Rhodes' throw to dismiss Sachin Tendulkar run out on 11.",
+        "id": "f4-1"
       },
       {
-        "id": "f4-2",
         "statement": "Shoaib Akhtar's official fastest ball in cricket history (161.3 km/h / 100.2 mph) was bowled to Sachin Tendulkar in 2003.",
         "isReal": false,
-        "explanation": "FALSE! The record 161.3 km/h delivery was bowled to England opener Nick Knight at Newlands in Cape Town during the 2003 World Cup."
+        "explanation": "FALSE! Akhtar's record delivery of 161.3 km/h was bowled to England opening batsman Nick Knight at Newlands, Cape Town in the 2003 World Cup.",
+        "id": "f4-2"
       },
       {
-        "id": "f4-3",
         "statement": "Sir Don Bradman hit only 6 sixes in his entire 20-year international Test career.",
         "isReal": true,
-        "explanation": "TRUE! Despite scoring 6,996 runs at an average of 99.94 with 618 fours, Bradman hit just 6 sixes in 52 Tests (5 against England, 1 against India)."
+        "explanation": "TRUE! In 52 Tests and 6,996 Test runs, Bradman hit 618 fours but only 6 sixes (5 against England and 1 against India), preferring to keep the ball firmly grounded.",
+        "id": "f4-3"
       },
       {
-        "id": "f4-4",
         "statement": "Anil Kumble's 10-wicket haul against Pakistan in 1999 contained zero catches by any Indian fielders.",
         "isReal": false,
-        "explanation": "FALSE! Kumble's 10/74 included 4 catches: Nayan Mongia took 2 catches behind the stumps, VVS Laxman took one at forward short leg, and Mohammad Azharuddin took one at slip."
+        "explanation": "FALSE! Kumble's 10/74 in Delhi featured multiple catches, including VVS Laxman catching Inzamam and Nayan Mongia catching Shahid Afridi behind the stumps.",
+        "id": "f4-4"
       },
       {
-        "id": "f4-5",
         "statement": "Courtney Walsh once refused to run out a non-striker in a World Cup match, which directly eliminated the West Indies from the tournament.",
         "isReal": true,
-        "explanation": "TRUE! In the 1987 World Cup, Pakistan needed 2 runs off the final ball with 1 wicket left. Walsh caught Salim Jaffar backing up early, chose to warn him rather than run him out, and Pakistan won on the next ball."
+        "explanation": "TRUE! In the 1987 World Cup against Pakistan in Lahore, with Pakistan needing 2 runs off the final ball with 1 wicket left, Walsh backed out from Mankading non-striker Saleem Jaffar. Abdul Qadir then took the winning runs, knocking WI out.",
+        "id": "f4-5"
       },
       {
-        "id": "f4-6",
         "statement": "Shane Warne dismissed an English batsman with the very first delivery of an Ashes series on three separate tours.",
         "isReal": false,
-        "explanation": "FALSE! Warne bowled the famous 'Ball of the Century' with his first ball in an Ashes match in 1993, but he never took a wicket with the very first ball of an entire Ashes series."
+        "explanation": "FALSE! Steve Harmison bowled the famous wide to second slip on ball one of the 2006-07 series, and Mitchell Starc bowled Rory Burns on ball one in 2021-22, but Warne never took a wicket on ball one of an Ashes series.",
+        "id": "f4-6"
       }
     ]
   },
   {
-    "id": "facts-set-5",
     "theme": "Superstars & Modern Myths",
     "facts": [
       {
-        "id": "f5-1",
         "statement": "AB de Villiers holds the world record for the fastest 50 (16 balls), fastest 100 (31 balls), and fastest 150 (64 balls) in ODI history.",
         "isReal": true,
-        "explanation": "TRUE! In 2015 against the West Indies, de Villiers set all three records in the same year (the 16-ball 50 and 31-ball 100 in Johannesburg, and 64-ball 150 in Sydney)."
+        "explanation": "TRUE! All three blistering world records were established by AB de Villiers in 2015 against the West Indies (the 50 and 100 in Johannesburg, the 150 in Sydney during the World Cup).",
+        "id": "f5-1"
       },
       {
-        "id": "f5-2",
         "statement": "Rohit Sharma was originally selected in Mumbai's Ranji Trophy team as a specialist off-spinner batting at number 8.",
-        "isReal": false,
-        "explanation": "FALSE! Rohit started as an off-spinner in childhood, but coaches noticed his batting talent early. By the time he made his First-Class debut, he was already an established top-order batsman."
+        "isReal": true,
+        "explanation": "TRUE! Rohit started his junior cricket as an off-spin bowler before his coach Dinesh Lad spotted his batting talent and promoted him to open the batting.",
+        "id": "f5-2"
       },
       {
-        "id": "f5-3",
         "statement": "Shahid Afridi used a cricket bat borrowed from Sachin Tendulkar when he scored his 37-ball ODI century against Sri Lanka.",
         "isReal": true,
-        "explanation": "TRUE! A 16-year-old Afridi didn't own a heavy bat suited for big hitting, so Waqar Younis handed him a bat that Sachin Tendulkar had gifted to him."
+        "explanation": "TRUE! Waqar Younis brought a custom bat given to him by Tendulkar to the Pakistan dressing room; Afridi borrowed it and smashed 102 off 40 balls in Nairobi in 1996.",
+        "id": "f5-3"
       },
       {
-        "id": "f5-4",
         "statement": "Jasprit Bumrah holds the world record for most runs scored in a single Test over (35 runs off Stuart Broad) batting at number 11.",
         "isReal": false,
-        "explanation": "FALSE! Bumrah was batting at number 10 at Edgbaston in 2022; Mohammed Siraj was the number 11 at the non-striker's end."
+        "explanation": "FALSE! Bumrah did smash Broad for 35 runs in an over at Edgbaston in 2022, but he was batting as India's captain at number 10, not number 11 (Mohammed Siraj was #11).",
+        "id": "f5-4"
       },
       {
-        "id": "f5-5",
         "statement": "MS Dhoni never scored an international century (in Tests or ODIs) outside the continent of Asia.",
-        "isReal": true,
-        "explanation": "TRUE! All 16 of Dhoni's international centuries (6 Test hundreds and 10 ODI hundreds) were scored in India, Pakistan, Sri Lanka, and Bangladesh."
+        "isReal": false,
+        "explanation": "FALSE! In ODIs Dhoni never scored a century outside Asia, but in Test cricket he scored a fighting 148 against the West Indies at St John's in Antigua in 2006.",
+        "id": "f5-5"
       },
       {
-        "id": "f5-6",
         "statement": "Virat Kohli was awarded Player of the Tournament in the 2011 ICC Cricket World Cup at age 22.",
         "isReal": false,
-        "explanation": "FALSE! Yuvraj Singh was the Player of the Tournament in 2011 with 362 runs and 15 wickets. Kohli scored a hundred against Bangladesh in the opening match."
+        "explanation": "FALSE! Yuvraj Singh was the Player of the Tournament in the 2011 World Cup (362 runs and 15 wickets). Kohli won Player of the Tournament in the 2023 World Cup.",
+        "id": "f5-6"
       }
     ]
   },
   {
-    "id": "facts-set-6",
     "theme": "Eccentrics, Records & Bizarre Rules",
     "facts": [
       {
-        "id": "f6-1",
         "statement": "England wicketkeeper Jack Russell ate a single Weetabix soaked in milk for exactly two minutes before every single day of Test cricket.",
         "isReal": true,
-        "explanation": "TRUE! Russell was famously eccentric: he timed the two-minute soak using his wristwatch, used the same tea bag all day, and wore the same battered white hat for 15 years."
+        "explanation": "TRUE! Russell was famously eccentric: he kept the same battered floppy white hat for his entire career, took his own tea bags on tour, and strictly timed his breakfast Weetabix.",
+        "id": "f6-1"
       },
       {
-        "id": "f6-2",
         "statement": "Jacques Kallis is the only cricketer to score 10,000 runs and take 250 wickets in both Tests and ODIs without ever captaining his country.",
         "isReal": false,
-        "explanation": "FALSE! Kallis captained South Africa in 2 Test matches and 13 ODIs during his illustrious career."
+        "explanation": "FALSE! Kallis did captain South Africa in two Test matches in 2006 against Australia, as well as 13 ODIs.",
+        "id": "f6-2"
       },
       {
-        "id": "f6-3",
         "statement": "Jim Laker took 19 wickets in a single Test match against Australia at Old Trafford in 1956.",
         "isReal": true,
-        "explanation": "TRUE! Laker took 9/37 in the first innings and 10/53 in the second innings to finish with historic match figures of 19 wickets for 90 runs."
+        "explanation": "TRUE! England off-spinner Jim Laker took 9/37 in the first innings and 10/53 in the second innings, finishing with match figures of 19 for 90, a record that has never been equalled.",
+        "id": "f6-3"
       },
       {
-        "id": "f6-4",
         "statement": "Yuvraj Singh's 6 sixes in an over off Stuart Broad in 2007 were all struck exclusively over the leg-side boundary.",
         "isReal": false,
-        "explanation": "FALSE! The 4th six went over deep backward point and the 5th six sailed over extra cover on the off side!"
+        "explanation": "FALSE! Yuvraj's fourth six was a ferocious slash sliced high over backward point on the off side, not over leg side.",
+        "id": "f6-4"
       },
       {
-        "id": "f6-5",
         "statement": "Wilfred Rhodes played Test cricket for England across four different calendar decades, from 1899 to 1930.",
         "isReal": true,
-        "explanation": "TRUE! Rhodes debuted in 1899 alongside W.G. Grace and played his final Test in 1930 at age 52, taking a world-record 4,204 first-class wickets in his career."
+        "explanation": "TRUE! Rhodes debuted in June 1899 (playing alongside WG Grace) and played his final Test in April 1930 in Jamaica at age 52, spanning the 1890s, 1900s, 1910s, and 1920s/30s.",
+        "id": "f6-5"
       },
       {
-        "id": "f6-6",
         "statement": "Kapil Dev never missed a single Test match for India in his entire 16-year career due to injury, fitness, or selection.",
         "isReal": false,
-        "explanation": "FALSE! While Kapil never missed a Test through injury, he was controversially dropped for one match (Kolkata 1984 vs England) after playing an attacking shot in Delhi."
+        "explanation": "FALSE! Kapil never missed a Test through injury, but he was controversially dropped for one Test match against England in Kolkata in 1984 for playing an irresponsible shot in Delhi.",
+        "id": "f6-6"
       }
     ]
   },
   {
-    "id": "facts-set-7",
     "theme": "IPL Blockbusters & Hidden Trivia",
     "facts": [
       {
-        "id": "f7-1",
         "statement": "Praveen Kumar bowled the very first ball in IPL history, and Sourav Ganguly was the batsman facing it.",
         "isReal": true,
-        "explanation": "TRUE! On April 18, 2008, at the M. Chinnaswamy Stadium, RCB's Praveen Kumar bowled the opening ball of IPL history to KKR captain Sourav Ganguly."
+        "explanation": "TRUE! On 18 April 2008 at the M. Chinnaswamy Stadium in Bengaluru, RCB's Praveen Kumar bowled to KKR opener Sourav Ganguly; it was a leg-bye off the thigh pad.",
+        "id": "f7-1"
       },
       {
-        "id": "f7-2",
         "statement": "Chris Gayle's unbeaten 175 off 66 balls for RCB against Pune Warriors in 2013 included 20 sixes.",
         "isReal": false,
-        "explanation": "FALSE! Gayle hit 17 sixes (along with 13 fours) during his world-record T20 score of 175*."
+        "explanation": "FALSE! Gayle hit 17 sixes (along with 13 fours) during his 175*, which remains the record for the highest individual score in T20 history.",
+        "id": "f7-2"
       },
       {
-        "id": "f7-3",
-        "statement": "BCCI rules originally allowed substitute fielders in the IPL to be non-squad local academy players.",
-        "isReal": false,
-        "explanation": "FALSE! IPL and ICC playing conditions have always strictly required substitute fielders to be registered members of the official squad."
-      },
-      {
-        "id": "f7-4",
         "statement": "Sunil Narine opened the batting and scored a 15-ball half-century in the IPL against Royal Challengers Bangalore.",
         "isReal": true,
-        "explanation": "TRUE! In 2017 in Bengaluru, Narine equaled the then-fastest IPL fifty off 15 balls alongside Chris Lynn as KKR chased down 159 in 12 overs."
+        "explanation": "TRUE! In IPL 2017 at Bengaluru, Narine equalled the then-fastest 50 in IPL history, blasting 54 off 17 balls (reaching 50 in 15 balls) for KKR.",
+        "id": "f7-3"
       },
       {
-        "id": "f7-5",
+        "statement": "BCCI rules originally allowed substitute fielders in the IPL to be non-squad local academy players.",
+        "isReal": false,
+        "explanation": "FALSE! IPL playing conditions strictly mandate that substitute fielders must be registered members of the 25-man team squad.",
+        "id": "f7-4"
+      },
+      {
         "statement": "Kolkata Knight Riders once won 14 consecutive IPL matches across two seasons in 2014 and 2015.",
         "isReal": true,
-        "explanation": "TRUE! KKR won 9 straight games to win the 2014 IPL title, and won their first 5 games in the 2014 Champions League T20 for a 14-match winning streak."
+        "explanation": "TRUE! KKR won their final 9 games of the 2014 season to lift the trophy and won their first game in 2015, alongside 4 Champions League T20 wins, totalling 14 straight T20 victories.",
+        "id": "f7-5"
       },
       {
-        "id": "f7-6",
         "statement": "David Warner has won the IPL Orange Cap award four times, more than any other batsman in history.",
         "isReal": false,
-        "explanation": "FALSE! Warner has won the Orange Cap 3 times (2015, 2017, 2019), which is the all-time record, but not four times."
+        "explanation": "FALSE! Warner has won the Orange Cap 3 times (2015, 2017, and 2019), which is the all-time record, but not four times.",
+        "id": "f7-6"
       }
     ]
   },
   {
-    "id": "facts-set-8",
     "theme": "Captains, Catches & Boundary Lines",
     "facts": [
       {
-        "id": "f8-1",
         "statement": "Graeme Smith captained South Africa in 109 Test matches, the most by any captain in Test history.",
         "isReal": true,
-        "explanation": "TRUE! Graeme Smith was appointed South Africa's captain at age 22 and led them in 109 Tests (winning 53), the only player to lead in over 100 Tests."
+        "explanation": "TRUE! Smith was handed the captaincy at age 22 and led South Africa in 108 Tests (plus 1 ICC World XI Test), winning 53 of them.",
+        "id": "f8-1"
       },
       {
-        "id": "f8-2",
         "statement": "Clive Lloyd and Ricky Ponting are the only two captains to win three consecutive ICC Cricket World Cups.",
         "isReal": false,
-        "explanation": "FALSE! Clive Lloyd won 2 (1975, 1979) and lost the 1983 final. Ricky Ponting won 2 as captain (2003, 2007). No captain has ever won three consecutive World Cups."
+        "explanation": "FALSE! Both Lloyd (1975, 1979) and Ponting (2003, 2007) captained two consecutive World Cup winning teams, losing in 1983 and 2011 respectively. No captain has won three consecutive World Cups.",
+        "id": "f8-2"
       },
       {
-        "id": "f8-3",
         "statement": "Sourav Ganguly was awarded Man of the Match in 4 consecutive ODIs against Pakistan in the 1997 Sahara Cup.",
         "isReal": true,
-        "explanation": "TRUE! In Toronto in September 1997, Ganguly won 4 consecutive Man of the Match awards for India with both bat and ball as India won the series 4-1."
+        "explanation": "TRUE! In Toronto in September 1997, Ganguly produced match-winning all-round displays against Pakistan in four straight matches (scoring runs and taking 5/16 with medium pace).",
+        "id": "f8-3"
       },
       {
-        "id": "f8-4",
         "statement": "Jonty Rhodes once took 7 catches in a single ODI match against the West Indies at Mumbai.",
         "isReal": false,
-        "explanation": "FALSE! Jonty took 5 catches (not 7) as a non-wicketkeeper against the West Indies at Brabourne Stadium in 1993, which still stands as an outfield ODI record."
+        "explanation": "FALSE! Rhodes took 5 catches (not 7) as an outfield fielder against the West Indies at Brabourne Stadium in the 1993 Hero Cup, which is an ODI world record for an outfielder.",
+        "id": "f8-4"
       },
       {
-        "id": "f8-5",
         "statement": "In 1999, New Zealand's Geoff Allott batted for 101 minutes in a Test match without scoring a single run.",
         "isReal": true,
-        "explanation": "TRUE! Against South Africa in Auckland in 1999, number 11 Geoff Allott faced 77 balls and lasted 101 minutes for a 0, the longest scoreless innings in First-Class history."
+        "explanation": "TRUE! Against South Africa in Auckland in 1999, Allott held up the South African attack for 101 minutes, facing 77 balls for a duck (0) to help New Zealand draw the Test.",
+        "id": "f8-5"
       },
       {
-        "id": "f8-6",
         "statement": "Australia once forfeited a World Cup match against Sri Lanka in 1996 because the pitch in Colombo was deemed unplayable.",
         "isReal": false,
-        "explanation": "FALSE! Australia and West Indies refused to travel to Colombo citing safety and security concerns following a bomb blast in the city, not pitch conditions."
+        "explanation": "FALSE! Australia forfeited due to security concerns following the Central Bank bomb blast in Colombo, not because of pitch conditions.",
+        "id": "f8-6"
       }
     ]
   },
   {
-    "id": "facts-set-9",
     "theme": "Speed Guns & Spinning Web",
     "facts": [
       {
-        "id": "f9-1",
         "statement": "South Africa's Dale Steyn spent a staggering 263 weeks as the world's number one ranked ICC Test bowler.",
         "isReal": true,
-        "explanation": "TRUE! Steyn dominated the ICC Test rankings from 2008 to 2014, spending 2,356 days (over 260 weeks) at the top of the bowling charts."
+        "explanation": "TRUE! Steyn dominated the ICC Test bowling rankings for over five full cumulative years (263 weeks) between 2008 and 2014, an extraordinary feat of fast-bowling consistency.",
+        "id": "f9-1"
       },
       {
-        "id": "f9-2",
         "statement": "Shane Warne once bowled an entire 6-ball maiden over in an Ashes Test bowling purely medium-pace outswingers.",
         "isReal": false,
-        "explanation": "FALSE! While Warne bowled seam-up bouncers and medium pacers occasionally in fun county games, he never bowled an entire maiden of seam in an Ashes Test."
+        "explanation": "FALSE! While Warne occasionally bowled a medium-pace bouncer or seam ball as a prank in exhibition matches, he never bowled an entire maiden of seam up in an Ashes Test.",
+        "id": "f9-2"
       },
       {
-        "id": "f9-3",
         "statement": "Shahid Afridi bowled a 134 km/h (83 mph) delivery as a leg-spinner in an international match.",
         "isReal": true,
-        "explanation": "TRUE! Afridi was renowned for his viciously fast 'quicker ball', and against New Zealand in 2010, the speed gun clocked one of his deliveries at 134.4 km/h."
+        "explanation": "TRUE! Known for bowling exceptionally brisk leg-spin, Afridi was clocked bowling a faster ball at 134 km/h against New Zealand, quicker than many traditional seamers.",
+        "id": "f9-3"
       },
       {
-        "id": "f9-4",
         "statement": "Rashid Khan took a five-wicket haul in T20 international cricket in his very first career appearance at age 17.",
         "isReal": false,
-        "explanation": "FALSE! Rashid Khan took 1 wicket for 20 runs on his T20I debut against Zimbabwe in 2015. His famous 5/3 came in 2017 against Ireland."
+        "explanation": "FALSE! Rashid took 1/20 on T20I debut vs Zimbabwe in Bulawayo in October 2015. His maiden T20I 5-for came in 2017 against Ireland (5/3 in Greater Noida).",
+        "id": "f9-4"
       },
       {
-        "id": "f9-5",
         "statement": "Muttiah Muralitharan took his 800th and final Test wicket on the very last ball of his Test career.",
         "isReal": true,
-        "explanation": "TRUE! In Galle in July 2010 against India, Murali needed one wicket to reach 800. Pragyan Ojha edged him to Mahela Jayawardene at slip on Murali's final ball to complete 800 wickets."
+        "explanation": "TRUE! Needing 8 wickets to reach 800 in his final Test against India in Galle in July 2010, Muralitharan had Pragyan Ojha caught by Mahela Jayawardene at slip on his final delivery.",
+        "id": "f9-5"
       },
       {
-        "id": "f9-6",
         "statement": "Shoaib Akhtar once bowled 8 consecutive maiden overs to Ricky Ponting in a fiery Test spell in Sydney.",
         "isReal": false,
-        "explanation": "FALSE! While Akhtar had fierce battles with Ponting, he was an aggressive strike bowler who bowled in short 4-to-5 over bursts and never bowled 8 consecutive maidens in any Test."
+        "explanation": "FALSE! Akhtar's fiery duel with Ponting at Perth in 1999 was iconic and rapid, but Ponting constantly took singles and boundaries; Akhtar never bowled 8 maidens in a row to him.",
+        "id": "f9-6"
       }
     ]
   },
   {
-    "id": "facts-set-10",
     "theme": "Super-Overs & Tie-Breakers",
     "facts": [
       {
-        "id": "f10-1",
         "statement": "England won the 2019 ICC World Cup Final on boundary countback despite scoring fewer sixes than New Zealand.",
         "isReal": true,
-        "explanation": "TRUE! New Zealand hit 2 sixes to England's 1 in the match, but England had hit 22 fours compared to New Zealand's 14, winning on total boundary count (26 to 17)."
+        "explanation": "TRUE! England hit 22 fours and 2 sixes (total 24 boundaries), while New Zealand hit 14 fours and 3 sixes (total 17 boundaries); England won the countback 24-17.",
+        "id": "f10-1"
       },
       {
-        "id": "f10-2",
         "statement": "The 2007 T20 World Cup group match between India and Pakistan was decided by an experimental 5-over mini match.",
         "isReal": false,
-        "explanation": "FALSE! It was decided by a bowl-out (football-style penalty shootout at the stumps), which India won 3-0 after Sehwag, Harbhajan, and Uthappa hit the stumps."
+        "explanation": "FALSE! The match was decided by a football-style 'bowl-out', where bowlers aimed at unguarded wickets. India won 3-0.",
+        "id": "f10-2"
       },
       {
-        "id": "f10-3",
         "statement": "In the 2020 IPL, Mumbai Indians and Kings XI Punjab played two back-to-back Super Overs in the same match before a winner emerged.",
         "isReal": true,
-        "explanation": "TRUE! On October 18, 2020 in Dubai, the first Super Over was tied at 5 runs each. The rules triggered a second Super Over, which Punjab won chasing 12."
+        "explanation": "TRUE! In Dubai in October 2020, both teams tied the 20-over match (176), tied the first Super Over (5 runs each), and KXIP finally won in the historic second Super Over.",
+        "id": "f10-3"
       },
       {
-        "id": "f10-4",
         "statement": "Rohit Sharma has scored five centuries in a single edition of an ICC Men's Cricket World Cup.",
         "isReal": true,
-        "explanation": "TRUE! In the 2019 World Cup in England, Rohit Sharma scored 5 centuries (vs South Africa, Pakistan, England, Bangladesh, Sri Lanka), the most in any World Cup."
+        "explanation": "TRUE! In the 2019 World Cup in England, Rohit smashed centuries against South Africa, Pakistan, England, Bangladesh, and Sri Lanka.",
+        "id": "f10-4"
       },
       {
-        "id": "f10-5",
         "statement": "Brendon McCullum hit the fastest century in Test history (54 balls) against Australia in the 2015 World Cup Final.",
         "isReal": false,
-        "explanation": "FALSE! McCullum's 54-ball Test century was scored in Christchurch in 2016 during his final Test match, not in a World Cup final (which is an ODI)."
+        "explanation": "FALSE! McCullum hit his 54-ball Test century in his farewell Test match in Christchurch in February 2016, not in the 2015 World Cup Final (where he was bowled for a duck by Starc).",
+        "id": "f10-5"
       },
       {
-        "id": "f10-6",
         "statement": "Martin Crowe won the 1992 World Cup Player of the Tournament by hitting six consecutive centuries in the tournament.",
         "isReal": false,
-        "explanation": "FALSE! Crowe was indeed the 1992 Player of the Tournament with 456 runs, but he scored one century (100* vs Australia) and 4 fifties, not six centuries."
+        "explanation": "FALSE! Crowe scored 456 runs with 1 century and 4 fifties, introducing innovative tactics like opening with spinner Dipak Patel, but never hit 6 consecutive tons.",
+        "id": "f10-6"
       }
     ]
   },
   {
-    "id": "facts-set-11",
     "theme": "Peculiar Dismissals & Rulebook Oddities",
     "facts": [
       {
-        "id": "f11-1",
         "statement": "Sri Lanka's Angelo Mathews became the first player in international cricket history to be timed out in 2023.",
         "isReal": true,
-        "explanation": "TRUE! In the 2023 World Cup match against Bangladesh in Delhi, Mathews' helmet strap broke before facing a ball, exceeding the 2-minute time limit, and Shakib Al Hasan successfully appealed."
+        "explanation": "TRUE! In the 2023 World Cup in Delhi against Bangladesh, Mathews took over 2 minutes to face his first ball after a broken helmet strap, and Shakib Al Hasan appealed under MCC Law 40.1.",
+        "id": "f11-1"
       },
       {
-        "id": "f11-2",
         "statement": "A batsman can be given out 'Handled the Ball' if they accidentally kick the ball with their shoe while outside the crease.",
         "isReal": false,
-        "explanation": "FALSE! 'Handled the ball' (now part of Obstructing the Field) specifically applies to touching the ball with a hand not holding the bat. Kicking the ball with a foot to defend stumps is legal."
+        "explanation": "FALSE! Handled the ball (now incorporated into Obstructing the Field) specifically requires intentional touch with the hand or glove not holding the bat. Kicking the ball with a shoe is not Handled the Ball.",
+        "id": "f11-2"
       },
       {
-        "id": "f11-3",
         "statement": "In 2001, Inzamam-ul-Haq was given out 'Obstructing the field' after swatting away a ball thrown at the stumps with his bat.",
         "isReal": false,
-        "explanation": "FALSE! Inzamam was given out Obstructing the Field in 2006 against India in Peshawar when Suresh Raina threw at the stumps and Inzamam blocked it with his bat while out of his ground."
+        "explanation": "FALSE! Inzamam was given out Obstructing the Field in 2006 against India in Peshawar (swatting Suresh Raina's throw), not in 2001.",
+        "id": "f11-3"
       },
       {
-        "id": "f11-4",
         "statement": "A batsman cannot be dismissed 'Timed Out' if the incoming batsman was delayed by an authorized broadcast television interview.",
         "isReal": false,
-        "explanation": "FALSE! The Laws of Cricket make no exception for TV interviews; it is the player and team's sole responsibility to have the next batsman ready within the allowed time limit."
+        "explanation": "FALSE! TV interviews are never permitted with incoming batsmen during active play; MCC Law 40 mandates the incoming batsman be ready within the required time regardless.",
+        "id": "f11-4"
       },
       {
-        "id": "f11-5",
         "statement": "India's Mohinder Amarnath is one of the only cricketers to be dismissed both 'Handled the Ball' and 'Obstructing the Field' in ODI cricket.",
         "isReal": true,
-        "explanation": "TRUE! Amarnath was given out 'Handled the ball' against Australia in 1986, and 'Obstructing the field' against Sri Lanka in 1989."
+        "explanation": "TRUE! Amarnath was out 'Handled the Ball' vs Australia in Melbourne in 1986, and 'Obstructing the Field' vs Sri Lanka in Ahmedabad in 1989.",
+        "id": "f11-5"
       },
       {
-        "id": "f11-6",
         "statement": "If a ball hits a fielding side's helmet placed on the ground behind the wicketkeeper, the batting side is awarded 5 penalty runs.",
         "isReal": true,
-        "explanation": "TRUE! Under Law 28.3, if the ball in play strikes a protective helmet belonging to the fielding side placed on the ground, 5 penalty runs are awarded to the batting side."
+        "explanation": "TRUE! Under MCC Law 28.3, if a ball in play strikes a fielder's helmet placed on the ground, the ball becomes immediately dead and 5 penalty runs are awarded to the batting side.",
+        "id": "f11-6"
       }
     ]
   },
   {
-    "id": "facts-set-12",
     "theme": "Captains & Historic Series",
     "facts": [
       {
-        "id": "f12-1",
         "statement": "India's first ever Test victory in Australia at Adelaide in 2003 was sealed by Rahul Dravid hitting the winning boundary.",
         "isReal": true,
-        "explanation": "TRUE! After scoring 233 in the first innings, Dravid scored 72 not out in the second innings and cut Stuart MacGill to the point boundary to win the Adelaide Test."
+        "explanation": "TRUE! Dravid scored 233 in the first innings and 72 not out in the second, cutting Stuart MacGill to the point fence to secure a historic 4-wicket triumph.",
+        "id": "f12-1"
       },
       {
-        "id": "f12-2",
         "statement": "Sachin Tendulkar and Sourav Ganguly shared 21 century partnerships as an opening pair in ODIs, the highest in cricket history.",
         "isReal": true,
-        "explanation": "TRUE! The legendary duo opened the batting 136 times for India, amassing 6,609 runs with 21 century stands\u2014an all-time world record."
+        "explanation": "TRUE! Tendulkar and Ganguly opened the batting in 136 ODI innings, amassing 6,609 runs together at an average of 49.32 with 21 hundred stands.",
+        "id": "f12-2"
       },
       {
-        "id": "f12-3",
         "statement": "Brian Lara once scored 501 not out for Warwickshire in English County cricket in just 300 balls.",
         "isReal": false,
-        "explanation": "FALSE! Lara scored 501* against Durham in 1994 facing 427 deliveries (hitting 62 fours and 10 sixes), not 300 balls."
+        "explanation": "FALSE! Lara's 501* against Durham at Edgbaston in 1994 came from 427 balls (62 fours and 10 sixes), which was incredibly quick but not 300 balls.",
+        "id": "f12-3"
       },
       {
-        "id": "f12-4",
         "statement": "Rahul Dravid and VVS Laxman's legendary 376-run partnership at Eden Gardens in 2001 remains the highest partnership for any wicket in Test cricket history.",
         "isReal": false,
-        "explanation": "FALSE! The all-time world record partnership for any wicket in Test history is 624 runs, set by Kumar Sangakkara and Mahela Jayawardene against South Africa in 2006."
+        "explanation": "FALSE! The all-time highest partnership in Test cricket is 624 runs between Kumar Sangakkara and Mahela Jayawardene against South Africa in Colombo in 2006.",
+        "id": "f12-4"
       },
       {
-        "id": "f12-5",
         "statement": "Shane Warne holds the world record for the most Test runs scored without ever scoring a Test century (3,154 runs).",
         "isReal": true,
-        "explanation": "TRUE! Warne scored 3,154 Test runs with 12 fifties, famously being caught off a Daniel Vettori no-ball for 99 against New Zealand in Perth."
+        "explanation": "TRUE! Warne scored 3,154 Test runs with 12 fifties, famously falling for 99 against New Zealand in Perth in 2001 on a Daniel Vettori no-ball that was missed by the umpire.",
+        "id": "f12-5"
       },
       {
-        "id": "f12-6",
         "statement": "Steve Waugh's Australia won 25 consecutive Test matches between 1999 and 2001 before India broke the streak at Kolkata.",
         "isReal": false,
-        "explanation": "FALSE! Australia won 16 consecutive Tests (not 25) before VVS Laxman and Rahul Dravid orchestrated the miraculous comeback at Eden Gardens in 2001."
+        "explanation": "FALSE! Australia's world-record winning streak was 16 consecutive Test matches, ending in the famous Kolkata 2001 Test.",
+        "id": "f12-6"
+      }
+    ]
+  },
+  {
+    "theme": "The Don & Golden Age Legends",
+    "facts": [
+      {
+        "statement": "Sir Don Bradman scored 309 runs in a single day of a Test match against England at Headingley in 1930.",
+        "isReal": true,
+        "explanation": "TRUE! On 11 July 1930, Bradman scored 309 runs between lunch and stumps on Day 1, finishing with 334, the most runs scored by a batsman in a single day of Test cricket.",
+        "id": "f13-1"
+      },
+      {
+        "statement": "Sir Don Bradman was clean bowled only once in his entire first-class career.",
+        "isReal": false,
+        "explanation": "FALSE! Bradman was bowled 46 times in his first-class career, including famously for a duck by Eric Hollies in his final Test innings at The Oval in 1948.",
+        "id": "f13-2"
+      },
+      {
+        "statement": "Sir Jack Hobbs scored 199 centuries in first-class cricket, the most in the history of the sport.",
+        "isReal": true,
+        "explanation": "TRUE! 'The Master' Jack Hobbs scored 199 first-class hundreds and 61,760 runs across a career spanning 1905 to 1934 for Surrey and England.",
+        "id": "f13-3"
+      },
+      {
+        "statement": "Sir Don Bradman scored a triple-century on his Test match debut for Australia.",
+        "isReal": false,
+        "explanation": "FALSE! Bradman scored 18 and 1 on Test debut against England in Brisbane in 1928, and was dropped for the second Test before returning in Melbourne.",
+        "id": "f13-4"
+      },
+      {
+        "statement": "England's Len Hutton batted for over 13 hours to score 364 against Australia at The Oval in 1938.",
+        "isReal": true,
+        "explanation": "TRUE! Hutton faced 847 deliveries over 13 hours and 17 minutes, hitting 35 fours to set a world record Test score that stood for nearly 20 years.",
+        "id": "f13-5"
+      },
+      {
+        "statement": "WG Grace was once given out LBW and refused to leave, famously telling the umpire 'They came to see me bat, not you umpire.'",
+        "isReal": false,
+        "explanation": "FALSE! While frequently repeated in cricket mythology, cricket historians have confirmed this quote is apocryphal and was never recorded in contemporary match reports.",
+        "id": "f13-6"
+      }
+    ]
+  },
+  {
+    "theme": "Fastest Fifties & Centuries",
+    "facts": [
+      {
+        "statement": "Yuvraj Singh scored a fifty off just 12 balls against England in the 2007 T20 World Cup, including six sixes in one over.",
+        "isReal": true,
+        "explanation": "TRUE! In Durban on 19 September 2007, Yuvraj reached his half-century in 12 balls off Stuart Broad and Andrew Flintoff, the fastest 50 in World Cup history.",
+        "id": "f14-1"
+      },
+      {
+        "statement": "Shahid Afridi hit his 37-ball ODI century against Sri Lanka using an aluminum baseball bat.",
+        "isReal": false,
+        "explanation": "FALSE! Afridi used a regular wooden cricket bat borrowed from teammate Waqar Younis, which had been gifted by Sachin Tendulkar.",
+        "id": "f14-2"
+      },
+      {
+        "statement": "South Africa's AB de Villiers scored the fastest hundred in ODI history off 31 balls against the West Indies.",
+        "isReal": true,
+        "explanation": "TRUE! In Johannesburg on 18 January 2015, de Villiers struck 16 sixes and 9 fours, reaching three figures in 31 deliveries.",
+        "id": "f14-3"
+      },
+      {
+        "statement": "Chris Gayle holds the world record for the fastest century in Test cricket history (off 50 balls).",
+        "isReal": false,
+        "explanation": "FALSE! The fastest century in Test history was scored by Brendon McCullum off 54 balls vs Australia in Christchurch in 2016.",
+        "id": "f14-4"
+      },
+      {
+        "statement": "Nepal's Dipendra Singh Airee scored a 9-ball half-century against Mongolia in the 2023 Asian Games.",
+        "isReal": true,
+        "explanation": "TRUE! In Hangzhou in September 2023, Airee smashed 52 not out off 10 balls, hitting 8 sixes and reaching his fifty in 9 deliveries, the fastest T20I fifty ever.",
+        "id": "f14-5"
+      },
+      {
+        "statement": "Corey Anderson's 36-ball ODI century in 2014 was achieved without running a single single.",
+        "isReal": false,
+        "explanation": "FALSE! Anderson ran multiple singles and twos alongside his 14 sixes and 6 fours in Queenstown against the West Indies.",
+        "id": "f14-6"
+      }
+    ]
+  },
+  {
+    "theme": "Hat-Tricks & Bowling Miracles",
+    "facts": [
+      {
+        "statement": "Chetan Sharma took the first-ever hat-trick in ICC Cricket World Cup history against New Zealand in 1987.",
+        "isReal": true,
+        "explanation": "TRUE! In Nagpur on 31 October 1987, Chetan Sharma bowled Ken Rutherford, Ian Smith, and Ewen Chatfield with consecutive deliveries, all clean bowled.",
+        "id": "f15-1"
+      },
+      {
+        "statement": "Wasim Akram is the only bowler to take three international hat-tricks in the same calendar year.",
+        "isReal": false,
+        "explanation": "FALSE! Wasim took 4 international hat-tricks across his career (2 in Tests, 2 in ODIs), but they occurred in 1989, 1990, and 1999, never 3 in one year.",
+        "id": "f15-2"
+      },
+      {
+        "statement": "Kuldeep Yadav is the only Indian bowler to take two hat-tricks in One Day Internationals.",
+        "isReal": true,
+        "explanation": "TRUE! The left-arm wrist-spinner took a hat-trick against Australia at Kolkata in 2017 and another against the West Indies at Visakhapatnam in 2019.",
+        "id": "f15-3"
+      },
+      {
+        "statement": "Lasith Malinga took a hat-trick on his international Test debut against Australia at Darwin in 2004.",
+        "isReal": false,
+        "explanation": "FALSE! Malinga took 6 wickets on debut but no hat-trick; all three of his international ODI hat-tricks came in white-ball cricket.",
+        "id": "f15-4"
+      },
+      {
+        "statement": "Australia's Peter Siddle took an Ashes Test hat-trick on his 26th birthday in Brisbane in 2010.",
+        "isReal": true,
+        "explanation": "TRUE! On 25 November 2010 at the Gabba, Siddle dismissed Alastair Cook, Matt Prior, and Stuart Broad on his 26th birthday.",
+        "id": "f15-5"
+      },
+      {
+        "statement": "Shane Warne never took a hat-trick in his entire 145-match Test career.",
+        "isReal": false,
+        "explanation": "FALSE! Warne took an Ashes Test hat-trick against England at the Melbourne Cricket Ground in December 1994, dismissing DeFreitas, Gough, and Malcolm.",
+        "id": "f15-6"
+      }
+    ]
+  },
+  {
+    "theme": "T20 World Cup Drama",
+    "facts": [
+      {
+        "statement": "Carlos Brathwaite hit four consecutive sixes off Ben Stokes in the final over of the 2016 T20 World Cup Final.",
+        "isReal": true,
+        "explanation": "TRUE! With 19 needed off the 20th over at Eden Gardens, Brathwaite smashed 6, 6, 6, 6 to win West Indies their second World T20 title.",
+        "id": "f16-1"
+      },
+      {
+        "statement": "MS Dhoni took off his right glove on the final ball against Bangladesh in 2016 because he had a broken thumb.",
+        "isReal": false,
+        "explanation": "FALSE! Dhoni removed his right keeping glove purely as a tactical masterstroke to allow an instant bare-hand throw or sprint to the stumps, running out Mustafizur Rahman by inches.",
+        "id": "f16-2"
+      },
+      {
+        "statement": "India won the 2024 ICC Men's T20 World Cup undefeated, becoming the first team in tournament history to win without losing a match.",
+        "isReal": true,
+        "explanation": "TRUE! Under Rohit Sharma, India won 8 games out of 8 (with 1 washout against Canada) in the USA and West Indies, defeating South Africa in the final.",
+        "id": "f16-3"
+      },
+      {
+        "statement": "Pakistan have won the ICC Men's T20 World Cup three times.",
+        "isReal": false,
+        "explanation": "FALSE! Pakistan have won the Men's T20 World Cup once (in 2009 in England under Younis Khan); West Indies, England, and India have won it twice.",
+        "id": "f16-4"
+      },
+      {
+        "statement": "In the 2007 T20 World Cup, India defeated Pakistan in a group stage bowl-out 3-0 after the match ended in a tie.",
+        "isReal": true,
+        "explanation": "TRUE! In Durban, India's Sehwag, Harbhajan, and Uthappa all hit the stumps, while Pakistan's Arafat, Gul, and Afridi missed all three.",
+        "id": "f16-5"
+      },
+      {
+        "statement": "Chris Gayle was the leading run-scorer in the 2014, 2016, and 2021 T20 World Cups.",
+        "isReal": false,
+        "explanation": "FALSE! Virat Kohli was the leading run-scorer in 2014 (319) and 2016 (273), while Babar Azam was top in 2021 (303); Gayle never won the tournament batting crown.",
+        "id": "f16-6"
+      }
+    ]
+  },
+  {
+    "theme": "The Ashes Folklore & Feuds",
+    "facts": [
+      {
+        "statement": "The term 'The Ashes' originated from a mock obituary for English cricket published in The Sporting Times in 1882.",
+        "isReal": true,
+        "explanation": "TRUE! Following Australia's maiden victory at The Oval in August 1882, the satirical notice proclaimed English cricket dead and stated 'the body will be cremated and the ashes taken to Australia'.",
+        "id": "f17-1"
+      },
+      {
+        "statement": "The original Ashes terracotta urn is officially presented to the winning captain to keep at home after each series.",
+        "isReal": false,
+        "explanation": "FALSE! The tiny, fragile original urn permanently remains in the MCC Museum at Lord's; the winning captain receives a modern crystal trophy.",
+        "id": "f17-2"
+      },
+      {
+        "statement": "In the 1981 Ashes Test at Headingley, bookmakers offered odds of 500-1 against England winning after following on.",
+        "isReal": true,
+        "explanation": "TRUE! Following on 227 runs behind, Ian Botham (149*) and Bob Willis (8/43) led England to an astonishing 18-run victory against 500-1 odds.",
+        "id": "f17-3"
+      },
+      {
+        "statement": "Shane Warne's 'Ball of the Century' to Mike Gatting in 1993 was the first spin ball bowled in England in 50 years.",
+        "isReal": false,
+        "explanation": "FALSE! Spin was bowled regularly in England; it was simply Shane Warne's very first ball in an Ashes Test on English soil.",
+        "id": "f17-4"
+      },
+      {
+        "statement": "England won the famous 2005 Edgbaston Ashes Test by just 2 runs, the narrowest margin in Ashes history.",
+        "isReal": true,
+        "explanation": "TRUE! Chasing 282, Australia reached 279 when Steve Harmison had Michael Kasprowicz caught behind off his glove to seal a 2-run win.",
+        "id": "f17-5"
+      },
+      {
+        "statement": "English captain Douglas Jardine was banned by the MCC for life following the 1932-33 Bodyline series.",
+        "isReal": false,
+        "explanation": "FALSE! Jardine was never banned by the MCC and captained England again on their tour of India in 1933-34 before retiring on his own terms.",
+        "id": "f17-6"
+      }
+    ]
+  },
+  {
+    "theme": "Incredible Run Chases",
+    "facts": [
+      {
+        "statement": "South Africa chased down 434 against Australia at the Wanderers in 2006, scoring 438/9 with one ball to spare.",
+        "isReal": true,
+        "explanation": "TRUE! Australia scored 434/4 (Ponting 164), but South Africa replied with 438/9 (Gibbs 175, Boucher 50*) to complete the highest successful chase in ODI history.",
+        "id": "f18-1"
+      },
+      {
+        "statement": "Mohammad Kaif and Yuvraj Singh hit 8 sixes in the final 10 overs to chase 326 in the 2002 NatWest Final at Lord's.",
+        "isReal": false,
+        "explanation": "FALSE! Kaif and Yuvraj played disciplined running cricket with crisp boundaries; their entire partnership featured only 3 sixes (2 by Kaif, 1 by Yuvraj).",
+        "id": "f18-2"
+      },
+      {
+        "statement": "India chased down 328 runs to win the 2021 Brisbane Test at the Gabba, ending Australia's 32-year unbeaten streak at the ground.",
+        "isReal": true,
+        "explanation": "TRUE! With Rishabh Pant's unbeaten 89, Shubman Gill's 91, and Pujara's brave 56, India breached fortress Gabba on 19 January 2021.",
+        "id": "f18-3"
+      },
+      {
+        "statement": "Ben Stokes' partner Jack Leach scored 25 runs in their match-winning 76-run last-wicket partnership at Headingley in 2019.",
+        "isReal": false,
+        "explanation": "FALSE! Jack Leach scored exactly 1 not out off 17 balls, while Stokes scored 73 of the 76 runs during their historic stand.",
+        "id": "f18-4"
+      },
+      {
+        "statement": "West Indies' 418/7 against Australia in Antigua in 2003 remains the highest successful fourth-innings run chase in Test history.",
+        "isReal": true,
+        "explanation": "TRUE! Shivnarine Chanderpaul (104) and Ramnaresh Sarwan (105) anchored the chase as West Indies won by 3 wickets, a Test record that stands today.",
+        "id": "f18-5"
+      },
+      {
+        "statement": "No team in IPL history has ever chased down a target of 260 runs or higher in 20 overs.",
+        "isReal": false,
+        "explanation": "FALSE! In IPL 2024 at Eden Gardens, Punjab Kings chased down KKR's 261/6, reaching 262/2 in just 18.4 overs, setting a world record in T20 history.",
+        "id": "f18-6"
+      }
+    ]
+  },
+  {
+    "theme": "Wicketkeeping Heroes & Stumping Sorcery",
+    "facts": [
+      {
+        "statement": "MS Dhoni once executed a stumping in an astonishing 0.08 seconds, faster than the blink of a human eye.",
+        "isReal": true,
+        "explanation": "TRUE! In an ODI against the West Indies in 2018, Dhoni stumped Keemo Paul in 0.08 seconds off Ravindra Jadeja, recorded as one of the fastest stumpings in cricket history.",
+        "id": "f19-1"
+      },
+      {
+        "statement": "MS Dhoni is the only wicketkeeper in ODI history to effect 5 stumpings in a single match.",
+        "isReal": false,
+        "explanation": "FALSE! The ODI record for most stumpings in a match is 3, shared by several keepers including Dhoni, Sangakkara, and McCullum; no keeper has made 5 stumpings in one ODI.",
+        "id": "f19-2"
+      },
+      {
+        "statement": "Mark Boucher holds the world record for the most dismissals by a wicketkeeper in international cricket with 998 dismissals.",
+        "isReal": true,
+        "explanation": "TRUE! South Africa's Mark Boucher claimed 998 dismissals across Tests (555), ODIs (425), and T20Is (18) before an unfortunate eye injury ended his career.",
+        "id": "f19-3"
+      },
+      {
+        "statement": "Kumar Sangakkara took 10 catches as a wicketkeeper in a single Test match against India in 2008.",
+        "isReal": false,
+        "explanation": "FALSE! The record for most dismissals in a Test match is 11, shared by Jack Russell and AB de Villiers. Sangakkara's best in a Test was 6 dismissals.",
+        "id": "f19-4"
+      },
+      {
+        "statement": "MS Dhoni has taken more catches as a designated wicketkeeper in Test matches than Mark Boucher.",
+        "isReal": false,
+        "explanation": "FALSE! Boucher took 532 Test catches, whereas Dhoni took 256 Test catches in his 90 Test matches.",
+        "id": "f19-5"
+      },
+      {
+        "statement": "Adam Gilchrist admitted to placing a squash ball inside his left glove during the 2007 World Cup Final to improve his grip.",
+        "isReal": true,
+        "explanation": "TRUE! Gilchrist used a squash ball in his batting glove to stop his bottom hand from gripping too tightly; he scored 149 off 104 balls and raised his glove toward batting coach Bob Meuleman.",
+        "id": "f19-6"
+      }
+    ]
+  },
+  {
+    "theme": "All-Rounder Greats & Double Honours",
+    "facts": [
+      {
+        "statement": "Sir Garfield Sobers once scored 365 not out in a Test match and also took 6 wickets in the same match.",
+        "isReal": false,
+        "explanation": "FALSE! Sobers scored his record 365* against Pakistan in Kingston in 1958, but he did not take a single wicket in that match (0/32 and 0/3).",
+        "id": "f20-1"
+      },
+      {
+        "statement": "Jacques Kallis is the only player in cricket history to score over 10,000 runs and take over 250 wickets in both Tests and ODIs.",
+        "isReal": true,
+        "explanation": "TRUE! Kallis scored 13,289 runs & 292 wickets in Tests, and 11,579 runs & 273 wickets in ODIs, a pinnacle of all-round excellence.",
+        "id": "f20-2"
+      },
+      {
+        "statement": "Kapil Dev's match-saving 175 not out against Zimbabwe in 1983 was never broadcast on television due to a BBC camera strike.",
+        "isReal": true,
+        "explanation": "TRUE! The BBC camera crew at Tunbridge Wells on 18 June 1983 was on a one-day strike, meaning no official video footage of Kapil's historic 175* exists.",
+        "id": "f20-3"
+      },
+      {
+        "statement": "Ian Botham is the only cricketer in Test history to score a century and take 10 wickets in the same Test match three times.",
+        "isReal": false,
+        "explanation": "FALSE! Botham achieved this extraordinary double once (114 and 13 wickets vs India in Mumbai 1980). Only 3 players in history have achieved it once (Botham, Imran Khan, and Shakib Al Hasan).",
+        "id": "f20-4"
+      },
+      {
+        "statement": "Richard Hadlee of New Zealand was the first bowler in Test history to reach the milestone of 400 Test wickets.",
+        "isReal": true,
+        "explanation": "TRUE! Sir Richard Hadlee dismissed Sanjay Manjrekar at Christchurch in February 1990 to become the founding member of the 400 Test wickets club.",
+        "id": "f20-5"
+      },
+      {
+        "statement": "Imran Khan captained Pakistan to the 1992 World Cup title after bowling with his left arm due to a broken right shoulder.",
+        "isReal": false,
+        "explanation": "FALSE! Imran was a right-arm fast bowler throughout his career and bowled right-arm in the 1992 World Cup, including the delivery that dismissed Richard Illingworth to seal the trophy.",
+        "id": "f20-6"
+      }
+    ]
+  },
+  {
+    "theme": "Fielding Marvels & Gravity-Defying Catches",
+    "facts": [
+      {
+        "statement": "Jonty Rhodes' flying horizontal run-out of Inzamam-ul-Haq in the 1992 World Cup saw all three stumps broken while Rhodes was fully airborne.",
+        "isReal": true,
+        "explanation": "TRUE! In Brisbane in 1992, Rhodes sprinted from point, dove headfirst through the air, and shattered all three stumps before Inzamam could regain his crease.",
+        "id": "f21-1"
+      },
+      {
+        "statement": "Paul Collingwood took a famous one-handed backward leaping catch at Bristol in 2005 while wearing sunglasses.",
+        "isReal": false,
+        "explanation": "FALSE! Collingwood's iconic flying catch off Matthew Hayden at backward point at Bristol was bare-faced with no sunglasses.",
+        "id": "f21-2"
+      },
+      {
+        "statement": "Ravindra Jadeja holds the Indian record for the most direct-hit run-outs in international cricket.",
+        "isReal": true,
+        "explanation": "TRUE! With over 25 direct-hit run-outs in international cricket, Jadeja's rocket left-arm throws have dismissed batsmen like Smith, Malik, and Guptill.",
+        "id": "f21-3"
+      },
+      {
+        "statement": "Ricky Ponting took over 150 catches in Test matches, predominantly in the slips and silly point.",
+        "isReal": true,
+        "explanation": "TRUE! Ponting took 196 catches in 168 Tests, fourth on the all-time Test list behind Rahul Dravid, Joe Root, and Mahela Jayawardene.",
+        "id": "f21-4"
+      },
+      {
+        "statement": "Suresh Raina once took 6 catches in a single Twenty20 International match for India.",
+        "isReal": false,
+        "explanation": "FALSE! The world record for most catches by an outfielder in a T20I is 4 catches, shared by multiple players. Raina never took 6 in a match.",
+        "id": "f21-5"
+      },
+      {
+        "statement": "Ben Stokes' backward-leaping one-handed catch against South Africa at The Oval was the opening wicket of the 2019 World Cup.",
+        "isReal": false,
+        "explanation": "FALSE! Stokes' breathtaking boundary catch dismissed Andile Phehlukwayo in the 35th over, not the opening wicket (Imran Tahir dismissed Bairstow in over 1).",
+        "id": "f21-6"
+      }
+    ]
+  },
+  {
+    "theme": "Left-Handed Magicians",
+    "facts": [
+      {
+        "statement": "Brian Lara is the only batsman in history to hold both the highest first-class score (501*) and highest Test score (400*).",
+        "isReal": true,
+        "explanation": "TRUE! Lara scored 501* for Warwickshire in 1994 and 400* for West Indies in 2004, a dual pinnacle that remains unchallenged.",
+        "id": "f22-1"
+      },
+      {
+        "statement": "Sourav Ganguly scored a century on his Test debut at Lord's in 1996.",
+        "isReal": true,
+        "explanation": "TRUE! On 22 June 1996, Ganguly made his Test debut at Lord's and scored a magnificent 131, sharing a memorable partnership with fellow debutant Rahul Dravid (95).",
+        "id": "f22-2"
+      },
+      {
+        "statement": "Wasim Akram took a double hat-trick (4 wickets in 4 balls) in a Test match against England at Lord's.",
+        "isReal": false,
+        "explanation": "FALSE! Akram took two Test hat-tricks (both against Sri Lanka in 1999), but neither was 4 wickets in 4 balls, and neither occurred at Lord's.",
+        "id": "f22-3"
+      },
+      {
+        "statement": "Adam Gilchrist scored centuries in all four innings of the 2001 Border-Gavaskar Trophy in India.",
+        "isReal": false,
+        "explanation": "FALSE! Gilchrist scored a blazing 122 in Mumbai, but made a pair of ducks (0 & 0) in Kolkata, and 1 & 1 in Chennai.",
+        "id": "f22-4"
+      },
+      {
+        "statement": "David Warner scored a century in both innings of his very first Test match for Australia.",
+        "isReal": false,
+        "explanation": "FALSE! Warner scored 3 and 12 not out on Test debut against New Zealand in Brisbane in 2011; his maiden Test hundred came in his second Test at Hobart.",
+        "id": "f22-5"
+      },
+      {
+        "statement": "Shikhar Dhawan holds the world record for the fastest century on Test debut, off just 85 balls against Australia in Mohali.",
+        "isReal": true,
+        "explanation": "TRUE! In March 2013, Dhawan reached his maiden Test hundred in 85 balls, finishing with 187 off 174 balls against Australia.",
+        "id": "f22-6"
+      }
+    ]
+  },
+  {
+    "theme": "Ranji Trophy & Domestic Folklore",
+    "facts": [
+      {
+        "statement": "Mumbai (formerly Bombay) has won the Ranji Trophy a record 42 times.",
+        "isReal": true,
+        "explanation": "TRUE! Mumbai is domestic cricket's most dominant dynasty, winning 42 titles, with their 42nd triumph coming against Vidarbha in 2024.",
+        "id": "f23-1"
+      },
+      {
+        "statement": "Bhausaheb Nimbalkar was stranded on 443 not out in 1948 because the opposing team conceded the match to catch a train.",
+        "isReal": true,
+        "explanation": "TRUE! Playing for Maharashtra against Kathiawar in Pune, Nimbalkar was just 9 runs short of Don Bradman's world record 452* when Kathiawar forfeited the match.",
+        "id": "f23-2"
+      },
+      {
+        "statement": "Sachin Tendulkar never scored a century in a Ranji Trophy final for Mumbai.",
+        "isReal": false,
+        "explanation": "FALSE! Tendulkar scored hundreds in multiple Ranji finals, including a match-winning 140 against Delhi in the 1994-95 final and 100 against Saurashtra in 2012-13.",
+        "id": "f23-3"
+      },
+      {
+        "statement": "The Ranji Trophy is named after Kumar Shri Ranjitsinhji, who played Test cricket for England, not India.",
+        "isReal": true,
+        "explanation": "TRUE! 'Ranji' played 15 Tests for England between 1896 and 1902; the Indian national championship was named in his honour upon its inception in 1934.",
+        "id": "f23-4"
+      },
+      {
+        "statement": "Cheteshwar Pujara has scored four triple-centuries in the Ranji Trophy, more than any other batsman in history.",
+        "isReal": false,
+        "explanation": "FALSE! Pujara has scored 3 triple-hundreds in first-class cricket for Saurashtra, matching Ravindra Jadeja (3 triple-hundreds); no player has scored four.",
+        "id": "f23-5"
+      },
+      {
+        "statement": "Karnataka once won the Ranji Trophy final without losing a single wicket across both innings.",
+        "isReal": false,
+        "explanation": "FALSE! While Karnataka has dominated several finals, winning a Ranji final without losing a wicket is mathematically impossible.",
+        "id": "f23-6"
+      }
+    ]
+  },
+  {
+    "theme": "India vs Pakistan Classics",
+    "facts": [
+      {
+        "statement": "Javed Miandad hit a six off Chetan Sharma off the final ball of the 1986 Austral-Asia Cup Final in Sharjah with 4 runs needed to win.",
+        "isReal": true,
+        "explanation": "TRUE! On 18 April 1986, Pakistan needed 4 off the final delivery; Sharma attempted a yorker that became a full toss, and Miandad smashed it over midwicket for six.",
+        "id": "f24-1"
+      },
+      {
+        "statement": "Sachin Tendulkar's upper-cut six off Shoaib Akhtar in the 2003 World Cup in Centurion came in the first over of the chase.",
+        "isReal": false,
+        "explanation": "FALSE! The iconic upper-cut came in the second over of India's chase, off the fourth ball bowled by Shoaib Akhtar.",
+        "id": "f24-2"
+      },
+      {
+        "statement": "India and Pakistan have played each other in an ICC Men's Cricket World Cup 8 times, and India has won all 8 matches.",
+        "isReal": true,
+        "explanation": "TRUE! India won in 1992, 1996, 1999, 2003, 2011, 2015, 2019, and 2023, maintaining an unblemished 8-0 50-over World Cup record against Pakistan.",
+        "id": "f24-3"
+      },
+      {
+        "statement": "Virender Sehwag's triple century in Multan in 2004 was reached by hitting a defensive tap-and-run single.",
+        "isReal": false,
+        "explanation": "FALSE! Sehwag famously reached his 300 on 295 by hitting Saqlain Mushtaq for a towering six over deep midwicket.",
+        "id": "f24-4"
+      },
+      {
+        "statement": "Virat Kohli's 82 not out against Pakistan at the MCG in the 2022 T20 World Cup included two straight sixes off Haris Rauf in the 19th over.",
+        "isReal": true,
+        "explanation": "TRUE! With 28 needed off 8 balls, Kohli hit a straight back-foot lofted drive over Rauf's head for six, followed by a flick over fine leg for six.",
+        "id": "f24-5"
+      },
+      {
+        "statement": "The first ever Test match between India and Pakistan in 1952 in Delhi was washed out without a single ball bowled.",
+        "isReal": false,
+        "explanation": "FALSE! India won the first Test in Delhi in October 1952 by an innings and 70 runs, with Vinoo Mankad taking 13 wickets in the match.",
+        "id": "f24-6"
+      }
+    ]
+  },
+  {
+    "theme": "Historic Grounds & Venue Mysteries",
+    "facts": [
+      {
+        "statement": "The pitch and outfield at Lord's in London features an 8-foot (2.5-meter) slope across the width of the ground.",
+        "isReal": true,
+        "explanation": "TRUE! The famous slope at Lord's drops by 2.5 meters from north to south, creating pronounced angle and swing for bowlers and challenges for outfielders.",
+        "id": "f25-1"
+      },
+      {
+        "statement": "Eden Gardens in Kolkata was the venue for the first ever Day-Night Test match in cricket history.",
+        "isReal": false,
+        "explanation": "FALSE! The first Day-Night Test was played between Australia and New Zealand at the Adelaide Oval in November 2015; Eden Gardens hosted India's first pink-ball Test in 2019.",
+        "id": "f25-2"
+      },
+      {
+        "statement": "The Melbourne Cricket Ground (MCG) hosted both the first-ever Test match in 1877 and the first-ever One Day International in 1971.",
+        "isReal": true,
+        "explanation": "TRUE! Australia defeated England in the inaugural Test match in March 1877, and the first official ODI was played at the MCG on 5 January 1971.",
+        "id": "f25-3"
+      },
+      {
+        "statement": "The Dharamshala cricket stadium is the highest altitude international cricket ground in the world.",
+        "isReal": false,
+        "explanation": "FALSE! While Dharamshala is stunning at 1,457 meters, Chail Cricket Ground in Himachal Pradesh sits at 2,444 meters, and Asgiriya in Sri Lanka was also historically elevated; Dharamshala is high, but not the world's highest.",
+        "id": "f25-4"
+      },
+      {
+        "statement": "The Wankhede Stadium in Mumbai was built in just six months following a dispute between the BCA and the Cricket Club of India (CCI).",
+        "isReal": true,
+        "explanation": "TRUE! After ticketing disputes at the Brabourne Stadium, politician S.K. Wankhede led the construction of the new stadium in under a year, opening for the 1975 Test vs West Indies.",
+        "id": "f25-5"
+      },
+      {
+        "statement": "Sydney Cricket Ground is the only international ground in Australia with natural grass boundary ropes.",
+        "isReal": false,
+        "explanation": "FALSE! All major Australian cricket grounds use standard foam padded boundary wedges for player safety, not natural grass ropes.",
+        "id": "f25-6"
+      }
+    ]
+  },
+  {
+    "theme": "Rain Rules & DLS Calculators",
+    "facts": [
+      {
+        "statement": "In the 1992 World Cup semifinal, South Africa needed 22 runs off 13 balls before rain, and the scoreboard changed to 22 runs off 1 ball after rain.",
+        "isReal": true,
+        "explanation": "TRUE! Under the flawed 'Most Productive Overs' rain rule in Sydney, England's two least productive overs (both maidens) were subtracted from South Africa's target, leaving them 22 runs off 1 ball.",
+        "id": "f26-1"
+      },
+      {
+        "statement": "The Duckworth-Lewis method was devised by two British mathematicians, Frank Duckworth and Tony Lewis, following the 1992 World Cup rain farce.",
+        "isReal": true,
+        "explanation": "TRUE! Shocked by the South Africa semi-final, Duckworth and Lewis devised a mathematical model based on wickets and overs in hand, adopted by the ICC in 1999.",
+        "id": "f26-2"
+      },
+      {
+        "statement": "South Africa was eliminated from the 2003 World Cup on home soil because captain Shaun Pollock misread the DLS target chart.",
+        "isReal": true,
+        "explanation": "TRUE! Facing Sri Lanka in Durban, Mark Boucher hit a single on the final ball of the 45th over thinking 229 was the winning score, but 229 was the tie score. The rain came, match was tied, and SA crashed out.",
+        "id": "f26-3"
+      },
+      {
+        "statement": "Under current DLS rules, if rain washes out play during a Super Over, the team with more boundary fours is automatically crowned the winner.",
+        "isReal": false,
+        "explanation": "FALSE! The ICC abolished the boundary countback rule after the 2019 World Cup; if a Super Over cannot be completed, the teams are declared joint winners or standings apply.",
+        "id": "f26-4"
+      },
+      {
+        "statement": "A minimum of 10 overs per team is required to constitute an official match in an ICC Twenty20 International.",
+        "isReal": false,
+        "explanation": "FALSE! The minimum number of overs required per team in a T20I is 5 overs, not 10 overs (10 overs is required in the knockout stages of certain World Cups).",
+        "id": "f26-5"
+      },
+      {
+        "statement": "The Duckworth-Lewis method was originally rejected by the ICC after a computer virus corrupted the calculation software during its 1997 trial.",
+        "isReal": false,
+        "explanation": "FALSE! The DLS method was successfully piloted in 1997 and was adopted with high praise by the ICC in 1999 without any computer virus incident.",
+        "id": "f26-6"
+      }
+    ]
+  },
+  {
+    "theme": "Umpiring Oddities & DRS Revolution",
+    "facts": [
+      {
+        "statement": "Steve Bucknor stood as an on-field umpire in five consecutive ICC Cricket World Cup finals from 1992 to 2007.",
+        "isReal": true,
+        "explanation": "TRUE! The Jamaican umpire officiated the finals in 1992 (Melbourne), 1996 (Lahore), 1999 (Lord's), 2003 (Johannesburg), and 2007 (Barbados), an all-time record.",
+        "id": "f27-1"
+      },
+      {
+        "statement": "Dickie Bird, the famous English umpire, once stopped a Test match because a solar eclipse made it too dangerous to look at the ball.",
+        "isReal": false,
+        "explanation": "FALSE! Dickie Bird famously stopped play for pigeons, sun in his eyes, and a delivery of a lunch tray, but never for a solar eclipse.",
+        "id": "f27-2"
+      },
+      {
+        "statement": "The Umpire's Call rule in DRS requires that more than 50% of the ball must be projected to hit the stumps to overturn an on-field not-out decision.",
+        "isReal": true,
+        "explanation": "TRUE! To account for the statistical margin of error in ball-tracking technology, at least 50% of the ball must be tracking into the zone of the stumps.",
+        "id": "f27-3"
+      },
+      {
+        "statement": "Hot Spot infrared thermal imaging technology was originally invented by NASA to detect micro-meteorites on space shuttles.",
+        "isReal": false,
+        "explanation": "FALSE! Hot Spot was adapted by French scientist Nicolas Bion from infrared military tank and missile-tracking cameras, not NASA space shuttles.",
+        "id": "f27-4"
+      },
+      {
+        "statement": "In 2008, India's tour of Sri Lanka was the very first Test series in cricket history to feature player reviews with player referrals (DRS).",
+        "isReal": true,
+        "explanation": "TRUE! The trial 'Umpire Decision Review System' debuted in July 2008; Virender Sehwag became the first international batsman to request a review.",
+        "id": "f27-5"
+      },
+      {
+        "statement": "If both teams exhaust all their DRS reviews, the third umpire is legally required to turn off the ball-tracking computers for the rest of the day.",
+        "isReal": false,
+        "explanation": "FALSE! The third umpire continues to monitor run-outs, stumpings, no-balls, and boundaries; the tracking tech remains active for broadcast and official tracking.",
+        "id": "f27-6"
+      }
+    ]
+  },
+  {
+    "theme": "Young Guns & Age Record Curiosities",
+    "facts": [
+      {
+        "statement": "Sachin Tendulkar is the youngest player to score a Test century for India, achieving it in England at age 17 years and 107 days.",
+        "isReal": true,
+        "explanation": "TRUE! In August 1990 at Old Trafford, 17-year-old Tendulkar scored an unbeaten 119 in the fourth innings to save the Test match for India.",
+        "id": "f28-1"
+      },
+      {
+        "statement": "Pakistan's Hasan Raza was officially recorded as 14 years and 227 days old on his Test debut in 1996, the youngest Test debutant in history.",
+        "isReal": true,
+        "explanation": "TRUE! Although his true birthdate was later disputed by researchers, official PCB and ICC records still list Hasan Raza as the youngest Test debutant at 14.",
+        "id": "f28-2"
+      },
+      {
+        "statement": "England's James Anderson took a five-wicket haul in Test cricket at age 41.",
+        "isReal": false,
+        "explanation": "FALSE! Anderson took his last Test 5-for at age 40 against South Africa in 2022 (3/32 and 3/30). While he took his 700th wicket at 41, his last 5-for was at 40.",
+        "id": "f28-3"
+      },
+      {
+        "statement": "Rashid Khan was officially named captain of Afghanistan's national team at age 19, making him the youngest international captain in history.",
+        "isReal": true,
+        "explanation": "TRUE! In 2018 at the ICC World Cup Qualifier in Zimbabwe, Rashid Khan captained Afghanistan at 19 years and 165 days, the youngest captain in international cricket history.",
+        "id": "f28-4"
+      },
+      {
+        "statement": "Rohit Sharma scored a double-century in his very first Under-19 international match for India.",
+        "isReal": false,
+        "explanation": "FALSE! Rohit played U-19 cricket alongside Cheteshwar Pujara in 2006, scoring useful fifties, but never scored a double-century at the U-19 level.",
+        "id": "f28-5"
+      },
+      {
+        "statement": "Sir Alastair Cook scored a century on his first-class debut, his Test debut, and his final Test match appearance.",
+        "isReal": false,
+        "explanation": "FALSE! Cook scored a century on Test debut (104* vs India in Nagpur 2006) and his final Test (147 vs India at The Oval 2018), but scored 13 on his first-class debut for Essex in 2003.",
+        "id": "f28-6"
+      }
+    ]
+  },
+  {
+    "theme": "Golden Ducks & Batting Nightmares",
+    "facts": [
+      {
+        "statement": "A 'King Pair' in cricket means a batsman is dismissed for a golden duck (first ball) in both innings of the same Test match.",
+        "isReal": true,
+        "explanation": "TRUE! A pair is out for 0 in both innings; a 'King Pair' is out first ball in both innings. Only 22 players in Test history have suffered this fate.",
+        "id": "f29-1"
+      },
+      {
+        "statement": "Sir Donald Bradman was dismissed for a duck in his final Test innings, leaving his career average at 99.94.",
+        "isReal": true,
+        "explanation": "TRUE! Needing just 4 runs at The Oval in 1948 to finish with a career average of exactly 100.00, Bradman was bowled for 0 second ball by leg-spinner Eric Hollies.",
+        "id": "f29-2"
+      },
+      {
+        "statement": "Virat Kohli was dismissed for a golden duck in three consecutive matches in the 2022 Indian Premier League.",
+        "isReal": false,
+        "explanation": "FALSE! Kohli was out for a golden duck twice in IPL 2022 (vs LSG and SRH), followed by 9 runs vs RR, before another first-ball duck vs SRH. It was not three consecutive games.",
+        "id": "f29-3"
+      },
+      {
+        "statement": "Ajit Agarkar was nicknamed 'Bombay Duck' because he grew up on a duck poultry farm in coastal Maharashtra.",
+        "isReal": false,
+        "explanation": "FALSE! The nickname was coined by the Australian media and crowds during India's 1999-2000 tour after Agarkar scored five consecutive ducks, a cheeky pun on Mumbai's famous dried fish delicacy 'Bombay Duck'.",
+        "id": "f29-4"
+      },
+      {
+        "statement": "MS Dhoni was run out for a diamond duck (out without facing a single delivery) on his international debut for India.",
+        "isReal": true,
+        "explanation": "TRUE! In Chittagong on 23 December 2004 against Bangladesh, Dhoni was run out off his very first ball (0 off 0 balls) after a mix-up with Mohammad Kaif.",
+        "id": "f29-5"
+      },
+      {
+        "statement": "Sachin Tendulkar never recorded a duck in his 463 One Day International appearances.",
+        "isReal": false,
+        "explanation": "FALSE! Tendulkar was dismissed for a duck 20 times in ODIs and 14 times in Tests across his 24-year international career.",
+        "id": "f29-6"
+      }
+    ]
+  },
+  {
+    "theme": "Six-Hitting Monsters",
+    "facts": [
+      {
+        "statement": "Rohit Sharma holds the world record for the most sixes hit in international cricket across all three formats combined (over 600 sixes).",
+        "isReal": true,
+        "explanation": "TRUE! Rohit overtook Chris Gayle's record of 553 sixes during the 2023 World Cup, becoming the first cricketer in history to cross 600 international sixes.",
+        "id": "f30-1"
+      },
+      {
+        "statement": "Shahid Afridi hit a six that struck the stadium roof at the Wanderers in Johannesburg and was measured at 158 meters.",
+        "isReal": false,
+        "explanation": "FALSE! While Afridi's colossal six off Ryan McLaren in 2013 was enormous, the widely reported 158m measurement was an unverified broadcast guess; modern ball-tracking estimated it around 125m.",
+        "id": "f30-2"
+      },
+      {
+        "statement": "Chris Gayle is the only batsman in history to hit more than 1,000 sixes in Twenty20 cricket.",
+        "isReal": true,
+        "explanation": "TRUE! The 'Universe Boss' has smashed an unbelievable 1,056 sixes in 463 T20 matches, over 300 more than his nearest rival Kieron Pollard.",
+        "id": "f30-3"
+      },
+      {
+        "statement": "MS Dhoni hit a six out of the stadium in the 2011 World Cup Final that shattered an LED floodlight tower.",
+        "isReal": false,
+        "explanation": "FALSE! Dhoni's famous match-winning six off Nuwan Kulasekara sailed into the delirious crowd in the mid-wicket stands; it never touched a floodlight tower.",
+        "id": "f30-4"
+      },
+      {
+        "statement": "Andre Russell struck 52 sixes in the 2019 IPL season, averaging a six every 4.8 balls faced.",
+        "isReal": true,
+        "explanation": "TRUE! Russell scored 510 runs at a mind-boggling strike rate of 204.81 in IPL 2019, smashing 52 sixes in just 249 balls.",
+        "id": "f30-5"
+      },
+      {
+        "statement": "AB de Villiers hit 25 sixes in a single ODI innings against the West Indies in 2015.",
+        "isReal": false,
+        "explanation": "FALSE! De Villiers hit 16 sixes in his 149 off 44 balls. Eoin Morgan holds the record for most sixes in an ODI innings with 17 sixes vs Afghanistan in 2019.",
+        "id": "f30-6"
+      }
+    ]
+  },
+  {
+    "theme": "Test Match Marathons",
+    "facts": [
+      {
+        "statement": "The longest Test match in history was played between South Africa and England in Durban in 1939, lasting 10 full days without finishing.",
+        "isReal": true,
+        "explanation": "TRUE! The 'Timeless Test' lasted from 3 to 14 March 1939; after 10 days and 1,981 runs, the match was declared a draw because England had to catch their boat home!",
+        "id": "f31-1"
+      },
+      {
+        "statement": "Pakistan's Hanif Mohammad batted for 970 minutes (over 16 hours) to score 337 against the West Indies in Bridgetown in 1958.",
+        "isReal": true,
+        "explanation": "TRUE! Following on 473 runs behind, Hanif's epic 16-hour vigil remains the longest individual innings in the history of Test cricket, saving the Test match.",
+        "id": "f31-2"
+      },
+      {
+        "statement": "Rahul Dravid holds the world record for facing the most deliveries in Test cricket history (over 31,000 balls).",
+        "isReal": true,
+        "explanation": "TRUE! 'The Wall' faced 31,258 balls and spent 44,152 minutes (735 hours) at the crease in 164 Tests, more than any batsman in history.",
+        "id": "f31-3"
+      },
+      {
+        "statement": "Gary Kirsten batted for 24 continuous hours without sleep to score 275 against England in Durban in 1999.",
+        "isReal": false,
+        "explanation": "FALSE! Kirsten batted for 14 hours and 32 minutes (872 balls) over four days, sleeping normally between play like every professional cricketer.",
+        "id": "f31-4"
+      },
+      {
+        "statement": "Sunil Gavaskar reached his milestone 10,000th Test run without ever wearing a helmet in his entire career.",
+        "isReal": false,
+        "explanation": "FALSE! While Gavaskar famously batted against lethal fast bowling wearing only a sun hat or customized lightweight skull cap for most of his career, he did wear protective helmets and gear as bowling speeds increased.",
+        "id": "f31-5"
+      },
+      {
+        "statement": "Brian Lara batted with a broken left wrist during his entire world-record 400 not out against England.",
+        "isReal": false,
+        "explanation": "FALSE! Lara was completely fit during his 400* in 2004; he played with supreme fluency across three days.",
+        "id": "f31-6"
+      }
+    ]
+  },
+  {
+    "theme": "The Nervous 90s & Heartbreaking Dismissals",
+    "facts": [
+      {
+        "statement": "Sachin Tendulkar was dismissed in the 90s a world-record 28 times in international cricket (10 in Tests, 18 in ODIs).",
+        "isReal": true,
+        "explanation": "TRUE! Tendulkar suffered the agony of the 'Nervous 90s' 28 times in his international career, including being dismissed for 99 on three occasions.",
+        "id": "f32-1"
+      },
+      {
+        "statement": "Sir Don Bradman was never dismissed in the 90s in his entire Test career.",
+        "isReal": false,
+        "explanation": "FALSE! Bradman was dismissed in the 90s twice in Test cricket: for 98 against West Indies in Sydney in 1931, and for 96 against England in Leeds in 1934.",
+        "id": "f32-2"
+      },
+      {
+        "statement": "Rahul Dravid, Ricky Ponting, and Michael Vaughan were all dismissed for 99 on the same weekend in different Test matches in 2002.",
+        "isReal": false,
+        "explanation": "FALSE! While several batsmen have fallen on 99, these three never experienced it on the same weekend in 2002.",
+        "id": "f32-3"
+      },
+      {
+        "statement": "India's Virender Sehwag was left stranded on 99 not out in an ODI against Sri Lanka because Suraj Randiv bowled a deliberate no-ball.",
+        "isReal": true,
+        "explanation": "TRUE! In Dambulla in August 2010, with India needing 1 run to win and Sehwag on 99, Randiv deliberately bowled a massive no-ball; the 1 penalty run won the match before Sehwag's six could count.",
+        "id": "f32-4"
+      },
+      {
+        "statement": "Stephen Fleming of New Zealand scored 9 fifties in a row in Test cricket without converting any of them into a century.",
+        "isReal": false,
+        "explanation": "FALSE! Fleming had conversion difficulties, but his streak of consecutive fifties was 5, not 9.",
+        "id": "f32-5"
+      },
+      {
+        "statement": "Geoff Boycott was once run out by his own teammate Graham Gooch because England captain Mike Brearley felt he was batting too slowly.",
+        "isReal": true,
+        "explanation": "TRUE! In the Christchurch Test in 1978, Boycott made 22 off 80 balls in 100 minutes. Botham admitted in his autobiography that the dressing room ordered him run out to increase the scoring rate.",
+        "id": "f32-6"
+      }
+    ]
+  },
+  {
+    "theme": "Iconic Jersey Numbers & Superstitions",
+    "facts": [
+      {
+        "statement": "The BCCI officially retired Sachin Tendulkar's iconic jersey number 10 from the Indian national team in 2017.",
+        "isReal": true,
+        "explanation": "TRUE! After Shardul Thakur briefly wore #10 on debut in 2017, fans protested and the BCCI officially retired the legendary #10 to honour Tendulkar.",
+        "id": "f33-1"
+      },
+      {
+        "statement": "Steve Waugh carried a lucky red handkerchief given to him by his grandfather in his pocket in every Test match.",
+        "isReal": true,
+        "explanation": "TRUE! Waugh carried his famous red rag in his pocket for his entire international career as a lucky talisman, touching it between deliveries.",
+        "id": "f33-2"
+      },
+      {
+        "statement": "MS Dhoni chose jersey number 7 because he was the 7th child born in his family.",
+        "isReal": false,
+        "explanation": "FALSE! Dhoni chose #7 because his birthday is on the 7th of July (7/7), and he considers 7 his lucky natural number.",
+        "id": "f33-3"
+      },
+      {
+        "statement": "Virat Kohli has worn jersey number 18 throughout his senior career to honor his father who passed away on 18 December 2006.",
+        "isReal": true,
+        "explanation": "TRUE! Kohli has stated on multiple occasions that jersey 18 connects him emotionally with his late father Prem Kohli, who passed away on 18 December.",
+        "id": "f33-4"
+      },
+      {
+        "statement": "Chris Gayle wore jersey number 333 in the IPL to celebrate his record of hitting 333 sixes in the Caribbean Premier League.",
+        "isReal": false,
+        "explanation": "FALSE! Gayle wore jersey 333 in tribute to his highest Test match score of 333 against Sri Lanka in Galle in 2010.",
+        "id": "f33-5"
+      },
+      {
+        "statement": "Neil McKenzie of South Africa refused to walk out to bat unless the stadium groundskeeper personally painted a white square in front of the pavilion.",
+        "isReal": false,
+        "explanation": "FALSE! McKenzie had legendary obsessive superstitions inside the dressing room (such as toilet seats down, taping bats to ceilings, and ensuring all square-leg umpire hats were straight), but never demanded custom painted squares from ground staff.",
+        "id": "f33-6"
+      }
+    ]
+  },
+  {
+    "theme": "Double Internationals & Multitalented Athletes",
+    "facts": [
+      {
+        "statement": "Australia's Ellyse Perry represented her country in both the ICC Women's Cricket World Cup and the FIFA Women's Football World Cup.",
+        "isReal": true,
+        "explanation": "TRUE! Perry debuted for Australia in cricket and football at age 16; she played in the 2011 FIFA Women's World Cup (scoring vs Sweden) and won multiple Cricket World Cups.",
+        "id": "f34-1"
+      },
+      {
+        "statement": "Sir Viv Richards played for Antigua in qualifying matches for the FIFA Football World Cup.",
+        "isReal": true,
+        "explanation": "TRUE! The legendary West Indies batsman was also a gifted football center-back and played international football for Antigua and Barbuda in 1974 World Cup qualifiers.",
+        "id": "f34-2"
+      },
+      {
+        "statement": "AB de Villiers was a national tennis champion, scratch golfer, national swimmer, and national rugby player before playing cricket.",
+        "isReal": false,
+        "explanation": "FALSE! This is a viral internet myth! In his autobiography, de Villiers clarified he was a keen schoolboy sportsman who loved tennis and golf, but never held national records or played national rugby.",
+        "id": "f34-3"
+      },
+      {
+        "statement": "England's CB Fry was a Test cricketer, international footballer, rugby player, and equalled the world long jump record in 1893.",
+        "isReal": true,
+        "explanation": "TRUE! Charles Burgess Fry was one of history's greatest polymaths: played Test cricket for England, soccer for England, and set a world long jump record of 7.17 meters.",
+        "id": "f34-4"
+      },
+      {
+        "statement": "Jonty Rhodes won an Olympic bronze medal for South Africa in field hockey at the 1996 Atlanta Olympic Games.",
+        "isReal": false,
+        "explanation": "FALSE! While Rhodes was selected for South African Olympic hockey trials and squads, he never competed at an Olympic tournament due to cricket tour clashes.",
+        "id": "f34-5"
+      },
+      {
+        "statement": "Sir Ian Botham played professional top-flight football as a striker for Manchester United in the English Premier League.",
+        "isReal": false,
+        "explanation": "FALSE! Botham played 11 League matches as a centre-back for Scunthorpe United in the Fourth Division in 1980-81, never for Manchester United.",
+        "id": "f34-6"
+      }
+    ]
+  },
+  {
+    "theme": "The Pink Ball & Day-Night Tests",
+    "facts": [
+      {
+        "statement": "The first Day-Night Test match with a pink ball was played in November 2015 between Australia and New Zealand in Adelaide.",
+        "isReal": true,
+        "explanation": "TRUE! Australia defeated New Zealand by 3 wickets at the Adelaide Oval in November 2015, with 123,000 spectators attending across three dramatic days.",
+        "id": "f35-1"
+      },
+      {
+        "statement": "India won their first-ever pink-ball Test match against Bangladesh at Eden Gardens inside three days in 2019.",
+        "isReal": true,
+        "explanation": "TRUE! In November 2019 at Eden Gardens, India bowled out Bangladesh twice to win by an innings and 46 runs, with Virat Kohli scoring 136.",
+        "id": "f35-2"
+      },
+      {
+        "statement": "India was bowled out for 36 in their second pink-ball Test against Australia in Adelaide in 2020, their lowest total in Test history.",
+        "isReal": true,
+        "explanation": "TRUE! On 19 December 2020, Josh Hazlewood (5/8) and Pat Cummins (4/21) dismantled India for 36 in 21.2 overs in the Adelaide day-night Test.",
+        "id": "f35-3"
+      },
+      {
+        "statement": "Pink cricket balls are coated with neon fluorescent dye to ensure they glow in complete darkness.",
+        "isReal": false,
+        "explanation": "FALSE! Pink balls use high-grade alum-tanned leather pigmented pink, topped with multiple polyurethane gloss coats to maintain visibility under stadium floodlights.",
+        "id": "f35-4"
+      },
+      {
+        "statement": "Australia has won every single Day-Night Test match they have ever played on home soil.",
+        "isReal": false,
+        "explanation": "FALSE! Australia's flawless home pink-ball streak was broken in January 2024 when Shamar Joseph's sensational 7/68 guided the West Indies to an 8-run victory in Brisbane.",
+        "id": "f35-5"
+      },
+      {
+        "statement": "A pink ball is heavier than a traditional red or white cricket ball by 2 ounces.",
+        "isReal": false,
+        "explanation": "FALSE! Under MCC Law 4, all cricket balls (red, white, and pink) must weigh between 5.5 and 5.75 ounces (155.9g to 163g); the weight is strictly identical.",
+        "id": "f35-6"
+      }
+    ]
+  },
+  {
+    "theme": "Spin Quartets & Mystery Deliveries",
+    "facts": [
+      {
+        "statement": "The famous Indian spin quartet of Bedi, Prasanna, Chandrasekhar, and Venkataraghavan played together in only one Test match.",
+        "isReal": true,
+        "explanation": "TRUE! Despite taking 853 Test wickets between them, all four legends featured in the same playing XI just once, against England at Edgbaston in 1967.",
+        "id": "f36-1"
+      },
+      {
+        "statement": "Pakistan's Saqlain Mushtaq is credited with inventing the 'Doosra', which spins away from the right-hander with an off-spinner's action.",
+        "isReal": true,
+        "explanation": "TRUE! Saqlain developed the delivery in domestic cricket and used it to baffle international batsmen in the late 1990s, named 'doosra' (the other one) by wicketkeeper Moin Khan.",
+        "id": "f36-2"
+      },
+      {
+        "statement": "Anil Kumble bowled with a broken jaw wired together in the 2002 Antigua Test and dismissed Brian Lara.",
+        "isReal": true,
+        "explanation": "TRUE! Hit in the mouth by a Mervyn Dillon bouncer, Kumble emerged with his head in bandages, bowled 14 consecutive overs, and trapped Brian Lara LBW.",
+        "id": "f36-3"
+      },
+      {
+        "statement": "Sri Lanka's Ajantha Mendis took 6 wickets for 8 runs in an Asia Cup final bowling with a baseball grip.",
+        "isReal": false,
+        "explanation": "FALSE! Mendis demolished India with 6/13 in the 2008 Asia Cup final in Karachi using his patented 'carrom ball' flicked with the middle finger, not a baseball grip.",
+        "id": "f36-4"
+      },
+      {
+        "statement": "Shane Warne bowled his flipper by clicking his thumb and index finger like a magician snapping his fingers.",
+        "isReal": false,
+        "explanation": "FALSE! Warne squeezed the ball between his thumb and first two fingers, imparting backspin so the ball skidded low, not by snapping fingers.",
+        "id": "f36-5"
+      },
+      {
+        "statement": "BS Chandrasekhar was forced to bowl with his left arm because of a childhood poliovirus infection in his right shoulder.",
+        "isReal": false,
+        "explanation": "FALSE! Remarkably, Chandrasekhar's right arm was withered by childhood polio, but he turned his condition into a unique weapon, bowling right-arm leg-spin with a whippy, unreadable action that took 242 Test wickets.",
+        "id": "f36-6"
+      }
+    ]
+  },
+  {
+    "theme": "World Cup Final Defining Moments",
+    "facts": [
+      {
+        "statement": "In the 1975 World Cup Final, West Indies captain Clive Lloyd scored 102 off 85 balls to defeat Australia at Lord's.",
+        "isReal": true,
+        "explanation": "TRUE! Lloyd's counter-attacking century rescued the West Indies from 50/3 and powered them to 291/8 in 60 overs, winning the inaugural World Cup.",
+        "id": "f37-1"
+      },
+      {
+        "statement": "Kapil Dev's running-backwards catch to dismiss Viv Richards in the 1983 World Cup Final covered over 20 yards.",
+        "isReal": true,
+        "explanation": "TRUE! Running over his shoulder from midwicket towards the boundary, Kapil plucked Madan Lal's top-edge out of the air to spark the collapse that won India the Cup.",
+        "id": "f37-2"
+      },
+      {
+        "statement": "Aravinda de Silva scored a century and took 3 wickets in the 1996 World Cup Final against Australia in Lahore.",
+        "isReal": true,
+        "explanation": "TRUE! De Silva produced arguably the finest all-round performance in World Cup final history: taking 3/42, two catches, and scoring an unbeaten 107* to steer Sri Lanka to glory.",
+        "id": "f37-3"
+      },
+      {
+        "statement": "Adam Gilchrist's 149 in the 2007 World Cup Final against Sri Lanka in Barbados was played in a match shortened by a power outage.",
+        "isReal": false,
+        "explanation": "FALSE! The 2007 final was shortened to 38 overs per side due to morning rain, not a power outage, though the final overs were played in near-total darkness.",
+        "id": "f37-4"
+      },
+      {
+        "statement": "MS Dhoni was named Player of the Tournament for the 2011 World Cup after scoring 91 not out in the final.",
+        "isReal": false,
+        "explanation": "FALSE! Dhoni was Player of the Match in the final, but Yuvraj Singh was Player of the Tournament with 362 runs and 15 wickets.",
+        "id": "f37-5"
+      },
+      {
+        "statement": "Ricky Ponting scored an unbeaten 140 off 121 balls in the 2003 World Cup Final with a spring fitted inside his bat.",
+        "isReal": false,
+        "explanation": "FALSE! The persistent urban legend that Ponting had a spring or graphite spring in his bat was completely debunked; he used a standard, approved Kookaburra Kahuna bat.",
+        "id": "f37-6"
+      }
+    ]
+  },
+  {
+    "theme": "Cricket & Royalty / Historical Quirks",
+    "facts": [
+      {
+        "statement": "In 1981, Australian captain Greg Chappell instructed his brother Trevor to bowl an underarm roll along the ground with New Zealand needing 6 runs to tie.",
+        "isReal": true,
+        "explanation": "TRUE! At the MCG on 1 February 1981, Brian McKechnie had to face an underarm roll along the pitch; the incident caused diplomatic fallout between Australia and New Zealand and was subsequently banned.",
+        "id": "f38-1"
+      },
+      {
+        "statement": "Dennis Lillee walked out to bat in an Ashes Test match at the WACA in 1979 using a combat-grade aluminum cricket bat.",
+        "isReal": true,
+        "explanation": "TRUE! Lillee used the 'Combat' metal bat manufactured by his friend; after complaints from England captain Mike Brearley about the sound and damage to the ball, umpire ordered him to switch back to wood.",
+        "id": "f38-2"
+      },
+      {
+        "statement": "The Marylebone Cricket Club (MCC) was founded at Lord's in 1787 and still owns the copyright to the official Laws of Cricket.",
+        "isReal": true,
+        "explanation": "TRUE! The MCC, based at Lord's, remains the sole custodian and drafter of the Laws of Cricket worldwide, not the International Cricket Council (ICC).",
+        "id": "f38-3"
+      },
+      {
+        "statement": "The cricket ball was dyed yellow during the 1992 World Cup to allow viewers with black-and-white television sets to see the ball clearly.",
+        "isReal": false,
+        "explanation": "FALSE! White Kookaburra cricket balls have been used in day-night and colored-clothing limited overs matches since Kerry Packer's World Series Cricket in 1977.",
+        "id": "f38-4"
+      },
+      {
+        "statement": "The third umpire TV red light / green light system was originally repurposed from a traffic light signal box in Durban.",
+        "isReal": false,
+        "explanation": "FALSE! Karl Liebenberg used a custom electronic desk button wired to illuminated signboard panels in the stadium, not street traffic signals.",
+        "id": "f38-5"
+      },
+      {
+        "statement": "Queen Elizabeth II was bowled for a duck by Prince Philip during a Buckingham Palace garden party cricket match in 1953.",
+        "isReal": false,
+        "explanation": "FALSE! This is a humorous satirical tabloid myth; Queen Elizabeth II attended dozens of Test matches as patron of the MCC but never played publicly.",
+        "id": "f38-6"
+      }
+    ]
+  },
+  {
+    "theme": "Century on Debut Club",
+    "facts": [
+      {
+        "statement": "Shikhar Dhawan scored 187 on Test debut against Australia in Mohali in 2013, reaching his century in just 85 balls.",
+        "isReal": true,
+        "explanation": "TRUE! Dhawan smashed the fastest century by a debutant in Test history, finishing with 187 off 174 balls with 33 fours and 2 sixes.",
+        "id": "f39-1"
+      },
+      {
+        "statement": "Rohit Sharma scored a century in both innings of his Test match debut against the West Indies at Eden Gardens in 2013.",
+        "isReal": false,
+        "explanation": "FALSE! Rohit scored a brilliant 177 in the first innings at Eden Gardens, but India won by an innings and 51 runs, so he did not bat a second time.",
+        "id": "f39-2"
+      },
+      {
+        "statement": "Kane Williamson scored 131 on his Test debut against India in Ahmedabad in November 2010 at age 20.",
+        "isReal": true,
+        "explanation": "TRUE! Facing an attack led by Zaheer Khan and Harbhajan Singh, 20-year-old Williamson made 131 to become the eighth New Zealander to score a ton on Test debut.",
+        "id": "f39-3"
+      },
+      {
+        "statement": "Virat Kohli scored 105 on his Test debut against the West Indies in Kingston, Jamaica in 2011.",
+        "isReal": false,
+        "explanation": "FALSE! Kohli had a difficult Test debut in June 2011, making scores of 4 and 15 against Fidel Edwards and Ravi Rampaul; his maiden Test hundred came in Adelaide in 2012.",
+        "id": "f39-4"
+      },
+      {
+        "statement": "Prithvi Shaw scored a century off 99 balls on his Test debut for India against the West Indies in Rajkot in 2018 at age 18.",
+        "isReal": true,
+        "explanation": "TRUE! Shaw became the youngest Indian to score a century on Test debut (18 years and 329 days), scoring 134 off 154 balls.",
+        "id": "f39-5"
+      },
+      {
+        "statement": "Steve Smith scored a century on his Test debut against Pakistan at Lord's in 2010.",
+        "isReal": false,
+        "explanation": "FALSE! Smith debuted as a leg-spin bowling all-rounder batting at number 8 and 9, scoring 1 and 12 against Pakistan at Lord's.",
+        "id": "f39-6"
+      }
+    ]
+  },
+  {
+    "theme": "Modern T20 Franchise Wonders",
+    "facts": [
+      {
+        "statement": "Sunrisers Hyderabad scored 287/3 against Royal Challengers Bengaluru in IPL 2024, the highest team total in IPL history.",
+        "isReal": true,
+        "explanation": "TRUE! In Bengaluru on 15 April 2024, Travis Head (102 off 41) and Heinrich Klaasen (67 off 31) propelled SRH to 287/3, breaking their own record of 277 set weeks earlier.",
+        "id": "f40-1"
+      },
+      {
+        "statement": "Alzarri Joseph holds the record for the best bowling figures in IPL history with 6 wickets for 12 runs on his debut for Mumbai Indians.",
+        "isReal": true,
+        "explanation": "TRUE! In April 2019 in Hyderabad, Joseph took 6/12 in 3.4 overs against Sunrisers Hyderabad, breaking Sohail Tanvir's 11-year record of 6/14.",
+        "id": "f40-2"
+      },
+      {
+        "statement": "Virat Kohli scored 973 runs in the 2016 IPL season, including four centuries, the most runs ever scored in a single T20 tournament.",
+        "isReal": true,
+        "explanation": "TRUE! Kohli averaged 81.08 with a strike rate of 152.03 in IPL 2016, a legendary batting campaign that remains the all-time benchmark.",
+        "id": "f40-3"
+      },
+      {
+        "statement": "Rashid Khan has taken five hat-tricks in the Indian Premier League, more than any other bowler.",
+        "isReal": false,
+        "explanation": "FALSE! Amit Mishra holds the all-time IPL record with 3 hat-tricks (for DC, DCH, and SRH); Rashid Khan has 1 IPL hat-trick (for GT vs KKR in 2023).",
+        "id": "f40-4"
+      },
+      {
+        "statement": "Chris Gayle and KL Rahul shared a 250-run opening partnership for Kings XI Punjab in IPL 2018.",
+        "isReal": false,
+        "explanation": "FALSE! The highest opening partnership in IPL history is 210 not out by KL Rahul and Quinton de Kock for LSG against KKR in 2022; Gayle and Rahul never reached 250.",
+        "id": "f40-5"
+      },
+      {
+        "statement": "Chennai Super Kings has won the IPL championship trophy six times, more than any other franchise in history.",
+        "isReal": false,
+        "explanation": "FALSE! Both Chennai Super Kings and Mumbai Indians share the all-time record with 5 titles each (MI won in 2013, 2015, 2017, 2019, 2020; CSK won in 2010, 2011, 2018, 2021, 2023).",
+        "id": "f40-6"
       }
     ]
   }

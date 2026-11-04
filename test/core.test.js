@@ -13,7 +13,7 @@ const DAY_START = Date.UTC(2026, 9, 27) - IST;
 
 test("players.js exports the player list and lookup tables", () => {
   assert.ok(Array.isArray(data.PLAYERS));
-  assert.equal(data.PLAYERS.length, 425);
+  assert.equal(data.PLAYERS.length, 427);
   assert.equal(data.COUNTRIES.IND, "India");
   assert.equal(data.BOWL_STYLES.SLA, "Left-arm orthodox");
   assert.ok(data.PACE.has("RF"));

@@ -131,8 +131,11 @@
 
   function selectDailySets(todayKey) {
     if (!allSets || allSets.length === 0) return [];
-    const seed = hashString(`${todayKey}_facts_daily_single`);
-    const idx = seed % allSets.length;
+    // Non-repeating calendar day progression: every day gets a unique set from the library
+    const epoch = new Date("2026-01-01T00:00:00Z").getTime();
+    const current = new Date(`${todayKey}T00:00:00Z`).getTime();
+    const dayNumber = Math.max(0, Math.floor((current - epoch) / 86400000));
+    const idx = ((dayNumber % allSets.length) + allSets.length) % allSets.length;
     return [allSets[idx]];
   }
 

@@ -42,7 +42,7 @@ const PLAYERS = [
   p("Sachin Tendulkar", "IND", "Batter", "R", "RM", 1989, false, 664, 34357, 201, 1, ["MI"]),
   p("Jasprit Bumrah", "IND", "Bowler", "R", "RF", 2016, true, 210, 400, 450, 1, ["MI"]),
   p("Ravindra Jadeja", "IND", "All-rounder", "L", "SLA", 2009, true, 370, 7500, 600, 3, ["RR", "CSK", "GT"]),
-  p("Ravichandran Ashwin", "IND", "Bowler", "R", "OB", 2010, false, 287, 4400, 765, 2, ["CSK", "RPS", "PBKS", "DC", "RR"]),
+  p("Ravichandran Ashwin", "IND", "Bowler", "R", "OB", 2010, true, 287, 4400, 765, 2, ["CSK", "RPS", "PBKS", "DC", "RR"]),
   p("Hardik Pandya", "IND", "All-rounder", "R", "RFM", 2016, true, 250, 5000, 250, 2, ["MI", "GT"]),
   p("KL Rahul", "IND", "Wicketkeeper", "R", "-", 2014, true, 230, 9000, 0, 1, ["RCB", "SRH", "PBKS", "LSG", "DC"]),
   p("Shubman Gill", "IND", "Batter", "R", "-", 2019, true, 130, 6500, 0, 1, ["KKR", "GT"]),
@@ -350,6 +350,8 @@ const PLAYERS = [
 
   // ---------------- West Indies ----------------
   p("Chris Gayle", "WI", "Batter", "L", "OB", 1999, false, 483, 19000, 259, 3, ["KKR", "RCB", "PBKS"]),
+  p("Kieron Pollard", "WI", "All-rounder", "R", "RM", 2007, false, 224, 4275, 97, 1, ["MI"]),
+  p("Nicholas Pooran", "WI", "Wicketkeeper", "L", "OB", 2016, true, 160, 4100, 6, 0, ["SRH", "PBKS", "LSG"]),
   p("Dwayne Bravo", "WI", "All-rounder", "R", "RFM", 2004, false, 295, 6000, 400, 2, ["MI", "CSK", "GL"]),
   p("Andre Russell", "WI", "All-rounder", "R", "RF", 2010, false, 180, 3500, 170, 2, ["DC", "KKR"]),
   p("Sunil Narine", "WI", "Bowler", "L", "OB", 2011, false, 122, 800, 200, 0, ["KKR"]),
