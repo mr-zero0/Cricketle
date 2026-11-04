@@ -51,12 +51,18 @@
 
   --z-dropdown: 10; --z-sticky: 20; --z-tabbar: 30; --z-toast: 50;
 
+  --dur-instant: 90ms;
   --dur-fast: 150ms;
   --dur-base: 240ms;
+  --dur-standard: 280ms;
   --dur-slow: 480ms;
+  --dur-entrance: 420ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-back: cubic-bezier(0.34, 1.4, 0.64, 1);
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 
   --tabbar-h: 64px;
 }
@@ -2342,4 +2348,513 @@ dialog form { margin-top: var(--space-4); text-align: right; }
 .report-textarea {
   resize: vertical;
   min-height: 72px;
+}
+
+/* ==========================================================================
+   SUPER SMOOTH UI MOTION & TACTILE SYSTEM (ALL PAGES)
+   Delivers fluid, 60/120fps GPU-accelerated transitions, native spring feedback,
+   and cohesive tactile feel across every game variant, modal, and page.
+   ========================================================================== */
+
+/* 1. Universal Page & View Entrance Reveal */
+main,
+.app,
+.hub-container,
+.conn-container,
+.facts-container,
+.journey-container,
+.pixel-container,
+.puzzle-container,
+.scorecard-container,
+.scramble-container,
+.stadium-container,
+.legal-container {
+  animation: pageReveal 0.4s var(--ease-smooth) both;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+@keyframes pageReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 2. Universal Tactile Button Micro-interactions & Spring Feedback */
+.btn,
+button,
+[role="button"],
+.tile-play-btn,
+.submit-facts-btn,
+.conn-btn,
+.gate-btn,
+.auth-tab-btn,
+.mode-btn,
+.theme-btn,
+.report-inaccuracy-pill,
+.icon-btn,
+.back-btn,
+.back-hub-btn,
+.close-btn,
+.btn-puzzle-reset,
+.btn-puzzle-rotate,
+.btn-share,
+.btn-copy,
+.mv-pill,
+.topbar-auth-btn,
+.google-blue-btn {
+  transition: transform 0.22s var(--ease-spring),
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.24s var(--ease-smooth),
+              filter 0.2s ease,
+              color 0.2s ease;
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:hover,
+button:not(:disabled):hover,
+[role="button"]:hover,
+.tile-play-btn:hover,
+.submit-facts-btn:hover,
+.conn-btn:not(:disabled):hover,
+.gate-btn:hover,
+.auth-tab-btn:hover,
+.mode-btn:hover,
+.theme-btn:hover,
+.report-inaccuracy-pill:hover,
+.icon-btn:hover,
+.back-btn:hover,
+.back-hub-btn:hover,
+.close-btn:hover,
+.btn-puzzle-reset:hover,
+.btn-puzzle-rotate:hover,
+.btn-share:hover,
+.btn-copy:hover,
+.topbar-auth-btn:hover,
+.google-blue-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.btn:active,
+button:not(:disabled):active,
+[role="button"]:active,
+.tile-play-btn:active,
+.submit-facts-btn:active,
+.conn-btn:not(:disabled):active,
+.gate-btn:active,
+.auth-tab-btn:active,
+.mode-btn:active,
+.theme-btn:active,
+.report-inaccuracy-pill:active,
+.icon-btn:active,
+.back-btn:active,
+.back-hub-btn:active,
+.close-btn:active,
+.btn-puzzle-reset:active,
+.btn-puzzle-rotate:active,
+.btn-share:active,
+.btn-copy:active,
+.mv-pill:active,
+.topbar-auth-btn:active,
+.google-blue-btn:active {
+  transform: translateY(1px) scale(0.965);
+  transition: transform 70ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: brightness(0.96);
+}
+
+/* 3. Universal Card Depth, Glow & Elevation */
+.card,
+.game-tile,
+.result-card,
+.daily-summary-card,
+.me-card,
+.member-gate-card,
+.photo-card,
+.stadium-blueprint-card,
+.scorecard-card,
+.scrambled-card,
+.solved-card,
+.journey-card,
+.legal-card,
+.puzzle-grid-card {
+  transition: transform 0.3s var(--ease-smooth),
+              box-shadow 0.3s var(--ease-smooth),
+              border-color 0.26s ease,
+              background-color 0.3s ease;
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+
+.card:hover,
+.result-card:hover,
+.daily-summary-card:hover,
+.me-card:hover,
+.member-gate-card:hover,
+.photo-card:hover,
+.stadium-blueprint-card:hover,
+.scorecard-card:hover,
+.scrambled-card:hover,
+.journey-card:hover,
+.puzzle-grid-card:hover {
+  box-shadow: 0 18px 40px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--border-strong);
+}
+
+/* 4. Smooth Form Inputs & Glow Focus */
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="search"],
+select,
+textarea,
+.guess-input {
+  transition: border-color 0.22s var(--ease-smooth),
+              box-shadow 0.22s var(--ease-smooth),
+              background-color 0.22s ease,
+              transform 0.22s var(--ease-smooth);
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="search"]:focus,
+select:focus,
+textarea:focus,
+.guess-input:focus {
+  border-color: var(--primary-bright, #22c55e) !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25), 0 6px 20px rgba(0, 0, 0, 0.28) !important;
+  transform: translateY(-1px);
+}
+
+/* 5. Smooth Autocomplete Dropdown Transitions */
+#autocomplete-list,
+.autocomplete-dropdown {
+  animation: dropdownSmoothSlide 0.22s var(--ease-smooth) both;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform-origin: top center;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-strong);
+}
+
+@keyframes dropdownSmoothSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#autocomplete-list div,
+.autocomplete-item {
+  transition: background-color 0.16s ease,
+              transform 0.16s var(--ease-smooth),
+              padding-left 0.16s ease,
+              color 0.16s ease;
+}
+
+#autocomplete-list div:hover,
+#autocomplete-list div.selected,
+.autocomplete-item:hover,
+.autocomplete-item.selected {
+  transform: translateX(4px);
+  padding-left: calc(var(--space-3) + 4px);
+  background: rgba(34, 197, 94, 0.18) !important;
+  color: #ffffff !important;
+}
+
+/* 6. Universal Smooth Dialog & Modal Transitions */
+dialog[open],
+.inaccuracy-dialog,
+.modal[open],
+.sheet[open] {
+  animation: dialogSmoothPop 0.32s var(--ease-smooth) both !important;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+dialog::backdrop,
+.inaccuracy-dialog::backdrop,
+.modal::backdrop {
+  animation: backdropSmoothFade 0.25s var(--ease-smooth) both !important;
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+}
+
+@keyframes dialogSmoothPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.93) translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes backdropSmoothFade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 7. Mobile Variants Quick-Switch Rail Transitions */
+.mv-bar {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mv-pill {
+  transition: transform 0.22s var(--ease-spring),
+              background 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.22s ease,
+              color 0.2s ease;
+  will-change: transform;
+}
+
+.mv-pill:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.mv-pill:active {
+  transform: scale(0.92);
+  transition: transform 70ms ease;
+}
+
+/* 8. Toast Alerts Spring Entrance */
+.toast,
+#toast-container > div {
+  animation: toastSpringIn 0.36s var(--ease-spring) both !important;
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+@keyframes toastSpringIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 9. Connections Game Transitions */
+.conn-tile {
+  transition: transform 0.2s var(--ease-spring),
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.2s ease,
+              color 0.2s ease !important;
+  will-change: transform;
+}
+
+.conn-tile:hover {
+  transform: translateY(-3px) scale(1.025) !important;
+  border-color: var(--cool, #38bdf8) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+.conn-tile:active {
+  transform: translateY(1px) scale(0.95) !important;
+  transition: transform 70ms ease !important;
+}
+
+.conn-tile.selected {
+  animation: tileSelectedSpring 0.28s var(--ease-spring) both;
+  box-shadow: 0 0 18px rgba(59, 130, 246, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+@keyframes tileSelectedSpring {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.91); }
+  100% { transform: scale(0.97); }
+}
+
+.solved-card {
+  animation: solvedCardReveal 0.38s var(--ease-smooth) both;
+  will-change: transform, opacity;
+}
+
+@keyframes solvedCardReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 10. Scramble Game Transitions */
+.scramble-letter-tile {
+  transition: transform 0.32s var(--ease-spring),
+              background-color 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+.scramble-letter-tile:hover {
+  transform: translateY(-2px) scale(1.06);
+}
+
+.scramble-letter-tile.revealed {
+  animation: letterFlipIn 0.38s var(--ease-spring) both;
+}
+
+@keyframes letterFlipIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotateX(80deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateX(0deg);
+  }
+}
+
+/* 11. Pixel Cricketer Game Transitions */
+.pixel-canvas-wrap,
+#pixel-img-wrap,
+.pixel-photo-card {
+  transition: filter 0.55s var(--ease-smooth),
+              transform 0.35s var(--ease-smooth),
+              box-shadow 0.35s ease;
+}
+
+.pixel-clue-item,
+.clue-pill {
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.pixel-clue-item:hover,
+.clue-pill:hover {
+  transform: scale(1.04);
+}
+
+/* 12. Fact or Fiction Game Transitions */
+.fact-card {
+  transition: transform 0.32s var(--ease-smooth),
+              box-shadow 0.32s var(--ease-smooth),
+              border-color 0.25s ease;
+  will-change: transform;
+}
+
+.fact-card:hover {
+  transform: translateY(-4px) scale(1.008);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+}
+
+.fact-action-btn,
+.fact-btn {
+  transition: transform 0.18s var(--ease-spring),
+              background-color 0.18s ease,
+              box-shadow 0.18s ease;
+}
+
+.fact-action-btn:hover,
+.fact-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.fact-action-btn:active,
+.fact-btn:active {
+  transform: translateY(1px) scale(0.95);
+}
+
+/* 13. Stadium Mystery Transitions */
+.stadium-blueprint-card {
+  transition: transform 0.35s var(--ease-smooth),
+              box-shadow 0.35s ease;
+}
+
+.stadium-blueprint-card:hover {
+  transform: scale(1.015);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.5);
+}
+
+.stadium-hint-row {
+  animation: hintAccordionIn 0.35s var(--ease-smooth) both;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.stadium-hint-row:hover {
+  transform: translateX(3px);
+}
+
+@keyframes hintAccordionIn {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 14. Career Journey & Scorecard Transitions */
+.journey-milestone,
+.journey-step {
+  animation: milestoneSpringIn 0.36s var(--ease-spring) both;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.journey-milestone:hover,
+.journey-step:hover {
+  transform: scale(1.03);
+}
+
+@keyframes milestoneSpringIn {
+  0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.scorecard-table tbody tr {
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.scorecard-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(2px);
+}
+
+/* 15. Theme Cross-Fade Smoothness */
+body,
+.topbar,
+.card,
+.game-tile,
+.sheet,
+dialog,
+.mv-bar,
+.report-inaccuracy-pill {
+  transition: background-color 0.4s var(--ease-smooth),
+              border-color 0.35s ease,
+              color 0.35s ease;
+}
+
+/* 16. Accessibility & Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

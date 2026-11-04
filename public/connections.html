@@ -130,13 +130,18 @@
       color: var(--fg);
       cursor: pointer;
       user-select: none;
-      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background 0.2s ease,
+                  border-color 0.2s ease,
+                  box-shadow 0.2s ease;
       line-height: 1.25;
       text-transform: uppercase;
       letter-spacing: 0.3px;
       overflow-wrap: break-word;
       word-break: break-word;
       hyphens: auto;
+      will-change: transform;
+      -webkit-tap-highlight-color: transparent;
     }
 
     @media (max-width: 480px) {
@@ -149,7 +154,14 @@
 
     .conn-tile:hover {
       background: var(--card-2);
-      border-color: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.35);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .conn-tile:active {
+      transform: translateY(1px) scale(0.95);
+      transition: transform 70ms ease;
     }
 
     .conn-tile.selected {
@@ -157,7 +169,14 @@
       border-color: #60a5fa;
       color: #ffffff;
       transform: scale(0.97);
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      animation: tileSelectedSpring 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes tileSelectedSpring {
+      0% { transform: scale(1); }
+      40% { transform: scale(0.92); }
+      100% { transform: scale(0.97); }
     }
 
     .conn-tile.shake {

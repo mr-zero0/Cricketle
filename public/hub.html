@@ -71,19 +71,50 @@
       text-decoration: none;
       color: var(--fg);
       overflow: hidden;
-      transition: transform var(--dur-base) cubic-bezier(0.34, 1.56, 0.64, 1),
-                  border-color var(--dur-base) ease,
-                  box-shadow var(--dur-base) ease;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.26s ease,
+                  box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.3s ease;
       cursor: pointer;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       box-shadow: var(--shadow);
+      animation: tileEntrance 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+      will-change: transform, box-shadow;
+      transform: translateZ(0);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hub-grid .game-tile:nth-child(1) { animation-delay: 25ms; }
+    .hub-grid .game-tile:nth-child(2) { animation-delay: 50ms; }
+    .hub-grid .game-tile:nth-child(3) { animation-delay: 75ms; }
+    .hub-grid .game-tile:nth-child(4) { animation-delay: 100ms; }
+    .hub-grid .game-tile:nth-child(5) { animation-delay: 125ms; }
+    .hub-grid .game-tile:nth-child(6) { animation-delay: 150ms; }
+    .hub-grid .game-tile:nth-child(7) { animation-delay: 175ms; }
+    .hub-grid .game-tile:nth-child(8) { animation-delay: 200ms; }
+    .hub-grid .game-tile:nth-child(9) { animation-delay: 225ms; }
+
+    @keyframes tileEntrance {
+      0% {
+        opacity: 0;
+        transform: translateY(22px) scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .game-tile:hover {
-      transform: translateY(-4px);
+      transform: translateY(-6px) scale(1.015);
       border-color: var(--tile-border-hover, var(--border-strong));
-      box-shadow: 0 16px 36px -10px var(--tile-shadow, rgba(0, 0, 0, 0.35));
+      box-shadow: 0 20px 44px -10px var(--tile-shadow, rgba(0, 0, 0, 0.45)), 0 0 24px -6px var(--tile-glow, rgba(34, 197, 94, 0.25));
+    }
+
+    .game-tile:active {
+      transform: translateY(-1px) scale(0.985);
+      transition: transform 70ms ease;
     }
 
     /* Subtle atmospheric glow behind each tile */
@@ -97,7 +128,7 @@
       background: radial-gradient(circle at 50% 0%, var(--tile-glow, rgba(34, 197, 94, 0.15)), transparent 70%);
       pointer-events: none;
       opacity: 0.6;
-      transition: opacity var(--dur-base) ease;
+      transition: opacity 0.3s ease;
     }
 
     .game-tile:hover::before {
@@ -212,11 +243,12 @@
       font-size: 44px;
       line-height: 1;
       margin-bottom: var(--space-3);
-      transition: transform var(--dur-base) ease;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: center bottom;
     }
 
     .game-tile:hover .tile-icon {
-      transform: scale(1.1) rotate(4deg);
+      transform: scale(1.18) rotate(6deg);
     }
 
     .tile-title {
@@ -256,11 +288,19 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: transform var(--dur-fast) ease, opacity var(--dur-fast) ease;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.2s ease,
+                  box-shadow 0.25s ease;
+      will-change: transform;
     }
 
     .game-tile:hover .tile-play-btn {
-      transform: scale(1.03);
+      transform: translateX(4px) scale(1.04);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-tile:active .tile-play-btn {
+      transform: scale(0.96);
     }
 
     .tile-locked .tile-play-btn {
