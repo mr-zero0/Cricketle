@@ -621,8 +621,17 @@ function createApp(opts = {}) {
         return fail(res, 400, "missing_credential", "Google credential token is required.");
       }
 
+      // Check whether mock Google auth is permitted (strictly in testing / local in-memory DB)
+      const isProduction = (Boolean(process.env.SUPABASE_URL) || process.env.NODE_ENV === "production") && opts.dbPath !== ":memory:";
+      const isTestEnv = process.env.NODE_ENV === "test" || opts.dbPath === ":memory:" || Boolean(opts.allowMockGoogle);
+      const allowMockGoogle = isTestEnv && !isProduction;
+
       let payload = null;
       if (credential.startsWith("mock_google_")) {
+        if (!allowMockGoogle) {
+          logger.authWarn("google_mock_rejected", "Mock Google auth credentials rejected in production");
+          return fail(res, 401, "invalid_google_token", "Google token verification failed.");
+        }
         const parts = credential.split(":");
         payload = {
           sub: parts[1] || "mock_google_id_123",
@@ -883,9 +892,30 @@ function createApp(opts = {}) {
       if (!allowedVariants.includes(variant)) {
         return fail(res, 400, "invalid_variant", "Unknown puzzle variant.");
       }
-      const score = Math.max(0, Math.min(300, Number(body.score) || 0));
+
+      // Max score for any variant is 100 points
+      const rawScore = Number(body.score);
+      const score = Math.max(0, Math.min(100, Number.isFinite(rawScore) ? Math.floor(rawScore) : 0));
       const status = body.status === "solved" ? "solved" : "gaveUp";
-      const durationMs = Math.max(0, Math.min(24 * 3600 * 1000, Number(body.durationMs) || 0));
+      const rawDuration = Number(body.durationMs);
+      const durationMs = Math.max(0, Math.min(24 * 3600 * 1000, Number.isFinite(rawDuration) ? Math.floor(rawDuration) : 0));
+
+      // Reject impossible automated solve times (< 2 seconds)
+      if (status === "solved" && durationMs < 2000) {
+        logger.gameWarn("variant_cheat_flagged", `🚨 Rejected impossible solve time (${durationMs}ms) on ${variant} for @${user.username}`, {
+          user: user.username,
+          variant,
+          durationMs,
+        });
+        return fail(res, 400, "invalid_duration", "Solve duration is invalid.");
+      }
+
+      // Prevent duplicate solve score manipulation if already solved today
+      const existing = (await db.puzzlesFor(user.id, game.day())).find((p) => p.mode === variant);
+      if (existing && existing.status === "solved") {
+        return send(res, 200, { ok: true, variant, score: existing.points, status: "already_completed", day: game.day() });
+      }
+
       const guesses = Array.isArray(body.guesses) ? body.guesses.slice(0, 50) : [];
 
       await game.recordVariant(user.id, variant, score, status, durationMs, guesses);

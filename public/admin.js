@@ -90,7 +90,9 @@ async function loadReports() {
 
     tbody.innerHTML = reports.map(r => {
       const dateStr = r.created_at ? new Date(r.created_at).toLocaleString() : "-";
-      const target = r.target_name ? `${escapeHtml(r.target_name)}${r.photo_url ? ` <br><code style="font-size:11px;color:var(--text-muted);">${escapeHtml(r.photo_url)}</code>` : ""}` : (r.photo_url || "-");
+      const target = r.target_name
+        ? `${escapeHtml(r.target_name)}${r.photo_url ? ` <br><code style="font-size:11px;color:var(--text-muted);">${escapeHtml(r.photo_url)}</code>` : ""}`
+        : (r.photo_url ? `<code style="font-size:11px;color:var(--text-muted);">${escapeHtml(r.photo_url)}</code>` : "-");
       const issueBadge = `<span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);text-transform:uppercase;">${escapeHtml(r.issue_type || "issue")}</span>`;
       const details = escapeHtml(r.details || "");
       const gameBadge = `<span style="font-weight:600;text-transform:capitalize;">${escapeHtml(r.variant || "game")}</span>`;
