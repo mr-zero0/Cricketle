@@ -21,11 +21,37 @@
       padding: var(--space-4) var(--space-4) var(--space-8);
     }
 
-    @media (min-width: 860px) {
+    .conn-game-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 960px) {
       .conn-container {
-        width: min(100%, 780px);
+        width: min(100%, 1160px);
         padding-top: var(--space-3);
         padding-bottom: var(--space-4);
+      }
+      .conn-game-grid {
+        display: grid;
+        grid-template-columns: minmax(520px, 640px) minmax(320px, 1fr);
+        gap: var(--space-6);
+        align-items: start;
+      }
+      .conn-col-board {
+        position: sticky;
+        top: var(--space-4);
+      }
+      .conn-col-controls {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+        padding: var(--space-4);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
       }
       .conn-grid {
         gap: 12px;
@@ -745,49 +771,55 @@
       <div class="conn-subtext" id="conn-day-label">Daily Puzzle</div>
     </div>
 
-    <!-- Solved Categories Section -->
-    <div class="solved-categories" id="solved-categories"></div>
+    <div class="conn-game-grid">
+      <div class="conn-col-board">
+        <!-- Solved Categories Section -->
+        <div class="solved-categories" id="solved-categories"></div>
 
-    <!-- Active 4x4 Grid -->
-    <div class="connections-grid" id="connections-grid"></div>
-
-    <!-- Mistakes Tracker -->
-    <div class="mistakes-row">
-      <span>Mistakes remaining:</span>
-      <div class="mistake-dots" id="mistake-dots">
-        <span class="mistake-dot"></span>
-        <span class="mistake-dot"></span>
-        <span class="mistake-dot"></span>
-        <span class="mistake-dot"></span>
+        <!-- Active 4x4 Grid -->
+        <div class="connections-grid" id="connections-grid"></div>
       </div>
-    </div>
 
-    <!-- Action Buttons -->
-    <div class="conn-actions">
-      <button id="btn-shuffle" class="conn-btn">Shuffle</button>
-      <button id="btn-deselect" class="conn-btn" disabled>Deselect All</button>
-      <button id="btn-submit" class="conn-btn conn-btn-submit" disabled>Submit</button>
-    </div>
+      <div class="conn-col-controls">
+        <!-- Mistakes Tracker -->
+        <div class="mistakes-row">
+          <span>Mistakes remaining:</span>
+          <div class="mistake-dots" id="mistake-dots">
+            <span class="mistake-dot"></span>
+            <span class="mistake-dot"></span>
+            <span class="mistake-dot"></span>
+            <span class="mistake-dot"></span>
+          </div>
+        </div>
 
-    <div style="text-align: center; margin: 10px 0 4px;">
-      <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect category or player association">
-        <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-        <span>Report Inaccuracy</span>
-      </button>
-    </div>
+        <!-- Action Buttons -->
+        <div class="conn-actions">
+          <button id="btn-shuffle" class="conn-btn">Shuffle</button>
+          <button id="btn-deselect" class="conn-btn" disabled>Deselect All</button>
+          <button id="btn-submit" class="conn-btn conn-btn-submit" disabled>Submit</button>
+        </div>
 
-    <!-- Result Card -->
-    <div class="result-card" id="result-card">
-      <h3 class="result-title" id="result-status">GENIUS! 🏆</h3>
-      <p class="result-desc" id="result-desc">You solved all four cricket categories!</p>
-      <div class="result-grid-share" id="result-grid-share"></div>
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center;">
-        <button id="btn-share" class="conn-btn conn-btn-submit">Share Result 📋</button>
-        <a href="hub.html" class="conn-btn" style="text-decoration:none;">Play Other Games →</a>
-        <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect category or player association">
-          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-          <span>Report Inaccuracy</span>
-        </button>
+        <div style="text-align: center; margin: 4px 0;">
+          <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect category or player association">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+            <span>Report Inaccuracy</span>
+          </button>
+        </div>
+
+        <!-- Result Card -->
+        <div class="result-card" id="result-card">
+          <h3 class="result-title" id="result-status">GENIUS! 🏆</h3>
+          <p class="result-desc" id="result-desc">You solved all four cricket categories!</p>
+          <div class="result-grid-share" id="result-grid-share"></div>
+          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center;">
+            <button id="btn-share" class="conn-btn conn-btn-submit">Share Result 📋</button>
+            <a href="hub.html" class="conn-btn" style="text-decoration:none;">Play Other Games →</a>
+            <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect category or player association">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Report Inaccuracy</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 

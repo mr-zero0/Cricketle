@@ -23,6 +23,37 @@
       --journey-glow: rgba(2, 132, 199, 0.3);
     }
 
+    .journey-game-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 960px) {
+      .journey-container {
+        width: min(100%, 1180px);
+        padding-top: var(--space-3);
+      }
+      .journey-game-grid {
+        display: grid;
+        grid-template-columns: minmax(460px, 560px) minmax(0, 1fr);
+        gap: var(--space-6);
+        align-items: start;
+      }
+      .journey-col-visual {
+        position: sticky;
+        top: var(--space-4);
+      }
+      .journey-col-input {
+        min-width: 0;
+      }
+      .journey-col-input .guess-history {
+        max-height: calc(100dvh - 280px);
+        overflow-y: auto;
+        padding-right: 6px;
+      }
+    }
+
     .game-header {
       text-align: center;
       margin-bottom: var(--space-4);
@@ -1048,82 +1079,88 @@
       </div>
     </div>
 
-    <!-- Franchise Journey Card -->
-    <div class="journey-card">
-      <div class="timeline-title">
-        <h3><span>🏏</span> IPL Franchise History</h3>
-        <span class="timeline-seasons" id="timeline-span">2008 – 2024</span>
-      </div>
-      <div class="timeline-trail-container">
-        <div class="timeline-trail" id="timeline-trail"></div>
-      </div>
-      <div class="mobile-swipe-hint" id="mobile-swipe-hint" aria-hidden="true">
-        <span>← Swipe to explore journey →</span>
-      </div>
-    </div>
+    <div class="journey-game-grid">
+      <div class="journey-col-visual">
+        <!-- Franchise Journey Card -->
+        <div class="journey-card">
+          <div class="timeline-title">
+            <h3><span>🏏</span> IPL Franchise History</h3>
+            <span class="timeline-seasons" id="timeline-span">2008 – 2024</span>
+          </div>
+          <div class="timeline-trail-container">
+            <div class="timeline-trail" id="timeline-trail"></div>
+          </div>
+          <div class="mobile-swipe-hint" id="mobile-swipe-hint" aria-hidden="true">
+            <span>← Swipe to explore journey →</span>
+          </div>
+        </div>
 
-    <!-- Mystery Letters & Clues Board -->
-    <div class="mystery-board">
-      <div class="mystery-meta">
-        <span class="meta-pill" id="meta-country-role">🇮🇳 India · Batter</span>
-        <span class="meta-pill" id="meta-matches">🏆 205 IPL Matches</span>
-      </div>
+        <!-- Mystery Letters & Clues Board -->
+        <div class="mystery-board">
+          <div class="mystery-meta">
+            <span class="meta-pill" id="meta-country-role">🇮🇳 India · Batter</span>
+            <span class="meta-pill" id="meta-matches">🏆 205 IPL Matches</span>
+          </div>
 
-      <!-- Locked Hint 1 Banner (Attempts 0, 1, 2) -->
-      <div class="hint-locked-banner" id="hint-locked-banner">
-        <div class="hint-lock-icon">🔒</div>
-        <div class="hint-lock-content">
-          <div class="hint-lock-title">Hint 1: Name Letter Clues</div>
-          <div class="hint-lock-desc" id="hint-lock-desc">Unlocks after 3 failed attempts (3 tries remaining)</div>
+          <!-- Locked Hint 1 Banner (Attempts 0, 1, 2) -->
+          <div class="hint-locked-banner" id="hint-locked-banner">
+            <div class="hint-lock-icon">🔒</div>
+            <div class="hint-lock-content">
+              <div class="hint-lock-title">Hint 1: Name Letter Clues</div>
+              <div class="hint-lock-desc" id="hint-lock-desc">Unlocks after 3 failed attempts (3 tries remaining)</div>
+            </div>
+          </div>
+
+          <!-- Letter reveal tiles (Unlocked after 3 failed attempts) -->
+          <div class="name-letters-wrap" id="name-letters-wrap" style="display:none;"></div>
+          <p class="clue-hint-text" id="clue-hint-text">Guess from the franchise history above or skip to unlock letter hints!</p>
+
+          <div class="attempts-track" id="attempts-track">
+            <span class="attempt-dot current"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+            <span class="attempt-dot"></span>
+          </div>
+
+          <div style="text-align: center; margin-top: 8px;">
+            <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect franchise history or player info">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Report Inaccuracy</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Letter reveal tiles (Unlocked after 3 failed attempts) -->
-      <div class="name-letters-wrap" id="name-letters-wrap" style="display:none;"></div>
-      <p class="clue-hint-text" id="clue-hint-text">Guess from the franchise history above or skip to unlock letter hints!</p>
+      <div class="journey-col-input">
+        <!-- Guess Input with Autocomplete -->
+        <div class="guess-box" id="guess-controls">
+          <div class="guess-input-wrap">
+            <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. Virat Kohli)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
+            <button id="btn-skip" class="btn-skip" title="Skip to reveal more letters">Skip</button>
+            <button id="btn-guess" class="btn-guess">Guess</button>
+          </div>
+          <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+        </div>
 
-      <div class="attempts-track" id="attempts-track">
-        <span class="attempt-dot current"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-        <span class="attempt-dot"></span>
-      </div>
+        <!-- Guess History -->
+        <div class="guess-history" id="guess-history"></div>
 
-      <div style="text-align: center; margin-top: 8px;">
-        <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect franchise history or player info">
-          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-          <span>Report Inaccuracy</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Guess Input with Autocomplete -->
-    <div class="guess-box" id="guess-controls">
-      <div class="guess-input-wrap">
-        <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. Virat Kohli)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
-        <button id="btn-skip" class="btn-skip" title="Skip to reveal more letters">Skip</button>
-        <button id="btn-guess" class="btn-guess">Guess</button>
-      </div>
-      <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
-    </div>
-
-    <!-- Guess History -->
-    <div class="guess-history" id="guess-history"></div>
-
-    <!-- Result Card -->
-    <div class="result-card" id="result-card">
-      <h3 class="result-title" id="result-status">CHAMPION GUESS! 🏆</h3>
-      <p class="result-name" id="result-name"></p>
-      <p class="result-stats" id="result-stats"></p>
-      <p class="result-funfact" id="result-funfact"></p>
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center;">
-        <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#0284c7;color:#fff;font-weight:700;">Play Other Games →</a>
-        <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect franchise history or player info">
-          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-          <span>Report Inaccuracy</span>
-        </button>
+        <!-- Result Card -->
+        <div class="result-card" id="result-card">
+          <h3 class="result-title" id="result-status">CHAMPION GUESS! 🏆</h3>
+          <p class="result-name" id="result-name"></p>
+          <p class="result-stats" id="result-stats"></p>
+          <p class="result-funfact" id="result-funfact"></p>
+          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center;">
+            <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#0284c7;color:#fff;font-weight:700;">Play Other Games →</a>
+            <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report incorrect franchise history or player info">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Report Inaccuracy</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </main>

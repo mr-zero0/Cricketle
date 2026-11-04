@@ -20,6 +20,32 @@
       box-sizing: border-box;
     }
 
+    .scramble-game-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 960px) {
+      .scramble-container {
+        width: min(100%, 1160px);
+        padding-top: var(--space-3);
+      }
+      .scramble-game-grid {
+        display: grid;
+        grid-template-columns: minmax(420px, 520px) minmax(400px, 1fr);
+        gap: var(--space-6);
+        align-items: start;
+      }
+      .scramble-col-board {
+        position: sticky;
+        top: var(--space-4);
+      }
+      .scramble-col-controls {
+        min-width: 0;
+      }
+    }
+
     .scramble-header {
       text-align: center;
       margin-bottom: var(--space-4);
@@ -921,59 +947,65 @@
         <span class="scramble-badge-pill">📅 Daily Challenge · 6 Attempts</span>
       </div>
 
-      <!-- Mystery Cricketer Pattern Card -->
-      <div class="scrambled-card" id="scrambled-card">
-        <div class="scrambled-label">
-          <span>🏏 Mystery Cricketer</span>
+      <div class="scramble-game-grid">
+        <div class="scramble-col-board">
+          <!-- Mystery Cricketer Pattern Card -->
+          <div class="scrambled-card" id="scrambled-card">
+            <div class="scrambled-label">
+              <span>🏏 Mystery Cricketer</span>
+            </div>
+            <div class="scrambled-tiles-wrap" id="scrambled-tiles-wrap" aria-label="Mystery player character slots">
+              <!-- Populated by scramble.js with blank dash slots _ _ _ _ _ -->
+            </div>
+            <div class="scramble-sub-actions">
+              <span class="scramble-pattern-text" id="scramble-pattern-text">Loading mystery cricketer...</span>
+              <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report wrong scrambled letters or clues">
+                <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                <span>Report Inaccuracy</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Wordle Guess Board -->
+          <div class="wordle-board" id="wordle-board">
+            <!-- 6 Rows rendered dynamically -->
+          </div>
+
+          <!-- Wordle Color Legend -->
+          <div class="wordle-legend">
+            <div class="legend-item"><span class="legend-dot green"></span> <span>Green = Correct Spot</span></div>
+            <div class="legend-item"><span class="legend-dot yellow"></span> <span>Yellow = In Name, Wrong Spot</span></div>
+            <div class="legend-item"><span class="legend-dot red"></span> <span>Red = Not in Name</span></div>
+          </div>
         </div>
-        <div class="scrambled-tiles-wrap" id="scrambled-tiles-wrap" aria-label="Mystery player character slots">
-          <!-- Populated by scramble.js with blank dash slots _ _ _ _ _ -->
+
+        <div class="scramble-col-controls">
+          <!-- Clues Drawer -->
+          <div class="clues-drawer" id="clues-drawer">
+            <div class="clue-pill unlocked" id="clue-country"><span>🌍 Country: Loading...</span></div>
+            <div class="clue-pill locked" id="clue-role"><span>🏏 Role: Unlocks after guess 2</span></div>
+            <div class="clue-pill locked" id="clue-debut"><span>📅 Debut: Unlocks after guess 4</span></div>
+          </div>
+
+          <!-- Guess Input Controls -->
+          <div class="guess-box" id="guess-controls">
+            <div class="guess-input-wrap">
+              <input type="text" id="guess-input" class="guess-input" placeholder="Type player name or letters..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
+              <button type="button" class="btn-submit-guess" id="btn-submit-guess">
+                <span>Guess (1/6)</span>
+              </button>
+            </div>
+            <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+          </div>
+
+          <!-- Interactive Virtual Keyboard -->
+          <div class="virtual-keyboard" id="virtual-keyboard">
+            <div class="keyboard-row" id="kb-row-1"></div>
+            <div class="keyboard-row" id="kb-row-2"></div>
+            <div class="keyboard-row" id="kb-row-3"></div>
+            <div class="keyboard-row" id="kb-row-4"></div>
+          </div>
         </div>
-        <div class="scramble-sub-actions">
-          <span class="scramble-pattern-text" id="scramble-pattern-text">Loading mystery cricketer...</span>
-          <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report wrong scrambled letters or clues">
-            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-            <span>Report Inaccuracy</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Clues Drawer -->
-      <div class="clues-drawer" id="clues-drawer">
-        <div class="clue-pill unlocked" id="clue-country"><span>🌍 Country: Loading...</span></div>
-        <div class="clue-pill locked" id="clue-role"><span>🏏 Role: Unlocks after guess 2</span></div>
-        <div class="clue-pill locked" id="clue-debut"><span>📅 Debut: Unlocks after guess 4</span></div>
-      </div>
-
-      <!-- Wordle Guess Board -->
-      <div class="wordle-board" id="wordle-board">
-        <!-- 6 Rows rendered dynamically -->
-      </div>
-
-      <!-- Wordle Color Legend -->
-      <div class="wordle-legend">
-        <div class="legend-item"><span class="legend-dot green"></span> <span>Green = Correct Spot</span></div>
-        <div class="legend-item"><span class="legend-dot yellow"></span> <span>Yellow = In Name, Wrong Spot</span></div>
-        <div class="legend-item"><span class="legend-dot red"></span> <span>Red = Not in Name</span></div>
-      </div>
-
-      <!-- Guess Input Controls -->
-      <div class="guess-box" id="guess-controls">
-        <div class="guess-input-wrap">
-          <input type="text" id="guess-input" class="guess-input" placeholder="Type player name or letters..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
-          <button type="button" class="btn-submit-guess" id="btn-submit-guess">
-            <span>Guess (1/6)</span>
-          </button>
-        </div>
-        <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
-      </div>
-
-      <!-- Interactive Virtual Keyboard -->
-      <div class="virtual-keyboard" id="virtual-keyboard">
-        <div class="keyboard-row" id="kb-row-1"></div>
-        <div class="keyboard-row" id="kb-row-2"></div>
-        <div class="keyboard-row" id="kb-row-3"></div>
-        <div class="keyboard-row" id="kb-row-4"></div>
       </div>
     </div>
 

@@ -23,6 +23,36 @@
       --puzzle-accent: #f59e0b;
     }
 
+    .puzzle-game-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 960px) {
+      .puzzle-container {
+        width: min(100%, 1120px);
+        padding-top: var(--space-3);
+      }
+      .puzzle-game-grid {
+        display: grid;
+        grid-template-columns: minmax(360px, 440px) minmax(0, 1fr);
+        gap: var(--space-6);
+        align-items: start;
+      }
+      .puzzle-col-visual {
+        position: sticky;
+        top: var(--space-4);
+      }
+      .puzzle-col-input {
+        min-width: 0;
+      }
+      .puzzle-col-input .guess-history {
+        max-height: calc(100dvh - 280px);
+        overflow-y: auto;
+      }
+    }
+
     .game-header {
       text-align: center;
       margin-bottom: var(--space-4);
@@ -777,73 +807,79 @@
       </div>
     </div>
 
-    <!-- Photo Card -->
-    <div class="photo-card">
-      <div class="canvas-wrapper">
-        <canvas id="puzzle-canvas" width="280" height="340"></canvas>
-      </div>
+    <div class="puzzle-game-grid">
+      <div class="puzzle-col-visual">
+        <!-- Photo Card -->
+        <div class="photo-card">
+          <div class="canvas-wrapper">
+            <canvas id="puzzle-canvas" width="280" height="340"></canvas>
+          </div>
 
-      <div class="puzzle-instructions">
-        <span>💡 Tap to swap tiles. Tap selected tile or ↷ Rotate to spin upright</span>
-      </div>
+          <div class="puzzle-instructions">
+            <span>💡 Tap to swap tiles. Tap selected tile or ↷ Rotate to spin upright</span>
+          </div>
 
-      <div class="puzzle-actions">
-        <button id="btn-rotate-tile" class="btn-puzzle-rotate" type="button" title="Rotate selected tile 90° clockwise">↷ Rotate Piece (90°)</button>
-        <button id="btn-reset-scramble" class="btn-puzzle-reset" type="button" title="Reset pieces to start">🔄 Reset Scramble</button>
-      </div>
+          <div class="puzzle-actions">
+            <button id="btn-rotate-tile" class="btn-puzzle-rotate" type="button" title="Rotate selected tile 90° clockwise">↷ Rotate Piece (90°)</button>
+            <button id="btn-reset-scramble" class="btn-puzzle-reset" type="button" title="Reset pieces to start">🔄 Reset Scramble</button>
+          </div>
 
-      <div id="puzzle-assembled-banner" class="puzzle-assembled-banner" style="display:none;">🎉 Portrait assembled! Enter your guess below.</div>
+          <div id="puzzle-assembled-banner" class="puzzle-assembled-banner" style="display:none;">🎉 Portrait assembled! Enter your guess below.</div>
 
-      <!-- Jigsaw Progress Bar -->
-      <div class="puzzle-progress-wrap">
-        <div class="puzzle-progress-header">
-          <span id="puzzle-progress-text">🧩 0 of 9 pieces in place</span>
-          <span id="puzzle-progress-percent">0%</span>
+          <!-- Jigsaw Progress Bar -->
+          <div class="puzzle-progress-wrap">
+            <div class="puzzle-progress-header">
+              <span id="puzzle-progress-text">🧩 0 of 9 pieces in place</span>
+              <span id="puzzle-progress-percent">0%</span>
+            </div>
+            <div class="puzzle-progress-bar-bg">
+              <div id="puzzle-progress-bar" class="puzzle-progress-bar-fill"></div>
+            </div>
+          </div>
+
+          <!-- 3-Attempt Indicators -->
+          <div class="attempts-track" id="attempts-track" aria-label="3 attempts">
+            <span class="attempt-dot current" title="Attempt 1"></span>
+            <span class="attempt-dot" title="Attempt 2"></span>
+            <span class="attempt-dot" title="Attempt 3"></span>
+          </div>
+          <div class="attempts-label" id="attempts-label">3 guesses remaining</div>
+          <div style="text-align: center; margin-top: 8px;">
+            <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report wrong portrait or cricketer info">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Report Inaccuracy</span>
+            </button>
+          </div>
         </div>
-        <div class="puzzle-progress-bar-bg">
-          <div id="puzzle-progress-bar" class="puzzle-progress-bar-fill"></div>
+      </div>
+
+      <div class="puzzle-col-input">
+        <!-- Guess Input with Dropdown (No Skip button) -->
+        <div class="guess-box" id="guess-controls">
+          <div class="guess-input-wrap">
+            <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. Virat Kohli)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
+            <button id="btn-guess" class="btn-guess">Guess</button>
+          </div>
+          <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
         </div>
-      </div>
 
-      <!-- 3-Attempt Indicators -->
-      <div class="attempts-track" id="attempts-track" aria-label="3 attempts">
-        <span class="attempt-dot current" title="Attempt 1"></span>
-        <span class="attempt-dot" title="Attempt 2"></span>
-        <span class="attempt-dot" title="Attempt 3"></span>
-      </div>
-      <div class="attempts-label" id="attempts-label">3 guesses remaining</div>
-      <div style="text-align: center; margin-top: 8px;">
-        <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report wrong portrait or cricketer info">
-          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-          <span>Report Inaccuracy</span>
-        </button>
-      </div>
-    </div>
+        <!-- Guess History -->
+        <div class="guess-history" id="guess-history"></div>
 
-    <!-- Guess Input with Dropdown (No Skip button) -->
-    <div class="guess-box" id="guess-controls">
-      <div class="guess-input-wrap">
-        <input type="text" id="guess-input" class="guess-input" placeholder="Type player name (e.g. Virat Kohli)..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" />
-        <button id="btn-guess" class="btn-guess">Guess</button>
-      </div>
-      <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
-    </div>
-
-    <!-- Guess History -->
-    <div class="guess-history" id="guess-history"></div>
-
-    <!-- Result Card -->
-    <div class="result-card" id="result-card">
-      <h3 class="result-title" id="result-status">HOWZAT! SOLVED!</h3>
-      <p class="result-name" id="result-name"></p>
-      <p class="result-role" id="result-role"></p>
-      <p class="result-score" id="result-score"></p>
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center;">
-        <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#f59e0b;color:#000;font-weight:700;">Play Other Games →</a>
-        <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report wrong portrait or cricketer info">
-          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-          <span>Report Inaccuracy</span>
-        </button>
+        <!-- Result Card -->
+        <div class="result-card" id="result-card">
+          <h3 class="result-title" id="result-status">HOWZAT! SOLVED!</h3>
+          <p class="result-name" id="result-name"></p>
+          <p class="result-role" id="result-role"></p>
+          <p class="result-score" id="result-score"></p>
+          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center;">
+            <a href="hub.html" class="tile-play-btn" style="text-decoration:none;display:inline-flex;padding:10px 20px;border-radius:var(--radius-sm);background:#f59e0b;color:#000;font-weight:700;">Play Other Games →</a>
+            <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report wrong portrait or cricketer info">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Report Inaccuracy</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </main>
