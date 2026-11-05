@@ -15,12 +15,61 @@
       "team": "India",
       "targetScore": "277/4 (48.2 overs)",
       "batting": [
-        { "player": "Virender Sehwag", "dismissal": "lbw b Malinga", "runs": 0, "balls": 2, "fours": 0, "sixes": 0, "sr": 0.0 },
-        { "player": "Sachin Tendulkar", "dismissal": "c Sangakkara b Malinga", "runs": 18, "balls": 14, "fours": 2, "sixes": 0, "sr": 128.5 },
-        { "player": "Gautam Gambhir", "dismissal": "b Perera", "runs": 97, "balls": 122, "fours": 9, "sixes": 0, "sr": 79.5 },
-        { "player": "Virat Kohli", "dismissal": "c & b Dilshan", "runs": 35, "balls": 49, "fours": 4, "sixes": 0, "sr": 71.4 },
-        { "player": "██████████", "dismissal": "not out", "runs": 91, "balls": 79, "fours": 8, "sixes": 2, "sr": 115.1, "isTarget": true },
-        { "player": "Yuvraj Singh", "dismissal": "not out", "runs": 21, "balls": 24, "fours": 2, "sixes": 0, "sr": 87.5 }
+        {
+          "player": "Virender Sehwag",
+          "dismissal": "lbw b Malinga",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Sachin Tendulkar",
+          "dismissal": "c Sangakkara b Malinga",
+          "runs": 18,
+          "balls": 14,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 128.5
+        },
+        {
+          "player": "Gautam Gambhir",
+          "dismissal": "b Perera",
+          "runs": 97,
+          "balls": 122,
+          "fours": 9,
+          "sixes": 0,
+          "sr": 79.5
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "c & b Dilshan",
+          "runs": 35,
+          "balls": 49,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 71.4
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 91,
+          "balls": 79,
+          "fours": 8,
+          "sixes": 2,
+          "sr": 115.1,
+          "isTarget": true
+        },
+        {
+          "player": "Yuvraj Singh",
+          "dismissal": "not out",
+          "runs": 21,
+          "balls": 24,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 87.5
+        }
       ],
       "extras": "15 (b 1, lb 6, w 8)",
       "total": "277/4 (48.2 overs)"
@@ -42,14 +91,79 @@
       "team": "England",
       "targetScore": "241 all out (50 overs)",
       "batting": [
-        { "player": "Jason Roy", "dismissal": "c Latham b Henry", "runs": 17, "balls": 20, "fours": 3, "sixes": 0, "sr": 85.0 },
-        { "player": "Jonny Bairstow", "dismissal": "b Ferguson", "runs": 36, "balls": 55, "fours": 7, "sixes": 0, "sr": 65.4 },
-        { "player": "Joe Root", "dismissal": "c Latham b de Grandhomme", "runs": 7, "balls": 30, "fours": 0, "sixes": 0, "sr": 23.3 },
-        { "player": "Eoin Morgan", "dismissal": "c Ferguson b Neesham", "runs": 9, "balls": 22, "fours": 0, "sixes": 0, "sr": 40.9 },
-        { "player": "██████████", "dismissal": "not out", "runs": 84, "balls": 98, "fours": 5, "sixes": 2, "sr": 85.7, "isTarget": true },
-        { "player": "Jos Buttler", "dismissal": "c Southee b Ferguson", "runs": 59, "balls": 60, "fours": 6, "sixes": 0, "sr": 98.3 },
-        { "player": "Chris Woakes", "dismissal": "c Latham b Ferguson", "runs": 2, "balls": 4, "fours": 0, "sixes": 0, "sr": 50.0 },
-        { "player": "Liam Plunkett", "dismissal": "c Boult b Neesham", "runs": 10, "balls": 10, "fours": 1, "sixes": 0, "sr": 100.0 }
+        {
+          "player": "Jason Roy",
+          "dismissal": "c Latham b Henry",
+          "runs": 17,
+          "balls": 20,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 85
+        },
+        {
+          "player": "Jonny Bairstow",
+          "dismissal": "b Ferguson",
+          "runs": 36,
+          "balls": 55,
+          "fours": 7,
+          "sixes": 0,
+          "sr": 65.4
+        },
+        {
+          "player": "Joe Root",
+          "dismissal": "c Latham b de Grandhomme",
+          "runs": 7,
+          "balls": 30,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 23.3
+        },
+        {
+          "player": "Eoin Morgan",
+          "dismissal": "c Ferguson b Neesham",
+          "runs": 9,
+          "balls": 22,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 40.9
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 84,
+          "balls": 98,
+          "fours": 5,
+          "sixes": 2,
+          "sr": 85.7,
+          "isTarget": true
+        },
+        {
+          "player": "Jos Buttler",
+          "dismissal": "c Southee b Ferguson",
+          "runs": 59,
+          "balls": 60,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 98.3
+        },
+        {
+          "player": "Chris Woakes",
+          "dismissal": "c Latham b Ferguson",
+          "runs": 2,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Liam Plunkett",
+          "dismissal": "c Boult b Neesham",
+          "runs": 10,
+          "balls": 10,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 100
+        }
       ],
       "extras": "17 (b 2, lb 3, w 12)",
       "total": "241 all out (50 overs)"
@@ -71,15 +185,88 @@
       "team": "Australia",
       "targetScore": "293/7 (46.5 overs)",
       "batting": [
-        { "player": "Travis Head", "dismissal": "c Alikhil b Naveen", "runs": 0, "balls": 2, "fours": 0, "sixes": 0, "sr": 0.0 },
-        { "player": "David Warner", "dismissal": "b Omarzai", "runs": 18, "balls": 29, "fours": 3, "sixes": 0, "sr": 62.0 },
-        { "player": "Mitchell Marsh", "dismissal": "lbw b Naveen", "runs": 24, "balls": 21, "fours": 2, "sixes": 2, "sr": 114.2 },
-        { "player": "Marnus Labuschagne", "dismissal": "run out (Noor)", "runs": 14, "balls": 28, "fours": 2, "sixes": 0, "sr": 50.0 },
-        { "player": "Josh Inglis", "dismissal": "c Ibrahim b Omarzai", "runs": 0, "balls": 1, "fours": 0, "sixes": 0, "sr": 0.0 },
-        { "player": "██████████", "dismissal": "not out", "runs": 201, "balls": 128, "fours": 21, "sixes": 10, "sr": 157.0, "isTarget": true },
-        { "player": "Marcus Stoinis", "dismissal": "lbw b Rashid", "runs": 6, "balls": 7, "fours": 1, "sixes": 0, "sr": 85.7 },
-        { "player": "Mitchell Starc", "dismissal": "c Alikhil b Rashid", "runs": 3, "balls": 7, "fours": 0, "sixes": 0, "sr": 42.8 },
-        { "player": "Pat Cummins", "dismissal": "not out", "runs": 12, "balls": 68, "fours": 1, "sixes": 0, "sr": 17.6 }
+        {
+          "player": "Travis Head",
+          "dismissal": "c Alikhil b Naveen",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "David Warner",
+          "dismissal": "b Omarzai",
+          "runs": 18,
+          "balls": 29,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 62
+        },
+        {
+          "player": "Mitchell Marsh",
+          "dismissal": "lbw b Naveen",
+          "runs": 24,
+          "balls": 21,
+          "fours": 2,
+          "sixes": 2,
+          "sr": 114.2
+        },
+        {
+          "player": "Marnus Labuschagne",
+          "dismissal": "run out (Noor)",
+          "runs": 14,
+          "balls": 28,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Josh Inglis",
+          "dismissal": "c Ibrahim b Omarzai",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 201,
+          "balls": 128,
+          "fours": 21,
+          "sixes": 10,
+          "sr": 157,
+          "isTarget": true
+        },
+        {
+          "player": "Marcus Stoinis",
+          "dismissal": "lbw b Rashid",
+          "runs": 6,
+          "balls": 7,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 85.7
+        },
+        {
+          "player": "Mitchell Starc",
+          "dismissal": "c Alikhil b Rashid",
+          "runs": 3,
+          "balls": 7,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 42.8
+        },
+        {
+          "player": "Pat Cummins",
+          "dismissal": "not out",
+          "runs": 12,
+          "balls": 68,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 17.6
+        }
       ],
       "extras": "15 (b 0, lb 3, w 12)",
       "total": "293/7 (46.5 overs)"
@@ -101,12 +288,61 @@
       "team": "Australia",
       "targetScore": "241/4 (43.0 overs)",
       "batting": [
-        { "player": "David Warner", "dismissal": "c Kohli b Shami", "runs": 7, "balls": 3, "fours": 1, "sixes": 0, "sr": 233.3 },
-        { "player": "██████████", "dismissal": "c Gill b Siraj", "runs": 137, "balls": 120, "fours": 15, "sixes": 4, "sr": 114.1, "isTarget": true },
-        { "player": "Mitchell Marsh", "dismissal": "c Rahul b Bumrah", "runs": 15, "balls": 15, "fours": 1, "sixes": 1, "sr": 100.0 },
-        { "player": "Steve Smith", "dismissal": "lbw b Bumrah", "runs": 4, "balls": 9, "fours": 1, "sixes": 0, "sr": 44.4 },
-        { "player": "Marnus Labuschagne", "dismissal": "not out", "runs": 58, "balls": 110, "fours": 4, "sixes": 0, "sr": 52.7 },
-        { "player": "Glenn Maxwell", "dismissal": "not out", "runs": 2, "balls": 1, "fours": 0, "sixes": 0, "sr": 200.0 }
+        {
+          "player": "David Warner",
+          "dismissal": "c Kohli b Shami",
+          "runs": 7,
+          "balls": 3,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 233.3
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Gill b Siraj",
+          "runs": 137,
+          "balls": 120,
+          "fours": 15,
+          "sixes": 4,
+          "sr": 114.1,
+          "isTarget": true
+        },
+        {
+          "player": "Mitchell Marsh",
+          "dismissal": "c Rahul b Bumrah",
+          "runs": 15,
+          "balls": 15,
+          "fours": 1,
+          "sixes": 1,
+          "sr": 100
+        },
+        {
+          "player": "Steve Smith",
+          "dismissal": "lbw b Bumrah",
+          "runs": 4,
+          "balls": 9,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 44.4
+        },
+        {
+          "player": "Marnus Labuschagne",
+          "dismissal": "not out",
+          "runs": 58,
+          "balls": 110,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 52.7
+        },
+        {
+          "player": "Glenn Maxwell",
+          "dismissal": "not out",
+          "runs": 2,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 200
+        }
       ],
       "extras": "18 (b 0, lb 2, w 16)",
       "total": "241/4 (43.0 overs)"
@@ -128,12 +364,61 @@
       "team": "India",
       "targetScore": "404/5 (50 overs)",
       "batting": [
-        { "player": "Ajinkya Rahane", "dismissal": "lbw b Mathews", "runs": 28, "balls": 31, "fours": 4, "sixes": 0, "sr": 90.3 },
-        { "player": "██████████", "dismissal": "c Jayawardene b Kulasekara", "runs": 264, "balls": 173, "fours": 33, "sixes": 9, "sr": 152.6, "isTarget": true },
-        { "player": "Ambati Rayudu", "dismissal": "b Eranga", "runs": 8, "balls": 19, "fours": 0, "sixes": 0, "sr": 42.1 },
-        { "player": "Virat Kohli", "dismissal": "run out (Seekkuge Prasanna)", "runs": 66, "balls": 64, "fours": 6, "sixes": 0, "sr": 103.1 },
-        { "player": "Suresh Raina", "dismissal": "c Jayawardene b Mathews", "runs": 11, "balls": 14, "fours": 0, "sixes": 0, "sr": 78.5 },
-        { "player": "Robin Uthappa", "dismissal": "not out", "runs": 16, "balls": 16, "fours": 0, "sixes": 0, "sr": 100.0 }
+        {
+          "player": "Ajinkya Rahane",
+          "dismissal": "lbw b Mathews",
+          "runs": 28,
+          "balls": 31,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 90.3
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Jayawardene b Kulasekara",
+          "runs": 264,
+          "balls": 173,
+          "fours": 33,
+          "sixes": 9,
+          "sr": 152.6,
+          "isTarget": true
+        },
+        {
+          "player": "Ambati Rayudu",
+          "dismissal": "b Eranga",
+          "runs": 8,
+          "balls": 19,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 42.1
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "run out (Seekkuge Prasanna)",
+          "runs": 66,
+          "balls": 64,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 103.1
+        },
+        {
+          "player": "Suresh Raina",
+          "dismissal": "c Jayawardene b Mathews",
+          "runs": 11,
+          "balls": 14,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 78.5
+        },
+        {
+          "player": "Robin Uthappa",
+          "dismissal": "not out",
+          "runs": 16,
+          "balls": 16,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 100
+        }
       ],
       "extras": "11 (lb 2, w 8, nb 1)",
       "total": "404/5 (50 overs)"
@@ -155,14 +440,79 @@
       "team": "India",
       "targetScore": "160/6 (20 overs)",
       "batting": [
-        { "player": "KL Rahul", "dismissal": "b Naseem Shah", "runs": 4, "balls": 8, "fours": 0, "sixes": 0, "sr": 50.0 },
-        { "player": "Rohit Sharma", "dismissal": "c Iftikhar b Haris Rauf", "runs": 4, "balls": 7, "fours": 0, "sixes": 0, "sr": 57.1 },
-        { "player": "Suryakumar Yadav", "dismissal": "c Rizwan b Haris Rauf", "runs": 15, "balls": 10, "fours": 2, "sixes": 0, "sr": 150.0 },
-        { "player": "Axar Patel", "dismissal": "run out (Babar/Rizwan)", "runs": 2, "balls": 3, "fours": 0, "sixes": 0, "sr": 66.7 },
-        { "player": "██████████", "dismissal": "not out", "runs": 82, "balls": 53, "fours": 6, "sixes": 4, "sr": 154.7, "isTarget": true },
-        { "player": "Hardik Pandya", "dismissal": "c Babar b Mohammad Nawaz", "runs": 40, "balls": 37, "fours": 1, "sixes": 2, "sr": 108.1 },
-        { "player": "Dinesh Karthik", "dismissal": "st Rizwan b Mohammad Nawaz", "runs": 1, "balls": 2, "fours": 0, "sixes": 0, "sr": 50.0 },
-        { "player": "Ravichandran Ashwin", "dismissal": "not out", "runs": 1, "balls": 1, "fours": 0, "sixes": 0, "sr": 100.0 }
+        {
+          "player": "KL Rahul",
+          "dismissal": "b Naseem Shah",
+          "runs": 4,
+          "balls": 8,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "c Iftikhar b Haris Rauf",
+          "runs": 4,
+          "balls": 7,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 57.1
+        },
+        {
+          "player": "Suryakumar Yadav",
+          "dismissal": "c Rizwan b Haris Rauf",
+          "runs": 15,
+          "balls": 10,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 150
+        },
+        {
+          "player": "Axar Patel",
+          "dismissal": "run out (Babar/Rizwan)",
+          "runs": 2,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 66.7
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 82,
+          "balls": 53,
+          "fours": 6,
+          "sixes": 4,
+          "sr": 154.7,
+          "isTarget": true
+        },
+        {
+          "player": "Hardik Pandya",
+          "dismissal": "c Babar b Mohammad Nawaz",
+          "runs": 40,
+          "balls": 37,
+          "fours": 1,
+          "sixes": 2,
+          "sr": 108.1
+        },
+        {
+          "player": "Dinesh Karthik",
+          "dismissal": "st Rizwan b Mohammad Nawaz",
+          "runs": 1,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Ravichandran Ashwin",
+          "dismissal": "not out",
+          "runs": 1,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 100
+        }
       ],
       "extras": "11 (lb 2, w 6, nb 3)",
       "total": "160/6 (20 overs)"
@@ -184,10 +534,43 @@
       "team": "Australia",
       "targetScore": "359/2 (50 overs)",
       "batting": [
-        { "player": "Adam Gilchrist", "dismissal": "c Sehwag b Harbhajan", "runs": 57, "balls": 48, "fours": 8, "sixes": 1, "sr": 118.7 },
-        { "player": "Matthew Hayden", "dismissal": "c Dravid b Harbhajan", "runs": 37, "balls": 54, "fours": 5, "sixes": 0, "sr": 68.5 },
-        { "player": "██████████", "dismissal": "not out", "runs": 140, "balls": 121, "fours": 4, "sixes": 8, "sr": 115.7, "isTarget": true },
-        { "player": "Damien Martyn", "dismissal": "not out", "runs": 88, "balls": 84, "fours": 7, "sixes": 1, "sr": 104.7 }
+        {
+          "player": "Adam Gilchrist",
+          "dismissal": "c Sehwag b Harbhajan",
+          "runs": 57,
+          "balls": 48,
+          "fours": 8,
+          "sixes": 1,
+          "sr": 118.7
+        },
+        {
+          "player": "Matthew Hayden",
+          "dismissal": "c Dravid b Harbhajan",
+          "runs": 37,
+          "balls": 54,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 68.5
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 140,
+          "balls": 121,
+          "fours": 4,
+          "sixes": 8,
+          "sr": 115.7,
+          "isTarget": true
+        },
+        {
+          "player": "Damien Martyn",
+          "dismissal": "not out",
+          "runs": 88,
+          "balls": 84,
+          "fours": 7,
+          "sixes": 1,
+          "sr": 104.7
+        }
       ],
       "extras": "37 (b 2, lb 12, w 16, nb 7)",
       "total": "359/2 (50 overs)"
@@ -209,13 +592,70 @@
       "team": "India",
       "targetScore": "250/5 (46 overs)",
       "batting": [
-        { "player": "Sourav Ganguly", "dismissal": "c Blewett b Fleming", "runs": 17, "balls": 31, "fours": 2, "sixes": 0, "sr": 54.8 },
-        { "player": "██████████", "dismissal": "c Gilchrist b Fleming", "runs": 143, "balls": 131, "fours": 9, "sixes": 5, "sr": 109.1, "isTarget": true },
-        { "player": "Nayan Mongia", "dismissal": "c Gilchrist b Moody", "runs": 35, "balls": 46, "fours": 1, "sixes": 1, "sr": 76.0 },
-        { "player": "Mohammad Azharuddin", "dismissal": "lbw b Kasprowicz", "runs": 14, "balls": 21, "fours": 1, "sixes": 0, "sr": 66.6 },
-        { "player": "Ajay Jadeja", "dismissal": "c Mark Waugh b Fleming", "runs": 1, "balls": 5, "fours": 0, "sixes": 0, "sr": 20.0 },
-        { "player": "VVS Laxman", "dismissal": "not out", "runs": 23, "balls": 34, "fours": 1, "sixes": 0, "sr": 67.6 },
-        { "player": "Hrishikesh Kanitkar", "dismissal": "not out", "runs": 5, "balls": 9, "fours": 0, "sixes": 0, "sr": 55.5 }
+        {
+          "player": "Sourav Ganguly",
+          "dismissal": "c Blewett b Fleming",
+          "runs": 17,
+          "balls": 31,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 54.8
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Gilchrist b Fleming",
+          "runs": 143,
+          "balls": 131,
+          "fours": 9,
+          "sixes": 5,
+          "sr": 109.1,
+          "isTarget": true
+        },
+        {
+          "player": "Nayan Mongia",
+          "dismissal": "c Gilchrist b Moody",
+          "runs": 35,
+          "balls": 46,
+          "fours": 1,
+          "sixes": 1,
+          "sr": 76
+        },
+        {
+          "player": "Mohammad Azharuddin",
+          "dismissal": "lbw b Kasprowicz",
+          "runs": 14,
+          "balls": 21,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 66.6
+        },
+        {
+          "player": "Ajay Jadeja",
+          "dismissal": "c Mark Waugh b Fleming",
+          "runs": 1,
+          "balls": 5,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 20
+        },
+        {
+          "player": "VVS Laxman",
+          "dismissal": "not out",
+          "runs": 23,
+          "balls": 34,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 67.6
+        },
+        {
+          "player": "Hrishikesh Kanitkar",
+          "dismissal": "not out",
+          "runs": 5,
+          "balls": 9,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 55.5
+        }
       ],
       "extras": "12 (b 0, lb 3, w 7, nb 2)",
       "total": "250/5 (46 overs)"
@@ -237,12 +677,61 @@
       "team": "India",
       "targetScore": "218/4 (20 overs)",
       "batting": [
-        { "player": "Gautam Gambhir", "dismissal": "c Collingwood b Tremlett", "runs": 58, "balls": 41, "fours": 7, "sixes": 1, "sr": 141.4 },
-        { "player": "Virender Sehwag", "dismissal": "b Tremlett", "runs": 68, "balls": 52, "fours": 4, "sixes": 3, "sr": 130.7 },
-        { "player": "Robin Uthappa", "dismissal": "c Pietersen b Anderson", "runs": 6, "balls": 6, "fours": 1, "sixes": 0, "sr": 100.0 },
-        { "player": "MS Dhoni", "dismissal": "not out", "runs": 10, "balls": 8, "fours": 0, "sixes": 0, "sr": 125.0 },
-        { "player": "██████████", "dismissal": "c Collingwood b Flintoff", "runs": 58, "balls": 16, "fours": 3, "sixes": 7, "sr": 362.5, "isTarget": true },
-        { "player": "Rohit Sharma", "dismissal": "not out", "runs": 0, "balls": 0, "fours": 0, "sixes": 0, "sr": 0.0 }
+        {
+          "player": "Gautam Gambhir",
+          "dismissal": "c Collingwood b Tremlett",
+          "runs": 58,
+          "balls": 41,
+          "fours": 7,
+          "sixes": 1,
+          "sr": 141.4
+        },
+        {
+          "player": "Virender Sehwag",
+          "dismissal": "b Tremlett",
+          "runs": 68,
+          "balls": 52,
+          "fours": 4,
+          "sixes": 3,
+          "sr": 130.7
+        },
+        {
+          "player": "Robin Uthappa",
+          "dismissal": "c Pietersen b Anderson",
+          "runs": 6,
+          "balls": 6,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 100
+        },
+        {
+          "player": "MS Dhoni",
+          "dismissal": "not out",
+          "runs": 10,
+          "balls": 8,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 125
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Collingwood b Flintoff",
+          "runs": 58,
+          "balls": 16,
+          "fours": 3,
+          "sixes": 7,
+          "sr": 362.5,
+          "isTarget": true
+        },
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "not out",
+          "runs": 0,
+          "balls": 0,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
       ],
       "extras": "18 (lb 4, w 13, nb 1)",
       "total": "218/4 (20 overs)"
@@ -264,16 +753,97 @@
       "team": "India",
       "targetScore": "326/8 (49.3 overs)",
       "batting": [
-        { "player": "Sourav Ganguly", "dismissal": "b Giles", "runs": 60, "balls": 43, "fours": 10, "sixes": 1, "sr": 139.5 },
-        { "player": "Virender Sehwag", "dismissal": "b Giles", "runs": 45, "balls": 49, "fours": 7, "sixes": 0, "sr": 91.8 },
-        { "player": "Dinesh Mongia", "dismissal": "c Irani b Giles", "runs": 9, "balls": 17, "fours": 1, "sixes": 0, "sr": 52.9 },
-        { "player": "Sachin Tendulkar", "dismissal": "b Giles", "runs": 14, "balls": 19, "fours": 2, "sixes": 0, "sr": 73.6 },
-        { "player": "Rahul Dravid", "dismissal": "c Irani b Collingwood", "runs": 5, "balls": 13, "fours": 0, "sixes": 0, "sr": 38.4 },
-        { "player": "Yuvraj Singh", "dismissal": "c Tudor b Collingwood", "runs": 69, "balls": 63, "fours": 9, "sixes": 1, "sr": 109.5 },
-        { "player": "██████████", "dismissal": "not out", "runs": 87, "balls": 75, "fours": 6, "sixes": 2, "sr": 116.0, "isTarget": true },
-        { "player": "Harbhajan Singh", "dismissal": "b Flintoff", "runs": 15, "balls": 13, "fours": 2, "sixes": 0, "sr": 115.3 },
-        { "player": "Anil Kumble", "dismissal": "c Stewart b Flintoff", "runs": 0, "balls": 2, "fours": 0, "sixes": 0, "sr": 0.0 },
-        { "player": "Zaheer Khan", "dismissal": "not out", "runs": 8, "balls": 11, "fours": 0, "sixes": 0, "sr": 72.7 }
+        {
+          "player": "Sourav Ganguly",
+          "dismissal": "b Giles",
+          "runs": 60,
+          "balls": 43,
+          "fours": 10,
+          "sixes": 1,
+          "sr": 139.5
+        },
+        {
+          "player": "Virender Sehwag",
+          "dismissal": "b Giles",
+          "runs": 45,
+          "balls": 49,
+          "fours": 7,
+          "sixes": 0,
+          "sr": 91.8
+        },
+        {
+          "player": "Dinesh Mongia",
+          "dismissal": "c Irani b Giles",
+          "runs": 9,
+          "balls": 17,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 52.9
+        },
+        {
+          "player": "Sachin Tendulkar",
+          "dismissal": "b Giles",
+          "runs": 14,
+          "balls": 19,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 73.6
+        },
+        {
+          "player": "Rahul Dravid",
+          "dismissal": "c Irani b Collingwood",
+          "runs": 5,
+          "balls": 13,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 38.4
+        },
+        {
+          "player": "Yuvraj Singh",
+          "dismissal": "c Tudor b Collingwood",
+          "runs": 69,
+          "balls": 63,
+          "fours": 9,
+          "sixes": 1,
+          "sr": 109.5
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 87,
+          "balls": 75,
+          "fours": 6,
+          "sixes": 2,
+          "sr": 116,
+          "isTarget": true
+        },
+        {
+          "player": "Harbhajan Singh",
+          "dismissal": "b Flintoff",
+          "runs": 15,
+          "balls": 13,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 115.3
+        },
+        {
+          "player": "Anil Kumble",
+          "dismissal": "c Stewart b Flintoff",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Zaheer Khan",
+          "dismissal": "not out",
+          "runs": 8,
+          "balls": 11,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 72.7
+        }
       ],
       "extras": "14 (b 1, lb 5, w 6, nb 2)",
       "total": "326/8 (49.3 overs)"
@@ -295,16 +865,97 @@
       "team": "South Africa",
       "targetScore": "213 all out (49.2 overs)",
       "batting": [
-        { "player": "Gary Kirsten", "dismissal": "b Warne", "runs": 18, "balls": 32, "fours": 3, "sixes": 0, "sr": 56.2 },
-        { "player": "Herschelle Gibbs", "dismissal": "b Warne", "runs": 30, "balls": 54, "fours": 4, "sixes": 0, "sr": 55.5 },
-        { "player": "Daryll Cullinan", "dismissal": "run out (Blewett)", "runs": 6, "balls": 20, "fours": 1, "sixes": 0, "sr": 30.0 },
-        { "player": "Jacques Kallis", "dismissal": "c Steve Waugh b Warne", "runs": 53, "balls": 92, "fours": 3, "sixes": 1, "sr": 57.6 },
-        { "player": "Hansie Cronje", "dismissal": "c Mark Waugh b Warne", "runs": 0, "balls": 2, "fours": 0, "sixes": 0, "sr": 0.0 },
-        { "player": "Jonty Rhodes", "dismissal": "c Bevan b Miller", "runs": 43, "balls": 55, "fours": 4, "sixes": 0, "sr": 78.1 },
-        { "player": "Shaun Pollock", "dismissal": "b Fleming", "runs": 20, "balls": 14, "fours": 2, "sixes": 0, "sr": 142.8 },
-        { "player": "██████████", "dismissal": "not out", "runs": 31, "balls": 16, "fours": 4, "sixes": 1, "sr": 193.7, "isTarget": true },
-        { "player": "Steve Elworthy", "dismissal": "run out (Fleming)", "runs": 1, "balls": 4, "fours": 0, "sixes": 0, "sr": 25.0 },
-        { "player": "Allan Donald", "dismissal": "run out (Mark Waugh/Gilchrist)", "runs": 0, "balls": 1, "fours": 0, "sixes": 0, "sr": 0.0 }
+        {
+          "player": "Gary Kirsten",
+          "dismissal": "b Warne",
+          "runs": 18,
+          "balls": 32,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 56.2
+        },
+        {
+          "player": "Herschelle Gibbs",
+          "dismissal": "b Warne",
+          "runs": 30,
+          "balls": 54,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 55.5
+        },
+        {
+          "player": "Daryll Cullinan",
+          "dismissal": "run out (Blewett)",
+          "runs": 6,
+          "balls": 20,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 30
+        },
+        {
+          "player": "Jacques Kallis",
+          "dismissal": "c Steve Waugh b Warne",
+          "runs": 53,
+          "balls": 92,
+          "fours": 3,
+          "sixes": 1,
+          "sr": 57.6
+        },
+        {
+          "player": "Hansie Cronje",
+          "dismissal": "c Mark Waugh b Warne",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Jonty Rhodes",
+          "dismissal": "c Bevan b Miller",
+          "runs": 43,
+          "balls": 55,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 78.1
+        },
+        {
+          "player": "Shaun Pollock",
+          "dismissal": "b Fleming",
+          "runs": 20,
+          "balls": 14,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 142.8
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 31,
+          "balls": 16,
+          "fours": 4,
+          "sixes": 1,
+          "sr": 193.7,
+          "isTarget": true
+        },
+        {
+          "player": "Steve Elworthy",
+          "dismissal": "run out (Fleming)",
+          "runs": 1,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 25
+        },
+        {
+          "player": "Allan Donald",
+          "dismissal": "run out (Mark Waugh/Gilchrist)",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
       ],
       "extras": "11 (b 0, lb 4, w 6, nb 1)",
       "total": "213 all out (49.2 overs)"
@@ -326,20 +977,4275 @@
       "team": "India",
       "targetScore": "183 all out (54.4 overs)",
       "batting": [
-        { "player": "Sunil Gavaskar", "dismissal": "c Dujon b Roberts", "runs": 2, "balls": 12, "fours": 0, "sixes": 0, "sr": 16.6 },
-        { "player": "Kris Srikkanth", "dismissal": "lbw b Marshall", "runs": 38, "balls": 57, "fours": 7, "sixes": 1, "sr": 66.6 },
-        { "player": "██████████", "dismissal": "b Holding", "runs": 26, "balls": 80, "fours": 3, "sixes": 0, "sr": 32.5, "isTarget": true },
-        { "player": "Yashpal Sharma", "dismissal": "c Logie b Gomes", "runs": 11, "balls": 32, "fours": 1, "sixes": 0, "sr": 34.3 },
-        { "player": "Sandeep Patil", "dismissal": "c Gomes b Garner", "runs": 27, "balls": 29, "fours": 5, "sixes": 0, "sr": 93.1 },
-        { "player": "Kapil Dev", "dismissal": "c Holding b Gomes", "runs": 15, "balls": 8, "fours": 3, "sixes": 0, "sr": 187.5 },
-        { "player": "Kirti Azad", "dismissal": "c Garner b Roberts", "runs": 0, "balls": 3, "fours": 0, "sixes": 0, "sr": 0.0 },
-        { "player": "Roger Binny", "dismissal": "c Garner b Roberts", "runs": 2, "balls": 8, "fours": 0, "sixes": 0, "sr": 25.0 },
-        { "player": "Madan Lal", "dismissal": "b Garner", "runs": 17, "balls": 27, "fours": 2, "sixes": 0, "sr": 62.9 },
-        { "player": "Syed Kirmani", "dismissal": "b Holding", "runs": 14, "balls": 43, "fours": 0, "sixes": 0, "sr": 32.5 },
-        { "player": "Balwinder Sandhu", "dismissal": "not out", "runs": 11, "balls": 30, "fours": 1, "sixes": 0, "sr": 36.6 }
+        {
+          "player": "Sunil Gavaskar",
+          "dismissal": "c Dujon b Roberts",
+          "runs": 2,
+          "balls": 12,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 16.6
+        },
+        {
+          "player": "Kris Srikkanth",
+          "dismissal": "lbw b Marshall",
+          "runs": 38,
+          "balls": 57,
+          "fours": 7,
+          "sixes": 1,
+          "sr": 66.6
+        },
+        {
+          "player": "██████████",
+          "dismissal": "b Holding",
+          "runs": 26,
+          "balls": 80,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 32.5,
+          "isTarget": true
+        },
+        {
+          "player": "Yashpal Sharma",
+          "dismissal": "c Logie b Gomes",
+          "runs": 11,
+          "balls": 32,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 34.3
+        },
+        {
+          "player": "Sandeep Patil",
+          "dismissal": "c Gomes b Garner",
+          "runs": 27,
+          "balls": 29,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 93.1
+        },
+        {
+          "player": "Kapil Dev",
+          "dismissal": "c Holding b Gomes",
+          "runs": 15,
+          "balls": 8,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 187.5
+        },
+        {
+          "player": "Kirti Azad",
+          "dismissal": "c Garner b Roberts",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Roger Binny",
+          "dismissal": "c Garner b Roberts",
+          "runs": 2,
+          "balls": 8,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 25
+        },
+        {
+          "player": "Madan Lal",
+          "dismissal": "b Garner",
+          "runs": 17,
+          "balls": 27,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 62.9
+        },
+        {
+          "player": "Syed Kirmani",
+          "dismissal": "b Holding",
+          "runs": 14,
+          "balls": 43,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 32.5
+        },
+        {
+          "player": "Balwinder Sandhu",
+          "dismissal": "not out",
+          "runs": 11,
+          "balls": 30,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 36.6
+        }
       ],
       "extras": "20 (b 0, lb 8, w 8, nb 4)",
       "total": "183 all out (54.4 overs)"
+    }
+  },
+  {
+    "id": 13,
+    "title": "Fastest ODI Hundred in History (31 Balls)",
+    "difficulty": "easy",
+    "date": "18 January 2015",
+    "venue": "Wanderers Stadium, Johannesburg",
+    "teams": "South Africa vs West Indies",
+    "result": "South Africa won by 148 runs",
+    "targetPlayer": "AB de Villiers",
+    "targetRole": "Batter / Captain",
+    "targetTeam": "South Africa",
+    "hint": "Mr. 360 shattered the world record by smashing 16 sixes and reaching his century in just 31 deliveries in pink.",
+    "innings": {
+      "team": "South Africa",
+      "targetScore": "439/2 (50 overs)",
+      "batting": [
+        {
+          "player": "Hashim Amla",
+          "dismissal": "not out",
+          "runs": 153,
+          "balls": 142,
+          "fours": 14,
+          "sixes": 0,
+          "sr": 107.7
+        },
+        {
+          "player": "Rilee Rossouw",
+          "dismissal": "c Benn b Taylor",
+          "runs": 128,
+          "balls": 115,
+          "fours": 11,
+          "sixes": 2,
+          "sr": 111.3
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Carter b Russell",
+          "runs": 149,
+          "balls": 44,
+          "fours": 9,
+          "sixes": 16,
+          "sr": 338.6,
+          "isTarget": true
+        }
+      ],
+      "extras": "9 (b 1, lb 3, w 4, nb 1)",
+      "total": "439/2 (50 overs)"
+    }
+  },
+  {
+    "id": 14,
+    "title": "Highest Individual Score in T20 History (175*)",
+    "difficulty": "easy",
+    "date": "23 April 2013",
+    "venue": "M. Chinnaswamy Stadium, Bengaluru",
+    "teams": "Royal Challengers Bangalore vs Pune Warriors India",
+    "result": "Royal Challengers Bangalore won by 130 runs",
+    "targetPlayer": "Chris Gayle",
+    "targetRole": "Opening Batter",
+    "targetTeam": "Royal Challengers Bangalore",
+    "hint": "Universe Boss unleashed a storm of 17 sixes and 13 fours, reaching 100 in 30 balls on his way to 175*.",
+    "innings": {
+      "team": "Royal Challengers Bangalore",
+      "targetScore": "263/5 (20 overs)",
+      "batting": [
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 175,
+          "balls": 66,
+          "fours": 13,
+          "sixes": 17,
+          "sr": 265.1,
+          "isTarget": true
+        },
+        {
+          "player": "Tillakaratne Dilshan",
+          "dismissal": "c Nehra b Murtaza",
+          "runs": 33,
+          "balls": 36,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 91.6
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "run out (Wright)",
+          "runs": 11,
+          "balls": 9,
+          "fours": 0,
+          "sixes": 1,
+          "sr": 122.2
+        },
+        {
+          "player": "AB de Villiers",
+          "dismissal": "c sub b Dinda",
+          "runs": 31,
+          "balls": 8,
+          "fours": 3,
+          "sixes": 3,
+          "sr": 387.5
+        }
+      ],
+      "extras": "13 (lb 2, w 9, nb 2)",
+      "total": "263/5 (20 overs)"
+    }
+  },
+  {
+    "id": 15,
+    "title": "Fastest Test Hundred in History (54 Balls)",
+    "difficulty": "easy",
+    "date": "20 February 2016",
+    "venue": "Hagley Oval, Christchurch",
+    "teams": "New Zealand vs Australia",
+    "result": "Australia won by 7 wickets",
+    "targetPlayer": "Brendon McCullum",
+    "targetRole": "Batter / Captain",
+    "targetTeam": "New Zealand",
+    "hint": "In his farewell Test match, the Kiwi captain smashed Viv Richards' record by hitting a 54-ball century.",
+    "innings": {
+      "team": "New Zealand",
+      "targetScore": "370 all out (65.4 overs)",
+      "batting": [
+        {
+          "player": "Martin Guptill",
+          "dismissal": "c Burns b Bird",
+          "runs": 18,
+          "balls": 30,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 60
+        },
+        {
+          "player": "Tom Latham",
+          "dismissal": "c Smith b Bird",
+          "runs": 4,
+          "balls": 10,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 40
+        },
+        {
+          "player": "Kane Williamson",
+          "dismissal": "c Smith b Hazlewood",
+          "runs": 7,
+          "balls": 24,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 29.1
+        },
+        {
+          "player": "Henry Nicholls",
+          "dismissal": "c Smith b Pattinson",
+          "runs": 14,
+          "balls": 41,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 34.1
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Warner b Pattinson",
+          "runs": 145,
+          "balls": 79,
+          "fours": 21,
+          "sixes": 6,
+          "sr": 183.5,
+          "isTarget": true
+        },
+        {
+          "player": "Corey Anderson",
+          "dismissal": "c Marsh b Bird",
+          "runs": 72,
+          "balls": 66,
+          "fours": 8,
+          "sixes": 4,
+          "sr": 109
+        },
+        {
+          "player": "BJ Watling",
+          "dismissal": "c Smith b Bird",
+          "runs": 39,
+          "balls": 57,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 68.4
+        }
+      ],
+      "extras": "22 (b 6, lb 6, w 3, nb 7)",
+      "total": "370 all out (65.4 overs)"
+    }
+  },
+  {
+    "id": 16,
+    "title": "2021 Historic Gabba Fortress Breach",
+    "difficulty": "easy",
+    "date": "19 January 2021",
+    "venue": "The Gabba, Brisbane",
+    "teams": "India vs Australia",
+    "result": "India won by 3 wickets",
+    "targetPlayer": "Rishabh Pant",
+    "targetRole": "Wicketkeeper-batter",
+    "targetTeam": "India",
+    "hint": "Fearless wicketkeeper played an audacious 89* in the 4th innings to end Australia's 32-year unbeaten streak at the Gabba.",
+    "innings": {
+      "team": "India",
+      "targetScore": "329/7 (97 overs)",
+      "batting": [
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "c Paine b Cummins",
+          "runs": 7,
+          "balls": 21,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 33.3
+        },
+        {
+          "player": "Shubman Gill",
+          "dismissal": "c Smith b Lyon",
+          "runs": 91,
+          "balls": 146,
+          "fours": 8,
+          "sixes": 2,
+          "sr": 62.3
+        },
+        {
+          "player": "Cheteshwar Pujara",
+          "dismissal": "lbw b Cummins",
+          "runs": 56,
+          "balls": 211,
+          "fours": 7,
+          "sixes": 0,
+          "sr": 26.5
+        },
+        {
+          "player": "Ajinkya Rahane",
+          "dismissal": "c Paine b Cummins",
+          "runs": 24,
+          "balls": 22,
+          "fours": 1,
+          "sixes": 1,
+          "sr": 109
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 89,
+          "balls": 138,
+          "fours": 9,
+          "sixes": 1,
+          "sr": 64.4,
+          "isTarget": true
+        },
+        {
+          "player": "Mayank Agarwal",
+          "dismissal": "c Wade b Cummins",
+          "runs": 9,
+          "balls": 15,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 60
+        },
+        {
+          "player": "Washington Sundar",
+          "dismissal": "b Lyon",
+          "runs": 22,
+          "balls": 29,
+          "fours": 2,
+          "sixes": 1,
+          "sr": 75.8
+        }
+      ],
+      "extras": "27 (b 14, lb 8, w 4, nb 1)",
+      "total": "329/7 (97 overs)"
+    }
+  },
+  {
+    "id": 17,
+    "title": "2016 ICC Men's T20 World Cup Final",
+    "difficulty": "easy",
+    "date": "3 April 2016",
+    "venue": "Eden Gardens, Kolkata",
+    "teams": "West Indies vs England",
+    "result": "West Indies won by 4 wickets",
+    "targetPlayer": "Carlos Brathwaite",
+    "targetRole": "All-rounder",
+    "targetTeam": "West Indies",
+    "hint": "Immortalized by Ian Bishop's 'Remember the Name' commentary after smashing 4 consecutive sixes in Ben Stokes' final over.",
+    "innings": {
+      "team": "West Indies",
+      "targetScore": "161/6 (19.4 overs)",
+      "batting": [
+        {
+          "player": "Johnson Charles",
+          "dismissal": "c Stokes b Root",
+          "runs": 1,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 33.3
+        },
+        {
+          "player": "Chris Gayle",
+          "dismissal": "c Stokes b Root",
+          "runs": 4,
+          "balls": 2,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 200
+        },
+        {
+          "player": "Lendl Simmons",
+          "dismissal": "lbw b Willey",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Marlon Samuels",
+          "dismissal": "not out",
+          "runs": 85,
+          "balls": 66,
+          "fours": 9,
+          "sixes": 2,
+          "sr": 128.7
+        },
+        {
+          "player": "Dwayne Bravo",
+          "dismissal": "c Root b Rashid",
+          "runs": 25,
+          "balls": 27,
+          "fours": 1,
+          "sixes": 1,
+          "sr": 92.5
+        },
+        {
+          "player": "Andre Russell",
+          "dismissal": "c Stokes b Willey",
+          "runs": 1,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 33.3
+        },
+        {
+          "player": "Darren Sammy",
+          "dismissal": "c Hales b Willey",
+          "runs": 2,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 100
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 34,
+          "balls": 10,
+          "fours": 1,
+          "sixes": 4,
+          "sr": 340,
+          "isTarget": true
+        }
+      ],
+      "extras": "9 (lb 3, w 6)",
+      "total": "161/6 (19.4 overs)"
+    }
+  },
+  {
+    "id": 18,
+    "title": "2015 ICC Cricket World Cup Quarter-Final (237*)",
+    "difficulty": "easy",
+    "date": "21 March 2015",
+    "venue": "Wellington Regional Stadium, Wellington",
+    "teams": "New Zealand vs West Indies",
+    "result": "New Zealand won by 143 runs",
+    "targetPlayer": "Martin Guptill",
+    "targetRole": "Opening Batter",
+    "targetTeam": "New Zealand",
+    "hint": "Smashed 24 boundaries and 11 sixes to register the highest individual score in ICC Cricket World Cup history.",
+    "innings": {
+      "team": "New Zealand",
+      "targetScore": "393/6 (50 overs)",
+      "batting": [
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 237,
+          "balls": 163,
+          "fours": 24,
+          "sixes": 11,
+          "sr": 145.3,
+          "isTarget": true
+        },
+        {
+          "player": "Brendon McCullum",
+          "dismissal": "c Holder b Taylor",
+          "runs": 12,
+          "balls": 8,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 150
+        },
+        {
+          "player": "Kane Williamson",
+          "dismissal": "c Gayle b Russell",
+          "runs": 33,
+          "balls": 35,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 94.2
+        },
+        {
+          "player": "Ross Taylor",
+          "dismissal": "run out (Benn)",
+          "runs": 42,
+          "balls": 61,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 68.8
+        },
+        {
+          "player": "Grant Elliott",
+          "dismissal": "lbw b Taylor",
+          "runs": 27,
+          "balls": 11,
+          "fours": 2,
+          "sixes": 2,
+          "sr": 245.4
+        }
+      ],
+      "extras": "17 (b 0, lb 6, w 9, nb 2)",
+      "total": "393/6 (50 overs)"
+    }
+  },
+  {
+    "id": 19,
+    "title": "2019 Ashes 1st Test Comeback Century",
+    "difficulty": "easy",
+    "date": "1 August 2019",
+    "venue": "Edgbaston, Birmingham",
+    "teams": "Australia vs England",
+    "result": "Australia won by 251 runs",
+    "targetPlayer": "Steve Smith",
+    "targetRole": "Batter",
+    "targetTeam": "Australia",
+    "hint": "Marked his Test comeback with an all-time classic 144 after Australia collapsed to 122/8 against Broad and Woakes.",
+    "innings": {
+      "team": "Australia",
+      "targetScore": "284 all out (80.4 overs)",
+      "batting": [
+        {
+          "player": "David Warner",
+          "dismissal": "lbw b Broad",
+          "runs": 2,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Cameron Bancroft",
+          "dismissal": "c Root b Broad",
+          "runs": 8,
+          "balls": 25,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 32
+        },
+        {
+          "player": "Usman Khawaja",
+          "dismissal": "c Bairstow b Woakes",
+          "runs": 13,
+          "balls": 23,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 56.5
+        },
+        {
+          "player": "██████████",
+          "dismissal": "b Broad",
+          "runs": 144,
+          "balls": 219,
+          "fours": 16,
+          "sixes": 2,
+          "sr": 65.7,
+          "isTarget": true
+        },
+        {
+          "player": "Travis Head",
+          "dismissal": "lbw b Woakes",
+          "runs": 35,
+          "balls": 64,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 54.6
+        },
+        {
+          "player": "Peter Siddle",
+          "dismissal": "c Bairstow b Broad",
+          "runs": 44,
+          "balls": 85,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 51.7
+        },
+        {
+          "player": "Nathan Lyon",
+          "dismissal": "not out",
+          "runs": 12,
+          "balls": 22,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 54.5
+        }
+      ],
+      "extras": "19 (b 5, lb 9, w 4, nb 1)",
+      "total": "284 all out (80.4 overs)"
+    }
+  },
+  {
+    "id": 20,
+    "title": "2007 ICC Cricket World Cup Final Century",
+    "difficulty": "easy",
+    "date": "28 April 2007",
+    "venue": "Kensington Oval, Bridgetown",
+    "teams": "Australia vs Sri Lanka",
+    "result": "Australia won by 53 runs (D/L method)",
+    "targetPlayer": "Adam Gilchrist",
+    "targetRole": "Wicketkeeper-batter",
+    "targetTeam": "Australia",
+    "hint": "Batted with a squash ball tucked inside his left batting glove, blasting 149 off 104 balls with 8 sixes.",
+    "innings": {
+      "team": "Australia",
+      "targetScore": "281/4 (38 overs)",
+      "batting": [
+        {
+          "player": "██████████",
+          "dismissal": "c Silva b Fernando",
+          "runs": 149,
+          "balls": 104,
+          "fours": 13,
+          "sixes": 8,
+          "sr": 143.2,
+          "isTarget": true
+        },
+        {
+          "player": "Matthew Hayden",
+          "dismissal": "c Jayawardene b Malinga",
+          "runs": 38,
+          "balls": 55,
+          "fours": 3,
+          "sixes": 1,
+          "sr": 69
+        },
+        {
+          "player": "Ricky Ponting",
+          "dismissal": "run out (Jayawardene)",
+          "runs": 37,
+          "balls": 42,
+          "fours": 1,
+          "sixes": 1,
+          "sr": 88
+        },
+        {
+          "player": "Andrew Symonds",
+          "dismissal": "not out",
+          "runs": 23,
+          "balls": 21,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 109.5
+        }
+      ],
+      "extras": "17 (b 0, lb 6, w 9, nb 2)",
+      "total": "281/4 (38 overs)"
+    }
+  },
+  {
+    "id": 21,
+    "title": "2017 Third ODI Double Century (208*)",
+    "difficulty": "easy",
+    "date": "13 December 2017",
+    "venue": "IS Bindra Stadium, Mohali",
+    "teams": "India vs Sri Lanka",
+    "result": "India won by 141 runs",
+    "targetPlayer": "Rohit Sharma",
+    "targetRole": "Opening Batter / Captain",
+    "targetTeam": "India",
+    "hint": "Captain celebrated his marriage anniversary by becoming the first and only cricketer to score three ODI double centuries.",
+    "innings": {
+      "team": "India",
+      "targetScore": "392/4 (50 overs)",
+      "batting": [
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 208,
+          "balls": 153,
+          "fours": 13,
+          "sixes": 12,
+          "sr": 135.9,
+          "isTarget": true
+        },
+        {
+          "player": "Shikhar Dhawan",
+          "dismissal": "c Thirimanne b Pathirana",
+          "runs": 68,
+          "balls": 67,
+          "fours": 9,
+          "sixes": 0,
+          "sr": 101.4
+        },
+        {
+          "player": "Shreyas Iyer",
+          "dismissal": "c sub b Perera",
+          "runs": 88,
+          "balls": 70,
+          "fours": 9,
+          "sixes": 2,
+          "sr": 125.7
+        },
+        {
+          "player": "MS Dhoni",
+          "dismissal": "lbw b Perera",
+          "runs": 7,
+          "balls": 5,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 140
+        },
+        {
+          "player": "Hardik Pandya",
+          "dismissal": "c Thirimanne b Perera",
+          "runs": 8,
+          "balls": 5,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 160
+        }
+      ],
+      "extras": "13 (b 0, lb 1, w 11, nb 1)",
+      "total": "392/4 (50 overs)"
+    }
+  },
+  {
+    "id": 22,
+    "title": "2019 ICC Cricket World Cup Thriller vs South Africa",
+    "difficulty": "easy",
+    "date": "19 June 2019",
+    "venue": "Edgbaston, Birmingham",
+    "teams": "New Zealand vs South Africa",
+    "result": "New Zealand won by 4 wickets",
+    "targetPlayer": "Kane Williamson",
+    "targetRole": "Batter / Captain",
+    "targetTeam": "New Zealand",
+    "hint": "Kiwi skipper produced a textbook chasing masterclass, hitting a clutch six in the final over to seal a sensational 106*.",
+    "innings": {
+      "team": "New Zealand",
+      "targetScore": "245/6 (48.3 overs)",
+      "batting": [
+        {
+          "player": "Martin Guptill",
+          "dismissal": "hit wicket b Phehlukwayo",
+          "runs": 35,
+          "balls": 44,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 79.5
+        },
+        {
+          "player": "Colin Munro",
+          "dismissal": "c & b Rabada",
+          "runs": 9,
+          "balls": 5,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 180
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 106,
+          "balls": 138,
+          "fours": 9,
+          "sixes": 1,
+          "sr": 76.8,
+          "isTarget": true
+        },
+        {
+          "player": "Ross Taylor",
+          "dismissal": "c de Kock b Morris",
+          "runs": 1,
+          "balls": 5,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 20
+        },
+        {
+          "player": "Tom Latham",
+          "dismissal": "c de Kock b Morris",
+          "runs": 1,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 25
+        },
+        {
+          "player": "James Neesham",
+          "dismissal": "c Amla b Morris",
+          "runs": 23,
+          "balls": 34,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 67.6
+        },
+        {
+          "player": "Colin de Grandhomme",
+          "dismissal": "c du Plessis b Ngidi",
+          "runs": 60,
+          "balls": 47,
+          "fours": 5,
+          "sixes": 2,
+          "sr": 127.6
+        }
+      ],
+      "extras": "10 (b 0, lb 4, w 6, nb 0)",
+      "total": "245/6 (48.3 overs)"
+    }
+  },
+  {
+    "id": 23,
+    "title": "2022 Fastest ODI Double Hundred in 126 Balls",
+    "difficulty": "easy",
+    "date": "10 December 2022",
+    "venue": "Zahur Ahmed Chowdhury Stadium, Chattogram",
+    "teams": "India vs Bangladesh",
+    "result": "India won by 227 runs",
+    "targetPlayer": "Ishan Kishan",
+    "targetRole": "Wicketkeeper-batter",
+    "targetTeam": "India",
+    "hint": "Pocket dynamo smashed 24 fours and 10 sixes to become the fastest double centurion in ODI history off 126 deliveries.",
+    "innings": {
+      "team": "India",
+      "targetScore": "409/8 (50 overs)",
+      "batting": [
+        {
+          "player": "Shikhar Dhawan",
+          "dismissal": "lbw b Mehidy",
+          "runs": 3,
+          "balls": 8,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 37.5
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Litton b Taskin",
+          "runs": 210,
+          "balls": 131,
+          "fours": 24,
+          "sixes": 10,
+          "sr": 160.3,
+          "isTarget": true
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "c Mehidy b Shakib",
+          "runs": 113,
+          "balls": 91,
+          "fours": 11,
+          "sixes": 2,
+          "sr": 124.1
+        },
+        {
+          "player": "Shreyas Iyer",
+          "dismissal": "c Litton b Ebadot",
+          "runs": 3,
+          "balls": 6,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "KL Rahul",
+          "dismissal": "b Ebadot",
+          "runs": 8,
+          "balls": 10,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 80
+        },
+        {
+          "player": "Washington Sundar",
+          "dismissal": "b Shakib",
+          "runs": 37,
+          "balls": 27,
+          "fours": 4,
+          "sixes": 1,
+          "sr": 137
+        }
+      ],
+      "extras": "19 (b 2, lb 4, w 13, nb 0)",
+      "total": "409/8 (50 overs)"
+    }
+  },
+  {
+    "id": 24,
+    "title": "2023 Youngest ODI Double Centurion (208)",
+    "difficulty": "easy",
+    "date": "18 January 2023",
+    "venue": "Rajiv Gandhi International Stadium, Hyderabad",
+    "teams": "India vs New Zealand",
+    "result": "India won by 12 runs",
+    "targetPlayer": "Shubman Gill",
+    "targetRole": "Opening Batter",
+    "targetTeam": "India",
+    "hint": "Prince of Indian batting struck 19 fours and 9 sixes, including 3 consecutive sixes off Ferguson to bring up 200.",
+    "innings": {
+      "team": "India",
+      "targetScore": "349/8 (50 overs)",
+      "batting": [
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "c Mitchell b Blair Tickner",
+          "runs": 34,
+          "balls": 38,
+          "fours": 4,
+          "sixes": 2,
+          "sr": 89.4
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Phillips b Shipley",
+          "runs": 208,
+          "balls": 149,
+          "fours": 19,
+          "sixes": 9,
+          "sr": 139.5,
+          "isTarget": true
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "b Santner",
+          "runs": 8,
+          "balls": 10,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 80
+        },
+        {
+          "player": "Ishan Kishan",
+          "dismissal": "c Latham b Ferguson",
+          "runs": 5,
+          "balls": 14,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 35.7
+        },
+        {
+          "player": "Suryakumar Yadav",
+          "dismissal": "c Santner b Mitchell",
+          "runs": 31,
+          "balls": 26,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 119.2
+        },
+        {
+          "player": "Hardik Pandya",
+          "dismissal": "b Mitchell",
+          "runs": 28,
+          "balls": 38,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 73.6
+        }
+      ],
+      "extras": "17 (b 0, lb 4, w 11, nb 2)",
+      "total": "349/8 (50 overs)"
+    }
+  },
+  {
+    "id": 25,
+    "title": "2023 World Cup Demolition (174 off 140)",
+    "difficulty": "easy",
+    "date": "24 October 2023",
+    "venue": "Wankhede Stadium, Mumbai",
+    "teams": "South Africa vs Bangladesh",
+    "result": "South Africa won by 149 runs",
+    "targetPlayer": "Quinton de Kock",
+    "targetRole": "Wicketkeeper-batter",
+    "targetTeam": "South Africa",
+    "hint": "South African southpaw pummeled 15 fours and 7 sixes in a sweltering Mumbai afternoon for his 3rd century of the tournament.",
+    "innings": {
+      "team": "South Africa",
+      "targetScore": "382/5 (50 overs)",
+      "batting": [
+        {
+          "player": "██████████",
+          "dismissal": "c Nasum b Hasan Mahmud",
+          "runs": 174,
+          "balls": 140,
+          "fours": 15,
+          "sixes": 7,
+          "sr": 124.2,
+          "isTarget": true
+        },
+        {
+          "player": "Reeza Hendricks",
+          "dismissal": "b Shoriful",
+          "runs": 12,
+          "balls": 19,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 63.1
+        },
+        {
+          "player": "Rassie van der Dussen",
+          "dismissal": "lbw b Mehidy",
+          "runs": 1,
+          "balls": 7,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 14.2
+        },
+        {
+          "player": "Aiden Markram",
+          "dismissal": "c Litton b Shakib",
+          "runs": 60,
+          "balls": 69,
+          "fours": 7,
+          "sixes": 0,
+          "sr": 86.9
+        },
+        {
+          "player": "Heinrich Klaasen",
+          "dismissal": "c Mahmudullah b Hasan Mahmud",
+          "runs": 90,
+          "balls": 49,
+          "fours": 2,
+          "sixes": 8,
+          "sr": 183.6
+        },
+        {
+          "player": "David Miller",
+          "dismissal": "not out",
+          "runs": 34,
+          "balls": 15,
+          "fours": 1,
+          "sixes": 4,
+          "sr": 226.6
+        }
+      ],
+      "extras": "11 (b 0, lb 1, w 10, nb 0)",
+      "total": "382/5 (50 overs)"
+    }
+  },
+  {
+    "id": 26,
+    "title": "2023 World Cup Century off 62 Balls",
+    "difficulty": "easy",
+    "date": "12 November 2023",
+    "venue": "M. Chinnaswamy Stadium, Bengaluru",
+    "teams": "India vs Netherlands",
+    "result": "India won by 160 runs",
+    "targetPlayer": "KL Rahul",
+    "targetRole": "Wicketkeeper-batter",
+    "targetTeam": "India",
+    "hint": "Broke Rohit Sharma's Indian record for the fastest Men's World Cup hundred by reaching 100 off 62 deliveries.",
+    "innings": {
+      "team": "India",
+      "targetScore": "410/4 (50 overs)",
+      "batting": [
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "c Barresi b de Leede",
+          "runs": 61,
+          "balls": 54,
+          "fours": 8,
+          "sixes": 2,
+          "sr": 112.9
+        },
+        {
+          "player": "Shubman Gill",
+          "dismissal": "c Nidamanuru b van Meekeren",
+          "runs": 51,
+          "balls": 32,
+          "fours": 3,
+          "sixes": 4,
+          "sr": 159.3
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "b van der Merwe",
+          "runs": 51,
+          "balls": 56,
+          "fours": 6,
+          "sixes": 1,
+          "sr": 91
+        },
+        {
+          "player": "Shreyas Iyer",
+          "dismissal": "not out",
+          "runs": 128,
+          "balls": 94,
+          "fours": 10,
+          "sixes": 5,
+          "sr": 136.1
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Engelbrecht b de Leede",
+          "runs": 102,
+          "balls": 64,
+          "fours": 11,
+          "sixes": 4,
+          "sr": 159.3,
+          "isTarget": true
+        }
+      ],
+      "extras": "17 (b 0, lb 7, w 10, nb 0)",
+      "total": "410/4 (50 overs)"
+    }
+  },
+  {
+    "id": 27,
+    "title": "2023 Centurion Carnage (174 off 83)",
+    "difficulty": "easy",
+    "date": "15 September 2023",
+    "venue": "SuperSport Park, Centurion",
+    "teams": "South Africa vs Australia",
+    "result": "South Africa won by 164 runs",
+    "targetPlayer": "Heinrich Klaasen",
+    "targetRole": "Batter",
+    "targetTeam": "South Africa",
+    "hint": "Middle-order powerhouse destroyed the Australian attack with 13 boundaries and 13 sixes in a brutal 83-ball blitz.",
+    "innings": {
+      "team": "South Africa",
+      "targetScore": "416/5 (50 overs)",
+      "batting": [
+        {
+          "player": "Quinton de Kock",
+          "dismissal": "c & b Ellis",
+          "runs": 45,
+          "balls": 64,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 70.3
+        },
+        {
+          "player": "Reeza Hendricks",
+          "dismissal": "run out (Stoinis)",
+          "runs": 28,
+          "balls": 39,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 71.7
+        },
+        {
+          "player": "Rassie van der Dussen",
+          "dismissal": "c sub b Zampa",
+          "runs": 62,
+          "balls": 65,
+          "fours": 7,
+          "sixes": 2,
+          "sr": 95.3
+        },
+        {
+          "player": "Aiden Markram",
+          "dismissal": "c Carey b Neser",
+          "runs": 8,
+          "balls": 13,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 61.5
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c sub b Neser",
+          "runs": 174,
+          "balls": 83,
+          "fours": 13,
+          "sixes": 13,
+          "sr": 209.6,
+          "isTarget": true
+        },
+        {
+          "player": "David Miller",
+          "dismissal": "not out",
+          "runs": 82,
+          "balls": 45,
+          "fours": 6,
+          "sixes": 5,
+          "sr": 182.2
+        }
+      ],
+      "extras": "17 (b 0, lb 3, w 14, nb 0)",
+      "total": "416/5 (50 overs)"
+    }
+  },
+  {
+    "id": 28,
+    "title": "2019 World Cup Record 322 Chase vs West Indies",
+    "difficulty": "easy",
+    "date": "17 June 2019",
+    "venue": "County Ground, Taunton",
+    "teams": "Bangladesh vs West Indies",
+    "result": "Bangladesh won by 7 wickets",
+    "targetPlayer": "Shakib Al Hasan",
+    "targetRole": "All-rounder",
+    "targetTeam": "Bangladesh",
+    "hint": "Master all-rounder struck an unbeaten 124 off 99 balls to anchor Bangladesh's highest-ever World Cup run chase.",
+    "innings": {
+      "team": "Bangladesh",
+      "targetScore": "322/3 (41.3 overs)",
+      "batting": [
+        {
+          "player": "Tamim Iqbal",
+          "dismissal": "run out (Cottrell)",
+          "runs": 48,
+          "balls": 53,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 90.5
+        },
+        {
+          "player": "Soumya Sarkar",
+          "dismissal": "c Gayle b Russell",
+          "runs": 29,
+          "balls": 23,
+          "fours": 2,
+          "sixes": 2,
+          "sr": 126
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 124,
+          "balls": 99,
+          "fours": 16,
+          "sixes": 0,
+          "sr": 125.2,
+          "isTarget": true
+        },
+        {
+          "player": "Mushfiqur Rahim",
+          "dismissal": "c Hope b Thomas",
+          "runs": 1,
+          "balls": 5,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 20
+        },
+        {
+          "player": "Litton Das",
+          "dismissal": "not out",
+          "runs": 94,
+          "balls": 69,
+          "fours": 8,
+          "sixes": 4,
+          "sr": 136.2
+        }
+      ],
+      "extras": "26 (b 4, lb 2, w 19, nb 1)",
+      "total": "322/3 (41.3 overs)"
+    }
+  },
+  {
+    "id": 29,
+    "title": "2021 T20 World Cup Century in Tough Conditions",
+    "difficulty": "easy",
+    "date": "1 November 2021",
+    "venue": "Sharjah Cricket Stadium, Sharjah",
+    "teams": "England vs Sri Lanka",
+    "result": "England won by 26 runs",
+    "targetPlayer": "Jos Buttler",
+    "targetRole": "Wicketkeeper-batter",
+    "targetTeam": "England",
+    "hint": "Batted through the innings and sealed his maiden T20I century off the final ball of the 20th over with a towering six.",
+    "innings": {
+      "team": "England",
+      "targetScore": "163/4 (20 overs)",
+      "batting": [
+        {
+          "player": "Jason Roy",
+          "dismissal": "c Shanaka b Hasaranga",
+          "runs": 9,
+          "balls": 6,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 150
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 101,
+          "balls": 67,
+          "fours": 6,
+          "sixes": 6,
+          "sr": 150.7,
+          "isTarget": true
+        },
+        {
+          "player": "Dawid Malan",
+          "dismissal": "b Chameera",
+          "runs": 6,
+          "balls": 8,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 75
+        },
+        {
+          "player": "Jonny Bairstow",
+          "dismissal": "lbw b Hasaranga",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Eoin Morgan",
+          "dismissal": "c sub b Hasaranga",
+          "runs": 40,
+          "balls": 36,
+          "fours": 1,
+          "sixes": 3,
+          "sr": 111.1
+        },
+        {
+          "player": "Moeen Ali",
+          "dismissal": "not out",
+          "runs": 1,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 50
+        }
+      ],
+      "extras": "6 (lb 1, w 5)",
+      "total": "163/4 (20 overs)"
+    }
+  },
+  {
+    "id": 30,
+    "title": "2018 Dunedin Miracle on One Leg (181*)",
+    "difficulty": "easy",
+    "date": "6 March 2018",
+    "venue": "University Oval, Dunedin",
+    "teams": "New Zealand vs England",
+    "result": "New Zealand won by 5 wickets",
+    "targetPlayer": "Ross Taylor",
+    "targetRole": "Batter",
+    "targetTeam": "New Zealand",
+    "hint": "Limping heavily with an aggravated thigh injury, blasted 181* with 17 fours and 6 sixes to hunt down 336.",
+    "innings": {
+      "team": "New Zealand",
+      "targetScore": "339/5 (49.3 overs)",
+      "batting": [
+        {
+          "player": "Martin Guptill",
+          "dismissal": "c Bairstow b Woakes",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Colin Munro",
+          "dismissal": "lbw b Woakes",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Kane Williamson",
+          "dismissal": "c Root b Curran",
+          "runs": 45,
+          "balls": 56,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 80.3
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 181,
+          "balls": 147,
+          "fours": 17,
+          "sixes": 6,
+          "sr": 123.1,
+          "isTarget": true
+        },
+        {
+          "player": "Tom Latham",
+          "dismissal": "c Roy b Curran",
+          "runs": 71,
+          "balls": 67,
+          "fours": 7,
+          "sixes": 1,
+          "sr": 105.9
+        },
+        {
+          "player": "Colin de Grandhomme",
+          "dismissal": "c Curran b Woakes",
+          "runs": 23,
+          "balls": 12,
+          "fours": 3,
+          "sixes": 1,
+          "sr": 191.6
+        },
+        {
+          "player": "Henry Nicholls",
+          "dismissal": "not out",
+          "runs": 13,
+          "balls": 10,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 130
+        }
+      ],
+      "extras": "6 (lb 3, w 3)",
+      "total": "339/5 (49.3 overs)"
+    }
+  },
+  {
+    "id": 31,
+    "title": "2023 World Test Championship Final Century (163)",
+    "difficulty": "easy",
+    "date": "7 June 2023",
+    "venue": "The Oval, London",
+    "teams": "Australia vs India",
+    "result": "Australia won by 209 runs",
+    "targetPlayer": "Travis Head",
+    "targetRole": "Batter",
+    "targetTeam": "Australia",
+    "hint": "Aggressive southpaw blasted 163 off 174 balls to dominate India in the World Test Championship Final.",
+    "innings": {
+      "team": "Australia",
+      "targetScore": "469 all out (121.3 overs)",
+      "batting": [
+        {
+          "player": "David Warner",
+          "dismissal": "c Bharat b Shardul",
+          "runs": 43,
+          "balls": 60,
+          "fours": 8,
+          "sixes": 0,
+          "sr": 71.6
+        },
+        {
+          "player": "Usman Khawaja",
+          "dismissal": "c Bharat b Shami",
+          "runs": 0,
+          "balls": 10,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Marnus Labuschagne",
+          "dismissal": "b Shami",
+          "runs": 26,
+          "balls": 62,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 41.9
+        },
+        {
+          "player": "Steve Smith",
+          "dismissal": "b Shardul",
+          "runs": 121,
+          "balls": 268,
+          "fours": 19,
+          "sixes": 0,
+          "sr": 45.1
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Bharat b Siraj",
+          "runs": 163,
+          "balls": 174,
+          "fours": 25,
+          "sixes": 1,
+          "sr": 93.6,
+          "isTarget": true
+        },
+        {
+          "player": "Cameron Green",
+          "dismissal": "c Gill b Shami",
+          "runs": 6,
+          "balls": 7,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 85.7
+        },
+        {
+          "player": "Alex Carey",
+          "dismissal": "lbw b Jadeja",
+          "runs": 48,
+          "balls": 69,
+          "fours": 7,
+          "sixes": 1,
+          "sr": 69.5
+        }
+      ],
+      "extras": "29 (b 10, lb 10, w 5, nb 4)",
+      "total": "469 all out (121.3 overs)"
+    }
+  },
+  {
+    "id": 32,
+    "title": "2022 T20 World Cup SCG Century (104)",
+    "difficulty": "easy",
+    "date": "29 October 2022",
+    "venue": "Sydney Cricket Ground, Sydney",
+    "teams": "New Zealand vs Sri Lanka",
+    "result": "New Zealand won by 65 runs",
+    "targetPlayer": "Glenn Phillips",
+    "targetRole": "Batter",
+    "targetTeam": "New Zealand",
+    "hint": "Rescued New Zealand from 15/3 with an explosive 104 off 64 balls with 10 fours and 4 sixes.",
+    "innings": {
+      "team": "New Zealand",
+      "targetScore": "167/7 (20 overs)",
+      "batting": [
+        {
+          "player": "Finn Allen",
+          "dismissal": "b Theekshana",
+          "runs": 1,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 33.3
+        },
+        {
+          "player": "Devon Conway",
+          "dismissal": "b Rajitha",
+          "runs": 1,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 25
+        },
+        {
+          "player": "Kane Williamson",
+          "dismissal": "c Mendis b Rajitha",
+          "runs": 8,
+          "balls": 13,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 61.5
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Shanaka b Kumara",
+          "runs": 104,
+          "balls": 64,
+          "fours": 10,
+          "sixes": 4,
+          "sr": 162.5,
+          "isTarget": true
+        },
+        {
+          "player": "Daryl Mitchell",
+          "dismissal": "b Hasaranga",
+          "runs": 22,
+          "balls": 24,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 91.6
+        },
+        {
+          "player": "James Neesham",
+          "dismissal": "c sub b Rajitha",
+          "runs": 5,
+          "balls": 8,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 62.5
+        }
+      ],
+      "extras": "11 (lb 2, w 9)",
+      "total": "167/7 (20 overs)"
+    }
+  },
+  {
+    "id": 33,
+    "title": "2019 World Cup Semi-Final Valiant Fightback",
+    "difficulty": "easy",
+    "date": "10 July 2019",
+    "venue": "Old Trafford, Manchester",
+    "teams": "India vs New Zealand",
+    "result": "New Zealand won by 18 runs",
+    "targetPlayer": "Ravindra Jadeja",
+    "targetRole": "All-rounder",
+    "targetTeam": "India",
+    "hint": "With India reeling at 92/6, celebrated with his iconic sword dance after a heroic 77 off 59 balls.",
+    "innings": {
+      "team": "India",
+      "targetScore": "221 all out (49.3 overs)",
+      "batting": [
+        {
+          "player": "KL Rahul",
+          "dismissal": "c Latham b Henry",
+          "runs": 1,
+          "balls": 7,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 14.2
+        },
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "c Latham b Henry",
+          "runs": 1,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 25
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "lbw b Boult",
+          "runs": 1,
+          "balls": 6,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 16.6
+        },
+        {
+          "player": "Dinesh Karthik",
+          "dismissal": "c Neesham b Henry",
+          "runs": 6,
+          "balls": 25,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 24
+        },
+        {
+          "player": "Rishabh Pant",
+          "dismissal": "c de Grandhomme b Santner",
+          "runs": 32,
+          "balls": 56,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 57.1
+        },
+        {
+          "player": "Hardik Pandya",
+          "dismissal": "c Williamson b Santner",
+          "runs": 32,
+          "balls": 62,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 51.6
+        },
+        {
+          "player": "MS Dhoni",
+          "dismissal": "run out (Guptill)",
+          "runs": 50,
+          "balls": 72,
+          "fours": 1,
+          "sixes": 1,
+          "sr": 69.4
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Williamson b Boult",
+          "runs": 77,
+          "balls": 59,
+          "fours": 4,
+          "sixes": 4,
+          "sr": 130.5,
+          "isTarget": true
+        }
+      ],
+      "extras": "12 (b 0, lb 4, w 8, nb 0)",
+      "total": "221 all out (49.3 overs)"
+    }
+  },
+  {
+    "id": 34,
+    "title": "2016 T20 World Cup Super 10 Masterclass vs Australia",
+    "difficulty": "easy",
+    "date": "27 March 2016",
+    "venue": "IS Bindra Stadium, Mohali",
+    "teams": "India vs Australia",
+    "result": "India won by 6 wickets",
+    "targetPlayer": "Virat Kohli",
+    "targetRole": "Batter",
+    "targetTeam": "India",
+    "hint": "Master of run chases scored an immaculate 82* off 51 balls, kneeling in emotion as Dhoni hit the winning runs.",
+    "innings": {
+      "team": "India",
+      "targetScore": "161/4 (19.1 overs)",
+      "batting": [
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "b Watson",
+          "runs": 12,
+          "balls": 17,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 70.5
+        },
+        {
+          "player": "Shikhar Dhawan",
+          "dismissal": "c Khawaja b Coulter-Nile",
+          "runs": 13,
+          "balls": 12,
+          "fours": 1,
+          "sixes": 1,
+          "sr": 108.3
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 82,
+          "balls": 51,
+          "fours": 9,
+          "sixes": 2,
+          "sr": 160.7,
+          "isTarget": true
+        },
+        {
+          "player": "Suresh Raina",
+          "dismissal": "c Nevill b Watson",
+          "runs": 10,
+          "balls": 7,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 142.8
+        },
+        {
+          "player": "Yuvraj Singh",
+          "dismissal": "c Watson b Faulkner",
+          "runs": 21,
+          "balls": 18,
+          "fours": 1,
+          "sixes": 1,
+          "sr": 116.6
+        },
+        {
+          "player": "MS Dhoni",
+          "dismissal": "not out",
+          "runs": 18,
+          "balls": 10,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 180
+        }
+      ],
+      "extras": "5 (lb 2, w 3)",
+      "total": "161/4 (19.1 overs)"
+    }
+  },
+  {
+    "id": 35,
+    "title": "2023 Wankhede Semi-Final Masterclass (117)",
+    "difficulty": "easy",
+    "date": "15 November 2023",
+    "venue": "Wankhede Stadium, Mumbai",
+    "teams": "India vs New Zealand",
+    "result": "India won by 70 runs",
+    "targetPlayer": "Virat Kohli",
+    "targetRole": "Batter",
+    "targetTeam": "India",
+    "hint": "Surpassed Sachin Tendulkar to record his historic 50th One Day International century in front of the master himself.",
+    "innings": {
+      "team": "India",
+      "targetScore": "397/4 (50 overs)",
+      "batting": [
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "c Williamson b Southee",
+          "runs": 47,
+          "balls": 29,
+          "fours": 4,
+          "sixes": 4,
+          "sr": 162
+        },
+        {
+          "player": "Shubman Gill",
+          "dismissal": "retired hurt",
+          "runs": 80,
+          "balls": 66,
+          "fours": 8,
+          "sixes": 3,
+          "sr": 121.2
+        },
+        {
+          "player": "██████████",
+          "dismissal": "c Conway b Southee",
+          "runs": 117,
+          "balls": 113,
+          "fours": 9,
+          "sixes": 2,
+          "sr": 103.5,
+          "isTarget": true
+        },
+        {
+          "player": "Shreyas Iyer",
+          "dismissal": "c Mitchell b Boult",
+          "runs": 105,
+          "balls": 70,
+          "fours": 4,
+          "sixes": 8,
+          "sr": 150
+        },
+        {
+          "player": "KL Rahul",
+          "dismissal": "not out",
+          "runs": 39,
+          "balls": 20,
+          "fours": 5,
+          "sixes": 2,
+          "sr": 195
+        }
+      ],
+      "extras": "8 (b 0, lb 1, w 7, nb 0)",
+      "total": "397/4 (50 overs)"
+    }
+  },
+  {
+    "id": 36,
+    "title": "2023 World Cup Wankhede 7-Wicket Haul (7/57)",
+    "difficulty": "easy",
+    "date": "15 November 2023",
+    "venue": "Wankhede Stadium, Mumbai",
+    "teams": "India vs New Zealand",
+    "result": "India won by 70 runs",
+    "targetPlayer": "Mohammed Shami",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "India",
+    "hint": "Premier pacer produced the best bowling figures by an Indian in World Cup history (7/57) to break the Kiwi resistance.",
+    "innings": {
+      "team": "India (Fielding)",
+      "targetScore": "327 all out (48.5 overs)",
+      "batting": [
+        {
+          "player": "Devon Conway",
+          "dismissal": "c Rahul b Shami",
+          "runs": 13,
+          "balls": 15,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 86.6
+        },
+        {
+          "player": "Rachin Ravindra",
+          "dismissal": "c Rahul b Shami",
+          "runs": 13,
+          "balls": 22,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 59
+        },
+        {
+          "player": "Kane Williamson",
+          "dismissal": "c Suryakumar b Shami",
+          "runs": 69,
+          "balls": 73,
+          "fours": 8,
+          "sixes": 1,
+          "sr": 94.5
+        },
+        {
+          "player": "Daryl Mitchell",
+          "dismissal": "c Jadeja b Shami",
+          "runs": 134,
+          "balls": 119,
+          "fours": 9,
+          "sixes": 7,
+          "sr": 112.6
+        },
+        {
+          "player": "Tom Latham",
+          "dismissal": "lbw b Shami",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Glenn Phillips",
+          "dismissal": "c Jadeja b Bumrah",
+          "runs": 41,
+          "balls": 33,
+          "fours": 4,
+          "sixes": 2,
+          "sr": 124.2
+        },
+        {
+          "player": "Mark Chapman",
+          "dismissal": "c Jadeja b Kuldeep",
+          "runs": 2,
+          "balls": 5,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 40
+        },
+        {
+          "player": "Tim Southee",
+          "dismissal": "c Rahul b Shami",
+          "runs": 9,
+          "balls": 10,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 90
+        },
+        {
+          "player": "Lockie Ferguson",
+          "dismissal": "c Rahul b Shami",
+          "runs": 6,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 1,
+          "sr": 200
+        }
+      ],
+      "extras": "19 (b 0, lb 4, w 15, nb 0)",
+      "total": "327 all out (48.5 overs)"
+    }
+  },
+  {
+    "id": 37,
+    "title": "10 Wickets in a Test Innings at Wankhede (10/119)",
+    "difficulty": "hard",
+    "date": "4 December 2021",
+    "venue": "Wankhede Stadium, Mumbai",
+    "teams": "New Zealand vs India",
+    "result": "India won by 372 runs",
+    "targetPlayer": "Ajaz Patel",
+    "targetRole": "Slow Left-arm Orthodox",
+    "targetTeam": "New Zealand",
+    "hint": "Born in Mumbai, returned to his birth city to become only the 3rd bowler in Test history to take all 10 wickets in an innings.",
+    "innings": {
+      "team": "India",
+      "targetScore": "325 all out (109.5 overs)",
+      "batting": [
+        {
+          "player": "Mayank Agarwal",
+          "dismissal": "c Blundell b Ajaz Patel",
+          "runs": 150,
+          "balls": 311,
+          "fours": 17,
+          "sixes": 4,
+          "sr": 48.2
+        },
+        {
+          "player": "Shubman Gill",
+          "dismissal": "c Taylor b Ajaz Patel",
+          "runs": 44,
+          "balls": 71,
+          "fours": 7,
+          "sixes": 1,
+          "sr": 61.9
+        },
+        {
+          "player": "Cheteshwar Pujara",
+          "dismissal": "b Ajaz Patel",
+          "runs": 0,
+          "balls": 5,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "b Ajaz Patel",
+          "runs": 0,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Shreyas Iyer",
+          "dismissal": "c Blundell b Ajaz Patel",
+          "runs": 18,
+          "balls": 41,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 43.9
+        },
+        {
+          "player": "Wriddhiman Saha",
+          "dismissal": "lbw b Ajaz Patel",
+          "runs": 27,
+          "balls": 62,
+          "fours": 3,
+          "sixes": 1,
+          "sr": 43.5
+        },
+        {
+          "player": "Ravichandran Ashwin",
+          "dismissal": "b Ajaz Patel",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Axar Patel",
+          "dismissal": "lbw b Ajaz Patel",
+          "runs": 52,
+          "balls": 128,
+          "fours": 5,
+          "sixes": 1,
+          "sr": 40.6
+        },
+        {
+          "player": "Jayant Yadav",
+          "dismissal": "c Ravindra b Ajaz Patel",
+          "runs": 12,
+          "balls": 31,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 38.7
+        },
+        {
+          "player": "Mohammed Siraj",
+          "dismissal": "c Ravindra b Ajaz Patel",
+          "runs": 4,
+          "balls": 5,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 80
+        }
+      ],
+      "extras": "18 (b 8, lb 8, w 1, nb 1)",
+      "total": "325 all out (109.5 overs)"
+    }
+  },
+  {
+    "id": 38,
+    "title": "2015 Ashes Trent Bridge Demolition (8/15)",
+    "difficulty": "hard",
+    "date": "6 August 2015",
+    "venue": "Trent Bridge, Nottingham",
+    "teams": "England vs Australia",
+    "result": "England won by an innings and 78 runs",
+    "targetPlayer": "Stuart Broad",
+    "targetRole": "Fast-medium Bowler",
+    "targetTeam": "England",
+    "hint": "Took 8/15 in 9.3 devastating overs as Australia were routed for just 60 runs before lunch on day one.",
+    "innings": {
+      "team": "Australia",
+      "targetScore": "60 all out (18.3 overs)",
+      "batting": [
+        {
+          "player": "Chris Rogers",
+          "dismissal": "c Cook b Broad",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "David Warner",
+          "dismissal": "c Cook b Broad",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Steve Smith",
+          "dismissal": "c Root b Broad",
+          "runs": 6,
+          "balls": 13,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 46.1
+        },
+        {
+          "player": "Shaun Marsh",
+          "dismissal": "c Bell b Broad",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Michael Clarke",
+          "dismissal": "c Cook b Broad",
+          "runs": 10,
+          "balls": 15,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 66.6
+        },
+        {
+          "player": "Adam Voges",
+          "dismissal": "c Stokes b Broad",
+          "runs": 1,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 25
+        },
+        {
+          "player": "Mitchell Johnson",
+          "dismissal": "c Root b Broad",
+          "runs": 13,
+          "balls": 25,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 52
+        },
+        {
+          "player": "Mitchell Starc",
+          "dismissal": "c Root b Broad",
+          "runs": 1,
+          "balls": 13,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 7.6
+        }
+      ],
+      "extras": "8 (b 0, lb 4, w 0, nb 4)",
+      "total": "60 all out (18.3 overs)"
+    }
+  },
+  {
+    "id": 39,
+    "title": "2007 World Cup 4 Wickets in 4 Balls",
+    "difficulty": "hard",
+    "date": "28 March 2007",
+    "venue": "Providence Stadium, Georgetown",
+    "teams": "Sri Lanka vs South Africa",
+    "result": "South Africa won by 1 wicket",
+    "targetPlayer": "Lasith Malinga",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "Sri Lanka",
+    "hint": "Slinging yorker specialist made history with four wickets in consecutive deliveries: Pollock, Hall, Kallis, and Ntini.",
+    "innings": {
+      "team": "South Africa",
+      "targetScore": "207/9 (48.2 overs)",
+      "batting": [
+        {
+          "player": "Graeme Smith",
+          "dismissal": "b Malinga",
+          "runs": 59,
+          "balls": 65,
+          "fours": 12,
+          "sixes": 0,
+          "sr": 90.7
+        },
+        {
+          "player": "Jacques Kallis",
+          "dismissal": "c Sangakkara b Malinga",
+          "runs": 86,
+          "balls": 110,
+          "fours": 5,
+          "sixes": 1,
+          "sr": 78.1
+        },
+        {
+          "player": "Shaun Pollock",
+          "dismissal": "b Malinga",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Andrew Hall",
+          "dismissal": "c Tharanga b Malinga",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Makhaya Ntini",
+          "dismissal": "b Malinga",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Robin Peterson",
+          "dismissal": "not out",
+          "runs": 2,
+          "balls": 7,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 28.5
+        }
+      ],
+      "extras": "12 (b 0, lb 6, w 5, nb 1)",
+      "total": "207/9 (48.2 overs)"
+    }
+  },
+  {
+    "id": 40,
+    "title": "2013/14 Ashes Adelaide Pace Blitz (7/40)",
+    "difficulty": "hard",
+    "date": "7 December 2013",
+    "venue": "Adelaide Oval, Adelaide",
+    "teams": "Australia vs England",
+    "result": "Australia won by 218 runs",
+    "targetPlayer": "Mitchell Johnson",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "Australia",
+    "hint": "Sporting an iconic handlebar mustache, bowled at 150+ km/h to claim 7 for 40 in one of the most hostile spells ever.",
+    "innings": {
+      "team": "England",
+      "targetScore": "172 all out (66.1 overs)",
+      "batting": [
+        {
+          "player": "Alastair Cook",
+          "dismissal": "b Johnson",
+          "runs": 3,
+          "balls": 12,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 25
+        },
+        {
+          "player": "Michael Carberry",
+          "dismissal": "c Warner b Watson",
+          "runs": 60,
+          "balls": 145,
+          "fours": 10,
+          "sixes": 0,
+          "sr": 41.3
+        },
+        {
+          "player": "Joe Root",
+          "dismissal": "c Haddin b Johnson",
+          "runs": 15,
+          "balls": 47,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 31.9
+        },
+        {
+          "player": "Kevin Pietersen",
+          "dismissal": "c sub b Siddle",
+          "runs": 4,
+          "balls": 11,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 36.3
+        },
+        {
+          "player": "Ben Stokes",
+          "dismissal": "lbw b Johnson",
+          "runs": 1,
+          "balls": 13,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 7.6
+        },
+        {
+          "player": "Matt Prior",
+          "dismissal": "c Haddin b Johnson",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Stuart Broad",
+          "dismissal": "b Johnson",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Graeme Swann",
+          "dismissal": "c Clarke b Johnson",
+          "runs": 7,
+          "balls": 22,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 31.8
+        },
+        {
+          "player": "James Anderson",
+          "dismissal": "b Johnson",
+          "runs": 0,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "18 (b 4, lb 8, w 1, nb 5)",
+      "total": "172 all out (66.1 overs)"
+    }
+  },
+  {
+    "id": 41,
+    "title": "2019 Sabina Park Test Hat-trick (6/27)",
+    "difficulty": "hard",
+    "date": "31 August 2019",
+    "venue": "Sabina Park, Kingston",
+    "teams": "India vs West Indies",
+    "result": "India won by 257 runs",
+    "targetPlayer": "Jasprit Bumrah",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "India",
+    "hint": "Became only the 3rd Indian bowler to take a Test hat-trick, removing Bravo, Brooks, and Chase with devastating swing.",
+    "innings": {
+      "team": "West Indies",
+      "targetScore": "117 all out (47.1 overs)",
+      "batting": [
+        {
+          "player": "Kraigg Brathwaite",
+          "dismissal": "c Pant b Bumrah",
+          "runs": 10,
+          "balls": 38,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 26.3
+        },
+        {
+          "player": "John Campbell",
+          "dismissal": "c Rahul b Bumrah",
+          "runs": 0,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Darren Bravo",
+          "dismissal": "c Rahul b Bumrah",
+          "runs": 4,
+          "balls": 13,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 30.7
+        },
+        {
+          "player": "Shamarh Brooks",
+          "dismissal": "lbw b Bumrah",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Roston Chase",
+          "dismissal": "lbw b Bumrah",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Shimron Hetmyer",
+          "dismissal": "b Shami",
+          "runs": 34,
+          "balls": 57,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 59.6
+        },
+        {
+          "player": "Jason Holder",
+          "dismissal": "c sub b Bumrah",
+          "runs": 18,
+          "balls": 38,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 47.3
+        }
+      ],
+      "extras": "11 (b 4, lb 4, w 2, nb 1)",
+      "total": "117 all out (47.1 overs)"
+    }
+  },
+  {
+    "id": 42,
+    "title": "2010 Nagpur Reverse Swing Exhibition (7/51)",
+    "difficulty": "hard",
+    "date": "9 February 2010",
+    "venue": "VCA Stadium, Jamtha, Nagpur",
+    "teams": "South Africa vs India",
+    "result": "South Africa won by an innings and 6 runs",
+    "targetPlayer": "Dale Steyn",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "South Africa",
+    "hint": "Steyn Gun generated frightening reverse swing on an unresponsive Indian pitch to scythe through with 7/51.",
+    "innings": {
+      "team": "India",
+      "targetScore": "233 all out (64.4 overs)",
+      "batting": [
+        {
+          "player": "Gautam Gambhir",
+          "dismissal": "c Boucher b Steyn",
+          "runs": 12,
+          "balls": 22,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 54.5
+        },
+        {
+          "player": "Virender Sehwag",
+          "dismissal": "b Steyn",
+          "runs": 109,
+          "balls": 139,
+          "fours": 15,
+          "sixes": 0,
+          "sr": 78.4
+        },
+        {
+          "player": "Murali Vijay",
+          "dismissal": "c Boucher b Steyn",
+          "runs": 4,
+          "balls": 28,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 14.2
+        },
+        {
+          "player": "Sachin Tendulkar",
+          "dismissal": "b Steyn",
+          "runs": 7,
+          "balls": 17,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 41.1
+        },
+        {
+          "player": "Subramaniam Badrinath",
+          "dismissal": "c Boucher b Steyn",
+          "runs": 56,
+          "balls": 139,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 40.2
+        },
+        {
+          "player": "Wriddhiman Saha",
+          "dismissal": "b Steyn",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Amit Mishra",
+          "dismissal": "b Steyn",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "11 (b 0, lb 8, w 2, nb 1)",
+      "total": "233 all out (64.4 overs)"
+    }
+  },
+  {
+    "id": 43,
+    "title": "500th Test Wicket Swing Masterclass (7/42)",
+    "difficulty": "hard",
+    "date": "8 September 2017",
+    "venue": "Lord's, London",
+    "teams": "England vs West Indies",
+    "result": "England won by 9 wickets",
+    "targetPlayer": "James Anderson",
+    "targetRole": "Fast-medium Bowler",
+    "targetTeam": "England",
+    "hint": "The swing king castled Kraigg Brathwaite for his 500th Test wicket, finishing with career-best figures of 7 for 42.",
+    "innings": {
+      "team": "West Indies",
+      "targetScore": "177 all out (65.1 overs)",
+      "batting": [
+        {
+          "player": "Kraigg Brathwaite",
+          "dismissal": "b Anderson",
+          "runs": 4,
+          "balls": 18,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 22.2
+        },
+        {
+          "player": "Kieran Powell",
+          "dismissal": "c & b Anderson",
+          "runs": 45,
+          "balls": 78,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 57.6
+        },
+        {
+          "player": "Kyle Hope",
+          "dismissal": "lbw b Roland-Jones",
+          "runs": 1,
+          "balls": 9,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 11.1
+        },
+        {
+          "player": "Shai Hope",
+          "dismissal": "c Bairstow b Anderson",
+          "runs": 62,
+          "balls": 144,
+          "fours": 9,
+          "sixes": 0,
+          "sr": 43
+        },
+        {
+          "player": "Roston Chase",
+          "dismissal": "c Bairstow b Anderson",
+          "runs": 3,
+          "balls": 17,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 17.6
+        },
+        {
+          "player": "Jermaine Blackwood",
+          "dismissal": "c Bairstow b Anderson",
+          "runs": 5,
+          "balls": 9,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 55.5
+        },
+        {
+          "player": "Shane Dowrich",
+          "dismissal": "c Broad b Anderson",
+          "runs": 0,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Kemar Roach",
+          "dismissal": "b Anderson",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "14 (b 4, lb 6, w 4, nb 0)",
+      "total": "177 all out (65.1 overs)"
+    }
+  },
+  {
+    "id": 44,
+    "title": "2019 Miracle at Kingsmead 10th-Wicket Chase",
+    "difficulty": "hard",
+    "date": "16 February 2019",
+    "venue": "Kingsmead, Durban",
+    "teams": "Sri Lanka vs South Africa",
+    "result": "Sri Lanka won by 1 wicket",
+    "targetPlayer": "Kusal Perera",
+    "targetRole": "Wicketkeeper-batter",
+    "targetTeam": "Sri Lanka",
+    "hint": "Batted with No. 11 Vishwa Fernando to forge an unbroken 78-run last-wicket stand, striking 153* to stun Steyn and Rabada.",
+    "innings": {
+      "team": "Sri Lanka",
+      "targetScore": "304/9 (85.3 overs)",
+      "batting": [
+        {
+          "player": "Dimuth Karunaratne",
+          "dismissal": "lbw b Philander",
+          "runs": 20,
+          "balls": 41,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 48.7
+        },
+        {
+          "player": "Lahiru Thirimanne",
+          "dismissal": "c du Plessis b Rabada",
+          "runs": 10,
+          "balls": 31,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 32.2
+        },
+        {
+          "player": "Oshada Fernando",
+          "dismissal": "c du Plessis b Steyn",
+          "runs": 37,
+          "balls": 78,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 47.4
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 153,
+          "balls": 200,
+          "fours": 12,
+          "sixes": 5,
+          "sr": 76.5,
+          "isTarget": true
+        },
+        {
+          "player": "Dhananjaya de Silva",
+          "dismissal": "lbw b Maharaj",
+          "runs": 48,
+          "balls": 65,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 73.8
+        },
+        {
+          "player": "Suranga Lakmal",
+          "dismissal": "c du Plessis b Steyn",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Vishwa Fernando",
+          "dismissal": "not out",
+          "runs": 6,
+          "balls": 27,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 22.2
+        }
+      ],
+      "extras": "12 (b 0, lb 8, w 4, nb 0)",
+      "total": "304/9 (85.3 overs)"
+    }
+  },
+  {
+    "id": 45,
+    "title": "2012 Adelaide Blockathon (110* off 376 Balls)",
+    "difficulty": "hard",
+    "date": "26 November 2012",
+    "venue": "Adelaide Oval, Adelaide",
+    "teams": "South Africa vs Australia",
+    "result": "Match drawn",
+    "targetPlayer": "Faf du Plessis",
+    "targetRole": "Batter",
+    "targetTeam": "South Africa",
+    "hint": "On his Test debut, batted for nearly 8 hours and faced 376 deliveries to pull off one of the greatest defensive rearguards.",
+    "innings": {
+      "team": "South Africa",
+      "targetScore": "248/8 (148 overs)",
+      "batting": [
+        {
+          "player": "Graeme Smith",
+          "dismissal": "c Ponting b Hilfenhaus",
+          "runs": 0,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Alviro Petersen",
+          "dismissal": "c Wade b Siddle",
+          "runs": 9,
+          "balls": 37,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 24.3
+        },
+        {
+          "player": "Hashim Amla",
+          "dismissal": "c Clarke b Siddle",
+          "runs": 17,
+          "balls": 63,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 26.9
+        },
+        {
+          "player": "Jacques Rudolph",
+          "dismissal": "c Cowan b Lyon",
+          "runs": 3,
+          "balls": 32,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 9.3
+        },
+        {
+          "player": "AB de Villiers",
+          "dismissal": "b Siddle",
+          "runs": 33,
+          "balls": 220,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 15
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 110,
+          "balls": 376,
+          "fours": 14,
+          "sixes": 0,
+          "sr": 29.2,
+          "isTarget": true
+        },
+        {
+          "player": "Jacques Kallis",
+          "dismissal": "c Ponting b Lyon",
+          "runs": 46,
+          "balls": 110,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 41.8
+        },
+        {
+          "player": "Morne Morkel",
+          "dismissal": "not out",
+          "runs": 8,
+          "balls": 21,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 38
+        }
+      ],
+      "extras": "17 (b 6, lb 5, w 5, nb 1)",
+      "total": "248/8 (148 overs)"
+    }
+  },
+  {
+    "id": 46,
+    "title": "2021 Historic 4th Innings Chase (210*) on Debut",
+    "difficulty": "hard",
+    "date": "7 February 2021",
+    "venue": "Zahur Ahmed Chowdhury Stadium, Chattogram",
+    "teams": "West Indies vs Bangladesh",
+    "result": "West Indies won by 3 wickets",
+    "targetPlayer": "Kyle Mayers",
+    "targetRole": "All-rounder",
+    "targetTeam": "West Indies",
+    "hint": "Became only the 2nd West Indian after Brian Lara to hit a double century in the 4th innings, chasing down 395 on Test debut.",
+    "innings": {
+      "team": "West Indies",
+      "targetScore": "395/7 (127.3 overs)",
+      "batting": [
+        {
+          "player": "Kraigg Brathwaite",
+          "dismissal": "b Taijul",
+          "runs": 20,
+          "balls": 53,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 37.7
+        },
+        {
+          "player": "John Campbell",
+          "dismissal": "lbw b Mehidy",
+          "runs": 23,
+          "balls": 41,
+          "fours": 2,
+          "sixes": 1,
+          "sr": 56
+        },
+        {
+          "player": "Shayne Moseley",
+          "dismissal": "lbw b Mehidy",
+          "runs": 12,
+          "balls": 34,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 35.2
+        },
+        {
+          "player": "Nkrumah Bonner",
+          "dismissal": "lbw b Taijul",
+          "runs": 86,
+          "balls": 245,
+          "fours": 10,
+          "sixes": 1,
+          "sr": 35.1
+        },
+        {
+          "player": "██████████",
+          "dismissal": "not out",
+          "runs": 210,
+          "balls": 310,
+          "fours": 20,
+          "sixes": 7,
+          "sr": 67.7,
+          "isTarget": true
+        },
+        {
+          "player": "Jermaine Blackwood",
+          "dismissal": "b Nayeem",
+          "runs": 9,
+          "balls": 16,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 56.2
+        },
+        {
+          "player": "Joshua Da Silva",
+          "dismissal": "b Taijul",
+          "runs": 20,
+          "balls": 43,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 46.5
+        }
+      ],
+      "extras": "13 (b 4, lb 6, w 3, nb 0)",
+      "total": "395/7 (127.3 overs)"
+    }
+  },
+  {
+    "id": 47,
+    "title": "2023 Asia Cup Final Demolition (6/21)",
+    "difficulty": "hard",
+    "date": "17 September 2023",
+    "venue": "R. Premadasa Stadium, Colombo",
+    "teams": "India vs Sri Lanka",
+    "result": "India won by 10 wickets",
+    "targetPlayer": "Mohammed Siraj",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "India",
+    "hint": "Took 4 wickets in a single over on his way to 6 for 21 as Sri Lanka were blown away for 50 in the Asia Cup Final.",
+    "innings": {
+      "team": "Sri Lanka",
+      "targetScore": "50 all out (15.2 overs)",
+      "batting": [
+        {
+          "player": "Pathum Nissanka",
+          "dismissal": "c Jadeja b Siraj",
+          "runs": 2,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Kusal Perera",
+          "dismissal": "c Rahul b Bumrah",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Kusal Mendis",
+          "dismissal": "b Siraj",
+          "runs": 17,
+          "balls": 34,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Sadeera Samarawickrama",
+          "dismissal": "lbw b Siraj",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Charith Asalanka",
+          "dismissal": "c Kishan b Siraj",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Dhananjaya de Silva",
+          "dismissal": "c Rahul b Siraj",
+          "runs": 4,
+          "balls": 2,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 200
+        },
+        {
+          "player": "Dasun Shanaka",
+          "dismissal": "b Siraj",
+          "runs": 0,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Dunith Wellalage",
+          "dismissal": "c Rahul b Hardik",
+          "runs": 8,
+          "balls": 21,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 38
+        }
+      ],
+      "extras": "5 (b 0, lb 1, w 4, nb 0)",
+      "total": "50 all out (15.2 overs)"
+    }
+  },
+  {
+    "id": 48,
+    "title": "2018 Johannesburg Bullring Test Win (5/24)",
+    "difficulty": "hard",
+    "date": "27 January 2018",
+    "venue": "Wanderers Stadium, Johannesburg",
+    "teams": "India vs South Africa",
+    "result": "India won by 63 runs",
+    "targetPlayer": "Bhuvneshwar Kumar",
+    "targetRole": "Medium-fast Bowler",
+    "targetTeam": "India",
+    "hint": "Master of swing bowler took 3/44 and scored crucial 30s in both innings on a terrifying pitch to claim Player of the Match.",
+    "innings": {
+      "team": "South Africa",
+      "targetScore": "194 all out (65.5 overs)",
+      "batting": [
+        {
+          "player": "Aiden Markram",
+          "dismissal": "c Patel b Bhuvneshwar",
+          "runs": 2,
+          "balls": 9,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 22.2
+        },
+        {
+          "player": "Dean Elgar",
+          "dismissal": "not out",
+          "runs": 86,
+          "balls": 240,
+          "fours": 10,
+          "sixes": 0,
+          "sr": 35.8
+        },
+        {
+          "player": "Hashim Amla",
+          "dismissal": "c Pandya b Ishant",
+          "runs": 52,
+          "balls": 140,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 37.1
+        },
+        {
+          "player": "AB de Villiers",
+          "dismissal": "c Rahane b Shami",
+          "runs": 6,
+          "balls": 8,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 75
+        },
+        {
+          "player": "Faf du Plessis",
+          "dismissal": "b Ishant",
+          "runs": 2,
+          "balls": 10,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 20
+        },
+        {
+          "player": "Quinton de Kock",
+          "dismissal": "lbw b Bumrah",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Vernon Philander",
+          "dismissal": "b Shami",
+          "runs": 10,
+          "balls": 31,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 32.2
+        },
+        {
+          "player": "Andile Phehlukwayo",
+          "dismissal": "b Shami",
+          "runs": 0,
+          "balls": 5,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "19 (b 9, lb 6, w 4, nb 0)",
+      "total": "194 all out (65.5 overs)"
+    }
+  },
+  {
+    "id": 49,
+    "title": "2023 Asia Cup Super 4 Spin Masterclass (5/25)",
+    "difficulty": "hard",
+    "date": "11 September 2023",
+    "venue": "R. Premadasa Stadium, Colombo",
+    "teams": "India vs Pakistan",
+    "result": "India won by 228 runs",
+    "targetPlayer": "Kuldeep Yadav",
+    "targetRole": "Left-arm Wrist Spinner",
+    "targetTeam": "India",
+    "hint": "Wrist spinner bamboozled Pakistan's middle order with unreadable wrong'uns to finish with 5 for 25.",
+    "innings": {
+      "team": "Pakistan",
+      "targetScore": "128 all out (32 overs)",
+      "batting": [
+        {
+          "player": "Fakhar Zaman",
+          "dismissal": "b Kuldeep",
+          "runs": 27,
+          "balls": 50,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 54
+        },
+        {
+          "player": "Imam-ul-Haq",
+          "dismissal": "c Gill b Bumrah",
+          "runs": 9,
+          "balls": 18,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Babar Azam",
+          "dismissal": "b Hardik",
+          "runs": 10,
+          "balls": 24,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 41.6
+        },
+        {
+          "player": "Mohammad Rizwan",
+          "dismissal": "c Rahul b Shardul",
+          "runs": 2,
+          "balls": 5,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 40
+        },
+        {
+          "player": "Agha Salman",
+          "dismissal": "lbw b Kuldeep",
+          "runs": 23,
+          "balls": 32,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 71.8
+        },
+        {
+          "player": "Iftikhar Ahmed",
+          "dismissal": "c & b Kuldeep",
+          "runs": 23,
+          "balls": 35,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 65.7
+        },
+        {
+          "player": "Shadab Khan",
+          "dismissal": "c Shardul b Kuldeep",
+          "runs": 6,
+          "balls": 10,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 60
+        },
+        {
+          "player": "Faheem Ashraf",
+          "dismissal": "b Kuldeep",
+          "runs": 4,
+          "balls": 14,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 28.5
+        }
+      ],
+      "extras": "14 (b 0, lb 4, w 9, nb 1)",
+      "total": "128 all out (32 overs)"
+    }
+  },
+  {
+    "id": 50,
+    "title": "2019 Lord's Ashes Test Bouncer Barrage",
+    "difficulty": "hard",
+    "date": "17 August 2019",
+    "venue": "Lord's, London",
+    "teams": "England vs Australia",
+    "result": "Match drawn",
+    "targetPlayer": "Jofra Archer",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "England",
+    "hint": "On his Test debut, unleashed a ferocious 96 mph bouncer spell that struck Steve Smith on the neck.",
+    "innings": {
+      "team": "Australia",
+      "targetScore": "250 all out (75.1 overs)",
+      "batting": [
+        {
+          "player": "David Warner",
+          "dismissal": "b Broad",
+          "runs": 3,
+          "balls": 8,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 37.5
+        },
+        {
+          "player": "Cameron Bancroft",
+          "dismissal": "lbw b Archer",
+          "runs": 13,
+          "balls": 66,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 19.6
+        },
+        {
+          "player": "Usman Khawaja",
+          "dismissal": "c Bairstow b Woakes",
+          "runs": 36,
+          "balls": 71,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 50.7
+        },
+        {
+          "player": "Steve Smith",
+          "dismissal": "lbw b Woakes",
+          "runs": 92,
+          "balls": 161,
+          "fours": 14,
+          "sixes": 0,
+          "sr": 57.1
+        },
+        {
+          "player": "Travis Head",
+          "dismissal": "lbw b Broad",
+          "runs": 7,
+          "balls": 24,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 29.1
+        },
+        {
+          "player": "Matthew Wade",
+          "dismissal": "c Burns b Broad",
+          "runs": 6,
+          "balls": 14,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 42.8
+        },
+        {
+          "player": "Tim Paine",
+          "dismissal": "c Burns b Archer",
+          "runs": 23,
+          "balls": 59,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 38.9
+        },
+        {
+          "player": "Peter Siddle",
+          "dismissal": "c Burns b Woakes",
+          "runs": 9,
+          "balls": 22,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 40.9
+        }
+      ],
+      "extras": "19 (b 4, lb 10, w 1, nb 4)",
+      "total": "250 all out (75.1 overs)"
+    }
+  },
+  {
+    "id": 51,
+    "title": "2021 Adelaide Pink Ball Night Session (5/32)",
+    "difficulty": "hard",
+    "date": "19 December 2020",
+    "venue": "Adelaide Oval, Adelaide",
+    "teams": "Australia vs India",
+    "result": "Australia won by 8 wickets",
+    "targetPlayer": "Josh Hazlewood",
+    "targetRole": "Fast-medium Bowler",
+    "targetTeam": "Australia",
+    "hint": "Combined with Pat Cummins to skittle India for their lowest-ever Test total of 36, taking 5 for 8 in 5 overs.",
+    "innings": {
+      "team": "India",
+      "targetScore": "36/9 (21.2 overs)",
+      "batting": [
+        {
+          "player": "Prithvi Shaw",
+          "dismissal": "b Starc",
+          "runs": 4,
+          "balls": 4,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 100
+        },
+        {
+          "player": "Mayank Agarwal",
+          "dismissal": "c Paine b Hazlewood",
+          "runs": 9,
+          "balls": 40,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 22.5
+        },
+        {
+          "player": "Jasprit Bumrah",
+          "dismissal": "c & b Cummins",
+          "runs": 2,
+          "balls": 17,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 11.7
+        },
+        {
+          "player": "Cheteshwar Pujara",
+          "dismissal": "c Paine b Cummins",
+          "runs": 0,
+          "balls": 8,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "c Green b Cummins",
+          "runs": 4,
+          "balls": 8,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Ajinkya Rahane",
+          "dismissal": "c Paine b Hazlewood",
+          "runs": 0,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Hanuma Vihari",
+          "dismissal": "c Paine b Hazlewood",
+          "runs": 8,
+          "balls": 16,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Wriddhiman Saha",
+          "dismissal": "c Labuschagne b Hazlewood",
+          "runs": 4,
+          "balls": 15,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 26.6
+        },
+        {
+          "player": "Ravichandran Ashwin",
+          "dismissal": "c Paine b Hazlewood",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "5 (b 0, lb 4, w 0, nb 1)",
+      "total": "36/9 (21.2 overs)"
+    }
+  },
+  {
+    "id": 52,
+    "title": "2019 World Cup 5-Wicket Haul vs Australia (5/26)",
+    "difficulty": "hard",
+    "date": "29 June 2019",
+    "venue": "Lord's, London",
+    "teams": "Australia vs New Zealand",
+    "result": "Australia won by 86 runs",
+    "targetPlayer": "Mitchell Starc",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "Australia",
+    "hint": "Leading wicket-taker of the tournament blasted out the Kiwi tail with ferocious yorkers to take 5 for 26.",
+    "innings": {
+      "team": "New Zealand",
+      "targetScore": "157 all out (43.4 overs)",
+      "batting": [
+        {
+          "player": "Martin Guptill",
+          "dismissal": "lbw b Behrendorff",
+          "runs": 20,
+          "balls": 43,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 46.5
+        },
+        {
+          "player": "Henry Nicholls",
+          "dismissal": "c Carey b Behrendorff",
+          "runs": 8,
+          "balls": 20,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 40
+        },
+        {
+          "player": "Kane Williamson",
+          "dismissal": "c Carey b Starc",
+          "runs": 40,
+          "balls": 51,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 78.4
+        },
+        {
+          "player": "Ross Taylor",
+          "dismissal": "c Carey b Cummins",
+          "runs": 30,
+          "balls": 54,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 55.5
+        },
+        {
+          "player": "Tom Latham",
+          "dismissal": "c Smith b Starc",
+          "runs": 14,
+          "balls": 28,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Colin de Grandhomme",
+          "dismissal": "c Khawaja b Smith",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "James Neesham",
+          "dismissal": "c & b Lyon",
+          "runs": 9,
+          "balls": 18,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Mitchell Santner",
+          "dismissal": "c sub b Starc",
+          "runs": 12,
+          "balls": 21,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 57.1
+        },
+        {
+          "player": "Ish Sodhi",
+          "dismissal": "lbw b Starc",
+          "runs": 5,
+          "balls": 11,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 45.4
+        },
+        {
+          "player": "Lockie Ferguson",
+          "dismissal": "b Starc",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "14 (b 0, lb 4, w 10, nb 0)",
+      "total": "157 all out (43.4 overs)"
+    }
+  },
+  {
+    "id": 53,
+    "title": "2023 WTC Final Relentless Spell (4/78)",
+    "difficulty": "hard",
+    "date": "11 June 2023",
+    "venue": "The Oval, London",
+    "teams": "Australia vs India",
+    "result": "Australia won by 209 runs",
+    "targetPlayer": "Nathan Lyon",
+    "targetRole": "Off-break Bowler",
+    "targetTeam": "Australia",
+    "hint": "The GOAT off-spinner dismantled India's lower order with subtle drift and overspin on day 5 to seal the ICC Mace.",
+    "innings": {
+      "team": "India",
+      "targetScore": "234 all out (63.3 overs)",
+      "batting": [
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "lbw b Lyon",
+          "runs": 43,
+          "balls": 60,
+          "fours": 7,
+          "sixes": 1,
+          "sr": 71.6
+        },
+        {
+          "player": "Shubman Gill",
+          "dismissal": "c Green b Boland",
+          "runs": 18,
+          "balls": 19,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 94.7
+        },
+        {
+          "player": "Cheteshwar Pujara",
+          "dismissal": "c Carey b Cummins",
+          "runs": 27,
+          "balls": 47,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 57.4
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "c Smith b Boland",
+          "runs": 49,
+          "balls": 78,
+          "fours": 7,
+          "sixes": 0,
+          "sr": 62.8
+        },
+        {
+          "player": "Ajinkya Rahane",
+          "dismissal": "c Carey b Starc",
+          "runs": 46,
+          "balls": 108,
+          "fours": 7,
+          "sixes": 0,
+          "sr": 42.5
+        },
+        {
+          "player": "Ravindra Jadeja",
+          "dismissal": "c Carey b Boland",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Srikar Bharat",
+          "dismissal": "c & b Lyon",
+          "runs": 23,
+          "balls": 41,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 56
+        },
+        {
+          "player": "Shardul Thakur",
+          "dismissal": "lbw b Lyon",
+          "runs": 0,
+          "balls": 5,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Mohammed Siraj",
+          "dismissal": "c Boland b Lyon",
+          "runs": 1,
+          "balls": 6,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 16.6
+        }
+      ],
+      "extras": "17 (b 4, lb 9, w 3, nb 1)",
+      "total": "234 all out (63.3 overs)"
+    }
+  },
+  {
+    "id": 54,
+    "title": "2018 Trent Bridge Swing Bowling Masterclass (5/28)",
+    "difficulty": "hard",
+    "date": "19 August 2018",
+    "venue": "Trent Bridge, Nottingham",
+    "teams": "India vs England",
+    "result": "India won by 203 runs",
+    "targetPlayer": "Hardik Pandya",
+    "targetRole": "All-rounder",
+    "targetTeam": "India",
+    "hint": "Silenced his critics by picking up his maiden Test 5-wicket haul in just 29 deliveries, including Root and Bairstow.",
+    "innings": {
+      "team": "England",
+      "targetScore": "161 all out (38.2 overs)",
+      "batting": [
+        {
+          "player": "Alastair Cook",
+          "dismissal": "c Pant b Ishant",
+          "runs": 29,
+          "balls": 37,
+          "fours": 5,
+          "sixes": 0,
+          "sr": 78.3
+        },
+        {
+          "player": "Keaton Jennings",
+          "dismissal": "c Pant b Bumrah",
+          "runs": 20,
+          "balls": 34,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 58.8
+        },
+        {
+          "player": "Joe Root",
+          "dismissal": "c Rahul b Pandya",
+          "runs": 16,
+          "balls": 26,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 61.5
+        },
+        {
+          "player": "Ollie Pope",
+          "dismissal": "c Rahul b Ishant",
+          "runs": 10,
+          "balls": 21,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 47.6
+        },
+        {
+          "player": "Jonny Bairstow",
+          "dismissal": "c Rahul b Pandya",
+          "runs": 15,
+          "balls": 14,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 107.1
+        },
+        {
+          "player": "Ben Stokes",
+          "dismissal": "c Rahul b Shami",
+          "runs": 10,
+          "balls": 24,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 41.6
+        },
+        {
+          "player": "Jos Buttler",
+          "dismissal": "c sub b Pandya",
+          "runs": 39,
+          "balls": 32,
+          "fours": 3,
+          "sixes": 2,
+          "sr": 121.8
+        },
+        {
+          "player": "Chris Woakes",
+          "dismissal": "c Pant b Pandya",
+          "runs": 8,
+          "balls": 11,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 72.7
+        },
+        {
+          "player": "Adil Rashid",
+          "dismissal": "c Pant b Pandya",
+          "runs": 5,
+          "balls": 11,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 45.4
+        },
+        {
+          "player": "Stuart Broad",
+          "dismissal": "lbw b Pandya",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "9 (b 0, lb 4, w 5, nb 0)",
+      "total": "161 all out (38.2 overs)"
+    }
+  },
+  {
+    "id": 55,
+    "title": "2016 IPL Final Match-Winning Death Bowling (3/38)",
+    "difficulty": "hard",
+    "date": "29 May 2016",
+    "venue": "M. Chinnaswamy Stadium, Bengaluru",
+    "teams": "Sunrisers Hyderabad vs Royal Challengers Bangalore",
+    "result": "Sunrisers Hyderabad won by 8 runs",
+    "targetPlayer": "Ben Cutting",
+    "targetRole": "All-rounder",
+    "targetTeam": "Sunrisers Hyderabad",
+    "hint": "Smashed 39* off 15 balls including a 117-meter six out of the ground, then claimed 2/35 including Chris Gayle.",
+    "innings": {
+      "team": "Royal Challengers Bangalore",
+      "targetScore": "200/7 (20 overs)",
+      "batting": [
+        {
+          "player": "Chris Gayle",
+          "dismissal": "c Bipul Sharma b Cutting",
+          "runs": 76,
+          "balls": 38,
+          "fours": 4,
+          "sixes": 8,
+          "sr": 200
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "b Sran",
+          "runs": 54,
+          "balls": 35,
+          "fours": 5,
+          "sixes": 2,
+          "sr": 154.2
+        },
+        {
+          "player": "AB de Villiers",
+          "dismissal": "c Henriques b Bipul Sharma",
+          "runs": 5,
+          "balls": 6,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 83.3
+        },
+        {
+          "player": "KL Rahul",
+          "dismissal": "b Cutting",
+          "runs": 11,
+          "balls": 9,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 122.2
+        },
+        {
+          "player": "Shane Watson",
+          "dismissal": "c Henriques b Mustafizur",
+          "runs": 11,
+          "balls": 9,
+          "fours": 0,
+          "sixes": 1,
+          "sr": 122.2
+        },
+        {
+          "player": "Stuart Binny",
+          "dismissal": "run out (sub)",
+          "runs": 9,
+          "balls": 7,
+          "fours": 0,
+          "sixes": 1,
+          "sr": 128.5
+        },
+        {
+          "player": "Sachin Baby",
+          "dismissal": "not out",
+          "runs": 18,
+          "balls": 10,
+          "fours": 1,
+          "sixes": 1,
+          "sr": 180
+        }
+      ],
+      "extras": "10 (lb 4, w 6)",
+      "total": "200/7 (20 overs)"
+    }
+  },
+  {
+    "id": 56,
+    "title": "2024 Gabba Fortress Miracle (7/68 on Broken Toe)",
+    "difficulty": "hard",
+    "date": "28 January 2024",
+    "venue": "The Gabba, Brisbane",
+    "teams": "West Indies vs Australia",
+    "result": "West Indies won by 8 runs",
+    "targetPlayer": "Alzarri Joseph",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "West Indies",
+    "hint": "Partnered in the historic West Indian pace attack that ended a 27-year winless drought in Australia.",
+    "innings": {
+      "team": "Australia",
+      "targetScore": "207 all out (50.5 overs)",
+      "batting": [
+        {
+          "player": "Usman Khawaja",
+          "dismissal": "c Da Silva b Shamar Joseph",
+          "runs": 10,
+          "balls": 16,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 62.5
+        },
+        {
+          "player": "Steve Smith",
+          "dismissal": "not out",
+          "runs": 91,
+          "balls": 146,
+          "fours": 9,
+          "sixes": 1,
+          "sr": 62.3
+        },
+        {
+          "player": "Marnus Labuschagne",
+          "dismissal": "c Greaves b Shamar Joseph",
+          "runs": 5,
+          "balls": 19,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 26.3
+        },
+        {
+          "player": "Cameron Green",
+          "dismissal": "b Shamar Joseph",
+          "runs": 42,
+          "balls": 73,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 57.5
+        },
+        {
+          "player": "Travis Head",
+          "dismissal": "b Shamar Joseph",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Mitchell Marsh",
+          "dismissal": "c Greaves b Shamar Joseph",
+          "runs": 10,
+          "balls": 12,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 83.3
+        },
+        {
+          "player": "Alex Carey",
+          "dismissal": "b Shamar Joseph",
+          "runs": 2,
+          "balls": 5,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 40
+        },
+        {
+          "player": "Mitchell Starc",
+          "dismissal": "c Greaves b Shamar Joseph",
+          "runs": 21,
+          "balls": 14,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 150
+        },
+        {
+          "player": "Pat Cummins",
+          "dismissal": "c Da Silva b Alzarri Joseph",
+          "runs": 2,
+          "balls": 14,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 14.2
+        },
+        {
+          "player": "Nathan Lyon",
+          "dismissal": "c Da Silva b Alzarri Joseph",
+          "runs": 9,
+          "balls": 20,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 45
+        },
+        {
+          "player": "Josh Hazlewood",
+          "dismissal": "b Shamar Joseph",
+          "runs": 0,
+          "balls": 2,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "16 (b 8, lb 8, w 0, nb 0)",
+      "total": "207 all out (50.5 overs)"
+    }
+  },
+  {
+    "id": 57,
+    "title": "2021 Headingley Test Collapse (5/29)",
+    "difficulty": "hard",
+    "date": "25 August 2021",
+    "venue": "Headingley, Leeds",
+    "teams": "India vs England",
+    "result": "England won by an innings and 76 runs",
+    "targetPlayer": "Ollie Robinson",
+    "targetRole": "Fast-medium Bowler",
+    "targetTeam": "England",
+    "hint": "Tall Sussex seamer made the ball talk under cloudy Leeds skies to claim 5 for 65 and bowl India out for 78.",
+    "innings": {
+      "team": "India",
+      "targetScore": "78 all out (40.4 overs)",
+      "batting": [
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "c Robinson b Overton",
+          "runs": 19,
+          "balls": 105,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 18
+        },
+        {
+          "player": "KL Rahul",
+          "dismissal": "c Buttler b Anderson",
+          "runs": 0,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Cheteshwar Pujara",
+          "dismissal": "c Buttler b Anderson",
+          "runs": 1,
+          "balls": 9,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 11.1
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "c Buttler b Anderson",
+          "runs": 7,
+          "balls": 17,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 41.1
+        },
+        {
+          "player": "Ajinkya Rahane",
+          "dismissal": "c Buttler b Robinson",
+          "runs": 18,
+          "balls": 54,
+          "fours": 3,
+          "sixes": 0,
+          "sr": 33.3
+        },
+        {
+          "player": "Rishabh Pant",
+          "dismissal": "c Buttler b Robinson",
+          "runs": 2,
+          "balls": 9,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 22.2
+        },
+        {
+          "player": "Ravindra Jadeja",
+          "dismissal": "lbw b Overton",
+          "runs": 4,
+          "balls": 11,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 36.3
+        },
+        {
+          "player": "Mohammed Shami",
+          "dismissal": "c Burns b Overton",
+          "runs": 0,
+          "balls": 1,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Jasprit Bumrah",
+          "dismissal": "c sub b Robinson",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "16 (b 4, lb 10, w 1, nb 1)",
+      "total": "78 all out (40.4 overs)"
+    }
+  },
+  {
+    "id": 58,
+    "title": "2019 Ashes Headingley Miracle Miracle Partnership (3/42)",
+    "difficulty": "hard",
+    "date": "25 August 2019",
+    "venue": "Headingley, Leeds",
+    "teams": "Australia vs England",
+    "result": "England won by 1 wicket",
+    "targetPlayer": "Pat Cummins",
+    "targetRole": "Fast Bowler",
+    "targetTeam": "Australia",
+    "hint": "Australia's speed spearhead bowled 24 fiery overs taking 3/49 as Ben Stokes and Jack Leach pulled off a miracle.",
+    "innings": {
+      "team": "England",
+      "targetScore": "362/9 (125.4 overs)",
+      "batting": [
+        {
+          "player": "Rory Burns",
+          "dismissal": "c Warner b Hazlewood",
+          "runs": 7,
+          "balls": 37,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 18.9
+        },
+        {
+          "player": "Jason Roy",
+          "dismissal": "c Warner b Cummins",
+          "runs": 8,
+          "balls": 18,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 44.4
+        },
+        {
+          "player": "Joe Root",
+          "dismissal": "c Warner b Lyon",
+          "runs": 77,
+          "balls": 205,
+          "fours": 7,
+          "sixes": 0,
+          "sr": 37.5
+        },
+        {
+          "player": "Joe Denly",
+          "dismissal": "c Paine b Hazlewood",
+          "runs": 50,
+          "balls": 155,
+          "fours": 6,
+          "sixes": 0,
+          "sr": 32.2
+        },
+        {
+          "player": "Ben Stokes",
+          "dismissal": "not out",
+          "runs": 135,
+          "balls": 219,
+          "fours": 11,
+          "sixes": 8,
+          "sr": 61.6
+        },
+        {
+          "player": "Jonny Bairstow",
+          "dismissal": "c Labuschagne b Hazlewood",
+          "runs": 36,
+          "balls": 67,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 53.7
+        },
+        {
+          "player": "Jos Buttler",
+          "dismissal": "run out (Head/Paine)",
+          "runs": 1,
+          "balls": 9,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 11.1
+        },
+        {
+          "player": "Chris Woakes",
+          "dismissal": "c Wade b Cummins",
+          "runs": 1,
+          "balls": 7,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 14.2
+        },
+        {
+          "player": "Jofra Archer",
+          "dismissal": "c Head b Lyon",
+          "runs": 15,
+          "balls": 33,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 45.4
+        },
+        {
+          "player": "Stuart Broad",
+          "dismissal": "lbw b Pattinson",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Jack Leach",
+          "dismissal": "not out",
+          "runs": 1,
+          "balls": 17,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 5.8
+        }
+      ],
+      "extras": "31 (b 4, lb 13, w 7, nb 7)",
+      "total": "362/9 (125.4 overs)"
+    }
+  },
+  {
+    "id": 59,
+    "title": "2019 Lord's Test 5-Wicket Haul on Honours Board (5/28)",
+    "difficulty": "hard",
+    "date": "25 July 2019",
+    "venue": "Lord's, London",
+    "teams": "England vs Ireland",
+    "result": "England won by 143 runs",
+    "targetPlayer": "Chris Woakes",
+    "targetRole": "All-rounder",
+    "targetTeam": "England",
+    "hint": "Lord's specialist demolished Ireland for just 38 in the 4th innings, taking 6 for 17 in 7.4 unplayable overs.",
+    "innings": {
+      "team": "Ireland",
+      "targetScore": "38 all out (15.4 overs)",
+      "batting": [
+        {
+          "player": "William Porterfield",
+          "dismissal": "b Woakes",
+          "runs": 2,
+          "balls": 13,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 15.3
+        },
+        {
+          "player": "Paul Stirling",
+          "dismissal": "c Root b Broad",
+          "runs": 11,
+          "balls": 24,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 45.8
+        },
+        {
+          "player": "Andrew Balbirnie",
+          "dismissal": "b Woakes",
+          "runs": 5,
+          "balls": 9,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 55.5
+        },
+        {
+          "player": "James McCollum",
+          "dismissal": "c Root b Broad",
+          "runs": 11,
+          "balls": 17,
+          "fours": 2,
+          "sixes": 0,
+          "sr": 64.7
+        },
+        {
+          "player": "Kevin O'Brien",
+          "dismissal": "lbw b Woakes",
+          "runs": 4,
+          "balls": 5,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 80
+        },
+        {
+          "player": "Gary Wilson",
+          "dismissal": "c Root b Broad",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Stuart Thompson",
+          "dismissal": "b Woakes",
+          "runs": 4,
+          "balls": 8,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 50
+        },
+        {
+          "player": "Mark Adair",
+          "dismissal": "b Broad",
+          "runs": 0,
+          "balls": 3,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Andy McBrine",
+          "dismissal": "c Root b Woakes",
+          "runs": 0,
+          "balls": 4,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        },
+        {
+          "player": "Tim Murtagh",
+          "dismissal": "b Woakes",
+          "runs": 0,
+          "balls": 8,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 0
+        }
+      ],
+      "extras": "1 (b 0, lb 1, w 0, nb 0)",
+      "total": "38 all out (15.4 overs)"
+    }
+  },
+  {
+    "id": 60,
+    "title": "2023 Ahmedabad Final Historic Spell (3/34)",
+    "difficulty": "hard",
+    "date": "19 November 2023",
+    "venue": "Narendra Modi Stadium, Ahmedabad",
+    "teams": "India vs Australia",
+    "result": "Australia won by 6 wickets",
+    "targetPlayer": "Pat Cummins",
+    "targetRole": "Fast Bowler / Captain",
+    "targetTeam": "Australia",
+    "hint": "Skipper bowled with supreme tactical discipline on a slow pitch, dismissing Kohli and Iyer to restrict India to 240.",
+    "innings": {
+      "team": "India",
+      "targetScore": "240 all out (50 overs)",
+      "batting": [
+        {
+          "player": "Rohit Sharma",
+          "dismissal": "c Head b Maxwell",
+          "runs": 47,
+          "balls": 31,
+          "fours": 4,
+          "sixes": 3,
+          "sr": 151.6
+        },
+        {
+          "player": "Shubman Gill",
+          "dismissal": "c Zampa b Starc",
+          "runs": 4,
+          "balls": 7,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 57.1
+        },
+        {
+          "player": "Virat Kohli",
+          "dismissal": "b Cummins",
+          "runs": 54,
+          "balls": 63,
+          "fours": 4,
+          "sixes": 0,
+          "sr": 85.7
+        },
+        {
+          "player": "Shreyas Iyer",
+          "dismissal": "c Inglis b Cummins",
+          "runs": 4,
+          "balls": 3,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 133.3
+        },
+        {
+          "player": "KL Rahul",
+          "dismissal": "c Inglis b Starc",
+          "runs": 66,
+          "balls": 107,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 61.6
+        },
+        {
+          "player": "Ravindra Jadeja",
+          "dismissal": "c Inglis b Hazlewood",
+          "runs": 9,
+          "balls": 22,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 40.9
+        },
+        {
+          "player": "Suryakumar Yadav",
+          "dismissal": "c Inglis b Hazlewood",
+          "runs": 18,
+          "balls": 28,
+          "fours": 1,
+          "sixes": 0,
+          "sr": 64.2
+        },
+        {
+          "player": "Kuldeep Yadav",
+          "dismissal": "run out (Labuschagne/Cummins)",
+          "runs": 10,
+          "balls": 18,
+          "fours": 0,
+          "sixes": 0,
+          "sr": 55.5
+        }
+      ],
+      "extras": "12 (b 3, lb 2, w 7, nb 0)",
+      "total": "240 all out (50 overs)"
     }
   }
 ]

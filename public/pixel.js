@@ -64,31 +64,55 @@
   // Generate a non-repeating cycle permutation of length N for cycle number `cycle`
   // Guaranteed: Every player appears exactly once per cycle; buffer prevents repeats at boundary.
   const cycleCache = new Map();
-  function getPermutation(N, cycle, salt) {
-    const key = `${N}:${cycle}:${salt}`;
+
+  function getMulberryRng(seed) {
+    let s = (seed + 0x6d2b79f5) | 0;
+    return function() {
+      s = (s + 0x6d2b79f5) | 0;
+      let t = Math.imul(s ^ (s >>> 15), 1 | s);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function getPermutation(length, cycle, modeSalt, minGap) {
+    const gap = minGap || Math.min(20, Math.max(1, length - 8));
+    const key = `${length}_${cycle}_${modeSalt}_${gap}`;
     if (cycleCache.has(key)) return cycleCache.get(key);
 
-    const arr = Array.from({ length: N }, (_, i) => i);
-    const rng = mulberry32(hashString(salt + "_cycle_" + cycle));
-    for (let i = N - 1; i > 0; i--) {
-      const j = Math.floor(rng() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
+    const rng = getMulberryRng(hashString(modeSalt + "_c_" + cycle));
+    let arr;
 
-    if (cycle > 0) {
-      const prev = getPermutation(N, cycle - 1, salt);
-      const buffer = Math.min(8, Math.floor(N / 3));
-      const recent = new Set(prev.slice(N - buffer));
-      let swapIdx = N - 1;
-      for (let i = 0; i < buffer; i++) {
-        if (recent.has(arr[i])) {
-          while (swapIdx >= buffer && recent.has(arr[swapIdx])) {
-            swapIdx--;
+    if (cycle === 0) {
+      arr = Array.from({ length }, (_, i) => i);
+      for (let i = length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    } else {
+      const prevPerm = getPermutation(length, cycle - 1, modeSalt, gap);
+      const prevPos = new Map();
+      prevPerm.forEach((item, pos) => prevPos.set(item, pos));
+
+      const remaining = new Set(Array.from({ length }, (_, i) => i));
+      arr = new Array(length);
+
+      for (let pos = 0; pos < length; pos++) {
+        const maxAllowedPrevPos = length - gap + pos;
+        const candidates = Array.from(remaining).filter((item) => prevPos.get(item) <= maxAllowedPrevPos);
+        if (candidates.length === 0) {
+          let bestItem = null, maxDist = -1;
+          for (const item of remaining) {
+            const dist = (length - prevPos.get(item)) + pos;
+            if (dist > maxDist) { maxDist = dist; bestItem = item; }
           }
-          if (swapIdx >= buffer) {
-            [arr[i], arr[swapIdx]] = [arr[swapIdx], arr[i]];
-            swapIdx--;
-          }
+          arr[pos] = bestItem;
+          remaining.delete(bestItem);
+        } else {
+          const idx = Math.floor(rng() * candidates.length);
+          const chosen = candidates[idx];
+          arr[pos] = chosen;
+          remaining.delete(chosen);
         }
       }
     }
@@ -98,7 +122,7 @@
     return arr;
   }
 
-  function getSpacedDailyIndex(todayKey, poolLength, modeSalt) {
+  function getSpacedDailyIndex(todayKey, poolLength, modeSalt, minGap) {
     if (poolLength <= 1) return 0;
     const [y, m, d] = todayKey.split("-").map(Number);
     const epoch2026 = Date.UTC(2026, 0, 1);
@@ -106,9 +130,11 @@
     const dayNumber = Math.max(0, diffDays);
     const cycle = Math.floor(dayNumber / poolLength);
     const pos = dayNumber % poolLength;
-    const perm = getPermutation(poolLength, cycle, modeSalt);
+    const gap = minGap || Math.min(20, Math.max(1, poolLength - 8));
+    const perm = getPermutation(poolLength, cycle, modeSalt, gap);
     return perm[pos];
   }
+
 
   // Draw pixelated image on canvas with headshot-focused center crop
   function renderPixelated(pixelSize) {

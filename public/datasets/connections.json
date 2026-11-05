@@ -978,5 +978,740 @@
         ]
       }
     ]
+  },
+  {
+    "id": "conn_21",
+    "groups": [
+      {
+        "category": "Captained Kolkata Knight Riders (KKR) in IPL",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Sourav Ganguly",
+          "Gautam Gambhir",
+          "Dinesh Karthik",
+          "Shreyas Iyer"
+        ]
+      },
+      {
+        "category": "Fast Bowlers with 500+ International Wickets Across All Formats",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Glenn McGrath",
+          "Brett Lee",
+          "Mitchell Starc",
+          "Tim Southee"
+        ]
+      },
+      {
+        "category": "Scored a Century in Both Innings of a Test Match",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Sunil Gavaskar",
+          "Ricky Ponting",
+          "Matthew Hayden",
+          "Rohit Sharma"
+        ]
+      },
+      {
+        "category": "Bowlers with Hat-tricks Across Multiple Formats",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Brett Lee",
+          "Lasith Malinga",
+          "Thisara Perera",
+          "Wanindu Hasaranga"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_22",
+    "groups": [
+      {
+        "category": "Players with 10,000+ Runs and 100+ Wickets in ODIs",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Sachin Tendulkar",
+          "Sourav Ganguly",
+          "Sanath Jayasuriya",
+          "Jacques Kallis"
+        ]
+      },
+      {
+        "category": "Captained Delhi Capitals (Daredevils) in IPL",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Virender Sehwag",
+          "Gautam Gambhir",
+          "Shreyas Iyer",
+          "Rishabh Pant"
+        ]
+      },
+      {
+        "category": "Hit a Six off the Very First Ball of Their International Innings",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Suryakumar Yadav",
+          "Kamran Khan",
+          "Ishan Kishan",
+          "Mark Craig"
+        ]
+      },
+      {
+        "category": "Bowlers Who Took 8 or More Wickets in a Single ODI Innings",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Chaminda Vaas",
+          "Muttiah Muralitharan",
+          "Glenn McGrath",
+          "Anil Kumble"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_23",
+    "groups": [
+      {
+        "category": "Indian Premier League (IPL) Emerging Player of the Year Winners",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Rohit Sharma",
+          "Rishabh Pant",
+          "Shubman Gill",
+          "Yashasvi Jaiswal"
+        ]
+      },
+      {
+        "category": "Batters with 50+ Test Centuries",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Sachin Tendulkar",
+          "Jacques Kallis",
+          "Ricky Ponting",
+          "Steve Smith"
+        ]
+      },
+      {
+        "category": "Bowlers Who Bowled a Maiden Over in a Men's T20 World Cup Super Over",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Sunil Narine",
+          "Jasprit Bumrah",
+          "Tim Southee",
+          "Mitchell Starc"
+        ]
+      },
+      {
+        "category": "Cricketers with an Olympic Gold Medal (Cricket 1900)",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "C.B.K. Beachcroft",
+          "Alfred Bowerman",
+          "George Buckley",
+          "Francis Burchell"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_24",
+    "groups": [
+      {
+        "category": "Active Players with 5,000+ Runs in the Indian Premier League",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Virat Kohli",
+          "Shikhar Dhawan",
+          "David Warner",
+          "Rohit Sharma"
+        ]
+      },
+      {
+        "category": "Captains Who Won the ICC Under-19 Cricket World Cup for India",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Mohammad Kaif",
+          "Virat Kohli",
+          "Prithvi Shaw",
+          "Yash Dhull"
+        ]
+      },
+      {
+        "category": "Bowlers with 5-Wicket Hauls on Men's Test Debut for Australia",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Pat Cummins",
+          "Scott Boland",
+          "Josh Hazlewood",
+          "Jason Krejza"
+        ]
+      },
+      {
+        "category": "Players Who Reached #1 ICC Ranking in Batting, Bowling and All-rounder",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Jacques Kallis",
+          "Shakib Al Hasan",
+          "Ravindra Jadeja",
+          "Imran Khan"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_25",
+    "groups": [
+      {
+        "category": "ICC Men's Cricketer of the Year (Sir Garfield Sobers Trophy) Winners",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Rahul Dravid",
+          "Ricky Ponting",
+          "Virat Kohli",
+          "Pat Cummins"
+        ]
+      },
+      {
+        "category": "South African Cricketers with 100+ Test Caps",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Jacques Kallis",
+          "Graeme Smith",
+          "Mark Boucher",
+          "AB de Villiers"
+        ]
+      },
+      {
+        "category": "Batters with a Century in Both Innings of an Ashes Test",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Steve Waugh",
+          "Matthew Hayden",
+          "Steve Smith",
+          "Usman Khawaja"
+        ]
+      },
+      {
+        "category": "Bowlers with a Hat-trick in the Indian Premier League (IPL)",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Lakshmipathy Balaji",
+          "Amit Mishra",
+          "Yuvraj Singh",
+          "Rashid Khan"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_26",
+    "groups": [
+      {
+        "category": "Wicketkeeper-Batters with 200+ Catches in One Day Internationals",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Adam Gilchrist",
+          "Mark Boucher",
+          "Kumar Sangakkara",
+          "MS Dhoni"
+        ]
+      },
+      {
+        "category": "Players with 150+ Sixes in Men's One Day Internationals",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Shahid Afridi",
+          "Chris Gayle",
+          "Rohit Sharma",
+          "MS Dhoni"
+        ]
+      },
+      {
+        "category": "Captained Sunrisers Hyderabad (SRH) in IPL",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Kumar Sangakkara",
+          "David Warner",
+          "Kane Williamson",
+          "Pat Cummins"
+        ]
+      },
+      {
+        "category": "Took a Hat-trick in an ICC Men's T20 World Cup Match",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Brett Lee",
+          "Curtis Campher",
+          "Wanindu Hasaranga",
+          "Kagiso Rabada"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_27",
+    "groups": [
+      {
+        "category": "Batters Who Scored 1,000+ Test Runs in a Single Calendar Year for England",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Michael Vaughan",
+          "Kevin Pietersen",
+          "Alastair Cook",
+          "Joe Root"
+        ]
+      },
+      {
+        "category": "Bowlers Who Took 15+ Wickets in a Single ICC Men's T20 World Cup",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Ajantha Mendis",
+          "Wanindu Hasaranga",
+          "Fazalhaq Farooqi",
+          "Arshdeep Singh"
+        ]
+      },
+      {
+        "category": "Players Who Won Both the Orange Cap and the IPL Trophy in the Same Season",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Robin Uthappa",
+          "Ruturaj Gaikwad",
+          "Jos Buttler",
+          "Shubman Gill"
+        ]
+      },
+      {
+        "category": "Cricketers with a Test Bowling Average Under 20 (Min 100 Wickets)",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "George Lohmann",
+          "Sydney Barnes",
+          "Charlie Turner",
+          "Jasprit Bumrah"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_28",
+    "groups": [
+      {
+        "category": "Batters with 10,000+ Runs in International T20 Cricket",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Chris Gayle",
+          "Kieron Pollard",
+          "Shoaib Malik",
+          "Virat Kohli"
+        ]
+      },
+      {
+        "category": "Captains Who Won the ICC Champions Trophy",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Sourav Ganguly",
+          "Ricky Ponting",
+          "MS Dhoni",
+          "Sarfaraz Ahmed"
+        ]
+      },
+      {
+        "category": "Bowlers with 10-Wicket Match Hauls at Lord's",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Ian Botham",
+          "Richard Hadlee",
+          "Glenn McGrath",
+          "Stuart Broad"
+        ]
+      },
+      {
+        "category": "Batters Dismissed for 99 in an ICC Men's Cricket World Cup Match",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Adam Gilchrist",
+          "JP Duminy",
+          "Michael Clarke",
+          "Eoin Morgan"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_29",
+    "groups": [
+      {
+        "category": "Left-Handed Batters with 8,000+ Test Runs",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Brian Lara",
+          "Kumar Sangakkara",
+          "Alastair Cook",
+          "David Warner"
+        ]
+      },
+      {
+        "category": "Bowlers with 300+ Test Wickets for West Indies",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Courtney Walsh",
+          "Curtly Ambrose",
+          "Malcolm Marshall",
+          "Lance Gibbs"
+        ]
+      },
+      {
+        "category": "Captained Rajasthan Royals (RR) in IPL",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Shane Warne",
+          "Rahul Dravid",
+          "Steve Smith",
+          "Sanju Samson"
+        ]
+      },
+      {
+        "category": "Players with 3 Consecutive Hundreds in One Day Internationals",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Zaheer Abbas",
+          "Saeed Anwar",
+          "Herschelle Gibbs",
+          "AB de Villiers"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_30",
+    "groups": [
+      {
+        "category": "Active Batters with 40+ International Hundreds",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Virat Kohli",
+          "Rohit Sharma",
+          "Joe Root",
+          "Steve Smith"
+        ]
+      },
+      {
+        "category": "Fast Bowlers Who Clocked 155+ km/h in Official International Matches",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Shoaib Akhtar",
+          "Brett Lee",
+          "Shaun Tait",
+          "Mitchell Starc"
+        ]
+      },
+      {
+        "category": "Captained Punjab Kings (Kings XI Punjab) in IPL",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Yuvraj Singh",
+          "George Bailey",
+          "Ravichandran Ashwin",
+          "KL Rahul"
+        ]
+      },
+      {
+        "category": "Bowlers with Double Hat-tricks (4 Wickets in 4 Balls) in International Cricket",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Lasith Malinga",
+          "Rashid Khan",
+          "Curtis Campher",
+          "Jason Holder"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_31",
+    "groups": [
+      {
+        "category": "Batters with Multiple Double Hundreds in Men's Test Cricket for New Zealand",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Glenn Turner",
+          "Stephen Fleming",
+          "Brendon McCullum",
+          "Kane Williamson"
+        ]
+      },
+      {
+        "category": "Fast Bowlers with 250+ One Day International Wickets",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Wasim Akram",
+          "Waqar Younis",
+          "Chaminda Vaas",
+          "James Anderson"
+        ]
+      },
+      {
+        "category": "Captained Lucknow Super Giants or Gujarat Titans in IPL",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "KL Rahul",
+          "Hardik Pandya",
+          "Shubman Gill",
+          "Krunal Pandya"
+        ]
+      },
+      {
+        "category": "Players Who Won the ICC Men's T20 World Cup Player of the Final Award",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Irfan Pathan",
+          "Shahid Afridi",
+          "Marlon Samuels",
+          "Sam Curran"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_32",
+    "groups": [
+      {
+        "category": "Batters with 10,000+ First-Class Runs in Indian Domestic Cricket",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Wasim Jaffer",
+          "Amol Muzumdar",
+          "Devendra Bundela",
+          "Yashpal Sharma"
+        ]
+      },
+      {
+        "category": "Right-Arm Leg Spinners with 300+ International Wickets",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Shane Warne",
+          "Anil Kumble",
+          "Shahid Afridi",
+          "Rashid Khan"
+        ]
+      },
+      {
+        "category": "Batters Who Scored 500+ Runs in a Single Men's T20 World Cup",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Virat Kohli",
+          "Babar Azam",
+          "Tillakaratne Dilshan",
+          "Mahela Jayawardene"
+        ]
+      },
+      {
+        "category": "Bowlers with 7 or More Wickets in an ICC Men's Cricket World Cup Match",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Glenn McGrath",
+          "Andy Bichel",
+          "Winston Davis",
+          "Mohammed Shami"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_33",
+    "groups": [
+      {
+        "category": "Captains Who Won the ICC Men's Cricket World Cup Unbeaten",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Clive Lloyd",
+          "Ricky Ponting",
+          "Rohit Sharma",
+          "Pat Cummins"
+        ]
+      },
+      {
+        "category": "Bowlers with 100+ Test Wickets at a Single Ground",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Muttiah Muralitharan",
+          "James Anderson",
+          "Stuart Broad",
+          "Rangana Herath"
+        ]
+      },
+      {
+        "category": "Batters with 300+ Career Sixes in the Indian Premier League (IPL)",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Chris Gayle",
+          "Rohit Sharma",
+          "Virat Kohli",
+          "AB de Villiers"
+        ]
+      },
+      {
+        "category": "Wicketkeepers Who Took 6 or More Catches in a Single Test Innings",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Bob Taylor",
+          "Ian Healy",
+          "Adam Gilchrist",
+          "Rishabh Pant"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_34",
+    "groups": [
+      {
+        "category": "Opening Batters with 5,000+ Test Runs for Australia",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Mark Taylor",
+          "Michael Slater",
+          "Matthew Hayden",
+          "David Warner"
+        ]
+      },
+      {
+        "category": "Bowlers Who Took a Wicket on Their Very First Delivery in Men's T20Is",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Michael Kasprowicz",
+          "Virat Kohli",
+          "Bhuvneshwar Kumar",
+          "Lockie Ferguson"
+        ]
+      },
+      {
+        "category": "Captained Pakistan in an ICC Men's Tournament Final",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Imran Khan",
+          "Wasim Akram",
+          "Younis Khan",
+          "Sarfaraz Ahmed"
+        ]
+      },
+      {
+        "category": "Batters with Fastest 50 in Men's T20Is (12 Balls or Fewer)",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Yuvraj Singh",
+          "Dipendra Singh Airee",
+          "Mirza Baig",
+          "Abhimanyu Mithun"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conn_35",
+    "groups": [
+      {
+        "category": "Top 4 Highest Run-Scorers in Men's Test Cricket History",
+        "level": 0,
+        "color": "#eab308",
+        "members": [
+          "Sachin Tendulkar",
+          "Ricky Ponting",
+          "Jacques Kallis",
+          "Rahul Dravid"
+        ]
+      },
+      {
+        "category": "Top 4 Highest Wicket-Takers in Men's Test Cricket History",
+        "level": 1,
+        "color": "#22c55e",
+        "members": [
+          "Muttiah Muralitharan",
+          "Shane Warne",
+          "James Anderson",
+          "Anil Kumble"
+        ]
+      },
+      {
+        "category": "Bowlers with 5-Wicket Hauls in ICC Men's Cricket World Cup Finals",
+        "level": 2,
+        "color": "#3b82f6",
+        "members": [
+          "Gary Gilmour",
+          "Joel Garner",
+          "Wasim Akram",
+          "Mitchell Starc"
+        ]
+      },
+      {
+        "category": "Batters Who Scored Centuries in Both Men's ODI and T20I World Cups",
+        "level": 3,
+        "color": "#a855f7",
+        "members": [
+          "Chris Gayle",
+          "Mahela Jayawardene",
+          "Suresh Raina",
+          "Rohit Sharma"
+        ]
+      }
+    ]
   }
 ]

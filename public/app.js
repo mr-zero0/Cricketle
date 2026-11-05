@@ -2467,7 +2467,7 @@
           app.store = new RemoteStore();
           app.store.sync(me);
           const hasCustomHandle = safeGet("cricketle:username_set_" + me.user.id) === "1";
-          if (!hasCustomHandle && (me.user.googleConnected || me.user.google_id || (me.user.username && me.user.username.includes("_")))) {
+          if (!hasCustomHandle && (me.user.googleConnected || me.user.google_id)) {
             setTimeout(() => openChooseUsernameDialog(me.user), 600);
           }
         } else {

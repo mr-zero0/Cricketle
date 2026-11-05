@@ -418,5 +418,530 @@
     },
     "historicMoment": "Site of the dramatic 2005 Ashes Test thriller where England won by just 2 runs.",
     "homeTeam": "Warwickshire CCC & Birmingham Phoenix"
+  },
+  {
+    "id": "the_gabba",
+    "name": "The Gabba (Brisbane Cricket Ground)",
+    "city": "Brisbane",
+    "country": "Australia",
+    "continent": "Oceania",
+    "capacity": "37,000",
+    "established": 1895,
+    "ends": [
+      "Stanley Street End",
+      "Vulture Street End"
+    ],
+    "pitchType": "Hard, fast, and bouncy surface with true carry; renowned as the fastest pitch in Australia",
+    "boundaries": {
+      "straight": 78,
+      "square": 69,
+      "fineLeg": 65
+    },
+    "historicMoment": "Site of the first-ever Tied Test in 1960 and India's famous 2021 fortress breach.",
+    "homeTeam": "Brisbane Heat (BBL) & Queensland"
+  },
+  {
+    "id": "headingley",
+    "name": "Headingley Cricket Ground",
+    "city": "Leeds",
+    "country": "England",
+    "continent": "Europe",
+    "capacity": "18,350",
+    "established": 1890,
+    "ends": [
+      "Kirkstall Lane End",
+      "Football Stand End"
+    ],
+    "pitchType": "Traditionally aids swing and seam under Yorkshire cloud cover; reliable batting track on dry days",
+    "boundaries": {
+      "straight": 75,
+      "square": 66,
+      "fineLeg": 62
+    },
+    "historicMoment": "Host to Botham's Miracle Ashes Test in 1981 and Ben Stokes' 135* miraculous 1-wicket heist in 2019.",
+    "homeTeam": "Yorkshire County Cricket Club & Northern Superchargers"
+  },
+  {
+    "id": "wanderers",
+    "name": "Imperial Wanderers Stadium (The Bullring)",
+    "city": "Johannesburg",
+    "country": "South Africa",
+    "continent": "Africa",
+    "capacity": "34,000",
+    "established": 1956,
+    "ends": [
+      "Corlett Drive End",
+      "Golf Course End"
+    ],
+    "pitchType": "High altitude (1753m) allows ball to travel farther; fiery pace and steep, uncomfortable bounce",
+    "boundaries": {
+      "straight": 74,
+      "square": 65,
+      "fineLeg": 60
+    },
+    "historicMoment": "Venue of the iconic 438 ODI chase in 2006 and the inaugural 2007 ICC World Twenty20 Final.",
+    "homeTeam": "Lions & Joburg Super Kings (SA20)"
+  },
+  {
+    "id": "kingsmead",
+    "name": "Kingsmead Cricket Ground",
+    "city": "Durban",
+    "country": "South Africa",
+    "continent": "Africa",
+    "capacity": "25,000",
+    "established": 1923,
+    "ends": [
+      "Umgeni End",
+      "Old Fort Road End"
+    ],
+    "pitchType": "Coastal humidity produces sharp late seam; tide movements historically influence moisture",
+    "boundaries": {
+      "straight": 76,
+      "square": 67,
+      "fineLeg": 63
+    },
+    "historicMoment": "Hosted the Timeless Test of 1939 and Yuvraj Singh's famous 6 sixes in an over in 2007.",
+    "homeTeam": "Dolphins & Durban's Super Giants (SA20)"
+  },
+  {
+    "id": "national_karachi",
+    "name": "National Bank Stadium",
+    "city": "Karachi",
+    "country": "Pakistan",
+    "continent": "Asia",
+    "capacity": "34,228",
+    "established": 1955,
+    "ends": [
+      "Pavilion End",
+      "University End"
+    ],
+    "pitchType": "Historically a fortress for spin and reverse swing; true batting surface in first two days",
+    "boundaries": {
+      "straight": 75,
+      "square": 67,
+      "fineLeg": 63
+    },
+    "historicMoment": "Pakistan remained undefeated in Test matches here for 45 consecutive years from 1955 to 2000.",
+    "homeTeam": "Karachi Kings (PSL) & Karachi"
+  },
+  {
+    "id": "rawalpindi_cricket",
+    "name": "Rawalpindi Cricket Stadium",
+    "city": "Rawalpindi",
+    "country": "Pakistan",
+    "continent": "Asia",
+    "capacity": "28,000",
+    "established": 1992,
+    "ends": [
+      "Pavilion End",
+      "Shell End"
+    ],
+    "pitchType": "High-scoring batting paradise with consistent bounce and brisk outfield",
+    "boundaries": {
+      "straight": 76,
+      "square": 68,
+      "fineLeg": 62
+    },
+    "historicMoment": "Home to Rahul Dravid's epic 270 in 2004 and Shoaib Akhtar's searing home-town spells.",
+    "homeTeam": "Islamabad United / Peshawar Zalmi (PSL)"
+  },
+  {
+    "id": "r_premadasa",
+    "name": "R. Premadasa International Stadium",
+    "city": "Colombo",
+    "country": "Sri Lanka",
+    "continent": "Asia",
+    "capacity": "35,000",
+    "established": 1986,
+    "ends": [
+      "Khettarama End",
+      "Maligawatte End"
+    ],
+    "pitchType": "Slow, turning track offering prodigal grip for spinners; high humidity brings evening dew",
+    "boundaries": {
+      "straight": 78,
+      "square": 68,
+      "fineLeg": 64
+    },
+    "historicMoment": "Hosted the 2012 ICC World Twenty20 Final and Sri Lanka's record 952/6 against India in 1997.",
+    "homeTeam": "Colombo Strikers (LPL) & Sri Lanka"
+  },
+  {
+    "id": "ssc_colombo",
+    "name": "Sinhalese Sports Club (SSC) Ground",
+    "city": "Colombo",
+    "country": "Sri Lanka",
+    "continent": "Asia",
+    "capacity": "10,000",
+    "established": 1952,
+    "ends": [
+      "Tennis Courts End",
+      "South End"
+    ],
+    "pitchType": "Sri Lanka's premier Test ground with traditional good carry on morning one, turning sharply by Day 4",
+    "boundaries": {
+      "straight": 77,
+      "square": 69,
+      "fineLeg": 63
+    },
+    "historicMoment": "Venue of Kumar Sangakkara and Mahela Jayawardene's world record 624-run partnership in 2006.",
+    "homeTeam": "Sinhalese Sports Club & Sri Lanka"
+  },
+  {
+    "id": "basin_reserve",
+    "name": "Basin Reserve",
+    "city": "Wellington",
+    "country": "New Zealand",
+    "continent": "Oceania",
+    "capacity": "11,600",
+    "established": 1868,
+    "ends": [
+      "Vance Stand End",
+      "Scoreboard End"
+    ],
+    "pitchType": "Classic grassy green seaming pitch; famous Wellington cross-winds heavily assist swing bowling",
+    "boundaries": {
+      "straight": 75,
+      "square": 65,
+      "fineLeg": 60
+    },
+    "historicMoment": "New Zealand defeated England by 1 run following on in 2023, only the second such finish in Test history.",
+    "homeTeam": "Wellington Firebirds & New Zealand"
+  },
+  {
+    "id": "eden_park",
+    "name": "Eden Park",
+    "city": "Auckland",
+    "country": "New Zealand",
+    "continent": "Oceania",
+    "capacity": "42,000",
+    "established": 1900,
+    "ends": [
+      "Broadcasting End",
+      "Terraces End"
+    ],
+    "pitchType": "Unique baseball/rugby hybrid dimensions with notoriously short straight boundaries and huge square boundaries",
+    "boundaries": {
+      "straight": 55,
+      "square": 78,
+      "fineLeg": 58
+    },
+    "historicMoment": "Grant Elliott struck Dale Steyn for a penultimate-ball six to send New Zealand into their first World Cup Final in 2015.",
+    "homeTeam": "Auckland Aces & New Zealand"
+  },
+  {
+    "id": "hagley_oval",
+    "name": "Hagley Oval",
+    "city": "Christchurch",
+    "country": "New Zealand",
+    "continent": "Oceania",
+    "capacity": "18,000",
+    "established": 1867,
+    "ends": [
+      "Port Hills End",
+      "City End"
+    ],
+    "pitchType": "True bounce with lush grassy embankment; Brendon McCullum smashed the fastest Test century (54 balls) here in 2016.",
+    "boundaries": {
+      "straight": 76,
+      "square": 68,
+      "fineLeg": 64
+    },
+    "historicMoment": "Venue for Brendon McCullum's farewell 54-ball century and the 2022 Women's Cricket World Cup Final.",
+    "homeTeam": "Canterbury & New Zealand"
+  },
+  {
+    "id": "seddon_park",
+    "name": "Seddon Park",
+    "city": "Hamilton",
+    "country": "New Zealand",
+    "continent": "Oceania",
+    "capacity": "10,500",
+    "established": 1906,
+    "ends": [
+      "Members End",
+      "City End"
+    ],
+    "pitchType": "Boutique circular ground with lush green turf; known for high-scoring ODIs and swing in overcast conditions",
+    "boundaries": {
+      "straight": 70,
+      "square": 68,
+      "fineLeg": 65
+    },
+    "historicMoment": "Regular fortress for New Zealand Test series wins with its distinctive grassy bank ambiance.",
+    "homeTeam": "Northern Districts & New Zealand"
+  },
+  {
+    "id": "sharjah_stadium",
+    "name": "Sharjah Cricket Stadium",
+    "city": "Sharjah",
+    "country": "United Arab Emirates",
+    "continent": "Asia",
+    "capacity": "16,000",
+    "established": 1982,
+    "ends": [
+      "Pavilion End",
+      "Sharjah Club End"
+    ],
+    "pitchType": "Flat, dry surface with short boundaries, renowned for high six-counts and low bounce in second innings",
+    "boundaries": {
+      "straight": 68,
+      "square": 62,
+      "fineLeg": 58
+    },
+    "historicMoment": "Host to Sachin Tendulkar's legendary 'Desert Storm' in 1998 and Javed Miandad's last-ball six in 1986.",
+    "homeTeam": "Sharjah Warriors (ILT20) & UAE"
+  },
+  {
+    "id": "sheikh_zayed",
+    "name": "Sheikh Zayed Cricket Stadium",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "continent": "Asia",
+    "capacity": "20,000",
+    "established": 2004,
+    "ends": [
+      "North End",
+      "Pavilion End"
+    ],
+    "pitchType": "Large outfield dimensions with dry, abrasive pitch; demands athletic running between wickets",
+    "boundaries": {
+      "straight": 79,
+      "square": 72,
+      "fineLeg": 68
+    },
+    "historicMoment": "Hosted numerous Pakistan home Test triumphs and the 2021 ICC Men's T20 World Cup semi-finals.",
+    "homeTeam": "Abu Dhabi Knight Riders (ILT20) & UAE"
+  },
+  {
+    "id": "sabina_park",
+    "name": "Sabina Park",
+    "city": "Kingston",
+    "country": "Jamaica",
+    "continent": "Americas",
+    "capacity": "15,600",
+    "established": 1880,
+    "ends": [
+      "Blue Mountains End",
+      "Headley Stand End"
+    ],
+    "pitchType": "Picturesque backdrop of the Blue Mountains; historically fast and fiery, now offering balanced contest",
+    "boundaries": {
+      "straight": 77,
+      "square": 68,
+      "fineLeg": 63
+    },
+    "historicMoment": "Sir Garfield Sobers scored his record 365* here in 1958; Brian Lara scored 375 against England in 1994.",
+    "homeTeam": "Jamaica Scorpions & Jamaica Tallawahs"
+  },
+  {
+    "id": "queens_park_oval",
+    "name": "Queen's Park Oval",
+    "city": "Port of Spain",
+    "country": "Trinidad and Tobago",
+    "continent": "Americas",
+    "capacity": "20,000",
+    "established": 1896,
+    "ends": [
+      "Brian Lara Pavilion End",
+      "Media Centre End"
+    ],
+    "pitchType": "Spin-friendly clay that dries out under the Caribbean sun; legendary carnival atmosphere",
+    "boundaries": {
+      "straight": 76,
+      "square": 66,
+      "fineLeg": 62
+    },
+    "historicMoment": "India chased down a then-record 403 in the 4th innings in 1976 led by Gavaskar and Viswanath.",
+    "homeTeam": "Trinidad & Tobago Red Force & Trinbago Knight Riders"
+  },
+  {
+    "id": "darren_sammy",
+    "name": "Daren Sammy Cricket Ground",
+    "city": "Gros Islet",
+    "country": "Saint Lucia",
+    "continent": "Americas",
+    "capacity": "15,000",
+    "established": 2002,
+    "ends": [
+      "Pavilion End",
+      "Media Centre End"
+    ],
+    "pitchType": "Good true bounce with Atlantic trade winds assisting seamers and power-hitters over deep midwicket",
+    "boundaries": {
+      "straight": 75,
+      "square": 67,
+      "fineLeg": 62
+    },
+    "historicMoment": "First international venue in the Caribbean named after an active player; hosted 2010 T20 World Cup.",
+    "homeTeam": "Saint Lucia Kings (CPL) & Windward Islands"
+  },
+  {
+    "id": "providence_stadium",
+    "name": "Providence Stadium",
+    "city": "Georgetown",
+    "country": "Guyana",
+    "continent": "Americas",
+    "capacity": "15,000",
+    "established": 2006,
+    "ends": [
+      "Media Centre End",
+      "Pavilion End"
+    ],
+    "pitchType": "Low and slow coastal clay surface; paradise for finger spinners and cutters",
+    "boundaries": {
+      "straight": 75,
+      "square": 66,
+      "fineLeg": 61
+    },
+    "historicMoment": "Lasith Malinga took 4 wickets in 4 balls against South Africa in the 2007 Cricket World Cup here.",
+    "homeTeam": "Guyana Amazon Warriors (CPL) & Guyana"
+  },
+  {
+    "id": "rajiv_gandhi_hyd",
+    "name": "Rajiv Gandhi International Stadium",
+    "city": "Hyderabad",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "39,200",
+    "established": 2004,
+    "ends": [
+      "Pavilion End",
+      "North End"
+    ],
+    "pitchType": "Flat, hard track with true carry; renowned for high-octane 250+ IPL T20 encounters",
+    "boundaries": {
+      "straight": 74,
+      "square": 66,
+      "fineLeg": 61
+    },
+    "historicMoment": "Hosted the IPL Finals in 2017 and 2019, both thrilling 1-run finishes won by Mumbai Indians.",
+    "homeTeam": "Sunrisers Hyderabad (IPL) & Hyderabad"
+  },
+  {
+    "id": "ekana_stadium",
+    "name": "BRSABV Ekana Cricket Stadium",
+    "city": "Lucknow",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "50,000",
+    "established": 2017,
+    "ends": [
+      "North End",
+      "South End"
+    ],
+    "pitchType": "Dual black-soil and red-soil pitches offering either gripping turn or good pace; huge boundary sizes",
+    "boundaries": {
+      "straight": 78,
+      "square": 72,
+      "fineLeg": 68
+    },
+    "historicMoment": "Rohit Sharma struck 111* off 61 balls against West Indies in the venue's inaugural T20I in 2018.",
+    "homeTeam": "Lucknow Super Giants (IPL) & Uttar Pradesh"
+  },
+  {
+    "id": "arun_jaitley",
+    "name": "Arun Jaitley Stadium (Feroz Shah Kotla)",
+    "city": "Delhi",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "35,200",
+    "established": 1883,
+    "ends": [
+      "Stadium End",
+      "Pavilion End"
+    ],
+    "pitchType": "Compact boundaries with low bounce; transformed recently into a high-scoring batting track in T20s",
+    "boundaries": {
+      "straight": 68,
+      "square": 62,
+      "fineLeg": 59
+    },
+    "historicMoment": "Anil Kumble took a historic 10 wickets in an innings (10/74) against Pakistan here in 1999.",
+    "homeTeam": "Delhi Capitals (IPL) & Delhi"
+  },
+  {
+    "id": "holkar_stadium",
+    "name": "Holkar Stadium",
+    "city": "Indore",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "30,000",
+    "established": 1990,
+    "ends": [
+      "Pavilion End",
+      "Jail End"
+    ],
+    "pitchType": "High-scoring batting paradise with compact boundaries and lightning outfield",
+    "boundaries": {
+      "straight": 68,
+      "square": 61,
+      "fineLeg": 57
+    },
+    "historicMoment": "Virender Sehwag smashed 219 against West Indies in 2011, then the highest individual ODI score.",
+    "homeTeam": "Madhya Pradesh Ranji Team"
+  },
+  {
+    "id": "sca_rajkot",
+    "name": "Niranjan Shah Stadium (SCA Stadium)",
+    "city": "Rajkot",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "28,000",
+    "established": 2008,
+    "ends": [
+      "Pavilion End",
+      "Media End"
+    ],
+    "pitchType": "Flat, hard batting wicket known for mammoth first-innings totals and true bounce",
+    "boundaries": {
+      "straight": 76,
+      "square": 68,
+      "fineLeg": 62
+    },
+    "historicMoment": "Host to Yashasvi Jaiswal's unbeaten 214* with 12 sixes against England in the 2024 Test series.",
+    "homeTeam": "Saurashtra Ranji Team"
+  },
+  {
+    "id": "aca_vdca_vizag",
+    "name": "Dr. Y.S. Rajasekhara Reddy ACA-VDCA Stadium",
+    "city": "Visakhapatnam",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "27,500",
+    "established": 2003,
+    "ends": [
+      "Vizag End",
+      "Gajuwaka End"
+    ],
+    "pitchType": "Lush green coastal venue offering consistent bounce and heavy six-hitting conditions",
+    "boundaries": {
+      "straight": 73,
+      "square": 65,
+      "fineLeg": 60
+    },
+    "historicMoment": "MS Dhoni scored his breakout maiden ODI century (148 off 123) against Pakistan here in 2005.",
+    "homeTeam": "Delhi Capitals (IPL second home) & Andhra"
+  },
+  {
+    "id": "green_park_kanpur",
+    "name": "Green Park Stadium",
+    "city": "Kanpur",
+    "country": "India",
+    "continent": "Asia",
+    "capacity": "32,000",
+    "established": 1945,
+    "ends": [
+      "Mill End",
+      "Pavilion End"
+    ],
+    "pitchType": "Traditional low-bounce subcontinent surface heavily assisting reverse swing and orthodox spin",
+    "boundaries": {
+      "straight": 74,
+      "square": 66,
+      "fineLeg": 61
+    },
+    "historicMoment": "Hosted India's historic 500th Test match in 2016 against New Zealand.",
+    "homeTeam": "Uttar Pradesh Ranji Team"
   }
 ]
