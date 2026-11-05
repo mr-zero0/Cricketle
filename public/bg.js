@@ -1595,29 +1595,32 @@
     bats = bats.filter((b) => (b.mode === "stroke" ? b.t < b.dur : b.x > -b.len * 1.5 && b.x < w + b.len * 1.5));
   }
 
-  // ---------- Celebration Confetti ----------
+  // ---------- Celebration Confetti & Sparkles ----------
 
   function burst(colors) {
     if (reduceMotion.matches) return;
-    const palette = colors && colors.length ? colors : ["#22c55e", "#f59e0b", "#38bdf8", "#f8fafc"];
-    const cx = w * 0.5;
-    const cy = Math.min(h * 0.35, 320);
-    const n = Math.min(160, Math.round(w / 5));
-    for (let i = 0; i < n; i++) {
-      const ang = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.92;
-      const speed = 380 + Math.random() * 520;
+    const palette = colors && colors.length ? colors : ["#22c55e", "#f59e0b", "#38bdf8", "#f8fafc", "#e11d48", "#facc15"];
+    const origins = [w * 0.5, w * 0.25, w * 0.75];
+    const cy = Math.min(h * 0.4, 340);
+    const total = Math.min(200, Math.round(w / 4));
+    for (let i = 0; i < total; i++) {
+      const originX = origins[i % origins.length];
+      const ang = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.95;
+      const speed = 360 + Math.random() * 560;
+      const isSpark = Math.random() < 0.45;
       confetti.push({
-        x: cx + (Math.random() - 0.5) * 60,
-        y: cy,
+        x: originX + (Math.random() - 0.5) * 80,
+        y: cy + (Math.random() - 0.5) * 40,
         vx: Math.cos(ang) * speed,
         vy: Math.sin(ang) * speed,
         rot: Math.random() * Math.PI,
-        vr: (Math.random() - 0.5) * 12,
-        sw: 6 + Math.random() * 6,
-        sh: 3 + Math.random() * 5,
+        vr: (Math.random() - 0.5) * 14,
+        sw: isSpark ? (5 + Math.random() * 6) : (6 + Math.random() * 7),
+        sh: isSpark ? (5 + Math.random() * 6) : (3 + Math.random() * 5),
         color: palette[i % palette.length],
+        shape: isSpark ? "spark" : "rect",
         life: 0,
-        ttl: 2200 + Math.random() * 900,
+        ttl: 2300 + Math.random() * 950,
       });
     }
     ensureRunning();
@@ -1626,18 +1629,29 @@
   function drawConfetti(dt) {
     for (const c of confetti) {
       c.life += dt * 1000;
-      c.vy += 900 * dt;
+      c.vy += (c.shape === "spark" ? 650 : 850) * dt;
       c.vx *= 1 - 0.9 * dt;
       c.x += c.vx * dt;
       c.y += c.vy * dt;
       c.rot += c.vr * dt;
       const a = 1 - Math.max(0, (c.life - c.ttl * 0.6) / (c.ttl * 0.4));
       ctx.save();
-      ctx.globalAlpha = a;
+      ctx.globalAlpha = Math.max(0, Math.min(1, a));
       ctx.translate(c.x, c.y);
       ctx.rotate(c.rot);
       ctx.fillStyle = c.color;
-      ctx.fillRect(-c.sw / 2, -c.sh / 2, c.sw, c.sh);
+      if (c.shape === "spark") {
+        const s = c.sw * (0.8 + 0.35 * Math.sin(c.life * 0.02));
+        ctx.beginPath();
+        ctx.moveTo(0, -s);
+        ctx.quadraticCurveTo(0, 0, s, 0);
+        ctx.quadraticCurveTo(0, 0, 0, s);
+        ctx.quadraticCurveTo(0, 0, -s, 0);
+        ctx.quadraticCurveTo(0, 0, 0, -s);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-c.sw / 2, -c.sh / 2, c.sw, c.sh);
+      }
       ctx.restore();
     }
     confetti = confetti.filter((c) => c.life < c.ttl && c.y < h + 40);

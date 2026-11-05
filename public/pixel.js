@@ -412,6 +412,9 @@
   function finishGame(won) {
     // Reveal full photo!
     renderPixelated(1);
+    if (won) {
+      try { window.CricketleFX?.burst?.(); } catch (_) {}
+    }
 
     const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
     const elapsedSec = Math.floor(elapsedMs / 1000);
@@ -455,7 +458,7 @@
         resultName.textContent = currentTarget.name + ` (${currentTarget.country} · ${currentTarget.role})`;
       }
       if (resultHint) {
-        resultHint.textContent = (won ? "Clue: " : "Answer: ") + currentTarget.hint;
+        resultHint.textContent = (won ? "DRS Clue: " : "Answer: ") + currentTarget.hint;
       }
     }
   }

@@ -430,16 +430,16 @@
 
     if (clueCountry) {
       clueCountry.className = "clue-pill unlocked";
-      clueCountry.innerHTML = `<span>${countryFlag} Country: <strong>${escapeHtml(countryName)}</strong></span>`;
+      clueCountry.innerHTML = `<span>${countryFlag} DRS 1 · Country: <strong>${escapeHtml(countryName)}</strong></span>`;
     }
 
     if (clueRole) {
       if (count >= 2 || isGameOver) {
         clueRole.className = "clue-pill unlocked";
-        clueRole.innerHTML = `<span>🏏 Role: <strong>${targetPlayer.role || "Player"}</strong></span>`;
+        clueRole.innerHTML = `<span>🏏 DRS 2 · Role: <strong>${targetPlayer.role || "Player"}</strong></span>`;
       } else {
         clueRole.className = "clue-pill locked";
-        clueRole.innerHTML = "<span>🔒 Role: Unlocks after guess 2</span>";
+        clueRole.innerHTML = "<span>🔒 DRS 2 · Role: Unlocks after guess 2</span>";
       }
     }
 
@@ -447,10 +447,10 @@
       if (count >= 4 || isGameOver) {
         clueDebut.className = "clue-pill unlocked";
         const status = targetPlayer.active ? "Still active" : "Retired";
-        clueDebut.innerHTML = `<span>📅 Debut: <strong>${targetPlayer.debut || "2000"} (${status})</strong></span>`;
+        clueDebut.innerHTML = `<span>📅 DRS 3 · Debut: <strong>${targetPlayer.debut || "2000"} (${status})</strong></span>`;
       } else {
         clueDebut.className = "clue-pill locked";
-        clueDebut.innerHTML = "<span>🔒 Debut: Unlocks after guess 4</span>";
+        clueDebut.innerHTML = "<span>🔒 DRS 3 · Debut: Unlocks after guess 4</span>";
       }
     }
   }
@@ -736,6 +736,7 @@
     if (cleanGuess === cleanTarget) {
       isWon = true;
       isGameOver = true;
+      try { window.CricketleFX?.burst?.(); } catch (_) {}
     } else if (userGuesses.length >= MAX_GUESSES) {
       isWon = false;
       isGameOver = true;
@@ -823,10 +824,28 @@
       if (summaryIcon) summaryIcon.textContent = "🏆";
       if (summaryTitle) summaryTitle.textContent = "SCRAMBLE SOLVED!";
       if (summarySub) summarySub.textContent = `Incredible deduction! Solved in ${attemptsCount}/${MAX_GUESSES} attempts.`;
+      try { window.CricketleFX?.burst?.(); } catch (_) {}
     } else {
       if (summaryIcon) summaryIcon.textContent = "💔";
       if (summaryTitle) summaryTitle.textContent = "OUT OF ATTEMPTS!";
       if (summarySub) summarySub.textContent = "Tough one today! Here is the cricketer you were looking for:";
+    }
+
+    const statScoreEl = document.getElementById("summary-stat-score");
+    const statAttemptsEl = document.getElementById("summary-stat-attempts");
+    const statTimeEl = document.getElementById("summary-stat-time");
+    const statDrsEl = document.getElementById("summary-stat-drs");
+
+    if (statScoreEl) statScoreEl.textContent = `${calculatedScore > 0 ? "+" : ""}${calculatedScore} pts`;
+    if (statAttemptsEl) statAttemptsEl.textContent = `${attemptsCount}/${MAX_GUESSES}`;
+    if (statTimeEl) {
+      const mins = Math.floor(elapsedSec / 60);
+      const secs = String(elapsedSec % 60).padStart(2, "0");
+      statTimeEl.textContent = `${mins}:${secs}`;
+    }
+    if (statDrsEl) {
+      const drsUsed = Math.max(0, revealedCount - 1);
+      statDrsEl.textContent = drsUsed === 0 ? "None" : `${drsUsed} review${drsUsed === 1 ? "" : "s"}`;
     }
 
     const emojiGrid = generateEmojiGrid();

@@ -320,7 +320,7 @@
       }
       nameLettersWrap.style.display = "none";
       if (clueHintText) {
-        clueHintText.textContent = "Guess the player from their IPL teams & years above or skip to unlock letter hints!";
+        clueHintText.textContent = "Guess the player from their IPL teams & years above or skip to unlock DRS letter reviews!";
       }
       return;
     }
@@ -376,7 +376,7 @@
       if (isGameOver) {
         clueHintText.textContent = "Full name revealed!";
       } else {
-        clueHintText.textContent = `💡 Hint 1 Unlocked: ${revealedSet.size} letters revealed!`;
+        clueHintText.textContent = `📺 DRS Review Unlocked: ${revealedSet.size} letters revealed!`;
       }
     }
   }
@@ -623,6 +623,9 @@
 
   function finishGame(won) {
     renderLetters();
+    if (won) {
+      try { window.CricketleFX?.burst?.(); } catch (_) {}
+    }
 
     const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
     const elapsedSec = Math.floor(elapsedMs / 1000);

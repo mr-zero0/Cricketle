@@ -563,14 +563,14 @@
       if (n <= p.hints) {
         const h = revealed[n - 1];
         items.push(`<li class="hint revealed"><span class="hint-num" aria-hidden="true"><svg><use href="#i-bulb"/></svg></span>
-          <div class="hint-body"><span class="hint-label">Hint ${n}</span><span class="hint-text">${escapeHtml(h ? h.text : "")}</span></div><span></span></li>`);
+          <div class="hint-body"><span class="hint-label">DRS Review ${n} · Hint ${n}</span><span class="hint-text">${escapeHtml(h ? h.text : "")}</span></div><span></span></li>`);
       } else if (n === p.hints + 1 && p.status === "active") {
         items.push(`<li class="hint next"><span class="hint-num" aria-hidden="true">${n}</span>
-          <div class="hint-body"><span class="hint-text">Hint ${n}</span></div>
-          <button type="button" class="btn small reveal-btn" data-n="${n}" aria-label="Reveal hint ${n}, costs ${core.HINT_COST} points">Reveal · −${core.HINT_COST}</button></li>`);
+          <div class="hint-body"><span class="hint-text">DRS · Hint ${n}</span></div>
+          <button type="button" class="btn small reveal-btn" data-n="${n}" aria-label="Take DRS review for hint ${n}, costs ${core.HINT_COST} points">Take DRS · −${core.HINT_COST}</button></li>`);
       } else {
         items.push(`<li class="hint locked"><span class="hint-num" aria-hidden="true"><svg><use href="#i-lock"/></svg></span>
-          <div class="hint-body"><span class="hint-text">Hint ${n}</span></div><span class="muted small-text">After hint ${n - 1}</span></li>`);
+          <div class="hint-body"><span class="hint-text">DRS · Hint ${n}</span></div><span class="muted small-text">After DRS ${n - 1}</span></li>`);
       }
     }
     hintList.innerHTML = items.join("");
@@ -645,7 +645,7 @@
       <div class="win-stats" role="list">
         <div class="win-stat" role="listitem"><span class="v">${n}</span><span class="k">guess${n === 1 ? "" : "es"}</span></div>
         <div class="win-stat" role="listitem" title="Puzzle: ${puzzleTime} · Total across 3: ${totalTime}"><span class="v">${totalTime}</span><span class="k">total time</span></div>
-        <div class="win-stat" role="listitem"><span class="v">${p.hints}</span><span class="k">hint${p.hints === 1 ? "" : "s"}</span></div>
+        <div class="win-stat" role="listitem"><span class="v">${p.hints}</span><span class="k">DRS review${p.hints === 1 ? "" : "s"}</span></div>
         <div class="win-stat points" role="listitem"><span class="v">${lost ? 0 : "+" + p.points}</span><span class="k">points</span></div>
       </div>
       ${puzzleTiles ? `<div class="win-tiles" aria-label="Guess heat progression: ${puzzleTiles}" title="Your guess heat progression">${puzzleTiles}</div>` : ""}
@@ -1167,7 +1167,7 @@
   async function revealHint(btn) {
     if (app.busy) return;
     if (isGuest()) {
-      toast("Hints are available for registered members. Sign up or log in free!", "info");
+      toast("DRS reviews are available for registered members. Sign up or log in free!", "info");
       openAuth("register");
       return;
     }
@@ -1178,7 +1178,7 @@
       const res = await app.store.hint(app.mode, i);
       applyPresentation(res);
       render();
-      setMessage(`Hint ${res.hint.n}: ${res.hint.text}`);
+      setMessage(`DRS Review · Hint ${res.hint.n}: ${res.hint.text}`);
       const nextBtn = hintList.querySelector(".reveal-btn");
       (nextBtn || input).focus();
     } catch (err) { handleError(err); } finally { setBusy(false); btn.classList.remove("loading"); }

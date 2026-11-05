@@ -630,49 +630,156 @@
 
     /* Result Modal / Summary Card */
     .scramble-summary-card {
-      background: var(--card);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6) var(--space-5);
+      background: var(--card-solid, #0f172a);
+      border: 1.5px solid rgba(251, 146, 60, 0.35);
+      border-radius: var(--radius-lg, 16px);
+      padding: clamp(20px, 4vw, 32px) clamp(16px, 3.5vw, 28px);
       text-align: center;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 30px rgba(234, 88, 12, 0.12);
       margin-bottom: var(--space-6);
-      animation: popIn 0.35s ease both;
+      animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, rgba(234, 88, 12, 0.08) 70%);
+      border: 1.5px solid rgba(251, 191, 36, 0.5);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+      margin: 0 auto 12px;
+    }
+
+    .summary-hero-icon {
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .summary-title {
+      font-family: var(--font-display, inherit);
+      font-size: clamp(24px, 5vw, 32px);
+      letter-spacing: 1px;
+      color: var(--fg, #ffffff);
+      margin: 0 0 6px;
+    }
+
+    .summary-subtitle {
+      color: var(--muted, rgba(255, 255, 255, 0.65));
+      font-size: 14.5px;
+      margin: 0 0 16px;
     }
 
     .player-reveal-badge {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 18px;
-      margin: 14px 0;
+      gap: 16px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 14px 20px;
+      margin: 0 auto 18px;
       text-align: left;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .player-reveal-flag-circle {
+      font-size: 34px;
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .player-reveal-info {
+      min-width: 0;
     }
 
     .player-reveal-name {
-      font-family: var(--font-display);
-      font-size: 26px;
+      font-family: var(--font-display, inherit);
+      font-size: clamp(22px, 4.5vw, 28px);
       color: #fdba74;
-      line-height: 1.1;
+      line-height: 1.15;
       margin: 0;
+      letter-spacing: 0.5px;
     }
 
     .player-reveal-meta {
       font-size: 13.5px;
-      color: var(--muted);
+      color: var(--muted, rgba(255, 255, 255, 0.65));
       margin: 4px 0 0;
       font-weight: 500;
     }
 
-    .summary-grid-preview {
-      background: rgba(0, 0, 0, 0.3);
+    .summary-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      max-width: 480px;
+      margin: 0 auto 18px;
+      width: 100%;
+    }
+
+    .summary-stat-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .stat-box-val {
+      font-family: var(--font-display, inherit);
+      font-size: clamp(16px, 3.5vw, 20px);
+      font-weight: 700;
+      color: var(--fg, #ffffff);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-box-lbl {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted, rgba(255, 255, 255, 0.55));
+      font-weight: 600;
+    }
+
+    .summary-grid-card {
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid var(--border);
+      border-radius: 12px;
       padding: 12px 16px;
-      border-radius: var(--radius-sm);
+      max-width: 380px;
+      margin: 0 auto 18px;
+    }
+
+    .summary-grid-header {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--muted, rgba(255, 255, 255, 0.5));
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .summary-grid-preview {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
       display: inline-block;
-      margin: var(--space-3) 0;
+      margin: 0;
       font-family: ui-monospace, monospace;
       font-size: 18px;
       line-height: 1.6;
@@ -685,6 +792,35 @@
       justify-content: center;
       gap: 12px;
       margin-top: var(--space-4);
+    }
+
+    .btn-more-games {
+      min-height: 46px;
+      padding: 0 20px;
+      border-radius: 9999px;
+      border: 1px solid rgba(251, 146, 60, 0.45);
+      background: rgba(234, 88, 12, 0.15);
+      color: #fed7aa;
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-more-games:hover {
+      background: rgba(234, 88, 12, 0.28);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .summary-countdown-text {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
     }
 
     .btn-share {
@@ -980,11 +1116,11 @@
         </div>
 
         <div class="scramble-col-controls">
-          <!-- Clues Drawer -->
+          <!-- DRS Clues Drawer -->
           <div class="clues-drawer" id="clues-drawer">
-            <div class="clue-pill unlocked" id="clue-country"><span>🌍 Country: Loading...</span></div>
-            <div class="clue-pill locked" id="clue-role"><span>🏏 Role: Unlocks after guess 2</span></div>
-            <div class="clue-pill locked" id="clue-debut"><span>📅 Debut: Unlocks after guess 4</span></div>
+            <div class="clue-pill unlocked" id="clue-country"><span>🌍 DRS 1 · Country: Loading...</span></div>
+            <div class="clue-pill locked" id="clue-role"><span>🏏 DRS 2 · Role: Unlocks after guess 2</span></div>
+            <div class="clue-pill locked" id="clue-debut"><span>📅 DRS 3 · Debut: Unlocks after guess 4</span></div>
           </div>
 
           <!-- Guess Input Controls -->
@@ -1011,19 +1147,46 @@
 
     <!-- Daily Finished View -->
     <div id="finished-view" class="scramble-summary-card" style="display:none;">
-      <div style="font-size:42px; margin-bottom:8px;" id="summary-icon">🏆</div>
-      <h2 id="summary-title">SCRAMBLE SOLVED!</h2>
-      <p style="color:var(--muted); font-size:15px; margin:0;" id="summary-sub">Great cricket deduction! Here is today's legend:</p>
+      <div class="summary-hero-badge">
+        <span class="summary-hero-icon" id="summary-icon">🏆</span>
+      </div>
+      <h2 id="summary-title" class="summary-title">SCRAMBLE SOLVED!</h2>
+      <p id="summary-sub" class="summary-subtitle">Great cricket deduction! Here is today's legend:</p>
 
       <div class="player-reveal-badge" id="player-reveal-badge">
-        <div style="font-size:36px;" id="player-reveal-flag">🏏</div>
-        <div>
+        <div class="player-reveal-flag-circle" id="player-reveal-flag">🏏</div>
+        <div class="player-reveal-info">
           <div class="player-reveal-name" id="player-reveal-name">-</div>
           <div class="player-reveal-meta" id="player-reveal-meta">-</div>
         </div>
       </div>
 
-      <div class="summary-grid-preview" id="summary-grid-preview"></div>
+      <!-- Performance Stats Grid -->
+      <div class="summary-stats-grid" id="summary-stats-grid">
+        <div class="summary-stat-box">
+          <span class="stat-box-val" id="summary-stat-score">+0</span>
+          <span class="stat-box-lbl">Score</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="stat-box-val" id="summary-stat-attempts">0/6</span>
+          <span class="stat-box-lbl">Guesses</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="stat-box-val" id="summary-stat-time">0:00</span>
+          <span class="stat-box-lbl">Time</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="stat-box-val" id="summary-stat-drs">0</span>
+          <span class="stat-box-lbl">DRS Reviews</span>
+        </div>
+      </div>
+
+      <div class="summary-grid-card">
+        <div class="summary-grid-header">
+          <span>MATCH SCORECARD</span>
+        </div>
+        <div class="summary-grid-preview" id="summary-grid-preview"></div>
+      </div>
 
       <div class="summary-actions">
         <a href="#" id="btn-share-whatsapp" class="btn-share" target="_blank" rel="noopener">
@@ -1032,14 +1195,17 @@
         <button type="button" id="btn-copy-score" class="btn-copy">
           <span>Copy Result</span>
         </button>
+        <a href="hub.html" class="btn-more-games" title="Explore all Cricketle game variants">
+          <span>Explore All Games</span>
+        </a>
         <button type="button" class="report-inaccuracy-pill" data-report-inaccuracy title="Report wrong scrambled letters or cricketer info">
           <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
           <span>Report Inaccuracy</span>
         </button>
       </div>
 
-      <p style="margin-top:20px; font-size:13px; color:var(--muted);">
-        Next daily scramble drops in <strong id="countdown-timer" style="color:var(--fg);">--:--:--</strong>
+      <p class="summary-countdown-text">
+        Next daily scramble drops in <strong id="countdown-timer">--:--:--</strong>
       </p>
     </div>
   </main>
@@ -1047,6 +1213,7 @@
   <div class="game-toast" id="scramble-toast" role="status" aria-live="polite"></div>
 
   <script src="players.js"></script>
+  <script src="bg.js?v=3.0.0" defer></script>
   <script src="mobile-keyboard.js?v=3.0.0" defer></script>
   <script src="report-inaccuracy.js?v=3.1.0" defer></script>
   <script src="scramble.js?v=3.0.0" defer></script>

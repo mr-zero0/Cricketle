@@ -478,6 +478,9 @@
     const result = roundResults[0] || { score: 0, details: [] };
     const totalScore = result.score || 0;
     const maxScore = 6;
+    if (totalScore >= 4) {
+      try { window.CricketleFX?.burst?.(); } catch (_) {}
+    }
     let gridText = "";
 
     if (result.details && result.details.length > 0) {

@@ -351,6 +351,7 @@
       updateButtons();
 
       if (solvedGroups.length === 4) {
+        try { window.CricketleFX?.burst?.(); } catch (_) {}
         handleGameOver(true);
       }
     } else {
@@ -379,6 +380,9 @@
   function handleGameOver(won) {
     isGameOver = true;
     updateButtons();
+    if (won) {
+      try { window.CricketleFX?.burst?.(); } catch (_) {}
+    }
 
     const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
     const elapsedSec = Math.floor(elapsedMs / 1000);

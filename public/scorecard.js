@@ -395,6 +395,9 @@
   }
 
   function finishGame(won) {
+    if (won) {
+      try { window.CricketleFX?.burst?.(); } catch (_) {}
+    }
     renderMatchInfo(); // reveals match info in hard mode too
 
     const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);

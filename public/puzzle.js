@@ -735,6 +735,9 @@
   function finishGame(won) {
     isGameOver = true;
     selectedSlot = -1;
+    if (won) {
+      try { window.CricketleFX?.burst?.(); } catch (_) {}
+    }
 
     // Reveal all pieces in solved order and upright (0° rotation)
     for (let i = 0; i < totalTiles; i++) {

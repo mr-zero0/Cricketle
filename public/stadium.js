@@ -330,6 +330,9 @@
 
   function endGame(won) {
     isGameOver = true;
+    if (won) {
+      try { window.CricketleFX?.burst?.(); } catch (_) {}
+    }
 
     const elapsedMs = Math.max(1000, Date.now() - puzzleStartTime);
     const elapsedSec = Math.floor(elapsedMs / 1000);
