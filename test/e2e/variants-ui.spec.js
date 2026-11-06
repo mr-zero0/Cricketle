@@ -148,16 +148,21 @@ test.describe("Full UI & Gameplay Tests (Authenticated Member)", () => {
     await expect(page.locator("h1")).toContainText("Cricket Connections");
     await expect(page.locator("#member-gate-modal")).toBeHidden();
 
-    // 16 Player tiles
+    // 16 Player tiles with distinct unique ids
     const tiles = page.locator(".conn-tile");
     await expect(tiles).toHaveCount(16);
+    const tileIds = await tiles.evaluateAll((list) => list.map((el) => el.getAttribute("data-id")));
+    expect(new Set(tileIds).size).toBe(16);
 
-    // Selection
+    // Selection: clicking a tile selects only that single tile
     await tiles.nth(0).click();
+    await expect(page.locator(".conn-tile.selected")).toHaveCount(1);
     await expect(tiles.nth(0)).toHaveClass(/selected/);
+    await expect(tiles.nth(1)).not.toHaveClass(/selected/);
     await tiles.nth(1).click();
     await tiles.nth(2).click();
     await tiles.nth(3).click();
+    await expect(page.locator(".conn-tile.selected")).toHaveCount(4);
 
     // Deselect all
     await page.locator("#btn-deselect").click();

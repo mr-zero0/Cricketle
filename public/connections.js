@@ -188,11 +188,12 @@
       const pIdx = seed % allPuzzles.length;
       currentPuzzle = allPuzzles[pIdx];
 
-      // Collect all 16 items
+      // Collect all 16 items with unique IDs so identical player names are treated independently
+      let nextId = 1;
       const items = [];
       currentPuzzle.groups.forEach((g) => {
         g.members.forEach((m) => {
-          items.push({ name: m, group: g });
+          items.push({ id: `item_${nextId++}`, name: m, group: g });
         });
       });
 
@@ -249,12 +250,13 @@
     gridEl.innerHTML = "";
 
     activeItems.forEach((item) => {
-      const isSelected = selectedItems.some((s) => s.name === item.name);
+      const isSelected = selectedItems.some((s) => s.id === item.id);
       const tile = document.createElement("button");
       tile.type = "button";
       tile.className = `conn-tile ${isSelected ? "selected" : ""}`;
       tile.textContent = item.name;
       tile.setAttribute("data-name", item.name);
+      tile.setAttribute("data-id", item.id);
 
       tile.addEventListener("click", () => {
         if (!currentUser) {
@@ -271,7 +273,7 @@
 
   function toggleSelect(item) {
     if (!currentUser) { if (gateModal) gateModal.hidden = false; return; }
-    const idx = selectedItems.findIndex((s) => s.name === item.name);
+    const idx = selectedItems.findIndex((s) => s.id === item.id);
     if (idx >= 0) {
       selectedItems.splice(idx, 1);
     } else {
@@ -317,10 +319,6 @@
     }
     pastGuesses.add(guessKey);
 
-    // Record guess history for share grid
-    const guessLevels = selectedItems.map((s) => s.group.level);
-    guessHistory.push(guessLevels);
-
     // Count how many selected items belong to each remaining category
     const remainingGroups = currentPuzzle.groups.filter(
       (g) => !solvedGroups.some((sg) => sg.category === g.category)
@@ -330,7 +328,16 @@
     let oneAway = false;
 
     for (const g of remainingGroups) {
-      const matchCount = selectedItems.filter((s) => s.group.category === g.category).length;
+      // Check how many selected items match distinct members of group g
+      const memberPool = [...g.members];
+      let matchCount = 0;
+      selectedItems.forEach((s) => {
+        const mIdx = memberPool.indexOf(s.name);
+        if (mIdx !== -1) {
+          matchCount++;
+          memberPool.splice(mIdx, 1);
+        }
+      });
       if (matchCount === 4) {
         matchedGroup = g;
         break;
@@ -339,11 +346,17 @@
       }
     }
 
+    // Record guess history for share grid
+    const guessLevels = matchedGroup
+      ? [matchedGroup.level, matchedGroup.level, matchedGroup.level, matchedGroup.level]
+      : selectedItems.map((s) => s.group.level);
+    guessHistory.push(guessLevels);
+
     if (matchedGroup) {
       // Correct!
       solvedGroups.push(matchedGroup);
-      const solvedNames = new Set(matchedGroup.members);
-      activeItems = activeItems.filter((item) => !solvedNames.has(item.name));
+      const selectedIds = new Set(selectedItems.map((s) => s.id));
+      activeItems = activeItems.filter((item) => !selectedIds.has(item.id));
       selectedItems = [];
 
       renderSolved();

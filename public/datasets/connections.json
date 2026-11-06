@@ -999,7 +999,7 @@
         "color": "#22c55e",
         "members": [
           "Glenn McGrath",
-          "Brett Lee",
+          "Wasim Akram",
           "Mitchell Starc",
           "Tim Southee"
         ]
@@ -1134,7 +1134,7 @@
         "level": 0,
         "color": "#eab308",
         "members": [
-          "Virat Kohli",
+          "MS Dhoni",
           "Shikhar Dhawan",
           "David Warner",
           "Rohit Sharma"
@@ -1246,7 +1246,7 @@
           "Shahid Afridi",
           "Chris Gayle",
           "Rohit Sharma",
-          "MS Dhoni"
+          "AB de Villiers"
         ]
       },
       {
@@ -1254,7 +1254,7 @@
         "level": 2,
         "color": "#3b82f6",
         "members": [
-          "Kumar Sangakkara",
+          "Bhuvneshwar Kumar",
           "David Warner",
           "Kane Williamson",
           "Pat Cummins"
@@ -1571,13 +1571,13 @@
     "id": "conn_33",
     "groups": [
       {
-        "category": "Captains Who Won the ICC Men's Cricket World Cup Unbeaten",
+        "category": "Captains Who Won the ICC Men's Cricket World Cup",
         "level": 0,
         "color": "#eab308",
         "members": [
           "Clive Lloyd",
           "Ricky Ponting",
-          "Rohit Sharma",
+          "Kapil Dev",
           "Pat Cummins"
         ]
       },
