@@ -1138,7 +1138,25 @@ function createApp(opts = {}) {
 
     const ext = path.extname(file).toLowerCase();
     const type = MIME[ext] || "application/octet-stream";
-    const raw = fs.readFileSync(file);
+    let raw = fs.readFileSync(file);
+    if (ext === ".css") {
+      const text = raw.toString("utf8")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/\r\n/g, "\n")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n\s*\n/g, "\n")
+        .trim();
+      raw = Buffer.from(text, "utf8");
+    } else if (ext === ".js" || ext === ".mjs") {
+      const text = raw.toString("utf8")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/^\s*\/\/[^\n]*\n/gm, "")
+        .replace(/\r\n/g, "\n")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n\s*\n/g, "\n")
+        .trim();
+      raw = Buffer.from(text, "utf8");
+    }
     const compressible = /^(text\/|application\/(json|manifest)|image\/svg)/.test(type);
     const gzipped = compressible && raw.length > 1024 ? zlib.gzipSync(raw, { level: 6 }) : null;
 
@@ -1260,6 +1278,7 @@ function createApp(opts = {}) {
     else if (pathname === "/puzzle" || pathname === "/puzzle/") serveStatic(req, res, "/puzzle.html");
     else if (pathname === "/stadium" || pathname === "/stadium/") serveStatic(req, res, "/stadium.html");
     else if (pathname === "/facts" || pathname === "/facts/") serveStatic(req, res, "/facts.html");
+    else if (pathname === "/scramble" || pathname === "/scramble/") serveStatic(req, res, "/scramble.html");
     else if (pathname === "/pixel" || pathname === "/pixel/") serveStatic(req, res, "/pixel.html");
     else if (pathname === "/admin" || pathname === "/admin/") serveStatic(req, res, "/admin.html");
     else if (pathname === "/privacy" || pathname === "/privacy/") serveStatic(req, res, "/privacy.html");
