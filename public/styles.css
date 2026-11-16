@@ -335,13 +335,18 @@ body.hard .nav-link[aria-current="page"] { color: #1a1200; background: var(--acc
 .tab {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   min-height: 52px; border-radius: 12px;
-  color: var(--muted); text-decoration: none; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.02em;
+  color: #94a3b8; text-decoration: none; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.02em;
   transition: color var(--dur-fast), background var(--dur-fast);
 }
 .tab svg { width: 24px; height: 24px; }
 .tab:active { background: rgba(255,255,255,0.06); }
 .tab[aria-current="page"] { color: var(--mode); }
 .tab[aria-current="page"] svg { filter: drop-shadow(0 0 8px color-mix(in srgb, var(--mode) 60%, transparent)); }
+
+body:has(dialog[open]) .tabbar {
+  display: none !important;
+  pointer-events: none !important;
+}
 
 @media (min-width: 768px) {
   .nav { display: flex; align-items: center; }
@@ -632,7 +637,7 @@ body.hard .segmented:not(.tabs) .seg-thumb { background: var(--accent-deep); box
 .tracker-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-3); flex-wrap: wrap; }
 .tracker-label { font-weight: 700; letter-spacing: 0.01em; }
 .reset { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
-.dots { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
+.dots { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); min-height: 48px; }
 .dot {
   min-height: 48px;
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -1907,7 +1912,7 @@ dialog form { margin-top: var(--space-4); text-align: right; }
 .onboard-details summary:hover { color: var(--fg); }
 .onboard-details p { font-size: 0.92rem; }
 .onboard-actions { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
-.onboard-actions .link-btn { min-height: 44px; display: inline-flex; align-items: center; }
+.onboard-actions .link-btn { min-height: 48px; padding: 12px 28px; display: inline-flex; align-items: center; justify-content: center; }
 
 /* ---------- Guest gate ---------- */
 

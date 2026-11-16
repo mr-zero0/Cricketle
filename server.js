@@ -753,6 +753,10 @@ function createApp(opts = {}) {
     if (key === "GET /api/me") {
       const user = await currentUser(req);
       if (!user) return send(res, 200, { user: null, day: core.todayKey(now()), now: now(), googleClientId });
+      const [stats, state] = await Promise.all([
+        game.stats(user.id),
+        game.loadState(user.id)
+      ]);
       return send(res, 200, {
         user: {
           id: user.id,
@@ -769,7 +773,8 @@ function createApp(opts = {}) {
           pinNeedsUpdate: Boolean(pinNeedsUpdateBySession.get(auth.hashToken(cookies(req)[COOKIE] || ""))),
           createdAt: user.created_at,
         },
-        stats: await game.stats(user.id),
+        stats,
+        state: game.present(state),
         day: core.todayKey(now()),
         now: now(),
       });
@@ -1117,6 +1122,38 @@ function createApp(opts = {}) {
 
   // ---------- static ----------
 
+  const staticCache = new Map();
+
+  function getStaticEntry(file) {
+    let stat;
+    try { stat = fs.statSync(file); } catch (_) { return null; }
+    if (stat && stat.isDirectory()) {
+      file = path.join(file, "index.html");
+      try { stat = fs.statSync(file); } catch (_) { return null; }
+    }
+    if (!stat || !stat.isFile()) return null;
+
+    const cached = staticCache.get(file);
+    if (cached && cached.mtimeMs === stat.mtimeMs) return cached;
+
+    const ext = path.extname(file).toLowerCase();
+    const type = MIME[ext] || "application/octet-stream";
+    const raw = fs.readFileSync(file);
+    const compressible = /^(text\/|application\/(json|manifest)|image\/svg)/.test(type);
+    const gzipped = compressible && raw.length > 1024 ? zlib.gzipSync(raw, { level: 6 }) : null;
+
+    const entry = {
+      mtimeMs: stat.mtimeMs,
+      mtimeUtc: stat.mtime.toUTCString(),
+      type,
+      ext,
+      raw,
+      gzipped,
+    };
+    staticCache.set(file, entry);
+    return entry;
+  }
+
   function serveStatic(req, res, pathname) {
     if (req.method !== "GET" && req.method !== "HEAD") return fail(res, 405, "method_not_allowed", "Method not allowed.");
     let decoded;
@@ -1124,26 +1161,21 @@ function createApp(opts = {}) {
     const rel = path.normalize(decoded).replace(/^(\.\.[/\\])+/, "");
     let file = path.join(publicDir, rel);
     if (!file.startsWith(publicDir + path.sep) && file !== publicDir) return fail(res, 404, "not_found", "Not found.");
-    let stat;
-    try { stat = fs.statSync(file); } catch (_) { stat = null; }
-    if (stat && stat.isDirectory()) {
-      file = path.join(file, "index.html");
-      try { stat = fs.statSync(file); } catch (_) { stat = null; }
-    }
-    if (!stat || !stat.isFile()) return fail(res, 404, "not_found", "Not found.");
-    const ext = path.extname(file).toLowerCase();
-    const type = MIME[ext] || "application/octet-stream";
+
+    const entry = getStaticEntry(file);
+    if (!entry) return fail(res, 404, "not_found", "Not found.");
+
     const since = req.headers["if-modified-since"];
-    if (since && Math.floor(stat.mtimeMs / 1000) <= Math.floor(Date.parse(since) / 1000)) {
+    if (since && Math.floor(entry.mtimeMs / 1000) <= Math.floor(Date.parse(since) / 1000)) {
       res.writeHead(304, { "cache-control": "no-cache" });
       return res.end();
     }
     // Assets referenced with ?v= are immutable per version; pages revalidate.
     const versioned = /[?&]v=/.test(req.url || "");
     const headers = {
-      "content-type": type,
+      "content-type": entry.type,
       "cache-control": versioned ? "public, max-age=31536000, immutable" : "no-cache",
-      "last-modified": stat.mtime.toUTCString(),
+      "last-modified": entry.mtimeUtc,
       "x-content-type-options": "nosniff",
       "x-frame-options": "DENY",
       "referrer-policy": "strict-origin-when-cross-origin",
@@ -1152,8 +1184,8 @@ function createApp(opts = {}) {
       "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
       "vary": "accept-encoding",
     };
-    if (ext === ".html") {
-            const csp = [
+    if (entry.ext === ".html") {
+      const csp = [
         "default-src 'self'",
         "script-src 'self' https://accounts.google.com/gsi/client",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style",
@@ -1169,16 +1201,13 @@ function createApp(opts = {}) {
       if (isSecure(req)) csp.push("upgrade-insecure-requests");
       headers["content-security-policy"] = csp.join("; ");
     }
-    // Text assets are gzipped on the fly (no build step, no dependencies).
-    const compressible = /^(text\/|application\/(json|manifest)|image\/svg)/.test(type);
-    const gzip = compressible && stat.size > 1024 && /\bgzip\b/.test(String(req.headers["accept-encoding"] || ""));
-    if (gzip) headers["content-encoding"] = "gzip";
-    else headers["content-length"] = stat.size;
+    const useGzip = Boolean(entry.gzipped && /\bgzip\b/.test(String(req.headers["accept-encoding"] || "")));
+    const body = useGzip ? entry.gzipped : entry.raw;
+    if (useGzip) headers["content-encoding"] = "gzip";
+    headers["content-length"] = body.length;
     res.writeHead(200, headers);
     if (req.method === "HEAD") return res.end();
-    const stream = fs.createReadStream(file);
-    if (gzip) stream.pipe(zlib.createGzip({ level: 6 })).pipe(res);
-    else stream.pipe(res);
+    res.end(body);
   }
 
   // ---------- dispatch ----------

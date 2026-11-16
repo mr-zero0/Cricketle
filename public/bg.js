@@ -246,8 +246,6 @@
     dpr = Math.min(window.devicePixelRatio || 1, small() ? 1.5 : 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
-    canvas.style.width = w + "px";
-    canvas.style.height = h + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     activeProfile = detectStadiumProfile();

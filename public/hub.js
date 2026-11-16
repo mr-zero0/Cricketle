@@ -43,47 +43,11 @@
     if (scrambleStatus) scrambleStatus.textContent = "6 Attempts Daily";
   }
 
-  function initGoogleAuth(clientId) {
-    if (!clientId || !window.google || !window.google.accounts) return;
-    try {
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async (response) => {
-          if (!response || !response.credential) return;
-          try {
-            const res = await fetch("/api/auth/google", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ credential: response.credential }),
-            });
-            const data = await res.json();
-            if (res.ok && data.user) {
-              applyUser(data.user);
-            }
-          } catch (_) {}
-        },
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-      window.google.accounts.id.prompt();
-    } catch (_) {}
-  }
-
   // Check user session and update profile label & tile statuses
   fetch("/api/me")
     .then((r) => r.json())
     .then((d) => {
-      if (d && d.user) {
-        applyUser(d.user);
-      } else if (d && d.googleClientId) {
-        if (window.google && window.google.accounts) {
-          initGoogleAuth(d.googleClientId);
-        } else {
-          window.addEventListener("load", () => {
-            initGoogleAuth(d.googleClientId);
-          });
-        }
-      }
+      if (d && d.user) applyUser(d.user);
     })
     .catch(() => {});
 })();

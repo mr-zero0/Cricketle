@@ -820,9 +820,9 @@
         }
       }
 
-      if (!app.user) {
+      if (!app.user && (location.hash === "#profile" || location.hash.startsWith("#profile"))) {
         try {
-          window.google.accounts.id.prompt();
+          window.google.accounts.id.prompt((notification) => {});
         } catch (_) {}
       }
 
@@ -830,6 +830,12 @@
     }
 
     attemptInit();
+  }
+
+  function promptGoogleOneTap() {
+    if (!app.user && window.google && window.google.accounts && window.google.accounts.id) {
+      try { window.google.accounts.id.prompt((notification) => {}); } catch (_) {}
+    }
   }
 
   
@@ -906,7 +912,7 @@
     if (customGoogleBtn) {
       customGoogleBtn.addEventListener("click", () => {
         if (window.google && window.google.accounts && window.google.accounts.id) {
-          try { window.google.accounts.id.prompt(); } catch (_) {}
+          try { window.google.accounts.id.prompt((notification) => {}); } catch (_) {}
         }
       });
     }
@@ -1477,6 +1483,7 @@
     for (const v of VIEWS) $("view-" + v).hidden = v !== app.view;
     renderNav();
     hideSuggestions();
+    if (app.view === "profile") promptGoogleOneTap();
     if (prevView === "play" && app.view !== "play") {
       handleLeavingPuzzle();
     } else if (prevView !== "play" && app.view === "play") {
@@ -2471,37 +2478,26 @@
       app.store = new LocalStore();
     } else {
       try {
-        const [meRes, stateRes] = await Promise.allSettled([
-          api("GET", "/api/me"),
-          api("GET", "/api/state")
-        ]);
-        if (meRes.status === "fulfilled") {
-          const me = meRes.value;
-          app.offline = false;
-          if (me.googleClientId) {
-            app.googleClientId = me.googleClientId;
-            initGoogleAuth(me.googleClientId);
+        const me = await api("GET", "/api/me");
+        app.offline = false;
+        if (me.googleClientId) {
+          app.googleClientId = me.googleClientId;
+          initGoogleAuth(me.googleClientId);
+        }
+        if (me.user) {
+          app.user = me.user;
+          app.stats = me.stats;
+          app.store = new RemoteStore();
+          app.store.sync(me);
+          if (me.state) {
+            preloadedState = me.state;
           }
-          if (me.user) {
-            app.user = me.user;
-            app.stats = me.stats;
-            app.store = new RemoteStore();
-            app.store.sync(me);
-            if (stateRes.status === "fulfilled") {
-              preloadedState = stateRes.value;
-            }
-            const hasCustomHandle = safeGet("cricketle:username_set_" + me.user.id) === "1";
-            if (!hasCustomHandle && (me.user.googleConnected || me.user.google_id)) {
-              setTimeout(() => openChooseUsernameDialog(me.user), 600);
-            }
-          } else {
-            app.store = new LocalStore();
+          const hasCustomHandle = safeGet("cricketle:username_set_" + me.user.id) === "1";
+          if (!hasCustomHandle && (me.user.googleConnected || me.user.google_id)) {
+            setTimeout(() => openChooseUsernameDialog(me.user), 600);
           }
         } else {
-          const err = meRes.reason;
-          app.offline = true;
           app.store = new LocalStore();
-          if (!(err instanceof ApiError && (err.status === 0 || err.status === 404 || err.status === 405))) console.warn("Cricketle: server unavailable", err);
         }
       } catch (err) {
         app.offline = true;
