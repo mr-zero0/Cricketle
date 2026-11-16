@@ -798,11 +798,7 @@ function createApp(opts = {}) {
       const body = await readJson(req);
       const { mode, idx } = puzzleArgs(body);
       if (typeof body.name !== "string") return fail(res, 400, "unknown_player");
-      if (Number(body.awayMs) > 0) {
-        const awayMs = Math.max(0, Math.min(Number(body.awayMs) || 0, 7 * 24 * 3600 * 1000));
-        await game.adjustTimer(user.id, mode, idx, awayMs);
-      }
-      const r = await game.guess(user.id, mode, idx, body.name);
+      const r = await game.guess(user.id, mode, idx, body.name, body.awayMs);
       if (!r.ok) {
         logger.game("guess_rejected", `Guess rejected for @${user.username} on ${mode} #${idx + 1}: ${r.error}`, {
           user: user.username,

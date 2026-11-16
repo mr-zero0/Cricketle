@@ -335,7 +335,18 @@
     gate: { easy: null, hard: null },
   };
 
-  if (core.MODES.includes(safeGet(MODE_KEY))) app.mode = safeGet(MODE_KEY);
+  function resolveMode() {
+    const hash = (location.hash || "").replace("#", "").toLowerCase();
+    if (core.MODES.includes(hash)) return hash;
+    if (app.state && app.day) {
+      const todayChoice = safeGet(`${MODE_KEY}:${app.day}`);
+      if (core.MODES.includes(todayChoice)) return todayChoice;
+      return "easy";
+    }
+    return "easy";
+  }
+
+  app.mode = resolveMode();
 
   const puzzles = () => app.state.modes[app.mode].puzzles;
   const idx = () => app.current[app.mode];
@@ -1202,7 +1213,10 @@
   function setMode(mode) {
     if (!core.MODES.includes(mode) || mode === app.mode) return;
     app.mode = mode;
-    try { localStorage.setItem(MODE_KEY, mode); } catch (_) { /* ignore */ }
+    try {
+      localStorage.setItem(MODE_KEY, mode);
+      if (app.day) localStorage.setItem(`${MODE_KEY}:${app.day}`, mode);
+    } catch (_) { /* ignore */ }
     setMessage("");
     hideSuggestions();
     render();
@@ -2316,8 +2330,9 @@
     } catch (_) { /* leave the old numbers */ }
   }
 
-  async function reload() {
-    applyPresentation(await app.store.load());
+  async function reload(initialState) {
+    applyPresentation(initialState ? (app.store && app.store.sync ? app.store.sync(initialState) : initialState) : await app.store.load());
+    app.mode = resolveMode();
     pickCurrent();
     render();
   }
@@ -2450,28 +2465,43 @@
     // Accounts, leaderboards and ranks live on the server, which is the only
     // place that can verify them.
     const isStaticHost = Boolean(location.hostname.endsWith("github.io") || location.protocol === "file:");
+    let preloadedState = null;
     if (isStaticHost) {
       app.offline = true;
       app.store = new LocalStore();
     } else {
       try {
-        const me = await api("GET", "/api/me");
-        app.offline = false;
-        if (me.googleClientId) {
-          app.googleClientId = me.googleClientId;
-          initGoogleAuth(me.googleClientId);
-        }
-        if (me.user) {
-          app.user = me.user;
-          app.stats = me.stats;
-          app.store = new RemoteStore();
-          app.store.sync(me);
-          const hasCustomHandle = safeGet("cricketle:username_set_" + me.user.id) === "1";
-          if (!hasCustomHandle && (me.user.googleConnected || me.user.google_id)) {
-            setTimeout(() => openChooseUsernameDialog(me.user), 600);
+        const [meRes, stateRes] = await Promise.allSettled([
+          api("GET", "/api/me"),
+          api("GET", "/api/state")
+        ]);
+        if (meRes.status === "fulfilled") {
+          const me = meRes.value;
+          app.offline = false;
+          if (me.googleClientId) {
+            app.googleClientId = me.googleClientId;
+            initGoogleAuth(me.googleClientId);
+          }
+          if (me.user) {
+            app.user = me.user;
+            app.stats = me.stats;
+            app.store = new RemoteStore();
+            app.store.sync(me);
+            if (stateRes.status === "fulfilled") {
+              preloadedState = stateRes.value;
+            }
+            const hasCustomHandle = safeGet("cricketle:username_set_" + me.user.id) === "1";
+            if (!hasCustomHandle && (me.user.googleConnected || me.user.google_id)) {
+              setTimeout(() => openChooseUsernameDialog(me.user), 600);
+            }
+          } else {
+            app.store = new LocalStore();
           }
         } else {
+          const err = meRes.reason;
+          app.offline = true;
           app.store = new LocalStore();
+          if (!(err instanceof ApiError && (err.status === 0 || err.status === 404 || err.status === 405))) console.warn("Cricketle: server unavailable", err);
         }
       } catch (err) {
         app.offline = true;
@@ -2493,7 +2523,7 @@
     } catch (_) {}
 
     try {
-      await reload();
+      await reload(preloadedState);
     } catch (err) {
       if (app.store && app.store.kind === "remote") { app.offline = false; await becomeGuest(); } else throw err;
     }
