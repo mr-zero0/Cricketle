@@ -338,11 +338,9 @@
   function resolveMode() {
     const hash = (location.hash || "").replace("#", "").toLowerCase();
     if (core.MODES.includes(hash)) return hash;
-    if (app.state && app.day) {
-      const todayChoice = safeGet(`${MODE_KEY}:${app.day}`);
-      if (core.MODES.includes(todayChoice)) return todayChoice;
-      return "easy";
-    }
+    let sessionChoice = null;
+    try { sessionChoice = sessionStorage.getItem(MODE_KEY); } catch (_) {}
+    if (core.MODES.includes(sessionChoice)) return sessionChoice;
     return "easy";
   }
 
@@ -1220,6 +1218,7 @@
     if (!core.MODES.includes(mode) || mode === app.mode) return;
     app.mode = mode;
     try {
+      sessionStorage.setItem(MODE_KEY, mode);
       localStorage.setItem(MODE_KEY, mode);
       if (app.day) localStorage.setItem(`${MODE_KEY}:${app.day}`, mode);
     } catch (_) { /* ignore */ }
@@ -1453,14 +1452,17 @@
 
   function renderNav() {
     const label = app.user ? app.user.username : "Sign in";
-    $("nav-profile-label").textContent = label;
-    $("tab-profile-label").textContent = app.user ? "Profile" : "Sign in";
+    const profileLabel = $("nav-profile-label");
+    if (profileLabel) profileLabel.textContent = label;
+    const tabProfileLabel = $("tab-profile-label");
+    if (tabProfileLabel) tabProfileLabel.textContent = app.user ? "Profile" : "Sign in";
     const navAdmin = $("nav-admin");
     if (navAdmin) {
       navAdmin.style.display = (app.user && app.user.isAdmin) ? "inline-flex" : "none";
     }
     const topbarAuth = $("topbar-auth-btn");
     if (topbarAuth) {
+      topbarAuth.classList.toggle("active", app.view === "profile");
       if (app.user) {
         topbarAuth.classList.add("signed-in");
         topbarAuth.title = `@${app.user.username} (Account)`;
@@ -1470,6 +1472,10 @@
         topbarAuth.title = "Sign in / Register";
         topbarAuth.setAttribute("aria-label", "Sign in or register");
       }
+    }
+    const topbarRanks = $("topbar-ranks-btn");
+    if (topbarRanks) {
+      topbarRanks.classList.toggle("active", app.view === "leaderboard");
     }
     document.querySelectorAll("[data-view]").forEach((el) => {
       if (el.dataset.view === app.view) el.setAttribute("aria-current", "page");
@@ -1500,8 +1506,43 @@
     return core.formatTime(s * 1000);
   }
 
+  function formatFastestTime(ms) {
+    if (!ms || ms <= 0) return "0s";
+    const sec = ms / 1000;
+    if (sec < 60) return (sec < 10 ? sec.toFixed(1) : Math.round(sec)) + "s";
+    const m = Math.floor(sec / 60);
+    const rem = Math.round(sec % 60);
+    return `${m}m ${rem < 10 ? "0" : ""}${rem}s`;
+  }
+
+  function formatVariantTitle(v) {
+    const map = {
+      easy: "Classic Easy",
+      hard: "Classic Hard",
+      connections: "Connections",
+      journey: "Journey",
+      scorecard: "Scorecard",
+      puzzle: "Puzzle",
+      puzzle_easy: "Puzzle Easy",
+      puzzle_hard: "Puzzle Hard",
+      stadium: "Stadium",
+      facts: "Facts",
+      scramble: "Scramble",
+      pixel: "Pixel",
+    };
+    return map[v] || (v ? v.charAt(0).toUpperCase() + v.slice(1) : "Classic");
+  }
+
+  function setSegmentedTabs(el, tab) {
+    if (!el) return;
+    el.classList.remove("pos-0", "pos-1", "pos-2");
+    if (tab === "today") el.classList.add("pos-0");
+    else if (tab === "alltime") el.classList.add("pos-1");
+    else if (tab === "fastest") el.classList.add("pos-2");
+  }
+
   function renderBoard() {
-    const tab = app.board.tab;
+    const tab = app.board.tab || "today";
     const data = app.board.data[tab];
     const list = $("board-list");
     const emptyEl = $("board-empty");
@@ -1510,7 +1551,12 @@
     $("tab-today").setAttribute("aria-selected", String(tab === "today"));
     $("tab-alltime").classList.toggle("active", tab === "alltime");
     $("tab-alltime").setAttribute("aria-selected", String(tab === "alltime"));
-    setSegmented($("tab-today").parentElement, tab === "alltime");
+    const tabFastest = $("tab-fastest");
+    if (tabFastest) {
+      tabFastest.classList.toggle("active", tab === "fastest");
+      tabFastest.setAttribute("aria-selected", String(tab === "fastest"));
+    }
+    setSegmentedTabs($("tab-today").parentElement, tab);
 
     if (app.offline && !data) {
       me.hidden = true;
@@ -1535,15 +1581,21 @@
       me.hidden = false;
       me.classList.remove("guest");
       if (data.me) {
-        const extra = tab === "today"
-          ? `<div><span class="k">Solved</span><span class="v">${data.me.solved} / ${core.PUZZLES_PER_DAY * 2}</span></div><div><span class="k">Time</span><span class="v">${formatSeconds(data.me.seconds)}</span></div>`
-          : `<div><span class="k">Title</span><span class="v">${escapeHtml(data.me.title)}</span></div><div><span class="k">Days</span><span class="v">${data.me.days}</span></div>`;
+        let extra = "";
+        if (tab === "today") {
+          extra = `<div><span class="k">Solved</span><span class="v">${data.me.solved} / ${core.PUZZLES_PER_DAY * 2}</span></div><div><span class="k">Time</span><span class="v">${formatSeconds(data.me.seconds)}</span></div>`;
+        } else if (tab === "alltime") {
+          extra = `<div><span class="k">Title</span><span class="v">${escapeHtml(data.me.title)}</span></div><div><span class="k">Days</span><span class="v">${data.me.days}</span></div>`;
+        } else {
+          extra = `<div><span class="k">Variant</span><span class="v title-chip">${escapeHtml(formatVariantTitle(data.me.variant))}</span></div><div><span class="k">Fastest</span><span class="v" style="color:var(--accent);font-weight:700;">⚡ ${formatFastestTime(data.me.durationMs)}</span></div>`;
+        }
         me.innerHTML = `<div><span class="k">Your rank</span><span class="big">#${data.me.rank}</span></div>
           <div class="me-mid"><div><span class="k">Points</span><span class="v">${data.me.points}</span></div>${extra}</div>
           <div class="muted small-text">of ${data.total}</div>`;
       } else {
+        const prompt = tab === "today" ? "Finish a puzzle today to be ranked." : (tab === "alltime" ? "Finish a puzzle to join the all-time table." : "Solve any cricket puzzle or variant to join the fastest ever table.");
         me.innerHTML = `<div><span class="k">Your rank</span><span class="big">–</span></div>
-          <div class="me-mid"><p class="muted" style="margin:0">${tab === "today" ? "Finish a puzzle today to be ranked." : "Finish a puzzle to join the all-time table."}</p></div>
+          <div class="me-mid"><p class="muted" style="margin:0">${prompt}</p></div>
           <a href="#play" class="btn small">Play</a>`;
       }
     } else {
@@ -1555,22 +1607,27 @@
     if (!data.rows.length) {
       list.innerHTML = "";
       emptyEl.hidden = false;
-      emptyEl.textContent = tab === "today" ? "No one has finished a puzzle yet today. Be the first." : "No results yet. Solve a puzzle to open the table.";
+      emptyEl.textContent = tab === "today" ? "No one has finished a puzzle yet today. Be the first." : (tab === "alltime" ? "No results yet. Solve a puzzle to open the table." : "No fast solves recorded yet. Solve a puzzle to join the fastest board!");
     } else {
       emptyEl.hidden = true;
       list.innerHTML = data.rows.map((r, i) => {
         const av = getAvatar(r.avatar);
         let sub = "";
-        if (r.me) {
+        if (tab === "fastest") {
+          sub = `<span class="title-chip">${escapeHtml(formatVariantTitle(r.variant))}</span> <span class="board-time" style="color:var(--accent);font-weight:600;">⚡ ${formatFastestTime(r.durationMs)}</span>`;
+        } else if (r.me) {
           sub = tab === "today"
             ? `<span class="board-time">${formatSeconds(r.seconds)}</span> · ${r.guesses} guess${r.guesses === 1 ? "" : "es"}`
             : `<span class="title-chip">${escapeHtml(r.title)}</span> ${r.days} day${r.days === 1 ? "" : "s"}`;
         }
+        const rightSide = tab === "fastest"
+          ? `<div class="board-pts"><span class="v" style="font-size:1.05rem;">⚡ ${formatFastestTime(r.durationMs)}</span><span class="k">${r.points} pts</span></div>`
+          : `<div class="board-pts"><span class="v">${r.points}</span><span class="k">pts</span></div>`;
         return `<li class="board-row${r.me ? " me" : ""}" style="--i:${i}">
           <span class="rank-badge r${r.rank}" aria-label="Rank ${r.rank}">${r.rank}</span>
           <span class="board-avatar" style="background:${av.bg}" aria-hidden="true">${avatarIcon(av)}</span>
           <div class="board-who"><span class="board-name">${escapeHtml(r.username)}${r.me ? ' <span class="muted small-text">(you)</span>' : ""}</span>${sub ? `<span class="board-sub">${sub}</span>` : ""}</div>
-          <div class="board-pts"><span class="v">${r.points}</span><span class="k">pts</span></div>
+          ${rightSide}
         </li>`;
       }).join("");
     }
@@ -1579,7 +1636,7 @@
   }
 
   async function loadBoard(force) {
-    const tab = app.board.tab;
+    const tab = app.board.tab || "today";
     const cached = app.board.data[tab];
     if (cached && !force && Date.now() - cached.loadedAt < 30 * 1000) { renderBoard(); return; }
     if (!cached) renderBoard();
@@ -1589,7 +1646,8 @@
     try {
       let data = null;
       if (!app.offline) {
-        data = await api("GET", tab === "today" ? "/api/leaderboard/today" : "/api/leaderboard/alltime");
+        const endpoint = tab === "today" ? "/api/leaderboard/today" : (tab === "alltime" ? "/api/leaderboard/alltime" : "/api/leaderboard/fastest");
+        data = await api("GET", endpoint);
       } else {
         throw new ApiError("offline", "Leaderboards need the Cricketle server. Open the hosted game to be ranked.", 0);
       }
@@ -1624,6 +1682,82 @@
   }
 
   const avatarIcon = (a) => `<svg aria-hidden="true"><use href="${a.icon}"/></svg>`;
+
+  const badgePopupQueue = [];
+  function showNextBadgePopup() {
+    if (badgePopupQueue.length === 0) return;
+    const b = badgePopupQueue.shift();
+    if (!b) return;
+
+    const tierColors = {
+      bronze: "#cd7f32",
+      silver: "#94a3b8",
+      gold: "#f59e0b",
+      diamond: "#38bdf8",
+    };
+    const col = tierColors[b.tier] || "#f59e0b";
+    window.CricketleFX?.burst([col, "#f8fafc", "#22c55e", "#fbbf24"]);
+
+    let container = document.getElementById("badge-toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "badge-toast-container";
+      container.className = "badge-toast-container";
+      document.body.appendChild(container);
+    }
+
+    const banner = document.createElement("div");
+    banner.className = `badge-unlock-banner card ${b.tier || "gold"}`;
+    banner.innerHTML = `
+      <div class="badge-unlock-icon" style="border-color:${col};background:linear-gradient(135deg, ${col}33, ${col}11);" aria-hidden="true">
+        <svg style="color:${col};width:20px;height:20px;"><use href="#i-${b.icon || "medal"}"/></svg>
+      </div>
+      <div class="badge-unlock-text">
+        <div class="badge-unlock-eyebrow" style="color:${col};">✨ BADGE UNLOCKED · ${String(b.tier || "achievement").toUpperCase()}</div>
+        <h4 class="badge-unlock-title">${escapeHtml(b.title)}</h4>
+        <p class="badge-unlock-desc">${escapeHtml(b.desc)}</p>
+      </div>
+      <button type="button" class="badge-unlock-close icon-btn" aria-label="Dismiss">&times;</button>
+    `;
+
+    const closeBtn = banner.querySelector(".badge-unlock-close");
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        banner.remove();
+        if (badgePopupQueue.length > 0) setTimeout(showNextBadgePopup, 200);
+      };
+    }
+
+    container.appendChild(banner);
+    setTimeout(() => {
+      banner.classList.add("leaving");
+      setTimeout(() => {
+        banner.remove();
+        if (badgePopupQueue.length > 0) showNextBadgePopup();
+      }, 300);
+    }, 4500);
+  }
+
+  function checkAndShowBadgeUnlock(achievements) {
+    if (!Array.isArray(achievements)) return;
+    const seenKey = "cricketle:seen_badges";
+    let seenStr = null;
+    try { seenStr = localStorage.getItem(seenKey); } catch (_) {}
+    let seenSet;
+    if (seenStr === null) {
+      seenSet = new Set(achievements.filter((a) => a.unlocked).map((a) => a.id));
+      try { localStorage.setItem(seenKey, JSON.stringify([...seenSet])); } catch (_) {}
+      return;
+    }
+    try { seenSet = new Set(JSON.parse(seenStr)); } catch (_) { seenSet = new Set(); }
+    const newUnlocks = achievements.filter((a) => a.unlocked && !seenSet.has(a.id));
+    if (newUnlocks.length === 0) return;
+
+    newUnlocks.forEach((a) => seenSet.add(a.id));
+    try { localStorage.setItem(seenKey, JSON.stringify([...seenSet])); } catch (_) {}
+    newUnlocks.forEach((b) => badgePopupQueue.push(b));
+    showNextBadgePopup();
+  }
 
   function renderProfile() {
     $("offline-card").hidden = true;
@@ -1719,7 +1853,7 @@
           </div>
           <div class="streak-details">
             <h4>${s.currentStreak || 0} Day${s.currentStreak === 1 ? "" : "s"} Streak</h4>
-            <p class="streak-subtitle">Best streak: <strong>${s.bestStreak || 0} days</strong> ${s.currentStreak > 0 ? "· Keep the flame alive tomorrow!" : "· Solve a puzzle to start a streak!"}</p>
+            <p class="streak-subtitle">Best streak: <strong>${s.bestStreak || 0} days</strong> · Login streak: <strong>${s.loginStreak || 1} day${(s.loginStreak || 1) === 1 ? "" : "s"}</strong></p>
           </div>
           <div class="streak-week" aria-label="7-day activity">
             ${weekDotsHtml}
@@ -1730,6 +1864,7 @@
             <div class="stat-tile card"><span class="v">${s.solved || 0}</span><span class="k">Puzzles solved</span></div>
             <div class="stat-tile card"><span class="v">${s.winRate || (s.solved ? 100 : 0)}%</span><span class="k">Win rate</span></div>
             <div class="stat-tile card"><span class="v">${unlockedCount} / ${achievements.length}</span><span class="k">Badges</span></div>
+            <div class="stat-tile card"><span class="v">🔥 ${s.loginStreak || 1}</span><span class="k">Login streak</span></div>
             <div class="stat-tile card"><span class="v">${s.daysPlayed || 0}</span><span class="k">Days active</span></div>
           </div>
           <div class="dist-card card">
@@ -2328,8 +2463,11 @@
     try {
       const me = await api("GET", "/api/me");
       if (me.googleClientId) { app.googleClientId = me.googleClientId; initGoogleAuth(me.googleClientId); }
-        if (me.user) { app.stats = me.stats; if (app.store && app.store.sync) app.store.sync(me); }
-      else { becomeGuest(); return; }
+      if (me.user) {
+        app.stats = me.stats;
+        if (app.store && app.store.sync) app.store.sync(me);
+        if (me.stats && me.stats.achievements) checkAndShowBadgeUnlock(me.stats.achievements);
+      } else { becomeGuest(); return; }
       app.board.data = {};
       renderTracker();
       if (app.view === "profile") renderProfile();
@@ -2442,6 +2580,7 @@
 
   $("tab-today").addEventListener("click", () => setBoardTab("today"));
   $("tab-alltime").addEventListener("click", () => setBoardTab("alltime"));
+  $("tab-fastest")?.addEventListener("click", () => setBoardTab("fastest"));
   $("board-refresh").addEventListener("click", () => loadBoard(true));
 
   window.addEventListener("hashchange", showView);
@@ -2491,6 +2630,9 @@
           app.store.sync(me);
           if (me.state) {
             preloadedState = me.state;
+          }
+          if (me.stats && me.stats.achievements) {
+            checkAndShowBadgeUnlock(me.stats.achievements);
           }
           const hasCustomHandle = safeGet("cricketle:username_set_" + me.user.id) === "1";
           if (!hasCustomHandle && (me.user.googleConnected || me.user.google_id)) {
@@ -2549,6 +2691,13 @@
     }
     tick();
     setInterval(tick, 250);
+    setTimeout(() => {
+      try {
+        const today = app.day || core.todayKey();
+        core.ranksFor(today, "easy", 0);
+        core.ranksFor(today, "hard", 0);
+      } catch (_) {}
+    }, 100);
   }
 
   // Exposed for tests and debugging.

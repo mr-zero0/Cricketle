@@ -3045,3 +3045,82 @@ dialog,
     scroll-behavior: auto !important;
   }
 }
+
+/* Badge Unlock Toast Banner */
+.badge-toast-container {
+  position: fixed;
+  top: 72px;
+  right: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: min(92vw, 380px);
+}
+.badge-unlock-banner {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--card-solid, #1e293b);
+  border: 1px solid var(--accent, #f59e0b);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(245, 158, 11, 0.25);
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--fg);
+}
+.badge-unlock-banner.leaving {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.badge-unlock-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #f59e0b;
+}
+.badge-unlock-text {
+  flex: 1;
+  min-width: 0;
+}
+.badge-unlock-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+.badge-unlock-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+}
+.badge-unlock-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 2px 0 0;
+}
+.badge-unlock-close {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+}
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

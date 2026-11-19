@@ -1020,6 +1020,12 @@ function createApp(opts = {}) {
       return send(res, 200, await game.leaderboardAllTime(user ? user.id : null, clampLimit(query.get("limit"), 50, 50)));
     }
 
+    if (key === "GET /api/leaderboard/fastest") {
+      rateLimit(req, "leaderboard", 120, 60 * 1000);
+      const user = await currentUser(req);
+      return send(res, 200, await game.leaderboardFastest(user ? user.id : null, clampLimit(query.get("limit"), 50, 50)));
+    }
+
     // ---------- Admin Endpoints ----------
 
     if (key === "POST /api/admin/login") {

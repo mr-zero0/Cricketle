@@ -468,8 +468,8 @@
   }
 
   function getHintsForPuzzle(player, mode, guesses) {
-    const nationIdentified = isNationIdentified(player, guesses);
-    const roleIdentified = isRoleIdentified(player, guesses);
+    const nationIdentified = mode === "easy" && isNationIdentified(player, guesses);
+    const roleIdentified = mode === "easy" && isRoleIdentified(player, guesses);
 
     const pool = [];
 
@@ -972,6 +972,84 @@
       check: function (s) {
         const pts = s.allTimePoints || 0;
         return { unlocked: pts >= 6000, progress: { current: Math.min(6000, pts), max: 6000, pct: Math.min(100, Math.round((pts / 6000) * 100)) } };
+      },
+    },
+    {
+      id: "speed_demon",
+      title: "Speed Demon",
+      desc: "Solve any cricket puzzle in under 15 seconds.",
+      tier: "diamond",
+      icon: "bolt",
+      check: function (s, h) {
+        const hit = h.some(function (p) {
+          return p.status === "solved" && p.started_at && p.finished_at && (p.finished_at - p.started_at) <= 15000;
+        });
+        return { unlocked: hit, progress: { current: hit ? 1 : 0, max: 1, pct: hit ? 100 : 0 } };
+      },
+    },
+    {
+      id: "login_streak_3",
+      title: "Daily Opener",
+      desc: "Maintain a 3-day consecutive login streak.",
+      tier: "bronze",
+      icon: "flame",
+      check: function (s) {
+        const streak = s.loginStreak || 0;
+        return { unlocked: streak >= 3, progress: { current: Math.min(3, streak), max: 3, pct: Math.min(100, Math.round((streak / 3) * 100)) } };
+      },
+    },
+    {
+      id: "login_streak_7",
+      title: "Dressing Room Regular",
+      desc: "Maintain a 7-day consecutive login streak.",
+      tier: "silver",
+      icon: "flame",
+      check: function (s) {
+        const streak = s.loginStreak || 0;
+        return { unlocked: streak >= 7, progress: { current: Math.min(7, streak), max: 7, pct: Math.min(100, Math.round((streak / 7) * 100)) } };
+      },
+    },
+    {
+      id: "variant_explorer",
+      title: "Variant Explorer",
+      desc: "Solve 3 different cricket game variants.",
+      tier: "silver",
+      icon: "medal",
+      check: function (s, h) {
+        const modes = new Set();
+        for (let i = 0; i < h.length; i++) {
+          if (h[i].status === "solved" && h[i].mode) modes.add(h[i].mode);
+        }
+        const c = modes.size;
+        return { unlocked: c >= 3, progress: { current: Math.min(3, c), max: 3, pct: Math.min(100, Math.round((c / 3) * 100)) } };
+      },
+    },
+    {
+      id: "variant_master",
+      title: "Cricket Polymath",
+      desc: "Solve 5 different cricket game variants.",
+      tier: "gold",
+      icon: "crown",
+      check: function (s, h) {
+        const modes = new Set();
+        for (let i = 0; i < h.length; i++) {
+          if (h[i].status === "solved" && h[i].mode) modes.add(h[i].mode);
+        }
+        const c = modes.size;
+        return { unlocked: c >= 5, progress: { current: Math.min(5, c), max: 5, pct: Math.min(100, Math.round((c / 5) * 100)) } };
+      },
+    },
+    {
+      id: "clutch_master",
+      title: "Clutch Finisher",
+      desc: "Score 140+ points on a single puzzle.",
+      tier: "diamond",
+      icon: "trophy",
+      check: function (s, h) {
+        const hit = h.some(function (p) {
+          return p.status === "solved" && (p.points || 0) >= 140;
+        });
+        return { unlocked: hit, progress: { current: hit ? 1 : 0, max: 1, pct: hit ? 100 : 0 } };
       },
     },
   ];

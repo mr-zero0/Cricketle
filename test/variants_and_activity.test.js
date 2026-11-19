@@ -242,3 +242,85 @@ test("POST /api/feedback/inaccuracy captures player reports and admin can view t
   }
 });
 
+test("GET /api/leaderboard/fastest returns fastest solves with variant and duration", async () => {
+  const app = await boot();
+  try {
+    const p1 = await registerUser(app.base, "flash_batter");
+    const p2 = await registerUser(app.base, "swift_bowler");
+
+    // p1 solves connections in 8500ms
+    await p1.post("/api/variant/complete", {
+      variant: "connections",
+      score: 95,
+      status: "solved",
+      durationMs: 8500,
+    });
+
+    // p2 solves stadium in 4200ms (faster!)
+    await p2.post("/api/variant/complete", {
+      variant: "stadium",
+      score: 100,
+      status: "solved",
+      durationMs: 4200,
+    });
+
+    // p1 also solves scorecard in 12000ms
+    await p1.post("/api/variant/complete", {
+      variant: "scorecard",
+      score: 90,
+      status: "solved",
+      durationMs: 12000,
+    });
+
+    // Check fastest leaderboard
+    const res = await p1.get("/api/leaderboard/fastest");
+    assert.equal(res.status, 200);
+    assert.ok(res.json.rows.length >= 2);
+    // Rank 1 should be p2 with 4200ms on stadium
+    assert.equal(res.json.rows[0].username, "swift_bowler");
+    assert.equal(res.json.rows[0].variant, "stadium");
+    assert.equal(res.json.rows[0].durationMs, 4200);
+
+    // Rank 2 should be p1 with 8500ms on connections
+    assert.equal(res.json.rows[1].username, "flash_batter");
+    assert.equal(res.json.rows[1].variant, "connections");
+    assert.equal(res.json.rows[1].durationMs, 8500);
+
+    // Viewer's own best solve is returned in me
+    assert.ok(res.json.me);
+    assert.equal(res.json.me.username, "flash_batter");
+  } finally {
+    await app.close();
+  }
+});
+
+test("maintains player login streak count across consecutive days", async () => {
+  const app = await boot();
+  try {
+    const userClient = await registerUser(app.base, "streak_keeper");
+
+    // Day 1
+    const d1 = await userClient.get("/api/me");
+    assert.equal(d1.status, 200);
+    assert.equal(d1.json.stats.loginStreak, 1);
+
+    // Advance to consecutive Day 2 (+24h)
+    app.setNow(T0 + 24 * 60 * 60 * 1000);
+    const d2 = await userClient.get("/api/me");
+    assert.equal(d2.status, 200);
+    assert.equal(d2.json.stats.loginStreak, 2);
+
+    // Same day visit retains streak 2
+    app.setNow(T0 + (24 + 2) * 60 * 60 * 1000);
+    const d2b = await userClient.get("/api/me");
+    assert.equal(d2b.json.stats.loginStreak, 2);
+
+    // Missed a day -> Advance to Day 5 (+4 days)
+    app.setNow(T0 + 4 * 24 * 60 * 60 * 1000);
+    const d5 = await userClient.get("/api/me");
+    assert.equal(d5.json.stats.loginStreak, 1);
+  } finally {
+    await app.close();
+  }
+});
+

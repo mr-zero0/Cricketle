@@ -991,6 +991,7 @@
     <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M5 7l7-3 7 3M5 7L2 15h6L5 7zm14 0l-3 8h6l-3-8zM9 21h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-scramble" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20l5.5-5.5M21 3l-7 7M4 4l16 16M16 21h5v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-pixel" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0V4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4m-4 3h8m-6 0v-3h4v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
 
@@ -1019,8 +1020,12 @@
         <svg class="i-sun" width="22" height="22" aria-hidden="true"><use href="#i-sun"/></svg>
         <svg class="i-moon" width="22" height="22" aria-hidden="true"><use href="#i-moon"/></svg>
       </button>
-      <a href="index.html#profile" class="icon-btn topbar-auth-btn" id="topbar-auth-btn" aria-label="Sign In or Account" title="Sign In / Profile">
+            <a href="index.html#leaderboard" class="icon-btn topbar-ranks-btn" id="topbar-ranks-btn" aria-label="Leaderboard" title="Leaderboard">
+        <svg class="i-trophy" width="20" height="20" aria-hidden="true"><use href="#i-trophy"/></svg>
+      </a>
+<a href="index.html#profile" class="icon-btn topbar-auth-btn" id="topbar-auth-btn" aria-label="Sign In or Account" title="Sign In / Profile">
         <svg class="i-user" width="20" height="20" aria-hidden="true"><use href="#i-user"/></svg>
+        <span id="nav-profile-label" class="sr-only">Sign in</span>
       </a>
     </div>
   </header>

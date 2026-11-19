@@ -475,6 +475,26 @@ test("ACHIEVEMENTS list covers tiers and progress evaluation", () => {
   // Golden arm: solved with 1 guess
   const goldenArm = solvedOne.find((a) => a.id === "golden_arm");
   assert.ok(goldenArm && goldenArm.unlocked);
+
+  // Speed demon: solved under 15s (15000 - 1000 = 14000ms)
+  const speedDemon = solvedOne.find((a) => a.id === "speed_demon");
+  assert.ok(speedDemon && speedDemon.unlocked);
+
+  // Login streak achievements
+  const streakAch = core.evaluateAchievements({ loginStreak: 7 }, []);
+  const streak3 = streakAch.find((a) => a.id === "login_streak_3");
+  const streak7 = streakAch.find((a) => a.id === "login_streak_7");
+  assert.ok(streak3 && streak3.unlocked);
+  assert.ok(streak7 && streak7.unlocked);
+
+  // Variant explorer achievements
+  const multivarAch = core.evaluateAchievements({}, [
+    { mode: "connections", status: "solved" },
+    { mode: "stadium", status: "solved" },
+    { mode: "pixel", status: "solved" },
+  ]);
+  const varExp = multivarAch.find((a) => a.id === "variant_explorer");
+  assert.ok(varExp && varExp.unlocked);
 });
 
 test("streakDetails calculates current streak, best streak, and week calendar", () => {
